@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV Builder - Manik Rnika</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
 body{
     font-family:'Poppins',sans-serif;
@@ -23,7 +22,7 @@ body{
 }
 h1{text-align:center;color:#6A1B9A;margin-bottom:25px;}
 label{font-weight:600;margin-top:10px;display:block;}
-input,textarea{
+input,textarea,select{
     width:100%;
     padding:10px;
     border-radius:6px;
@@ -37,33 +36,39 @@ button{
     border:none;
     border-radius:12px;
     cursor:pointer;
-    font-weight:600;
+    margin-right:10px;
+    font-weight:600
 }
 .preview-btn{background:#FB8C00}
+.print-btn{background:#43A047}
 .add-btn{background:silver}
 
-/* Webpage banner only */
+/* Top banner visible only on webpage */
 #topBanner{
     width:100%;
     height:180px;
-    background:url('manika.jpeg') center / cover no-repeat;
+    background: url('manika.jpeg') center center / cover no-repeat;
+    border-radius:12px;
     margin-bottom:20px;
 }
 
-/* Hide everything except popup while printing */
+/* CV Preview hidden */
+#cvPreview{display:none;}
+
+/* Hide top banner when printing */
 @media print{
-    body * { visibility:hidden; }
-    .page, .page * { visibility:visible; }
+    #topBanner, .container{display:none;}
 }
 </style>
 </head>
-
 <body>
 
+<!-- Webpage Top Banner -->
 <div id="topBanner"></div>
 
 <div class="container">
-<h1>(MANIK_A_RNIKA) CV Builder</h1>
+<h1>(MANIK_A_RNIKA)</h1>
+<h1>****RESUME_BUILDER_****</h1>
 
 <label>Upload Photo</label>
 <input type="file" id="photo" accept="image/*">
@@ -81,17 +86,15 @@ button{
 <textarea id="address">Bengaluru, Karnataka, India</textarea>
 
 <label>Career Objective</label>
-<textarea id="objective" rows="6">
-A highly motivated and detail-oriented professional seeking a challenging role where I can apply my technical skills, creativity, and problem-solving abilities to contribute to organizational success while continuously enhancing my knowledge and professional growth.
-</textarea>
+<textarea id="objective" rows="6">A highly motivated and detail-oriented professional seeking a challenging role where I can apply my technical skills, creativity, and problem-solving abilities to contribute to organizational success while continuously enhancing my knowledge and professional growth.</textarea>
 
 <label>Professional Summary</label>
-<textarea id="summary">Results-driven professional with hands-on experience in modern technologies.</textarea>
+<textarea id="summary">Results-driven professional with hands-on experience in modern technologies and a passion for continuous learning.</textarea>
 
-<label>Academic Details</label>
+<label>Academic Details (COURSE, INSTITUTE/UNIVERSITY, YEAR, PERCENTAGE/GPA)</label>
 <div id="academicsContainer">
-    <div style="display:flex; gap:5px;">
-        <input value="B.Tech CSE">
+    <div style="display:flex; gap:5px; margin-bottom:5px;">
+        <input value="B.Tech in Computer Science">
         <input value="XYZ University">
         <input value="2023">
         <input value="8.5/10">
@@ -103,19 +106,19 @@ A highly motivated and detail-oriented professional seeking a challenging role w
 <textarea id="education">Bachelor of Technology in Computer Science</textarea>
 
 <label>Experience</label>
-<textarea id="experience">Frontend Developer – ABC Technologies</textarea>
+<textarea id="experience">Frontend Developer – ABC Technologies (2022–Present)</textarea>
 
-<label>Technical Skills</label>
-<input id="techSkills" value="HTML, CSS, JavaScript, React">
+<label>Technical Skills (comma separated)</label>
+<input id="techSkills" value="HTML, CSS, JavaScript, React, Node.js">
 
-<label>Projects</label>
-<textarea id="projects">Resume Builder, Portfolio Website</textarea>
+<label>Projects Done Earlier</label>
+<textarea id="projects">Resume Builder App, E-commerce Platform, Analytics Dashboard</textarea>
 
-<label>Strengths</label>
-<textarea id="habits">Quick learner, Team player</textarea>
+<label>Habits / Strengths</label>
+<textarea id="habits">Quick learner, disciplined, creative thinker, team player</textarea>
 
 <label>Declaration</label>
-<textarea id="declaration">I hereby declare that the above information is true.</textarea>
+<textarea id="declaration">I hereby declare that the above information is true and correct to the best of my knowledge.</textarea>
 
 <label>Place</label>
 <input id="place" value="Bengaluru">
@@ -129,96 +132,177 @@ A highly motivated and detail-oriented professional seeking a challenging role w
 <button class="preview-btn" onclick="showPreviewPopup()">Preview CV</button>
 </div>
 
-<div id="cvPreview" style="display:none;"></div>
+<div id="cvPreview"></div>
 
 <script>
+// Add more academic rows
 function addAcademic(){
-    const d=document.createElement("div");
-    d.style.display="flex"; d.style.gap="5px";
-    d.innerHTML=`<input><input><input><input>`;
-    academicsContainer.appendChild(d);
+    const container = document.getElementById("academicsContainer");
+    const div = document.createElement("div");
+    div.style.display = "flex";
+    div.style.gap = "5px";
+    div.style.marginBottom = "5px";
+    div.innerHTML = `<input value=""><input value=""><input value=""><input value="">`;
+    container.appendChild(div);
 }
 
+// Generate CV preview
 function updatePreview(){
-    cvPreview.innerHTML="";
-    const page=document.createElement("div");
-    page.className="page";
-    page.style.width="210mm";
-    page.style.minHeight="297mm";
-    page.style.border="10px solid #6A1B9A";
-    page.style.boxShadow="0 0 0 5px #FF5722 inset";
-    page.style.padding="15mm";
-    page.style.boxSizing="border-box";
-    page.style.background="#fff";
+    const cvPreview = document.getElementById("cvPreview");
+    cvPreview.innerHTML = ""; 
 
-    const header=document.createElement("div");
-    header.style.display="flex"; header.style.alignItems="center";
-    const img=document.createElement("img");
-    img.style.width="100px"; img.style.height="100px"; img.style.borderRadius="50%";
-    if(photo.files[0]){
-        const r=new FileReader();
-        r.onload=e=>img.src=e.target.result;
-        r.readAsDataURL(photo.files[0]);
+    const page = document.createElement("div");
+    page.className = "page";
+    page.style.width = "210mm";
+    page.style.minHeight = "297mm";
+    page.style.padding = "15mm";
+    page.style.border = "10px solid #6A1B9A";
+    page.style.background = "#FAFAFA";
+    page.style.boxSizing = "border-box";
+    page.style.position = "relative";
+    page.style.overflow = "hidden";
+    page.style.margin = "auto";
+    page.style.boxShadow = "0 0 0 5px #FF5722 inset";
+
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.alignItems = "center";
+    header.style.marginBottom = "15px";
+    const photoInput = document.getElementById("photo");
+    const img = document.createElement("img");
+    img.style.width = "100px"; img.style.height = "100px";
+    img.style.borderRadius = "50%"; img.style.objectFit = "cover"; img.style.marginRight = "15px";
+    if(photoInput.files[0]){
+        const reader = new FileReader();
+        reader.onload = e => { img.src = e.target.result; };
+        reader.readAsDataURL(photoInput.files[0]);
     }
     header.appendChild(img);
 
-    const t=document.createElement("div");
-    t.innerHTML=`<h1>${fullName.value}</h1><p>${email.value} | ${phone.value} | ${address.value}</p>`;
-    header.appendChild(t);
+    const headText = document.createElement("div");
+    const h1 = document.createElement("h1");
+    h1.innerText = document.getElementById("fullName").value;
+    h1.style.margin = "0"; h1.style.fontSize = "24px";
+    const contact = document.createElement("p");
+    contact.innerText = `${document.getElementById("email").value} | ${document.getElementById("phone").value} | ${document.getElementById("address").value}`;
+    headText.appendChild(h1);
+    headText.appendChild(contact);
+    header.appendChild(headText);
     page.appendChild(header);
 
-    function sec(h,v){
-        page.innerHTML+=`<h3>${h}</h3><p>${v}</p>`;
+    function addSection(title, value){
+        const section = document.createElement("div");
+        section.className = "section";
+        const h2 = document.createElement("h2");
+        h2.innerText = title;
+        h2.style.background = "linear-gradient(90deg,#2E7D32,#66BB6A)";
+        h2.style.color = "#fff";
+        h2.style.padding = "6px 10px";
+        h2.style.borderRadius = "18px";
+        h2.style.fontSize = "16px";
+        h2.style.letterSpacing = ".5px";
+        const p = document.createElement("p");
+        p.innerText = value;
+        section.appendChild(h2);
+        section.appendChild(p);
+        page.appendChild(section);
     }
 
-    sec("Career Objective",objective.value);
-    sec("Professional Summary",summary.value);
-    sec("Education",education.value);
-    sec("Experience",experience.value);
-    sec("Projects",projects.value);
-    sec("Declaration",declaration.value);
+    addSection("Career Objective", document.getElementById("objective").value);
+    addSection("Professional Summary", document.getElementById("summary").value);
 
-    page.innerHTML+=`<br><div style="display:flex;justify-content:space-between">
-    <span>Place: ${place.value}</span>
-    <span>Date: ${date.value}</span>
-    <span>Signature: ${signature.value}</span></div>`;
+    // Academics table
+    const academicsSection = document.createElement("div");
+    academicsSection.className = "section";
+    const h2Academics = document.createElement("h2");
+    h2Academics.innerText = "Academic Details";
+    academicsSection.appendChild(h2Academics);
+
+    const table = document.createElement("table");
+    const trHead = document.createElement("tr");
+    ["COURSE","INSTITUTE/UNIVERSITY","YEAR","PERCENTAGE/GPA"].forEach(h=>{
+        const th = document.createElement("th"); th.innerText = h; trHead.appendChild(th);
+    });
+    table.appendChild(trHead);
+
+    document.querySelectorAll("#academicsContainer div").forEach(div=>{
+        const inputs = div.querySelectorAll("input");
+        const tr = document.createElement("tr");
+        [0,1,2,3].forEach(i=>{
+            const td = document.createElement("td");
+            td.innerText = inputs[i].value || "-";
+            tr.appendChild(td);
+        });
+        table.appendChild(tr);
+    });
+    academicsSection.appendChild(table);
+    page.appendChild(academicsSection);
+
+    addSection("Education", document.getElementById("education").value);
+    addSection("Experience", document.getElementById("experience").value);
+
+    const skillsSection = document.createElement("div");
+    skillsSection.className="section";
+    const h2skills = document.createElement("h2"); h2skills.innerText="Technical Skills";
+    skillsSection.appendChild(h2skills);
+    const skillsDiv = document.createElement("div");
+    skillsDiv.style.display="flex"; skillsDiv.style.flexWrap="wrap"; skillsDiv.style.gap="5px";
+    (document.getElementById("techSkills").value||"").split(",").forEach(s=>{
+        if(s.trim()){
+            const span=document.createElement("span");
+            span.innerText=s.trim();
+            span.style.background="#6a1b9a"; span.style.color="#fff"; span.style.padding="5px 10px"; span.style.borderRadius="12px";
+            skillsDiv.appendChild(span);
+        }
+    });
+    skillsSection.appendChild(skillsDiv);
+    page.appendChild(skillsSection);
+
+    addSection("Projects", document.getElementById("projects").value);
+    addSection("Habits / Strengths", document.getElementById("habits").value);
+    addSection("Declaration", document.getElementById("declaration").value);
+
+    const sig = document.createElement("div");
+    sig.style.display = "flex"; sig.style.justifyContent = "space-between"; sig.style.marginTop = "20px";
+    sig.innerHTML = `<div>Place: ${document.getElementById("place").value}</div>
+                     <div>Date: ${document.getElementById("date").value}</div>
+                     <div>Signature: ${document.getElementById("signature").value}</div>`;
+    page.appendChild(sig);
 
     cvPreview.appendChild(page);
 }
 
 function showPreviewPopup(){
     updatePreview();
-    const c=cvPreview.innerHTML;
-    const p=window.open("","_blank","width=1000,height=1200");
-    p.document.write(`
-<html>
-<head>
-<style>
-@page{margin:0; size:A4;}
-body{
-    margin:0;
-    display:flex;
-    justify-content:center;
-    background:#eee;
-}
-.scale-wrapper{
-    transform:scale(0.94);
-    transform-origin:top center;
-}
-</style>
-</head>
-<body>
-<div class="scale-wrapper">
-${c}
-</div>
-<div style="position:fixed;top:10px;right:10px;">
-<button onclick="window.print()">Print</button>
-<button onclick="window.close()">Close</button>
-</div>
-</body>
-</html>
-`);
-    p.document.close();
+    const content = document.getElementById("cvPreview").innerHTML;
+    const popup = window.open("", "_blank", "width=950,height=1200,scrollbars=yes");
+    popup.document.write(`<html><head><title>CV Preview</title>
+    <style>
+    body{margin:0; font-family:'Poppins',sans-serif; display:flex; justify-content:center; background:#f0f0f0; padding:20px;}
+    .page{width:210mm; min-height:297mm; padding:15mm; border:10px solid #6A1B9A; background:#fff; box-sizing:border-box; position:relative; overflow:hidden; box-shadow:0 0 0 5px #FF5722 inset;}
+    .page h1{margin:0;font-size:24px;}
+    .page p{margin:5px 0;font-size:14px;}
+    .section{margin-top:14px;}
+    .section h2{background:linear-gradient(90deg,#2E7D32,#66BB6A); color:#fff; padding:6px 10px; border-radius:18px; font-size:16px; letter-spacing:.5px;}
+    .section p, table{font-size:14px; margin-top:8px; line-height:1.5; word-break:break-word;}
+    table{width:100%; border-collapse:collapse;}
+    table, th, td{border:1px solid #666;}
+    th, td{padding:6px; text-align:left;}
+    th{background:#4caf50; color:#fff;}
+    span{display:inline-block; background:#6a1b9a; color:#fff; padding:5px 10px; margin:3px; border-radius:12px; font-size:13px;}
+    .popupBtns{position:fixed; top:10px; right:10px; display:flex; gap:10px;}
+    .popupBtns button{padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
+    .printBtn{background:#43A047; color:#fff;}
+    .closeBtn{background:#f44336; color:#fff;}
+    </style>
+    </head><body>
+    <div class="popupBtns">
+        <button class="printBtn" onclick="window.print()">Print</button>
+        <button class="closeBtn" onclick="window.close()">Close</button>
+    </div>
+    ${content}
+    </body></html>`);
+    popup.document.close();
 }
 </script>
 
