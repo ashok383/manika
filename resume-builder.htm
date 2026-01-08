@@ -73,60 +73,60 @@ button{
 <input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName" placeholder="John Michael Doe">
+<input id="fullName" value="John Michael Doe">
 
 <label>Email</label>
-<input id="email" placeholder="john.doe@email.com">
+<input id="email" value="john.doe@email.com">
 
 <label>Phone</label>
-<input id="phone" placeholder="+91 98765 43210">
+<input id="phone" value="+91 98765 43210">
 
 <label>Address</label>
-<textarea id="address" placeholder="Bengaluru, Karnataka, India"></textarea>
+<textarea id="address">Bengaluru, Karnataka, India</textarea>
 
 <label>Career Objective</label>
-<textarea id="objective" placeholder="A highly motivated and detail-oriented professional seeking a challenging role where I can apply my technical skills, creativity, and problem-solving abilities to contribute to organizational success while continuously enhancing my knowledge and professional growth." rows="6"></textarea>
+<textarea id="objective" rows="6">A highly motivated and detail-oriented professional seeking a challenging role where I can apply my technical skills, creativity, and problem-solving abilities to contribute to organizational success while continuously enhancing my knowledge and professional growth.</textarea>
 
 <label>Professional Summary</label>
-<textarea id="summary" placeholder="Results-driven professional with hands-on experience in modern technologies and a passion for continuous learning."></textarea>
+<textarea id="summary">Results-driven professional with hands-on experience in modern technologies and a passion for continuous learning.</textarea>
 
 <label>Academic Details (COURSE, INSTITUTE/UNIVERSITY, YEAR, PERCENTAGE/GPA)</label>
 <div id="academicsContainer">
     <div style="display:flex; gap:5px; margin-bottom:5px;">
-        <input placeholder="COURSE">
-        <input placeholder="INSTITUTE/UNIVERSITY">
-        <input placeholder="YEAR">
-        <input placeholder="PERCENTAGE/GPA">
+        <input value="B.Tech in Computer Science">
+        <input value="XYZ University">
+        <input value="2023">
+        <input value="8.5/10">
     </div>
 </div>
 <button class="add-btn" onclick="addAcademic()">Add Academic</button>
 
 <label>Education</label>
-<textarea id="education" placeholder="Bachelor of Technology in Computer Science"></textarea>
+<textarea id="education">Bachelor of Technology in Computer Science</textarea>
 
 <label>Experience</label>
-<textarea id="experience" placeholder="Frontend Developer – ABC Technologies (2022–Present)"></textarea>
+<textarea id="experience">Frontend Developer – ABC Technologies (2022–Present)</textarea>
 
 <label>Technical Skills (comma separated)</label>
-<input id="techSkills" placeholder="HTML, CSS, JavaScript, React, Node.js">
+<input id="techSkills" value="HTML, CSS, JavaScript, React, Node.js">
 
 <label>Projects Done Earlier</label>
-<textarea id="projects" placeholder="Resume Builder App, E-commerce Platform, Analytics Dashboard"></textarea>
+<textarea id="projects">Resume Builder App, E-commerce Platform, Analytics Dashboard</textarea>
 
 <label>Habits / Strengths</label>
-<textarea id="habits" placeholder="Quick learner, disciplined, creative thinker, team player"></textarea>
+<textarea id="habits">Quick learner, disciplined, creative thinker, team player</textarea>
 
 <label>Declaration</label>
-<textarea id="declaration" placeholder="I hereby declare that the above information is true and correct to the best of my knowledge."></textarea>
+<textarea id="declaration">I hereby declare that the above information is true and correct to the best of my knowledge.</textarea>
 
 <label>Place</label>
-<input id="place" placeholder="Bengaluru">
+<input id="place" value="Bengaluru">
 
 <label>Date</label>
 <input id="date" type="date">
 
 <label>Signature</label>
-<input id="signature" placeholder="Your Name">
+<input id="signature" value="John Michael Doe">
 
 <button class="preview-btn" onclick="showPreviewPopup()">Preview CV</button>
 </div>
@@ -134,16 +134,18 @@ button{
 <div id="cvPreview"></div>
 
 <script>
+// Add more academic rows
 function addAcademic(){
     const container = document.getElementById("academicsContainer");
     const div = document.createElement("div");
     div.style.display = "flex";
     div.style.gap = "5px";
     div.style.marginBottom = "5px";
-    div.innerHTML = `<input placeholder="COURSE"><input placeholder="INSTITUTE/UNIVERSITY"><input placeholder="YEAR"><input placeholder="%/GPA">`;
+    div.innerHTML = `<input value=""><input value=""><input value=""><input value="">`;
     container.appendChild(div);
 }
 
+// Generate CV preview
 function updatePreview(){
     const cvPreview = document.getElementById("cvPreview");
     cvPreview.innerHTML = ""; 
@@ -161,7 +163,6 @@ function updatePreview(){
     page.style.margin = "auto";
     page.style.boxShadow = "0 0 0 5px #FF5722 inset";
 
-    // Header with uploaded photo
     const header = document.createElement("div");
     header.style.display = "flex";
     header.style.alignItems = "center";
@@ -179,10 +180,10 @@ function updatePreview(){
 
     const headText = document.createElement("div");
     const h1 = document.createElement("h1");
-    h1.innerText = document.getElementById("fullName").value || "John Michael Doe";
+    h1.innerText = document.getElementById("fullName").value;
     h1.style.margin = "0"; h1.style.fontSize = "24px";
     const contact = document.createElement("p");
-    contact.innerText = `${document.getElementById("email").value || "john.doe@email.com"} | ${document.getElementById("phone").value || "+91 98765 43210"} | ${document.getElementById("address").value || "Bengaluru"}`;
+    contact.innerText = `${document.getElementById("email").value} | ${document.getElementById("phone").value} | ${document.getElementById("address").value}`;
     headText.appendChild(h1);
     headText.appendChild(contact);
     header.appendChild(headText);
@@ -239,7 +240,6 @@ function updatePreview(){
     addSection("Education", document.getElementById("education").value);
     addSection("Experience", document.getElementById("experience").value);
 
-    // Skills
     const skillsSection = document.createElement("div");
     skillsSection.className="section";
     const h2skills = document.createElement("h2"); h2skills.innerText="Technical Skills";
@@ -261,12 +261,11 @@ function updatePreview(){
     addSection("Habits / Strengths", document.getElementById("habits").value);
     addSection("Declaration", document.getElementById("declaration").value);
 
-    // Place, Date, Signature
     const sig = document.createElement("div");
     sig.style.display = "flex"; sig.style.justifyContent = "space-between"; sig.style.marginTop = "20px";
-    sig.innerHTML = `<div>Place: ${document.getElementById("place").value || "-"}</div>
-                     <div>Date: ${document.getElementById("date").value || "-"}</div>
-                     <div>Signature: ${document.getElementById("signature").value || "-"}</div>`;
+    sig.innerHTML = `<div>Place: ${document.getElementById("place").value}</div>
+                     <div>Date: ${document.getElementById("date").value}</div>
+                     <div>Signature: ${document.getElementById("signature").value}</div>`;
     page.appendChild(sig);
 
     cvPreview.appendChild(page);
