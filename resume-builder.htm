@@ -31,7 +31,7 @@ button:hover{background:#ff6b6b}
     width:210mm;min-height:297mm;padding:20mm;
     background:#fff;border:10px solid;
     border-image:linear-gradient(45deg,#ff6b6b,#fbc531,#2a2a72) 1;
-    border-radius:15px;margin:20px auto;
+    border-radius:15px;margin:20px auto;display:none;
 }
 .pdf-header{
     display:flex;align-items:center;
@@ -50,13 +50,6 @@ button:hover{background:#ff6b6b}
 .skills span{
     display:inline-block;background:#2a2a72;color:#fff;
     padding:6px 12px;border-radius:20px;margin:5px;font-size:.9rem;
-}
-
-/* Print */
-@media print{
-    body *{visibility:hidden}
-    #pdfContent,#pdfContent *{visibility:visible}
-    #pdfContent{position:absolute;top:0;left:0}
 }
 </style>
 </head>
@@ -100,10 +93,92 @@ button:hover{background:#ff6b6b}
 <input id="techSkills" placeholder="HTML, CSS, JavaScript, React, Node.js, Python">
 
 <label>Projects Done Earlier</label>
-<textarea id="projects" placeholder="Portfolio Website – Developed personal portfolio using HTML, CSS, JS&#10;E-Commerce App – Built a React-based e-commerce platform with payment integration&#10>Data Analysis Project – Analyzed sales data using Python and visualized results."></textarea>
+<textarea id="projects" placeholder="Portfolio Website – Developed personal portfolio using HTML, CSS, JS&#10;E-Commerce App – Built a React-based e-commerce platform with payment integration&#10;Data Analysis Project – Analyzed sales data using Python and visualized results."></textarea>
 
 <label>Habits / Strengths</label>
 <textarea id="habits" placeholder="Self-motivated, disciplined, team player, fast learner, adaptable"></textarea>
 
 <label>Declaration</label>
 <textarea id="declaration" placeholder="I hereby declare that the information provided above is true and correct to the best of my knowledge."></textarea>
+
+<button onclick="updatePreview()">Preview CV</button>
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<!-- ===== CV PREVIEW ===== -->
+<div id="pdfContent">
+
+<div class="pdf-header">
+    <img id="pdfPhoto" src="" alt="Profile Photo">
+    <div>
+        <h1 id="pdfName">Your Name</h1>
+        <p id="pdfContact">Email | Phone | Address</p>
+    </div>
+</div>
+
+<div class="section"><h2>Career Objective</h2><p id="pdfObjective">-</p></div>
+<div class="section"><h2>Professional Summary</h2><p id="pdfSummary">-</p></div>
+<div class="section"><h2>Academic Details</h2><p id="pdfAcademics">-</p></div>
+<div class="section"><h2>Education</h2><p id="pdfEducation">-</p></div>
+<div class="section"><h2>Experience</h2><p id="pdfExperience">-</p></div>
+
+<div class="section">
+<h2>Technical Skills</h2>
+<div class="skills" id="pdfTechSkills"></div>
+</div>
+
+<div class="section"><h2>Projects</h2><p id="pdfProjects">-</p></div>
+<div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits">-</p></div>
+<div class="section"><h2>Declaration</h2><p id="pdfDeclaration">-</p></div>
+
+</div>
+
+<!-- ===== JS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function updatePreview(){
+    pdfContent.style.display="block";
+    pdfName.innerText = fullName.value || "John Doe";
+    pdfContact.innerText = `${email.value || "email@example.com"} | ${phone.value || "+91-XXXXXXXXXX"} | ${address.value || "Address"}`;
+    pdfObjective.innerText = objective.value || "To secure a challenging position where I can apply my skills.";
+    pdfSummary.innerText = summary.value || "A highly motivated professional with relevant experience.";
+    pdfAcademics.innerText = academics.value || "B.Tech Computer Science – 85%, XYZ University";
+    pdfEducation.innerText = education.value || "Bachelor of Technology in Computer Science – XYZ University";
+    pdfExperience.innerText = experience.value || "Frontend Developer at ABC Company (2022-Present)";
+    pdfProjects.innerText = projects.value || "Portfolio Website – Developed personal portfolio using HTML, CSS, JS";
+    pdfHabits.innerText = habits.value || "Self-motivated, disciplined, team player";
+    pdfDeclaration.innerText = declaration.value || "I hereby declare that the information provided is true.";
+
+    pdfTechSkills.innerHTML="";
+    techSkills.value.split(",").forEach(skill=>{
+        if(skill.trim()){
+            let span=document.createElement("span");
+            span.innerText=skill.trim();
+            pdfTechSkills.appendChild(span);
+        }
+    });
+
+    if(photo.files[0]){
+        let r=new FileReader();
+        r.onload=()=>pdfPhoto.src=r.result;
+        r.readAsDataURL(photo.files[0]);
+    }
+}
+
+// Download as PDF
+function downloadPDF(){
+    updatePreview(); // Ensure preview is updated
+    const element = document.getElementById('pdfContent');
+    const opt = {
+        margin:       0.5,
+        filename:     `${fullName.value || 'Resume'}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+</body>
+</html>
