@@ -76,8 +76,8 @@ button{
 <label>Full Name</label>
 <input id="fullName" value="MANIKARNIKA">
 
-<label>Date</label>
-<input id="date" type="date">
+<label>Date_of_Birth</label>
+<input id="date_of_birth" type="date">
 
 <label>Email</label>
 <input id="email" value="john.doe@email.com">
@@ -94,7 +94,7 @@ button{
 <label>Professional Summary</label>
 <textarea id="summary">Results-driven professional with hands-on experience in modern technologies and a passion for continuous learning.</textarea>
 
-<label>Academic Details (COURSE, INSTITUTE/UNIVERSITY, YEAR, PERCENTAGE/GPA)</label>
+<label>Academic Details (COURSE, INSTITUTE/UNIVERSITY, YEAR, GPA/PERCENTAGE)</label>
 <div id="academicsContainer">
     <div style="display:flex; gap:5px; margin-bottom:5px;">
         <input value="B.Tech in Computer Science">
@@ -223,7 +223,7 @@ function updatePreview(){
 
     const table = document.createElement("table");
     const trHead = document.createElement("tr");
-    ["COURSE","INSTITUTE/UNIVERSITY","YEAR","PERCENTAGE/GPA"].forEach(h=>{
+    ["COURSE","INSTITUTE/UNIVERSITY","YEAR","GPA/PERCENTAGE"].forEach(h=>{
         const th = document.createElement("th"); th.innerText = h; trHead.appendChild(th);
     });
     table.appendChild(trHead);
