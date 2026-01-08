@@ -3,52 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>(MANIK_A_RNIKA) CV Builder - Preview & Print</title>
+<title>(MANIK_A_RNIKA) CV Builder</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-body {
-    font-family: 'Poppins', sans-serif;
-    margin:0; padding:0; background: #f0f2f5;
+body{font-family:'Poppins',sans-serif;background:#f0f2f5;margin:0}
+.container{
+    max-width:900px;margin:30px auto;padding:30px;
+    background:#fff;border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
-.container {
-    max-width:900px; margin:30px auto; padding:30px; background:#fff;
-    border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1);
+h1{text-align:center;color:#2a2a72}
+label{font-weight:600;margin-top:10px;display:block}
+input,textarea{
+    width:100%;padding:10px;border-radius:8px;
+    border:1px solid #ccc;margin-bottom:12px;
 }
-h1 { text-align:center; color:#2a2a72; font-size:2.2rem; margin-bottom:20px;}
-label { display:block; margin:5px 0 5px 0; font-weight:600;}
-input, textarea { width:100%; padding:10px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;}
-button { background:#2a2a72; color:#fff; padding:12px 25px; border:none; border-radius:10px; cursor:pointer; font-size:1rem; margin-right:10px;}
-button:hover { background:#ff6b6b;}
+button{
+    background:#2a2a72;color:#fff;padding:12px 25px;
+    border:none;border-radius:10px;cursor:pointer;margin-right:10px;
+}
+button:hover{background:#ff6b6b}
 
-/* PDF / Preview Styles */
-#pdfContent {
-    width:210mm; min-height:297mm; padding:20mm;
-    box-sizing:border-box; background:#fff;
-    border: 10px solid; border-image-slice:1;
-    border-image-source: linear-gradient(45deg, #ff6b6b, #fbc531, #2a2a72, #ff6b6b);
-    border-radius:15px; font-family:'Poppins', sans-serif;
-    margin:20px auto;
+/* ===== CV PREVIEW ===== */
+#pdfContent{
+    width:210mm;min-height:297mm;padding:20mm;
+    background:#fff;border:10px solid;
+    border-image:linear-gradient(45deg,#ff6b6b,#fbc531,#2a2a72) 1;
+    border-radius:15px;margin:20px auto;
 }
-.pdf-header {
-    display:flex; align-items:center; background:#2a2a72; color:#fff;
-    padding:20px; border-radius:12px; margin-bottom:20px;
+.pdf-header{
+    display:flex;align-items:center;
+    background:#2a2a72;color:#fff;
+    padding:20px;border-radius:12px;
 }
-.pdf-header img { width:100px; height:100px; border-radius:50%; object-fit:cover; border:4px solid #fff; margin-right:20px;}
-.pdf-header div h1 { margin:0; font-size:1.8rem;}
-.pdf-header div p { margin:5px 0 0 0; font-size:0.95rem;}
-.section { margin-top:15px;}
-.section h2 { background:#ff6b6b; color:#fff; padding:5px 10px; border-radius:5px; margin-bottom:10px; font-size:1.1rem;}
-.section p { margin:5px 0; line-height:1.4;}
-.skills span { display:inline-block; background:#2a2a72; color:#fff; padding:6px 12px; border-radius:20px; margin:5px 5px 5px 0; font-size:0.9rem;}
+.pdf-header img{
+    width:100px;height:100px;border-radius:50%;
+    border:4px solid #fff;object-fit:cover;margin-right:20px;
+}
+.section{margin-top:15px}
+.section h2{
+    background:#ff6b6b;color:#fff;
+    padding:6px 10px;border-radius:6px;font-size:1.1rem;
+}
+.skills span{
+    display:inline-block;background:#2a2a72;color:#fff;
+    padding:6px 12px;border-radius:20px;margin:5px;font-size:.9rem;
+}
 
-/* Hide PDF div when printing page controls */
-@media print {
-    body * { visibility: hidden; }
-    #pdfContent, #pdfContent * { visibility: visible; }
-    #pdfContent { position: absolute; left:0; top:0; width:100%; }
+/* Print */
+@media print{
+    body *{visibility:hidden}
+    #pdfContent,#pdfContent *{visibility:visible}
+    #pdfContent{position:absolute;top:0;left:0}
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -58,97 +70,105 @@ button:hover { background:#ff6b6b;}
 <input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName" placeholder="John Doe">
+<input id="fullName">
 
 <label>Email</label>
-<input id="email" placeholder="john@example.com">
+<input id="email">
 
 <label>Phone</label>
-<input id="phone" placeholder="+91 9876543210">
+<input id="phone">
 
 <label>Address</label>
-<textarea id="address" placeholder="City, State, Country"></textarea>
+<textarea id="address"></textarea>
+
+<label>Career Objective</label>
+<textarea id="objective"></textarea>
 
 <label>Professional Summary</label>
-<textarea id="summary" placeholder="Write a short summary about yourself"></textarea>
+<textarea id="summary"></textarea>
+
+<label>Academic Details (with %)</label>
+<textarea id="academics"></textarea>
 
 <label>Education</label>
-<textarea id="education" placeholder="Degree, College/University, Year"></textarea>
+<textarea id="education"></textarea>
 
 <label>Experience</label>
-<textarea id="experience" placeholder="Job Title, Company, Duration, Responsibilities"></textarea>
+<textarea id="experience"></textarea>
 
-<label>Skills (comma separated)</label>
-<input id="skills" placeholder="HTML, CSS, JavaScript">
+<label>Technical Skills (comma separated)</label>
+<input id="techSkills" placeholder="HTML, CSS, JavaScript, Node.js">
+
+<label>Projects Done Earlier</label>
+<textarea id="projects" placeholder="Project Name – Description"></textarea>
+
+<label>Habits / Strengths</label>
+<textarea id="habits" placeholder="Self-motivated, disciplined, team player"></textarea>
+
+<label>Declaration</label>
+<textarea id="declaration"></textarea>
 
 <button onclick="updatePreview()">Preview CV</button>
 <button onclick="window.print()">Print CV</button>
 </div>
 
-<!-- CV Preview / PDF Template -->
+<!-- ===== CV PREVIEW ===== -->
 <div id="pdfContent">
-    <div class="pdf-header">
-        <img id="pdfPhoto">
-        <div>
-            <h1 id="pdfName"></h1>
-            <p id="pdfContact"></p>
-        </div>
+
+<div class="pdf-header">
+    <img id="pdfPhoto">
+    <div>
+        <h1 id="pdfName"></h1>
+        <p id="pdfContact"></p>
     </div>
-    <div class="section">
-        <h2>Professional Summary</h2>
-        <p id="pdfSummary"></p>
-    </div>
-    <div class="section">
-        <h2>Education</h2>
-        <p id="pdfEducation"></p>
-    </div>
-    <div class="section">
-        <h2>Experience</h2>
-        <p id="pdfExperience"></p>
-    </div>
-    <div class="section">
-        <h2>Skills</h2>
-        <div class="skills" id="pdfSkills"></div>
-    </div>
+</div>
+
+<div class="section"><h2>Career Objective</h2><p id="pdfObjective"></p></div>
+<div class="section"><h2>Professional Summary</h2><p id="pdfSummary"></p></div>
+<div class="section"><h2>Academic Details</h2><p id="pdfAcademics"></p></div>
+<div class="section"><h2>Education</h2><p id="pdfEducation"></p></div>
+<div class="section"><h2>Experience</h2><p id="pdfExperience"></p></div>
+
+<div class="section">
+<h2>Technical Skills</h2>
+<div class="skills" id="pdfTechSkills"></div>
+</div>
+
+<div class="section"><h2>Projects</h2><p id="pdfProjects"></p></div>
+<div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits"></p></div>
+<div class="section"><h2>Declaration</h2><p id="pdfDeclaration"></p></div>
+
 </div>
 
 <script>
 function updatePreview(){
-    document.getElementById("pdfName").innerText = document.getElementById("fullName").value || "Your Name";
-    document.getElementById("pdfContact").innerText =
-        (document.getElementById("email").value || "") + " | " +
-        (document.getElementById("phone").value || "") + " | " +
-        (document.getElementById("address").value || "");
-    document.getElementById("pdfSummary").innerText = document.getElementById("summary").value || "-";
-    document.getElementById("pdfEducation").innerText = document.getElementById("education").value || "-";
-    document.getElementById("pdfExperience").innerText = document.getElementById("experience").value || "-";
+    pdfName.innerText = fullName.value || "Your Name";
+    pdfContact.innerText = `${email.value} | ${phone.value} | ${address.value}`;
+    pdfObjective.innerText = objective.value || "-";
+    pdfSummary.innerText = summary.value || "-";
+    pdfAcademics.innerText = academics.value || "-";
+    pdfEducation.innerText = education.value || "-";
+    pdfExperience.innerText = experience.value || "-";
+    pdfProjects.innerText = projects.value || "-";
+    pdfHabits.innerText = habits.value || "-";
+    pdfDeclaration.innerText = declaration.value || "-";
 
-    // Skills
-    let skillBox = document.getElementById("pdfSkills");
-    skillBox.innerHTML = "";
-    document.getElementById("skills").value.split(",").forEach(skill=>{
+    pdfTechSkills.innerHTML="";
+    techSkills.value.split(",").forEach(skill=>{
         if(skill.trim()){
-            let span = document.createElement("span");
-            span.innerText = skill.trim();
-            skillBox.appendChild(span);
+            let span=document.createElement("span");
+            span.innerText=skill.trim();
+            pdfTechSkills.appendChild(span);
         }
     });
 
-    // Photo preview
-    let file = document.getElementById("photo").files[0];
-    let img = document.getElementById("pdfPhoto");
-    if(file){
-        let reader = new FileReader();
-        reader.onload = function(){
-            img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        img.src = "";
+    if(photo.files[0]){
+        let r=new FileReader();
+        r.onload=()=>pdfPhoto.src=r.result;
+        r.readAsDataURL(photo.files[0]);
     }
 }
 </script>
 
 </body>
 </html>
-
