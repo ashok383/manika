@@ -3,247 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>(MANIK_A_RNIKA) CV Builder</title>
+<title>MANIK_A_RNIKA – CV Builder</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{font-family:'Poppins',sans-serif;background:#f0f2f5;margin:0}
+body{font-family:'Poppins',sans-serif;background:#f6fef9;margin:0}
 .container{
     max-width:900px;margin:30px auto;padding:30px;
     background:#fff;border-radius:15px;
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
-h1{text-align:center;color:#2a2a72;margin-bottom:25px;}
+h1{text-align:center;color:#2ecc71;margin-bottom:25px;}
 label{font-weight:600;margin-top:10px;display:block}
 input,textarea{
     width:100%;padding:10px;border-radius:8px;
-    border:1px solid #ccc;margin-bottom:12px;
+    border:2px solid #ddd;margin-bottom:12px;
+}
+input:focus,textarea:focus{
+    border-color:#2ecc71;
+    box-shadow:0 0 6px rgba(46,204,113,.4);
+    outline:none;
 }
 button{
-    background:#2a2a72;color:#fff;padding:12px 25px;
-    border:none;border-radius:10px;cursor:pointer;margin-right:10px;
+    background:#ff5fa2;color:#fff;
+    padding:12px 25px;border:none;
+    border-radius:25px;cursor:pointer;margin-right:10px;
 }
-button:hover{background:#ff6b6b}
+button:hover{background:#2ecc71}
 
-/* ===== Modal Preview ===== */
+/* ===== MODAL ===== */
 #previewModal{
-    display:none;
-    position:fixed;
-    z-index:1000;
-    left:0;top:0;
-    width:100%;height:100%;
-    overflow:auto;
+    display:none;position:fixed;z-index:1000;
+    left:0;top:0;width:100%;height:100%;
     background:rgba(0,0,0,0.6);
 }
 .modal-content{
-    background:#fff;
-    margin:5% auto;
-    padding:20px;
-    border-radius:15px;
-    width:90%;
-    max-width:800px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    background:#fff;margin:4% auto;padding:20px;
+    border-radius:15px;width:90%;max-width:850px;
     position:relative;
 }
 .close-btn{
-    position:absolute;
-    top:15px;right:20px;
-    font-size:25px;
-    font-weight:bold;
-    color:#333;
-    cursor:pointer;
-}
-#pdfContent{
-    padding:20px;
-    background:#fff;
-    border-radius:10px;
-}
-.pdf-header{
-    display:flex;align-items:center;
-    background:#2a2a72;color:#fff;
-    padding:20px;border-radius:12px;
-    margin-bottom:15px;
-}
-.pdf-header img{
-    width:100px;height:100px;border-radius:50%;
-    border:4px solid #fff;object-fit:cover;margin-right:20px;
-}
-.section{margin-top:15px}
-.section h2{
-    background:#ff6b6b;color:#fff;
-    padding:6px 10px;border-radius:6px;font-size:1.1rem;
-}
-.skills span{
-    display:inline-block;background:#2a2a72;color:#fff;
-    padding:6px 12px;border-radius:20px;margin:5px;font-size:.9rem;
-}
-.modal-buttons{
-    text-align:right;
-    margin-top:15px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-<h1>(MANIK_A_RNIKA) CV Builder</h1>
-
-<label>Passport Photo</label>
-<input type="file" id="photo" accept="image/*">
-
-<label>Full Name</label>
-<input id="fullName" placeholder="John Doe">
-
-<label>Email</label>
-<input id="email" placeholder="john.doe@example.com">
-
-<label>Phone</label>
-<input id="phone" placeholder="+91-9876543210">
-
-<label>Address</label>
-<textarea id="address" placeholder="123 Street, City, State, Country"></textarea>
-
-<label>Career Objective</label>
-<textarea id="objective" placeholder="To secure a challenging position where I can apply my skills and grow professionally."></textarea>
-
-<label>Professional Summary</label>
-<textarea id="summary" placeholder="A highly motivated professional with experience in web development and project management."></textarea>
-
-<label>Academic Details (with %)</label>
-<textarea id="academics" placeholder="B.Tech Computer Science – 85%, XYZ University, 2022&#10;12th Grade – 90%, ABC School, 2018"></textarea>
-
-<label>Education</label>
-<textarea id="education" placeholder="Bachelor of Technology in Computer Science – XYZ University (2018-2022)"></textarea>
-
-<label>Experience</label>
-<textarea id="experience" placeholder="Frontend Developer at ABC Company (2022-Present)&#10;Intern at DEF Startup (2021)"></textarea>
-
-<label>Technical Skills (comma separated)</label>
-<input id="techSkills" placeholder="HTML, CSS, JavaScript, React, Node.js, Python">
-
-<label>Projects Done Earlier</label>
-<textarea id="projects" placeholder="Portfolio Website – Developed personal portfolio using HTML, CSS, JS&#10;E-Commerce App – Built a React-based e-commerce platform with payment integration&#10;Data Analysis Project – Analyzed sales data using Python and visualized results."></textarea>
-
-<label>Habits / Strengths</label>
-<textarea id="habits" placeholder="Self-motivated, disciplined, team player, fast learner, adaptable"></textarea>
-
-<label>Declaration</label>
-<textarea id="declaration" placeholder="I hereby declare that the information provided above is true and correct to the best of my knowledge."></textarea>
-
-<button onclick="openPreview()">Preview CV</button>
-</div>
-
-<!-- ===== Modal ===== -->
-<div id="previewModal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closePreview()">&times;</span>
-        <div id="pdfContent">
-
-            <div class="pdf-header">
-                <img id="pdfPhoto" src="" alt="Profile Photo">
-                <div>
-                    <h1 id="pdfName">Your Name</h1>
-                    <p id="pdfContact">Email | Phone | Address</p>
-                </div>
-            </div>
-
-            <div class="section"><h2>Career Objective</h2><p id="pdfObjective">-</p></div>
-            <div class="section"><h2>Professional Summary</h2><p id="pdfSummary">-</p></div>
-            <div class="section"><h2>Academic Details</h2><p id="pdfAcademics">-</p></div>
-            <div class="section"><h2>Education</h2><p id="pdfEducation">-</p></div>
-            <div class="section"><h2>Experience</h2><p id="pdfExperience">-</p></div>
-
-            <div class="section">
-            <h2>Technical Skills</h2>
-            <div class="skills" id="pdfTechSkills"></div>
-            </div>
-
-            <div class="section"><h2>Projects</h2><p id="pdfProjects">-</p></div>
-            <div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits">-</p></div>
-            <div class="section"><h2>Declaration</h2><p id="pdfDeclaration">-</p></div>
-
-        </div>
-
-        <div class="modal-buttons">
-            <button onclick="printPDF()">Print Generated PDF</button>
-            <button onclick="closePreview()">Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== JS ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-function updatePreview(){
-    pdfName.innerText = fullName.value || "John Doe";
-    pdfContact.innerText = `${email.value || "email@example.com"} | ${phone.value || "+91-XXXXXXXXXX"} | ${address.value || "Address"}`;
-    pdfObjective.innerText = objective.value || "To secure a challenging position where I can apply my skills.";
-    pdfSummary.innerText = summary.value || "A highly motivated professional with relevant experience.";
-    pdfAcademics.innerText = academics.value || "B.Tech Computer Science – 85%, XYZ University";
-    pdfEducation.innerText = education.value || "Bachelor of Technology in Computer Science – XYZ University";
-    pdfExperience.innerText = experience.value || "Frontend Developer at ABC Company (2022-Present)";
-    pdfProjects.innerText = projects.value || "Portfolio Website – Developed personal portfolio using HTML, CSS, JS";
-    pdfHabits.innerText = habits.value || "Self-motivated, disciplined, team player";
-    pdfDeclaration.innerText = declaration.value || "I hereby declare that the information provided is true.";
-
-    pdfTechSkills.innerHTML="";
-    techSkills.value.split(",").forEach(skill=>{
-        if(skill.trim()){
-            let span=document.createElement("span");
-            span.innerText=skill.trim();
-            pdfTechSkills.appendChild(span);
-        }
-    });
-
-    if(photo.files[0]){
-        let r=new FileReader();
-        r.onload=()=>pdfPhoto.src=r.result;
-        r.readAsDataURL(photo.files[0]);
-    } else {
-        pdfPhoto.src="";
-    }
-}
-
-function openPreview(){
-    updatePreview();
-    document.getElementById('previewModal').style.display="block";
-}
-function closePreview(){
-    document.getElementById('previewModal').style.display="none";
-}
-
-// Print PDF
-function printPDF(){
-    updatePreview();
-    const element = document.getElementById('pdfContent');
-    const opt = {
-        margin:       0.5,
-        filename:     `${fullName.value || 'Resume'}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).outputPdf().then(function(pdf){
-        // Open print dialog
-        const blob = pdf.output('bloburl');
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = blob;
-        document.body.appendChild(iframe);
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-    });
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    if (event.target == document.getElementById('previewModal')) {
-        closePreview();
-    }
-}
-</script>
-
-</body>
-</html>
+    position:absolute
