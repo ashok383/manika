@@ -3,273 +3,265 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>(MANIK_A_RNIKA) CV Builder</title>
-
+<title>CV Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <style>
 body{
     font-family:'Poppins',sans-serif;
+    margin:0; padding:0;
     background:linear-gradient(135deg,#f3e5f5,#e8f5e9);
-    margin:0;
-    color:#212121
 }
 .container{
-    max-width:900px;
-    margin:30px auto;
-    padding:30px;
+    max-width:950px;
+    margin:20px auto;
+    padding:20px;
     background:#fff;
-    border-radius:18px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.15)
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
-h1{
-    text-align:center;
-    color:#6A1B9A;
-    margin-bottom:25px
-}
-label{font-weight:600;margin-top:10px;display:block}
-input,textarea{
+.top-banner img{
     width:100%;
-    padding:11px;
+    height:150px;
+    object-fit:cover;
     border-radius:8px;
-    border:1px solid #ccc;
-    margin-bottom:12px;
-    font-size:14px
+    margin-bottom:20px;
 }
+
+/* Form Styles */
+h1{text-align:center;color:#4a148c;}
+label{font-weight:600;margin-top:10px;display:block;}
+input,textarea,select{
+    width:100%; padding:10px; margin-bottom:12px;
+    border-radius:6px; border:1px solid #ccc; font-size:14px;
+}
+textarea{resize:vertical;}
 button{
-    color:#fff;
-    padding:12px 26px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    margin-right:10px;
-    font-weight:600
+    padding:12px 25px; border:none; border-radius:12px;
+    cursor:pointer; font-weight:600; color:#fff; margin-right:10px;
 }
-.preview-btn{background:#FB8C00}
-.print-btn{background:#43A047}
-.download-btn{background:#EC407A}
+.preview-btn{background:#f57c00;}
+.print-btn{background:#1b5e20;}
+.add-academic-btn{background:silver; color:#000; margin-bottom:15px;}
 
-/* ===== A4 CV PAGE ===== */
-#cvPreview{
-    display:none;
-    position:relative;
-    width:210mm;
-    min-height:297mm;
-    margin:30px auto;
-    padding:18mm;
-    background:#FAFAFA;
-    border:10px solid #212121;
-    box-sizing:border-box
+/* PDF Preview / Print Styles */
+#cvPreview{display:none;width:210mm; margin:0 auto;}
+
+.page{
+    position:relative; width:210mm; padding:15mm;
+    margin:0 auto 10mm auto; border:12px solid #6a1b9a;
+    box-sizing:border-box; background:#fff; page-break-after:always;
+    overflow:hidden; word-wrap:break-word;
 }
-
-/* Decorative inner border */
-#cvPreview::before{
-    content:"";
-    position:absolute;
-    inset:12mm;
-    border:4px solid #6A1B9A;
-    pointer-events:none
+.page::before{
+    content:""; position:absolute; inset:10px; border:5px solid #ff5722; pointer-events:none;
 }
 
 /* Header */
 .pdf-header{
-    display:flex;
-    align-items:center;
-    background:linear-gradient(135deg,#6A1B9A,#2E7D32);
-    color:#fff;
-    padding:18px;
-    border-radius:14px
+    display:flex; align-items:center; background:#4caf50; color:#fff;
+    padding:15px; border-radius:10px; margin-bottom:15px;
 }
 .pdf-header img{
-    width:95px;
-    height:95px;
-    border-radius:50%;
-    border:4px solid #fff;
-    margin-right:18px;
-    object-fit:cover
+    width:100px; height:100px; border-radius:50%; border:4px solid #fff; margin-right:15px; object-fit:cover;
 }
-.pdf-header h1{
-    margin:0;
-    font-size:24px
-}
-.pdf-header p{
-    margin-top:5px;
-    font-size:14px
-}
+.pdf-header h1{margin:0;font-size:24px;}
+.pdf-header p{margin:5px 0 0 0;font-size:14px;}
 
 /* Sections */
-.section{margin-top:16px}
+.section{margin-top:14px;}
 .section h2{
     background:linear-gradient(90deg,#2E7D32,#66BB6A);
-    color:#fff;
-    padding:7px 12px;
-    border-radius:20px;
-    font-size:15px;
-    letter-spacing:.5px
+    color:#fff; padding:6px 10px; border-radius:18px;
+    font-size:16px; letter-spacing:.5px;
 }
-.section p{
-    font-size:14px;
-    margin-top:8px;
-    line-height:1.6;
-    color:#333
-}
+.section p, .section table{font-size:14px;margin-top:8px; color:#000; line-height:1.5; word-break:break-word;}
+.skills span{display:inline-block;background:#6a1b9a;color:#fff;padding:5px 10px;margin:3px;border-radius:12px;font-size:13px;}
+table{width:100%; border-collapse:collapse;}
+table, th, td{border:1px solid #666;}
+th, td{padding:6px; text-align:left;}
+th{background:#4caf50; color:#fff;}
 
-/* Skills */
-.skills span{
-    display:inline-block;
-    background:#6A1B9A;
-    color:#fff;
-    padding:6px 12px;
-    border-radius:18px;
-    margin:5px;
-    font-size:13px
-}
+/* Place, Date, Sign section */
+.signature-section{margin-top:25px; display:flex; justify-content:space-between; font-size:14px;}
 
-/* Print only CV */
+/* Hide top banner in print */
 @media print{
-    body *{visibility:hidden}
-    #cvPreview,#cvPreview *{visibility:visible}
-    #cvPreview{
-        position:absolute;
-        left:0;
-        top:0;
-        margin:0
-    }
+    body *{visibility:hidden;}
+    #cvPreview,#cvPreview *{visibility:visible;}
+    #cvPreview{position:absolute; left:0; top:0; width:100%;}
+    .top-banner{display:none;}
 }
+
+/* Constrain textarea and input text in PDF */
+.page p, .page span{overflow-wrap: break-word;}
 </style>
 </head>
-
 <body>
 
+<!-- Top Banner only visible on webpage -->
+<div class="top-banner">
+    <img src="manika.jpeg" alt="Banner Image">
+</div>
+
 <div class="container">
-<h1>(MANIK_A_RNIKA) CV Builder</h1>
+<h1>CV Builder</h1>
 
 <label>Passport Photo</label>
 <input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName" placeholder="John Michael Doe">
+<input id="fullName" placeholder="Enter your full name">
 
 <label>Email</label>
-<input id="email" placeholder="john.doe@email.com">
+<input id="email" placeholder="Enter your email">
 
 <label>Phone</label>
-<input id="phone" placeholder="+91 98765 43210">
+<input id="phone" placeholder="Enter your phone number">
 
 <label>Address</label>
-<textarea id="address" placeholder="Bengaluru, Karnataka, India"></textarea>
+<textarea id="address" placeholder="Enter your full address"></textarea>
 
 <label>Career Objective</label>
-<textarea id="objective">
-A highly motivated and detail-oriented professional seeking a challenging role where I can apply my technical skills, creativity, and problem-solving abilities to contribute to organizational success while continuously enhancing my knowledge and professional growth.
-</textarea>
+<textarea id="objective" rows="6" placeholder="I am a highly motivated professional seeking a challenging role where I can utilize my skills, knowledge, and creativity to contribute to organizational success, continuously learn, and develop professionally."></textarea>
 
 <label>Professional Summary</label>
-<textarea id="summary" placeholder="Results-driven professional with hands-on experience in modern technologies and a passion for continuous learning."></textarea>
+<textarea id="summary" rows="4" placeholder="Enter your professional summary"></textarea>
 
 <label>Academic Details</label>
-<textarea id="academics" placeholder="B.Tech – 85% – XYZ University (2022)"></textarea>
-
-<label>Education</label>
-<textarea id="education" placeholder="Bachelor of Technology in Computer Science"></textarea>
+<div id="academicsContainer">
+    <div class="academic-entry">
+        <input placeholder="Course (e.g., B.Tech)"/>
+        <input placeholder="Year (e.g., 2022)"/>
+        <input placeholder="Institution"/>
+        <input placeholder="Percentage / CGPA"/>
+    </div>
+</div>
+<button type="button" class="add-academic-btn" onclick="addAcademic()">Add Another Academic Entry</button>
 
 <label>Experience</label>
-<textarea id="experience" placeholder="Frontend Developer – ABC Technologies (2022–Present)"></textarea>
+<textarea id="experience" placeholder="Enter your work experience"></textarea>
 
 <label>Technical Skills (comma separated)</label>
-<input id="techSkills" placeholder="HTML, CSS, JavaScript, React, Node.js">
+<input id="techSkills" placeholder="HTML, CSS, JavaScript, etc.">
 
-<label>Projects Done Earlier</label>
-<textarea id="projects" placeholder="Resume Builder App, E-commerce Platform, Analytics Dashboard"></textarea>
+<label>Projects</label>
+<textarea id="projects" placeholder="Enter your projects"></textarea>
 
-<label>Habits / Strengths</label>
-<textarea id="habits" placeholder="Quick learner, disciplined, creative thinker, team player"></textarea>
+<label>Strengths / Habits</label>
+<textarea id="habits" placeholder="Enter your strengths, habits, qualities"></textarea>
 
 <label>Declaration</label>
 <textarea id="declaration" placeholder="I hereby declare that the above information is true and correct to the best of my knowledge."></textarea>
 
 <button class="preview-btn" onclick="showPreview()">Preview CV</button>
 <button class="print-btn" onclick="printCV()">Print CV</button>
-<button class="download-btn" onclick="downloadPDF()">Download PDF</button>
 </div>
 
-<!-- CV PREVIEW -->
-<div id="cvPreview">
-<div class="pdf-header">
-<img id="pdfPhoto">
-<div>
-<h1 id="pdfName">John Michael Doe</h1>
-<p id="pdfContact">john.doe@email.com | +91 98765 43210 | Bengaluru</p>
-</div>
-</div>
-
-<div class="section"><h2>Career Objective</h2><p id="pdfObjective"></p></div>
-<div class="section"><h2>Professional Summary</h2><p id="pdfSummary"></p></div>
-<div class="section"><h2>Academic Details</h2><p id="pdfAcademics"></p></div>
-<div class="section"><h2>Education</h2><p id="pdfEducation"></p></div>
-<div class="section"><h2>Experience</h2><p id="pdfExperience"></p></div>
-
-<div class="section">
-<h2>Technical Skills</h2>
-<div class="skills" id="pdfTechSkills"></div>
-</div>
-
-<div class="section"><h2>Projects</h2><p id="pdfProjects"></p></div>
-<div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits"></p></div>
-<div class="section"><h2>Declaration</h2><p id="pdfDeclaration"></p></div>
-</div>
+<!-- CV Preview for print -->
+<div id="cvPreview"></div>
 
 <script>
+function addAcademic(){
+    const container = document.getElementById("academicsContainer");
+    const div = document.createElement("div");
+    div.className = "academic-entry";
+    div.innerHTML = `<input placeholder="Course"/><input placeholder="Year"/><input placeholder="Institution"/><input placeholder="Percentage / CGPA"/>`;
+    container.appendChild(div);
+}
+
 function updatePreview(){
-    pdfName.innerText = fullName.value || "John Michael Doe";
-    pdfContact.innerText =
-        `${email.value||'john.doe@email.com'} | ${phone.value||'+91 98765 43210'} | ${address.value||'Bengaluru'}`;
-    pdfObjective.innerText = objective.value;
-    pdfSummary.innerText = summary.value;
-    pdfAcademics.innerText = academics.value;
-    pdfEducation.innerText = education.value;
-    pdfExperience.innerText = experience.value;
-    pdfProjects.innerText = projects.value;
-    pdfHabits.innerText = habits.value;
-    pdfDeclaration.innerText = declaration.value;
+    const cvPreview = document.getElementById("cvPreview");
+    cvPreview.innerHTML = "";
 
-    pdfTechSkills.innerHTML="";
-    (techSkills.value||"").split(",").forEach(s=>{
-        if(s.trim()){
-            let span=document.createElement("span");
-            span.innerText=s.trim();
-            pdfTechSkills.appendChild(span);
-        }
+    const page = document.createElement("div");
+    page.className = "page";
+
+    // Header with profile photo
+    const header = document.createElement("div");
+    header.className = "pdf-header";
+    const img = document.createElement("img"); img.id="pdfPhoto";
+    header.appendChild(img);
+
+    const hdiv = document.createElement("div");
+    const h1 = document.createElement("h1"); h1.id="pdfName"; h1.innerText=document.getElementById("fullName").value||"John Michael Doe";
+    const p = document.createElement("p"); p.id="pdfContact";
+    p.innerText=`${document.getElementById("email").value||''} | ${document.getElementById("phone").value||''} | ${document.getElementById("address").value||''}`;
+    hdiv.appendChild(h1); hdiv.appendChild(p);
+    header.appendChild(hdiv);
+    page.appendChild(header);
+
+    function addSection(title,id,value){
+        const section = document.createElement("div");
+        section.className="section";
+        const h2 = document.createElement("h2"); h2.innerText=title;
+        const p = document.createElement("p"); p.id=id; p.innerText=value;
+        section.appendChild(h2); section.appendChild(p);
+        page.appendChild(section);
+    }
+
+    addSection("Career Objective","pdfObjective",document.getElementById("objective").value);
+    addSection("Professional Summary","pdfSummary",document.getElementById("summary").value);
+
+    // Academic Table
+    const acadSection = document.createElement("div"); acadSection.className="section";
+    const h2 = document.createElement("h2"); h2.innerText="Academic Details";
+    acadSection.appendChild(h2);
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    thead.innerHTML="<tr><th>Course</th><th>Year</th><th>Institution</th><th>Percentage / CGPA</th></tr>";
+    table.appendChild(thead);
+    const tbody = document.createElement("tbody");
+    document.querySelectorAll("#academicsContainer .academic-entry").forEach(entry=>{
+        const vals = Array.from(entry.querySelectorAll("input")).map(i=>i.value||"-");
+        const tr = document.createElement("tr");
+        tr.innerHTML=`<td>${vals[0]}</td><td>${vals[1]}</td><td>${vals[2]}</td><td>${vals[3]}</td>`;
+        tbody.appendChild(tr);
     });
+    table.appendChild(tbody);
+    acadSection.appendChild(table);
+    page.appendChild(acadSection);
 
-    if(photo.files[0]){
-        const r=new FileReader();
-        r.onload=()=>pdfPhoto.src=r.result;
-        r.readAsDataURL(photo.files[0]);
+    addSection("Experience","pdfExperience",document.getElementById("experience").value);
+
+    // Technical Skills
+    const skillsSection = document.createElement("div"); skillsSection.className="section";
+    const h2skills = document.createElement("h2"); h2skills.innerText="Technical Skills";
+    const skillsDiv = document.createElement("div"); skillsDiv.className="skills";
+    (document.getElementById("techSkills").value||"").split(",").forEach(s=>{
+        if(s.trim()){ const span=document.createElement("span"); span.innerText=s.trim(); skillsDiv.appendChild(span);}
+    });
+    skillsSection.appendChild(h2skills); skillsSection.appendChild(skillsDiv);
+    page.appendChild(skillsSection);
+
+    addSection("Projects","pdfProjects",document.getElementById("projects").value);
+    addSection("Strengths / Habits","pdfHabits",document.getElementById("habits").value);
+    addSection("Declaration","pdfDeclaration",document.getElementById("declaration").value);
+
+    // Place, Date, Signature
+    const sigDiv = document.createElement("div");
+    sigDiv.className = "signature-section";
+    sigDiv.innerHTML = `<div>Place: __________</div><div>Date: __________</div><div>Signature: __________</div>`;
+    page.appendChild(sigDiv);
+
+    cvPreview.appendChild(page);
+
+    const fileInput=document.getElementById("photo");
+    if(fileInput.files[0]){
+        const reader=new FileReader();
+        reader.onload=()=>img.src=reader.result;
+        reader.readAsDataURL(fileInput.files[0]);
     }
 }
 
 function showPreview(){
     updatePreview();
-    cvPreview.style.display="block";
-    window.scrollTo({top:cvPreview.offsetTop,behavior:"smooth"});
+    document.getElementById("cvPreview").style.display="block";
+    window.scrollTo({top:document.getElementById("cvPreview").offsetTop,behavior:"smooth"});
 }
 
 function printCV(){
     showPreview();
     setTimeout(()=>window.print(),300);
-}
-
-function downloadPDF(){
-    showPreview();
-    html2pdf().set({
-        margin:0,
-        filename:`${fullName.value || 'Resume'}.pdf`,
-        image:{type:'jpeg',quality:1},
-        html2canvas:{scale:2},
-        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-    }).from(cvPreview).save();
 }
 </script>
 
