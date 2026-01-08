@@ -14,17 +14,17 @@ body{font-family:'Poppins',sans-serif;background:#f0f2f5;margin:0}
     background:#fff;border-radius:15px;
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
-h1{text-align:center;color:#28a745;margin-bottom:25px;}
+h1{text-align:center;color:#2a2a72;margin-bottom:25px;}
 label{font-weight:600;margin-top:10px;display:block}
 input,textarea{
     width:100%;padding:10px;border-radius:8px;
     border:1px solid #ccc;margin-bottom:12px;
 }
 button{
-    background:#28a745;color:#fff;padding:12px 25px;
+    background:#2a2a72;color:#fff;padding:12px 25px;
     border:none;border-radius:10px;cursor:pointer;margin-right:10px;
 }
-button:hover{background:#218838}
+button:hover{background:#ff6b6b}
 
 /* ===== Modal Preview ===== */
 #previewModal{
@@ -61,7 +61,7 @@ button:hover{background:#218838}
 }
 .pdf-header{
     display:flex;align-items:center;
-    background:#28a745;color:#fff;
+    background:#2a2a72;color:#fff;
     padding:20px;border-radius:12px;
     margin-bottom:15px;
 }
@@ -71,11 +71,11 @@ button:hover{background:#218838}
 }
 .section{margin-top:15px}
 .section h2{
-    background:#218838;color:#fff;
+    background:#ff6b6b;color:#fff;
     padding:6px 10px;border-radius:6px;font-size:1.1rem;
 }
 .skills span{
-    display:inline-block;background:#28a745;color:#fff;
+    display:inline-block;background:#2a2a72;color:#fff;
     padding:6px 12px;border-radius:20px;margin:5px;font-size:.9rem;
 }
 .modal-buttons{
@@ -174,4 +174,76 @@ button:hover{background:#218838}
 </div>
 
 <!-- ===== JS ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function updatePreview(){
+    pdfName.innerText = fullName.value || "John Doe";
+    pdfContact.innerText = `${email.value || "email@example.com"} | ${phone.value || "+91-XXXXXXXXXX"} | ${address.value || "Address"}`;
+    pdfObjective.innerText = objective.value || "To secure a challenging position where I can apply my skills.";
+    pdfSummary.innerText = summary.value || "A highly motivated professional with relevant experience.";
+    pdfAcademics.innerText = academics.value || "B.Tech Computer Science – 85%, XYZ University";
+    pdfEducation.innerText = education.value || "Bachelor of Technology in Computer Science – XYZ University";
+    pdfExperience.innerText = experience.value || "Frontend Developer at ABC Company (2022-Present)";
+    pdfProjects.innerText = projects.value || "Portfolio Website – Developed personal portfolio using HTML, CSS, JS";
+    pdfHabits.innerText = habits.value || "Self-motivated, disciplined, team player";
+    pdfDeclaration.innerText = declaration.value || "I hereby declare that the information provided is true.";
+
+    pdfTechSkills.innerHTML="";
+    techSkills.value.split(",").forEach(skill=>{
+        if(skill.trim()){
+            let span=document.createElement("span");
+            span.innerText=skill.trim();
+            pdfTechSkills.appendChild(span);
+        }
+    });
+
+    if(photo.files[0]){
+        let r=new FileReader();
+        r.onload=()=>pdfPhoto.src=r.result;
+        r.readAsDataURL(photo.files[0]);
+    } else {
+        pdfPhoto.src="";
+    }
+}
+
+function openPreview(){
+    updatePreview();
+    document.getElementById('previewModal').style.display="block";
+}
+function closePreview(){
+    document.getElementById('previewModal').style.display="none";
+}
+
+// Print PDF
+function printPDF(){
+    updatePreview();
+    const element = document.getElementById('pdfContent');
+    const opt = {
+        margin:       0.5,
+        filename:     `${fullName.value || 'Resume'}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).outputPdf().then(function(pdf){
+        // Open print dialog
+        const blob = pdf.output('bloburl');
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = blob;
+        document.body.appendChild(iframe);
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target == document.getElementById('previewModal')) {
+        closePreview();
+    }
+}
+</script>
+
+</body>
+</html>
