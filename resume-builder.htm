@@ -26,17 +26,44 @@ button{
 }
 button:hover{background:#ff6b6b}
 
-/* ===== CV PREVIEW ===== */
+/* ===== Modal Preview ===== */
+#previewModal{
+    display:none;
+    position:fixed;
+    z-index:1000;
+    left:0;top:0;
+    width:100%;height:100%;
+    overflow:auto;
+    background:rgba(0,0,0,0.6);
+}
+.modal-content{
+    background:#fff;
+    margin:5% auto;
+    padding:20px;
+    border-radius:15px;
+    width:90%;
+    max-width:800px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    position:relative;
+}
+.close-btn{
+    position:absolute;
+    top:15px;right:20px;
+    font-size:25px;
+    font-weight:bold;
+    color:#333;
+    cursor:pointer;
+}
 #pdfContent{
-    width:210mm;min-height:297mm;padding:20mm;
-    background:#fff;border:10px solid;
-    border-image:linear-gradient(45deg,#ff6b6b,#fbc531,#2a2a72) 1;
-    border-radius:15px;margin:20px auto;display:none;
+    padding:20px;
+    background:#fff;
+    border-radius:10px;
 }
 .pdf-header{
     display:flex;align-items:center;
     background:#2a2a72;color:#fff;
     padding:20px;border-radius:12px;
+    margin-bottom:15px;
 }
 .pdf-header img{
     width:100px;height:100px;border-radius:50%;
@@ -50,6 +77,10 @@ button:hover{background:#ff6b6b}
 .skills span{
     display:inline-block;background:#2a2a72;color:#fff;
     padding:6px 12px;border-radius:20px;margin:5px;font-size:.9rem;
+}
+.modal-buttons{
+    text-align:right;
+    margin-top:15px;
 }
 </style>
 </head>
@@ -101,43 +132,49 @@ button:hover{background:#ff6b6b}
 <label>Declaration</label>
 <textarea id="declaration" placeholder="I hereby declare that the information provided above is true and correct to the best of my knowledge."></textarea>
 
-<button onclick="updatePreview()">Preview CV</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="openPreview()">Preview CV</button>
 </div>
 
-<!-- ===== CV PREVIEW ===== -->
-<div id="pdfContent">
+<!-- ===== Modal ===== -->
+<div id="previewModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closePreview()">&times;</span>
+        <div id="pdfContent">
 
-<div class="pdf-header">
-    <img id="pdfPhoto" src="" alt="Profile Photo">
-    <div>
-        <h1 id="pdfName">Your Name</h1>
-        <p id="pdfContact">Email | Phone | Address</p>
+            <div class="pdf-header">
+                <img id="pdfPhoto" src="" alt="Profile Photo">
+                <div>
+                    <h1 id="pdfName">Your Name</h1>
+                    <p id="pdfContact">Email | Phone | Address</p>
+                </div>
+            </div>
+
+            <div class="section"><h2>Career Objective</h2><p id="pdfObjective">-</p></div>
+            <div class="section"><h2>Professional Summary</h2><p id="pdfSummary">-</p></div>
+            <div class="section"><h2>Academic Details</h2><p id="pdfAcademics">-</p></div>
+            <div class="section"><h2>Education</h2><p id="pdfEducation">-</p></div>
+            <div class="section"><h2>Experience</h2><p id="pdfExperience">-</p></div>
+
+            <div class="section">
+            <h2>Technical Skills</h2>
+            <div class="skills" id="pdfTechSkills"></div>
+            </div>
+
+            <div class="section"><h2>Projects</h2><p id="pdfProjects">-</p></div>
+            <div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits">-</p></div>
+            <div class="section"><h2>Declaration</h2><p id="pdfDeclaration">-</p></div>
+
+        </div>
+
+        <div class="modal-buttons">
+            <button onclick="printCV()">Print</button>
+            <button onclick="closePreview()">Close</button>
+        </div>
     </div>
 </div>
 
-<div class="section"><h2>Career Objective</h2><p id="pdfObjective">-</p></div>
-<div class="section"><h2>Professional Summary</h2><p id="pdfSummary">-</p></div>
-<div class="section"><h2>Academic Details</h2><p id="pdfAcademics">-</p></div>
-<div class="section"><h2>Education</h2><p id="pdfEducation">-</p></div>
-<div class="section"><h2>Experience</h2><p id="pdfExperience">-</p></div>
-
-<div class="section">
-<h2>Technical Skills</h2>
-<div class="skills" id="pdfTechSkills"></div>
-</div>
-
-<div class="section"><h2>Projects</h2><p id="pdfProjects">-</p></div>
-<div class="section"><h2>Habits / Strengths</h2><p id="pdfHabits">-</p></div>
-<div class="section"><h2>Declaration</h2><p id="pdfDeclaration">-</p></div>
-
-</div>
-
-<!-- ===== JS ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function updatePreview(){
-    pdfContent.style.display="block";
     pdfName.innerText = fullName.value || "John Doe";
     pdfContact.innerText = `${email.value || "email@example.com"} | ${phone.value || "+91-XXXXXXXXXX"} | ${address.value || "Address"}`;
     pdfObjective.innerText = objective.value || "To secure a challenging position where I can apply my skills.";
@@ -162,21 +199,32 @@ function updatePreview(){
         let r=new FileReader();
         r.onload=()=>pdfPhoto.src=r.result;
         r.readAsDataURL(photo.files[0]);
+    } else {
+        pdfPhoto.src="";
     }
 }
 
-// Download as PDF
-function downloadPDF(){
-    updatePreview(); // Ensure preview is updated
-    const element = document.getElementById('pdfContent');
-    const opt = {
-        margin:       0.5,
-        filename:     `${fullName.value || 'Resume'}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+function openPreview(){
+    updatePreview();
+    document.getElementById('previewModal').style.display="block";
+}
+function closePreview(){
+    document.getElementById('previewModal').style.display="none";
+}
+function printCV(){
+    const printContent = document.getElementById('pdfContent').innerHTML;
+    const originalContent = document.body.innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    location.reload(); // reload page to restore buttons & inputs
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target == document.getElementById('previewModal')) {
+        closePreview();
+    }
 }
 </script>
 
