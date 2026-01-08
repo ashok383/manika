@@ -167,12 +167,14 @@ button:hover{background:#ff6b6b}
         </div>
 
         <div class="modal-buttons">
-            <button onclick="printCV()">Print</button>
+            <button onclick="downloadPDF()">Download Generated PDF</button>
             <button onclick="closePreview()">Close</button>
         </div>
     </div>
 </div>
 
+<!-- ===== JS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function updatePreview(){
     pdfName.innerText = fullName.value || "John Doe";
@@ -211,13 +213,19 @@ function openPreview(){
 function closePreview(){
     document.getElementById('previewModal').style.display="none";
 }
-function printCV(){
-    const printContent = document.getElementById('pdfContent').innerHTML;
-    const originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    location.reload(); // reload page to restore buttons & inputs
+
+// Download as PDF
+function downloadPDF(){
+    updatePreview();
+    const element = document.getElementById('pdfContent');
+    const opt = {
+        margin:       0.5,
+        filename:     `${fullName.value || 'Resume'}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
 }
 
 // Close modal when clicking outside
