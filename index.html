@@ -1,89 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ElegantShop – E-Commerce</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-        body{background:#f5f7fb;color:#333}
-        header{background:#000;color:#fff;padding:0}
-        .top-banner img{width:100%;height:auto;display:block;object-fit:cover}
-        nav{display:flex;justify-content:space-between;align-items:center;padding:15px 8%}
-        nav h1{font-size:28px;font-weight:700}
-        nav ul{display:flex;gap:25px;list-style:none}
-        nav ul li a{color:#fff;text-decoration:none;font-weight:500}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ElegantShop – Premium products at unbeatable prices">
+<meta name="robots" content="index,follow">
+<title>ElegantShop – Smart Shopping</title>
 
-        .hero{display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:60px 8%}
-        .hero-text h2{font-size:48px;margin-bottom:15px}
-        .hero-text p{font-size:16px;margin-bottom:25px;line-height:1.6}
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        .btn{
-            background:#ffcc00;
-            color:#000;
-            padding:14px 28px;
-            border-radius:30px;
-            text-decoration:none;
-            font-weight:600;
-            margin-right:12px;
-            display:inline-block;
-            border:none;
-            cursor:pointer;
-            font-size:16px;
-        }
+<style>
+:root{
+    --primary:#2575fc;
+    --secondary:#ffcc00;
+    --dark:#111;
+    --light:#f5f7fb;
+    --radius:18px;
+}
 
-        .btn.resume{
-            background:#2575fc;
-            color:#fff;
-        }
+*,
+*::before,
+*::after{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .hero img{width:100%;max-width:420px;justify-self:center}
-        section{padding:70px 8%}
-        .section-title{text-align:center;margin-bottom:45px}
-        .section-title h2{font-size:36px}
+html{
+    scroll-behavior:smooth;
+}
 
-        .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px}
-        .card{background:#fff;border-radius:18px;box-shadow:0 10px 25px rgba(0,0,0,.08);padding:20px;text-align:center;transition:.3s}
-        .card:hover{transform:translateY(-8px)}
-        .card img{width:100%;height:200px;object-fit:cover;border-radius:15px}
-        .card h3{margin:15px 0 5px}
-        .price{font-weight:700;color:#2575fc;margin-bottom:12px}
+body{
+    font-family:'Poppins',sans-serif;
+    background:var(--light);
+    color:#333;
+    line-height:1.6;
+}
 
-        .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px}
-        .feature{background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.06)}
+/* ================= HEADER & BANNER ================= */
+header{
+    position:relative;
+    overflow:hidden;
+}
 
-        footer{background:#111;color:#ccc;text-align:center;padding:30px;margin-top:50px}
+.top-banner img{
+    width:100%;
+    height:320px;
+    object-fit:cover;
+    display:block;
+    filter:brightness(0.85);
+}
 
-        @media(max-width:900px){
-            .hero{grid-template-columns:1fr;text-align:center}
-            .hero img{margin-top:30px}
-        }
-    </style>
+nav{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,0));
+}
+
+nav h1{
+    color:#fff;
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+/* ================= HERO ================= */
+.hero{
+    max-width:1200px;
+    margin:-80px auto 0;
+    padding:40px 8%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    align-items:center;
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:0 20px 40px rgba(0,0,0,.1);
+}
+
+.hero-text h2{
+    font-size:42px;
+    margin-bottom:15px;
+}
+
+.hero-text p{
+    margin-bottom:28px;
+    color:#555;
+}
+
+.hero img{
+    width:100%;
+    max-width:420px;
+    justify-self:center;
+}
+
+/* ================= BUTTONS ================= */
+.btn{
+    display:inline-block;
+    padding:14px 30px;
+    border-radius:30px;
+    border:none;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:.3s ease;
+    text-decoration:none;
+}
+
+.btn.primary{
+    background:var(--secondary);
+    color:#000;
+}
+
+.btn.secondary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+}
+
+/* ================= FOOTER ================= */
+footer{
+    margin-top:80px;
+    background:var(--dark);
+    color:#aaa;
+    text-align:center;
+    padding:35px 15px;
+    font-size:14px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:900px){
+    .hero{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+    .hero img{
+        margin-top:25px;
+    }
+}
+
+@media (max-width:500px){
+    nav h1{
+        font-size:22px;
+    }
+    .hero-text h2{
+        font-size:30px;
+    }
+    .top-banner img{
+        height:240px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-<header class="top-banner">
-    <img src="manika.jpeg" alt="Manik Rnika Banner" />
-    <nav>
+<header>
+    <div class="top-banner">
+        <img src="manika.jpeg" alt="ElegantShop Banner">
+    </div>
+
+    <nav aria-label="Main Navigation">
         <h1>ElegantShop</h1>
     </nav>
 </header>
 
-<div class="hero">
-    <div class="hero-text">
+<main class="hero">
+    <section class="hero-text">
         <h2>Shop Smart. Live Better.</h2>
-        <p>Discover premium products at unbeatable prices. Quality, style, and trust — all in one place.</p>
+        <p>
+            Discover premium products at unbeatable prices.  
+            Designed for quality, trust, and modern living.
+        </p>
 
-        <button class="btn resume" onclick="window.location.href='resume-builder.htm'">RESUME_MAKER</button>
-    </div>
+        <button class="btn primary"
+            onclick="location.href='resume-builder.htm'"
+            aria-label="Open Resume Builder">
+            RESUME MAKER
+        </button>
 
-    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30" alt="shopping">
-</div>
+        <button class="btn secondary"
+            onclick="location.href='haircut.htm'"
+            aria-label="Book Haircut">
+            BOOK MY HAIR CUT
+        </button>
+    </section>
 
+    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+         alt="Online shopping products"
+         loading="lazy">
+</main>
 
 <footer>
-    <p>(MANIK_A_RNIKA). All Rights Reserved.</p>
+    <p>© MANIK_A_RNIKA — All Rights Reserved.</p>
 </footer>
 
 </body>
