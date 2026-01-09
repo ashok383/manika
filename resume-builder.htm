@@ -73,13 +73,13 @@ button{
     </div>
 
 <div class="container">
-<h4>🌸🌿 (MANIK_A_RNIKA)_(RESUME_BUILDER) 🌿🌸</h4>
+<h4>🌸🌿(RESUME_BUILDER) 🌿🌸</h4>
 
 <label>Upload Photo</label>
 <input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName" value="Manik_A_rnikA">
+<input id="fullName" value="remomanik">
 
 <label>Date of Birth</label>
 <input id="dob" type="date">
@@ -107,9 +107,9 @@ Enthusiastic and dedicated professional with a strong foundation in modern techn
 <div id="academicsContainer">
     <div class="academicRow" style="display:flex;gap:5px;">
         <input value="B.Tech in Computer Science">
-        <input value="XYZ University">
+        <input value="University">
         <input value="2026 - 2027">
-        <input value="8.5 CGPA">
+        <input value="  8.5 CGPA  ">
         <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
     </div>
 </div>
@@ -225,7 +225,7 @@ function openPreview(photo){
 
         <h2>Academic Details</h2>
         <table>
-        <tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA/PERCENTAGE</th></tr>
+        <tr><th>COURSE</th><th>INSTITUTE</th><th>YEAR</th><th>GPA/PERCENTAGE</th></tr>
         ${[...document.querySelectorAll(".academicRow")].map(r=>{
             const i=r.querySelectorAll("input");
             return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
