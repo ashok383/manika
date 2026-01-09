@@ -21,23 +21,16 @@
     --radius:18px;
 }
 
-*,
-*::before,
-*::after{
+*{
     margin:0;
     padding:0;
     box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
 }
 
 body{
     font-family:'Poppins',sans-serif;
     background:var(--light);
     color:#333;
-    line-height:1.6;
 }
 
 /* ================= HEADER & BANNER ================= */
@@ -46,14 +39,37 @@ header{
     overflow:hidden;
 }
 
+/* Banner container */
+.top-banner{
+    width:100%;
+    height:360px;              /* Desktop */
+}
+
+/* Banner image judged properly */
 .top-banner img{
     width:100%;
-    height:320px;
-    object-fit:cover;
+    height:100%;
+    object-fit:cover;          /* No stretch */
+    object-position:center;    /* Balanced center */
     display:block;
     filter:brightness(0.85);
 }
 
+/* Tablet */
+@media (max-width:900px){
+    .top-banner{
+        height:280px;
+    }
+}
+
+/* Mobile */
+@media (max-width:500px){
+    .top-banner{
+        height:220px;
+    }
+}
+
+/* ================= NAV ================= */
 nav{
     position:absolute;
     top:0;
@@ -61,7 +77,6 @@ nav{
     width:100%;
     padding:18px 8%;
     display:flex;
-    justify-content:space-between;
     align-items:center;
     background:linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,0));
 }
@@ -70,13 +85,12 @@ nav h1{
     color:#fff;
     font-size:28px;
     font-weight:700;
-    letter-spacing:1px;
 }
 
 /* ================= HERO ================= */
 .hero{
     max-width:1200px;
-    margin:-80px auto 0;
+    margin:-90px auto 0;
     padding:40px 8%;
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -84,7 +98,7 @@ nav h1{
     align-items:center;
     background:#fff;
     border-radius:var(--radius);
-    box-shadow:0 20px 40px rgba(0,0,0,.1);
+    box-shadow:0 20px 40px rgba(0,0,0,.12);
 }
 
 .hero-text h2{
@@ -105,20 +119,17 @@ nav h1{
 
 /* ================= BUTTONS ================= */
 .btn{
-    display:inline-block;
     padding:14px 30px;
     border-radius:30px;
     border:none;
     font-weight:600;
-    font-size:15px;
     cursor:pointer;
-    transition:.3s ease;
-    text-decoration:none;
+    transition:.3s;
+    margin-right:10px;
 }
 
 .btn.primary{
     background:var(--secondary);
-    color:#000;
 }
 
 .btn.secondary{
@@ -128,7 +139,7 @@ nav h1{
 
 .btn:hover{
     transform:translateY(-3px);
-    box-shadow:0 10px 20px rgba(0,0,0,.15);
+    box-shadow:0 10px 20px rgba(0,0,0,.2);
 }
 
 /* ================= FOOTER ================= */
@@ -138,7 +149,6 @@ footer{
     color:#aaa;
     text-align:center;
     padding:35px 15px;
-    font-size:14px;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -159,9 +169,6 @@ footer{
     .hero-text h2{
         font-size:30px;
     }
-    .top-banner img{
-        height:240px;
-    }
 }
 </style>
 </head>
@@ -173,7 +180,7 @@ footer{
         <img src="manika.jpeg" alt="ElegantShop Banner">
     </div>
 
-    <nav aria-label="Main Navigation">
+    <nav>
         <h1>ElegantShop</h1>
     </nav>
 </header>
@@ -183,24 +190,20 @@ footer{
         <h2>Shop Smart. Live Better.</h2>
         <p>
             Discover premium products at unbeatable prices.  
-            Designed for quality, trust, and modern living.
+            Quality, trust, and modern shopping experience.
         </p>
 
-        <button class="btn primary"
-            onclick="location.href='resume-builder.htm'"
-            aria-label="Open Resume Builder">
+        <button class="btn primary" onclick="location.href='resume-builder.htm'">
             RESUME MAKER
         </button>
 
-        <button class="btn secondary"
-            onclick="location.href='haircut.htm'"
-            aria-label="Book Haircut">
+        <button class="btn secondary" onclick="location.href='haircut.htm'">
             BOOK MY HAIR CUT
         </button>
     </section>
 
     <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
-         alt="Online shopping products"
+         alt="Shopping Products"
          loading="lazy">
 </main>
 
