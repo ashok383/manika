@@ -8,6 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.banner img {
+    width: 100%;
+    height: 250px;      /* balanced height */
+    object-fit: cover; /* keeps image proportional */
+}
+
+.content {
+    padding: 20px;
+}
 body{
     font-family:'Poppins',sans-serif;
     background:linear-gradient(135deg,#fce4ec,#e8f5e9);
@@ -54,10 +68,12 @@ button{
 </head>
 
 <body>
+    <div class="banner">
+        <img src="manika.jpeg" alt="Top Banner Image">
+    </div>
 
 <div class="container">
-<h1>🌸🌿 (MANIK_A_RNIKA) 🌿🌸</h1>
-<h1>🌸🌿 RESUME_BUILDER 🌿🌸</h1>
+<h4>🌸🌿 (MANIK_A_RNIKA)_(RESUME_BUILDER) 🌿🌸</h4>
 
 <label>Upload Photo</label>
 <input type="file" id="photo" accept="image/*">
