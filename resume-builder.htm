@@ -248,7 +248,33 @@ function openPreview(photo){
     `);
 }
 </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js">
+function payAndPreview() {
+    var options = {
+        "key": "rzp_test_1DP5mmOlF5G5ag", // Razorpay TEST key
+        "amount": 4900, // 49 INR (in paise)
+        "currency": "INR",
+        "name": "Resume Builder",
+        "description": "Resume Download & Print",
+        "handler": function (response) {
+            alert("Payment Successful ✅");
+            previewCV(); // Allow preview only after payment
+        },
+        "prefill": {
+            "name": fullName.value,
+            "email": email.value,
+            "contact": phone.value
+        },
+        "theme": {
+            "color": "#ec407a"
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+    </script>
     
 </body>
 </html>
