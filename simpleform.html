@@ -1,81 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Simple Resume Form</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-    padding: 20px;
-}
-.container {
-    max-width: 500px;
-    background: #fff;
-    padding: 20px;
-    margin: auto;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-input, textarea, button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-}
-button {
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-pre {
-    background: #eee;
-    padding: 10px;
-    margin-top: 15px;
-    overflow-x: auto;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Razorpay Simple Integration</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
+<body style="font-family: Arial; padding: 40px;">
 
-<body>
+    <h2>Razorpay Payment Demo</h2>
+    <button id="payBtn" style="padding:10px 20px; font-size:16px;">
+        Pay ₹100
+    </button>
 
-<div class="container">
-    <h2>Online Resume Form</h2>
+    <script>
+        document.getElementById("payBtn").onclick = function () {
 
-    <input type="text" id="name" placeholder="Full Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="text" id="phone" placeholder="Phone Number" required>
-    <textarea id="skills" placeholder="Skills (comma separated)"></textarea>
+            var options = {
+                "key": "YOUR_RAZORPAY_KEY_ID", // Enter the Key ID generated from Razorpay Dashboard
+                "amount": 10000, // Amount in paise (₹100)
+                "currency": "INR",
+                "name": "Demo Company",
+                "description": "Test Transaction",
+                "image": "https://razorpay.com/favicon.png",
+                "handler": function (response) {
+                    alert("Payment Successful!");
+                    alert("Payment ID: " + response.razorpay_payment_id);
+                },
+                "prefill": {
+                    "name": "Test User",
+                    "email": "test@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
 
-    <button onclick="saveData()">Submit</button>
-
-    <h3>Stored Data (JSON)</h3>
-    <pre id="output"></pre>
-</div>
-
-<script>
-function saveData() {
-    const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        skills: document.getElementById("skills").value.split(","),
-        createdAt: new Date().toISOString()
-    };
-
-    // Simulate storing data (localStorage)
-    let allData = JSON.parse(localStorage.getItem("resumeData")) || [];
-    allData.push(data);
-    localStorage.setItem("resumeData", JSON.stringify(allData));
-
-    document.getElementById("output").textContent =
-        JSON.stringify(allData, null, 2);
-
-    alert("Data saved successfully (local test)!");
-}
-</script>
+            var rzp = new Razorpay(options);
+            rzp.open();
+        };
+    </script>
 
 </body>
 </html>
