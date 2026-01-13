@@ -1,45 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Razorpay Simple Integration</title>
+    <title>Form Payment PDF Download</title>
+
+    <!-- Razorpay -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
-<body style="font-family: Arial; padding: 40px;">
+<body style="font-family:Arial; padding:40px;">
 
-    <h2>Razorpay Payment Demo</h2>
-    <button id="payBtn" style="padding:10px 20px; font-size:16px;">
-        Pay ₹100
-    </button>
+<h2>Fill Form & Pay to Download PDF</h2>
 
-    <script>
-        document.getElementById("payBtn").onclick = function () {
+<form id="userForm">
+    <input type="text" id="name" placeholder="Name" required><br><br>
+    <input type="email" id="email" placeholder="Email" required><br><br>
+    <input type="text" id="course" placeholder="Course" required><br><br>
 
-            var options = {
-                "key": "YOUR_RAZORPAY_KEY_ID", // Enter the Key ID generated from Razorpay Dashboard
-                "amount": 10000, // Amount in paise (₹100)
-                "currency": "INR",
-                "name": "Demo Company",
-                "description": "Test Transaction",
-                "image": "https://razorpay.com/favicon.png",
-                "handler": function (response) {
-                    alert("Payment Successful!");
-                    alert("Payment ID: " + response.razorpay_payment_id);
-                },
-                "prefill": {
-                    "name": "Test User",
-                    "email": "test@example.com",
-                    "contact": "9999999999"
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
+    <button type="button" onclick="payNow()">Pay ₹50 & Download</button>
+</form>
 
-            var rzp = new Razorpay(options);
-            rzp.open();
-        };
-    </script>
+<script>
+function payNow() {
+
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var course = document.getElementById("course").value;
+
+    if (!name || !email || !course) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    var options = {
+        "key": "YOUR_RAZORPAY_KEY_ID",
+        "amount": 5000,
+        "currency": "INR",
+        "name": "PDF Generator",
+        "description": "Form PDF Download",
+        "handler": function (response) {
+            generatePDF(name, email, course);
+        },
+        "prefill": {
+            "name": name,
+            "email": email
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+function generatePDF(name, email, course) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.text("User Details", 20, 20);
+    doc.text("Name: " + name, 20, 40);
+    doc.text("Email: " + email, 20, 50);
+    doc.text("Course: " + course, 20, 60);
+
+    doc.save("details.pdf");
+}
+</script>
 
 </body>
 </html>
