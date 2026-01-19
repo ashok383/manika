@@ -1,212 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-body { margin: 0; font-family:'Poppins',sans-serif; background: linear-gradient(135deg, #f9fbe7, #ffe0b2); }
-.container{ max-width:900px; margin:20px auto; padding:20px; background: linear-gradient(135deg, #fffde7, #fff3e0); border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,.15); }
-h1{text-align:center; background: linear-gradient(90deg, #ff5252, #ff4081, #7c4dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size:2em;}
-label{font-weight:600;display:block;margin-top:12px; color:#4a148c; font-size:1rem;}
-input,textarea{ width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:2px solid #ccc; font-size:14px; transition: all 0.3s ease;}
-input:focus, textarea:focus{ border-color:#ff4081; outline:none; box-shadow:0 0 8px rgba(255,64,129,.5); background: #fff8e1;}
-button{ padding:10px 20px; border:none; border-radius:10px; font-weight:600; cursor:pointer; margin-top:10px; transition: all 0.3s ease; font-size:1rem;}
-.preview-btn{background:linear-gradient(45deg,#ff4081,#ffea00,#ff4081); color:#fff;}
-.add-btn{background:linear-gradient(45deg,#448aff,#40c4ff,#448aff); color:#fff;}
-.remove-btn{background:linear-gradient(45deg,#ff1744,#f50057,#ff1744); color:#fff;}
-.download-btn{background:linear-gradient(45deg,#00e676,#1de9b6,#00e676); color:#fff;}
-
-/* Popup styles */
-#previewPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; overflow:auto;}
-#popupContent { position:relative; width:95%; max-width:950px; margin:40px auto; background: linear-gradient(135deg,#f3e5f5,#e1f5fe,#e8f5e9); padding:20px; border-radius:16px; max-height:90vh; overflow-y:auto; box-shadow:0 0 20px rgba(0,0,0,0.3);}
-#closePopup { position:absolute; top:10px; right:10px; background:#d50000; color:#fff; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:1rem;}
-.page { padding:20px; border:8px double #ff4081; border-radius:16px; background: linear-gradient(180deg,#ffffff,#ffe0f0); box-shadow:0 0 15px rgba(255,64,129,.4); scroll-behavior:smooth; }
-.page h2{background: linear-gradient(45deg,#448aff,#7c4dff,#ff4081); color:#fff; padding:8px; border-radius:12px; text-shadow: 1px 1px 2px #000;}
-.page span{background: linear-gradient(45deg,#ff4081,#ffea00,#ff4081); color:#fff; padding:5px 12px; border-radius:12px; margin:3px; display:inline-block; text-shadow: 1px 1px 1px #000;}
-.page table{width:100%;border-collapse:collapse; margin-bottom:10px; box-shadow:0 0 5px rgba(0,0,0,.2);}
-.page th, .page td{border:2px solid #555; padding:8px; text-align:center;}
-.page th{background: linear-gradient(45deg,#00bfa5,#1de9b6,#00bfa5); color:#fff; text-shadow: 1px 1px 1px #000;}
-.page .header{display:flex;align-items:center;gap:20px; margin-bottom:15px;}
-.page img{width:120px;height:120px;border-radius:50%;object-fit:cover; border:3px solid #ff4081; box-shadow:0 0 10px rgba(255,64,129,.5);}
-.page p, .page div{margin:4px 0; font-size:0.95rem;}
-</style>
+    <meta charset="UTF-8">
+    <title>Shining Resume Builder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body{
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg,#1d2671,#c33764);
+            margin:0;
+            padding:20px;
+            overflow-y: scroll;
+        }
+        .container{
+            max-width:1100px;
+            margin:auto;
+            background:#fff;
+            padding:25px;
+            border-radius:15px;
+            box-shadow:0 0 25px gold;
+            border: 10px solid;
+            border-image: linear-gradient(45deg,red,orange,yellow,green,blue,purple) 1;
+        }
+        h2{
+            text-align:center;
+            color:#c33764;
+            text-shadow:0 0 10px gold;
+        }
+        label{
+            font-weight:600;
+        }
+        input, textarea{
+            width:100%;
+            padding:10px;
+            margin-bottom:10px;
+            border-radius:6px;
+            border:1px solid #ccc;
+        }
+        textarea{
+            resize:none
+        }
+        button{
+            padding:10px 18px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:600;
+        }
+        .btn-add{
+            background:#27ae60;
+            color:#fff
+        }
+        .btn-del{
+            background:#e74c3c;
+            color:#fff
+        }
+        .btn-preview{
+            background:#2980b9;
+            color:#fff
+        }
+        .btn-pay{
+            background:#f39c12;
+            color:#fff
+        }
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:10px;
+        }
+        table th, table td{
+            border:1px solid #000;
+            padding:8px;
+            text-align:center;
+        }
+        #resumePreview{
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.6);
+            overflow-y: scroll;
+        }
+        .preview-box{
+            background:#fff;
+            width:80%;
+            margin:40px auto;
+            padding:20px;
+            border:6px solid;
+            border-image:linear-gradient(45deg,red,orange,yellow,green,blue,purple) 1;
+            box-shadow:0 0 30px gold;
+        }
+        .preview-header{
+            display:flex;
+            justify-content:space-between;
+        }
+        .preview-header img{
+            width:120px;
+            height:140px;
+            object-fit:cover;
+            border:3px solid #000;
+        }
+        .close{
+            background:red;
+            color:white;
+        }
+        @media (max-width: 768px) {
+            .container{
+                padding:15px;
+                margin:10px;
+            }
+            .preview-box{
+                width:95%;
+                margin:20px auto;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="banner">
-    <img src="manika.jpeg" alt="Top Banner Image" style="width:100%; height:250px; object-fit:cover; filter: brightness(1.1);">
-</div>
-
-<div class="container">
-    <h4>🌸🌿(RESUME_BUILDER) 🌿🌸</h4>
-    <label>Upload Photo</label>
-    <input type="file" id="photo" accept="image/*">
-    <label>Full Name</label>
-    <input id="fullName" value="remomanik">
-    <label>Date of Birth</label>
-    <input id="dob" type="date">
-    <label>Email</label>
-    <input id="email" value="yourname@email.com">
-    <label>Phone</label>
-    <input id="phone" value="+91 9XXXXXXXXX">
-    <label>Address</label>
-    <textarea id="address">Hyderabad, Telangana, India</textarea>
-    <label>Career Objective</label>
-    <textarea id="objective" rows="6">A highly motivated, disciplined, and detail-oriented individual seeking a challenging position...</textarea>
-    <label>Professional Summary</label>
-    <textarea id="summary">Enthusiastic and dedicated professional with a strong foundation in modern technologies...</textarea>
-    
-    <label>Academic Details</label>
-    <div id="academicsContainer">
-        <div class="academicRow" style="display:flex;gap:5px;">
-            <input value="B.Tech in Computer Science">
-            <input value="University">
-            <input value="2026 - 2027">
-            <input value="8.5 CGPA">
-            <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-        </div>
-    </div>
-    <button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
-
-    <label>Education</label>
-    <textarea id="education">Bachelor of Technology in Computer Science</textarea>
-    <label>Experience</label>
-    <textarea id="experience">Fresher / Internship experience</textarea>
-    <label>Technical Skills</label>
-    <input id="skills" value="HTML, CSS, JavaScript, React, Node.js">
-    <label>Projects</label>
-    <textarea id="projects">Resume Builder, E-commerce Website</textarea>
-    <label>Habits / Strengths</label>
-    <textarea id="habits">Quick learner, disciplined, team player</textarea>
-    <label>Declaration</label>
-    <textarea id="declaration">I hereby declare that the information furnished above is true and correct.</textarea>
-    <label>Place</label>
-    <input id="place" value="Hyderabad">
-    <label>Date</label>
-    <input id="date" type="date">
-    <label>Signature</label>
-    <input id="signature" value="manikhanta">
-    
-    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-    <button class="download-btn" onclick="payAndDownload()">💾 Pay & Download PDF</button>
-</div>
-
-<!-- Popup Preview -->
-<div id="previewPopup">
-    <div id="popupContent">
-        <button id="closePopup" onclick="closePopup()">✖ Close</button>
-        <div id="popupResume"></div>
-    </div>
-</div>
-
-<!-- Razorpay and html2pdf libraries -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<script>
-function addAcademic(){
-    const container=document.getElementById("academicsContainer");
-    const div=document.createElement("div");
-    div.className="academicRow";
-    div.style.display="flex";
-    div.style.gap="5px";
-    div.innerHTML=`<input value="Course"><input value="Institute / University"><input value="Year"><input value="GPA / %"><button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
-    container.appendChild(div);
-}
-
-function removeAcademic(btn){
-    btn.parentElement.remove();
-}
-
-function previewCV(){
-    const photoInput=document.getElementById("photo").files[0];
-    const reader=new FileReader();
-    reader.onload=e=>{
-        const content=generateResumeHTML(e.target.result);
-        document.getElementById("popupResume").innerHTML=content;
-        document.getElementById("previewPopup").style.display="block";
-    }
-    if(photoInput) reader.readAsDataURL(photoInput);
-    else { 
-        const content=generateResumeHTML("");
-        document.getElementById("popupResume").innerHTML=content;
-        document.getElementById("previewPopup").style.display="block";
-    }
-}
-
-function closePopup(){
-    document.getElementById("previewPopup").style.display="none";
-}
-
-function generateResumeHTML(photo){
-    return `
-    <div class="page">
-        <div class="header">
-            ${photo ? `<img src="${photo}">` : ""}
-            <div>
-                <h1>${document.getElementById("fullName").value}</h1>
-                <p><b>DOB:</b> ${document.getElementById("dob").value}</p>
-                <p>${document.getElementById("email").value} | ${document.getElementById("phone").value}</p>
-                <p>${document.getElementById("address").value}</p>
-            </div>
-        </div>
-        <h2>Career Objective</h2><p>${document.getElementById("objective").value}</p>
-        <h2>Professional Summary</h2><p>${document.getElementById("summary").value}</p>
-        <h2>Academic Details</h2>
-        <table>
-            <tr><th>COURSE</th><th>INSTITUTE</th><th>YEAR</th><th>GPA/PERCENTAGE</th></tr>
-            ${[...document.querySelectorAll(".academicRow")].map(r=>{
-                const i=r.querySelectorAll("input");
-                return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
-            }).join("")}
+    <div class="container">
+        <h2>✨ Shining Resume Builder ✨</h2>
+        <label>Full Name</label>
+        <input id="name">
+        <label>Date of Birth</label>
+        <input type="date" id="dob">
+        <label>Email</label>
+        <input id="email">
+        <label>Mobile</label>
+        <input id="mobile">
+        <label>Address</label>
+        <textarea id="address"></textarea>
+        <label>Career Objective</label>
+        <textarea id="objective"></textarea>
+        <label>Passport Photo</label>
+        <input type="file" id="photo" accept="image/*">
+        <h3>Academic Qualification</h3>
+        <table id="eduTable">
+            <tr>
+                <th>Course</th><th>Institution</th><th>Year</th><th>Percentage</th><th>Action</th>
+            </tr>
         </table>
-        <h2>Technical Skills</h2>${(document.getElementById("skills").value||"").split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
-        <h2>Projects</h2><p>${document.getElementById("projects").value}</p>
-        <h2>Habits / Strengths</h2><p>${document.getElementById("habits").value}</p>
-        <h2>Declaration</h2><p>${document.getElementById("declaration").value}</p>
-        <p><b>Place:</b> ${document.getElementById("place").value}</p>
-        <p><b>Date:</b> ${document.getElementById("date").value}</p>
-        <p><b>Signature:</b> ${document.getElementById("signature").value}</p>
+        <button class="btn-add" onclick="addRow()">Add Row</button>
+        <label>Skills</label>
+        <textarea id="skills"></textarea>
+        <label>Experience</label>
+        <textarea id="experience"></textarea>
+        <label>Declaration</label>
+        <textarea id="declaration">I hereby declare that the above information is true.</textarea>
+        <label>Place</label>
+        <input id="place">
+        <label>Date</label>
+        <input type="date" id="date">
+        <br><br>
+        <button class="btn-preview" onclick="previewResume()">Preview</button>
+        <button class="btn-pay" onclick="payNow()">Pay & Download PDF</button>
     </div>
-    `;
-}
-
-function payAndDownload(){
-    const options = {
-        "key": "rzp_live_S5ex0BvHGJcmo6",
-        "amount": 10,
-        "currency": "INR",
-        "name": "Resume Builder Payment",
-        "description": "Pay to download your Resume PDF",
-        "handler": function (response){
-            generatePDF();
-        },
-        "prefill": {
-            "name": document.getElementById("fullName").value,
-            "email": document.getElementById("email").value,
-            "contact": document.getElementById("phone").value
-        },
-        "theme": { "color": "#4caf50" }
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
-}
-
-function generatePDF(){
-    const photoInput=document.getElementById("photo").files[0];
-    const reader=new FileReader();
-    reader.onload=e=>{
-        const content=generateResumeHTML(e.target.result);
-        html2pdf().from(content)
-            .set({margin:0.5, filename:`${document.getElementById("fullName").value}_Resume.pdf`})
-            .save();
-    }
-    if(photoInput) reader.readAsDataURL(photoInput);
-    else reader.onload({target:{result:""}});
-}
-</script>
-
+    <!-- PREVIEW -->
+    <div id="resumePreview">
+        <div class="preview-box" id="resumeContent">
+            <div class="preview-header">
+                <div>
+                    <h2 id="pname"></h2>
+                    <p id="pemail"></p>
+                    <p id="pmobile"></p>
+                </div>
+                <img id="pphoto">
+            </div>
+            <hr>
+            <p><b>DOB:</b> <span id="pdob"></span></p>
+            <p><b>Address:</b> <span id="paddress"></span></p>
+            <p><b>Objective:</b> <span id="pobjective"></span></p>
+            <h3>Education</h3>
+            <div id="pedu"></div>
+            <p><b>Skills:</b> <span id="pskills"></span></p>
+            <p><b>Experience:</b> <span id="pexp"></span></p>
+            <p><b>Declaration:</b> <span id="pdec"></span></p>
+            <p><b>Place:</b> <span id="pplace"></span></p>
+            <p><b>Date:</b> <span id="pdate"></span></p>
+            <button class="close" onclick="closePreview()">Close</button>
+        </div>
+    </div>
+    <script>
+        function addRow(){
+            let t=document.getElementById("eduTable");
+            let r=t.insertRow();
+            r.innerHTML=`<td><input></td><td><input></td><td><input></td><td><input></td><td><button class="btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>`;
+        }
+        function previewResume(){
+            pname.innerText=name.value;
+            pemail.innerText=email.value;
+            pmobile.innerText=mobile.value;
+            pdob.innerText=dob.value;
+            paddress.innerText=address.value;
+            pobjective.innerText=objective.value;
+            pskills.innerText=skills.value;
+            pexp.innerText=experience.value;
+            pdec.innerText=declaration.value;
+            pplace.innerText=place.value;
+            pdate.innerText=date.value;
+            let eduHTML="<table>"+eduTable.innerHTML+"</table>";
+            pedu.innerHTML=eduHTML;
+            let file=photo.files[0];
+            if(file){
+                let r=new FileReader();
+                r.onload=e=>pphoto.src=e.target.result;
+                r.readAsDataURL(file);
+            }
+            resumePreview.style.display="block";
+        }
+        function closePreview(){
+            resumePreview.style.display="none";
+        }
+        function payNow(){
+            let options={
+                key:"rzp_live_S5ex0BvHGJcmo6", // Replace with your Razorpay key
+                amount:10,
+                currency:"INR",
+                name:"Resume Download",
+                description:"PDF Resume",
+                handler:function(){
+                    downloadPDF();
+                }
+            };
+            new Razorpay(options).open();
+        }
+        function downloadPDF(){
+            html2pdf().from(document.getElementById("resumeContent"))
+            .set({
+                margin:0.5,
+                filename:'resume.pdf',
+                html2canvas:{scale:2},
+                jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
+            }).save();
+        }
+    </script>
 </body>
 </html>
