@@ -1,51 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Form Payment PDF Download</title>
+<meta charset="UTF-8">
+<title>Payment to Download PDF</title>
 
-    <!-- Razorpay -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+}
+.container {
+    width: 350px;
+    margin: 80px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 6px;
+}
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+button {
+    background: #2d7ef7;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+</style>
 </head>
-<body style="font-family:Arial; padding:40px;">
 
-<h2>Fill Form & Pay to Download PDF</h2>
+<body>
 
-<form id="userForm">
-    <input type="text" id="name" placeholder="Name" required><br><br>
-    <input type="email" id="email" placeholder="Email" required><br><br>
-    <input type="text" id="course" placeholder="Course" required><br><br>
+<div class="container">
+    <h3>Pay & Download PDF</h3>
 
-    <button type="button" onclick="payNow()">Pay ₹50 & Download</button>
-</form>
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="email" id="email" placeholder="Your Email" required>
+
+    <button onclick="payNow()">Pay ₹1</button>
+</div>
 
 <script>
 function payNow() {
 
     var name = document.getElementById("name").value;
     var email = document.getElementById("email").value;
-    var course = document.getElementById("course").value;
 
-    if (!name || !email || !course) {
+    if(name === "" || email === "") {
         alert("Please fill all fields");
         return;
     }
 
     var options = {
-        "key": "YOUR_RAZORPAY_KEY_ID",
-        "amount": 5000,
+        "key": "rzp_live_S5ex0BvHGJcmo6",   // ONLY KEY ID (safe)
+        "amount": 100,      // ₹10 = 1000 paise
         "currency": "INR",
-        "name": "PDF Generator",
-        "description": "Form PDF Download",
+        "name": "PDF Download",
+        "description": "Payment for PDF",
         "handler": function (response) {
-            generatePDF(name, email, course);
+            generatePDF(name, email, response.razorpay_payment_id);
         },
         "prefill": {
             "name": name,
             "email": email
+        },
+        "theme": {
+            "color": "#3399cc"
         }
     };
 
@@ -53,16 +80,19 @@ function payNow() {
     rzp.open();
 }
 
-function generatePDF(name, email, course) {
+function generatePDF(name, email, paymentId) {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const pdf = new jsPDF();
 
-    doc.text("User Details", 20, 20);
-    doc.text("Name: " + name, 20, 40);
-    doc.text("Email: " + email, 20, 50);
-    doc.text("Course: " + course, 20, 60);
+    pdf.setFontSize(14);
+    pdf.text("Payment Successful", 20, 20);
 
-    doc.save("details.pdf");
+    pdf.setFontSize(12);
+    pdf.text("Name: " + name, 20, 40);
+    pdf.text("Email: " + email, 20, 50);
+    pdf.text("Payment ID: " + paymentId, 20, 60);
+
+    pdf.save("payment_receipt.pdf");
 }
 </script>
 
