@@ -1,242 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Shining Resume Builder</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Razorpay -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <!-- html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        body{
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg,#1d2671,#c33764);
-            margin:0;
-            padding:20px;
-            overflow-y: scroll;
-        }
-        .container{
-            max-width:1100px;
-            margin:auto;
-            background:#fff;
-            padding:25px;
-            border-radius:15px;
-            box-shadow:0 0 25px gold;
-            border: 10px solid;
-            border-image: linear-gradient(45deg,red,orange,yellow,green,blue,purple) 1;
-        }
-        h2{
-            text-align:center;
-            color:#c33764;
-            text-shadow:0 0 10px gold;
-        }
-        label{
-            font-weight:600;
-        }
-        input, textarea{
-            width:100%;
-            padding:10px;
-            margin-bottom:10px;
-            border-radius:6px;
-            border:1px solid #ccc;
-        }
-        textarea{
-            resize:none
-        }
-        button{
-            padding:10px 18px;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;
-            font-weight:600;
-        }
-        .btn-add{
-            background:#27ae60;
-            color:#fff
-        }
-        .btn-del{
-            background:#e74c3c;
-            color:#fff
-        }
-        .btn-preview{
-            background:#2980b9;
-            color:#fff
-        }
-        .btn-pay{
-            background:#f39c12;
-            color:#fff
-        }
-        table{
-            width:100%;
-            border-collapse:collapse;
-            margin-top:10px;
-        }
-        table th, table td{
-            border:1px solid #000;
-            padding:8px;
-            text-align:center;
-        }
-        #resumePreview{
-            display:none;
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.6);
-            overflow-y: scroll;
-        }
-        .preview-box{
-            background:#fff;
-            width:80%;
-            margin:40px auto;
-            padding:20px;
-            border:6px solid;
-            border-image:linear-gradient(45deg,red,orange,yellow,green,blue,purple) 1;
-            box-shadow:0 0 30px gold;
-        }
-        .preview-header{
-            display:flex;
-            justify-content:space-between;
-        }
-        .preview-header img{
-            width:120px;
-            height:140px;
-            object-fit:cover;
-            border:3px solid #000;
-        }
-        .close{
-            background:red;
-            color:white;
-        }
-        @media (max-width: 768px) {
-            .container{
-                padding:15px;
-                margin:10px;
-            }
-            .preview-box{
-                width:95%;
-                margin:20px auto;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Premium Resume Builder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- html2pdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    margin:0;
+    padding:20px;
+    color:#fff;
+}
+.container{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+.card{
+    background:#fff;
+    color:#000;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+input,textarea{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+button{
+    padding:12px 20px;
+    background:linear-gradient(135deg,#ff512f,#dd2476);
+    border:none;
+    color:#fff;
+    font-weight:600;
+    border-radius:30px;
+    cursor:pointer;
+    margin:10px 5px 0 0;
+}
+button:hover{opacity:.9}
+.resume{
+    border:6px solid #dd2476;
+    padding:25px;
+    border-radius:12px;
+}
+.header{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+.header img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #dd2476;
+}
+h1{margin:0}
+.section{margin-top:20px}
+.section h3{
+    border-bottom:2px solid #dd2476;
+    padding-bottom:5px;
+}
+.hidden{display:none}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>✨ Shining Resume Builder ✨</h2>
-        <label>Full Name</label>
-        <input id="name">
-        <label>Date of Birth</label>
-        <input type="date" id="dob">
-        <label>Email</label>
-        <input id="email">
-        <label>Mobile</label>
-        <input id="mobile">
-        <label>Address</label>
-        <textarea id="address"></textarea>
-        <label>Career Objective</label>
-        <textarea id="objective"></textarea>
-        <label>Passport Photo</label>
-        <input type="file" id="photo" accept="image/*">
-        <h3>Academic Qualification</h3>
-        <table id="eduTable">
-            <tr>
-                <th>Course</th><th>Institution</th><th>Year</th><th>Percentage</th><th>Action</th>
-            </tr>
-        </table>
-        <button class="btn-add" onclick="addRow()">Add Row</button>
-        <label>Skills</label>
-        <textarea id="skills"></textarea>
-        <label>Experience</label>
-        <textarea id="experience"></textarea>
-        <label>Declaration</label>
-        <textarea id="declaration">I hereby declare that the above information is true.</textarea>
-        <label>Place</label>
-        <input id="place">
-        <label>Date</label>
-        <input type="date" id="date">
-        <br><br>
-        <button class="btn-preview" onclick="previewResume()">Preview</button>
-        <button class="btn-pay" onclick="payNow()">Pay & Download PDF</button>
-    </div>
-    <!-- PREVIEW -->
-    <div id="resumePreview">
-        <div class="preview-box" id="resumeContent">
-            <div class="preview-header">
-                <div>
-                    <h2 id="pname"></h2>
-                    <p id="pemail"></p>
-                    <p id="pmobile"></p>
-                </div>
-                <img id="pphoto">
-            </div>
-            <hr>
-            <p><b>DOB:</b> <span id="pdob"></span></p>
-            <p><b>Address:</b> <span id="paddress"></span></p>
-            <p><b>Objective:</b> <span id="pobjective"></span></p>
-            <h3>Education</h3>
-            <div id="pedu"></div>
-            <p><b>Skills:</b> <span id="pskills"></span></p>
-            <p><b>Experience:</b> <span id="pexp"></span></p>
-            <p><b>Declaration:</b> <span id="pdec"></span></p>
-            <p><b>Place:</b> <span id="pplace"></span></p>
-            <p><b>Date:</b> <span id="pdate"></span></p>
-            <button class="close" onclick="closePreview()">Close</button>
+
+<h1 style="text-align:center">🌟 World-Class Resume Builder</h1>
+
+<div class="container">
+
+<!-- FORM -->
+<div class="card">
+<h2>Enter Your Details</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Mobile Number">
+<textarea id="objective" placeholder="Career Objective"></textarea>
+<textarea id="skills" placeholder="Skills (comma separated)"></textarea>
+<textarea id="education" placeholder="Education"></textarea>
+<textarea id="experience" placeholder="Experience"></textarea>
+
+<label>Upload Photo</label>
+<input type="file" id="photo" accept="image/*">
+
+<button onclick="preview()">Preview Resume</button>
+<button onclick="payAndDownload()">Pay & Download PDF</button>
+</div>
+
+<!-- PREVIEW -->
+<div class="card hidden" id="previewCard">
+<div class="resume" id="resume">
+    <div class="header">
+        <img id="pimg">
+        <div>
+            <h1 id="pname"></h1>
+            <p id="pemail"></p>
+            <p id="pphone"></p>
         </div>
     </div>
-    <script>
-        function addRow(){
-            let t=document.getElementById("eduTable");
-            let r=t.insertRow();
-            r.innerHTML=`<td><input></td><td><input></td><td><input></td><td><input></td><td><button class="btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>`;
+
+    <div class="section">
+        <h3>Career Objective</h3>
+        <p id="pobjective"></p>
+    </div>
+
+    <div class="section">
+        <h3>Skills</h3>
+        <p id="pskills"></p>
+    </div>
+
+    <div class="section">
+        <h3>Education</h3>
+        <p id="pedu"></p>
+    </div>
+
+    <div class="section">
+        <h3>Experience</h3>
+        <p id="pexp"></p>
+    </div>
+</div>
+</div>
+
+</div>
+
+<script>
+let imageData = "";
+
+document.getElementById("photo").addEventListener("change", function(){
+    const reader = new FileReader();
+    reader.onload = () => imageData = reader.result;
+    reader.readAsDataURL(this.files[0]);
+});
+
+function preview(){
+    document.getElementById("previewCard").classList.remove("hidden");
+    pname.innerText = name.value;
+    pemail.innerText = email.value;
+    pphone.innerText = phone.value;
+    pobjective.innerText = objective.value;
+    pskills.innerText = skills.value;
+    pedu.innerText = education.value;
+    pexp.innerText = experience.value;
+    pimg.src = imageData;
+}
+
+function payAndDownload(){
+    var options = {
+        "key": "ashok3;£+",
+        "amount": 9900,
+        "currency": "INR",
+        "name": "Premium Resume Builder",
+        "description": "Resume PDF Download",
+        "handler": function () {
+            html2pdf().from(document.getElementById("resume")).save("Resume.pdf");
+        },
+        "theme": {
+            "color": "#dd2476"
         }
-        function previewResume(){
-            pname.innerText=name.value;
-            pemail.innerText=email.value;
-            pmobile.innerText=mobile.value;
-            pdob.innerText=dob.value;
-            paddress.innerText=address.value;
-            pobjective.innerText=objective.value;
-            pskills.innerText=skills.value;
-            pexp.innerText=experience.value;
-            pdec.innerText=declaration.value;
-            pplace.innerText=place.value;
-            pdate.innerText=date.value;
-            let eduHTML="<table>"+eduTable.innerHTML+"</table>";
-            pedu.innerHTML=eduHTML;
-            let file=photo.files[0];
-            if(file){
-                let r=new FileReader();
-                r.onload=e=>pphoto.src=e.target.result;
-                r.readAsDataURL(file);
-            }
-            resumePreview.style.display="block";
-        }
-        function closePreview(){
-            resumePreview.style.display="none";
-        }
-        function payNow(){
-            let options={
-                key:"rzp_live_S5ex0BvHGJcmo6", // Replace with your Razorpay key
-                amount:100,
-                currency:"INR",
-                name:"Resume Download",
-                description:"PDF Resume",
-                handler:function(){
-                    downloadPDF();
-                }
-            };
-            new Razorpay(options).open();
-        }
-        function downloadPDF(){
-            html2pdf().from(document.getElementById("resumeContent"))
-            .set({
-                margin:0.5,
-                filename:'resume.pdf',
-                html2canvas:{scale:2},
-                jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
-            }).save();
-        }
-    </script>
+    };
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+</script>
+
 </body>
 </html>
