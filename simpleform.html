@@ -69,62 +69,77 @@ button{
 <body>
 
 <div class="container">
-<h1>🌸 Resume Builder 🌸</h1>
+<h4>🌸🌿(RESUME_BUILDER) 🌿🌸</h4>
 
 <label>Upload Photo</label>
-<input type="file" id="photo">
+<input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName">
+<input id="fullName" value="remomanik">
 
 <label>Date of Birth</label>
 <input id="dob" type="date">
 
 <label>Email</label>
-<input id="email">
+<input id="email" value="yourname@email.com">
 
 <label>Phone</label>
-<input id="phone">
+<input id="phone" value="+91 9XXXXXXXXX">
 
 <label>Address</label>
-<textarea id="address"></textarea>
+<textarea id="address">Hyderabad, Telangana, India</textarea>
 
 <label>Career Objective</label>
-<textarea id="objective"></textarea>
+<textarea id="objective" rows="6">
+A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.
+</textarea>
 
 <label>Professional Summary</label>
-<textarea id="summary"></textarea>
+<textarea id="summary">
+Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.
+</textarea>
 
 <label>Academic Details</label>
 <div id="academicsContainer">
-<div class="academicRow" style="display:flex;gap:5px">
-<input placeholder="Course">
-<input placeholder="Institute">
-<input placeholder="Year">
-<input placeholder="GPA">
-<button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-</div>
+    <div class="academicRow" style="display:flex;gap:5px;">
+        <input value="B.Tech in Computer Science">
+        <input value="University">
+        <input value="2026 - 2027">
+        <input value="  8.5 CGPA  ">
+        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
+    </div>
 </div>
 
 <button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
 
-<label>Skills (comma separated)</label>
-<input id="skills">
+<label>Education</label>
+<textarea id="education">Bachelor of Technology in Computer Science</textarea>
+
+<label>Experience</label>
+<textarea id="experience">Fresher / Internship experience</textarea>
+
+<label>Technical Skills</label>
+<input id="skills" value="HTML, CSS, JavaScript, React, Node.js">
 
 <label>Projects</label>
-<textarea id="projects"></textarea>
+<textarea id="projects">Resume Builder, E-commerce Website</textarea>
+
+<label>Habits / Strengths</label>
+<textarea id="habits">Quick learner, disciplined, team player</textarea>
 
 <label>Declaration</label>
-<textarea id="declaration"></textarea>
+<textarea id="declaration">
+I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.
+</textarea>
 
 <label>Place</label>
-<input id="place">
+<input id="place" value="Hyderabad">
 
 <label>Date</label>
 <input id="date" type="date">
 
 <label>Signature</label>
-<input id="signature">
+<input id="signature" value="manikhanta">
 
 <div style="margin-top:15px;">
     <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
