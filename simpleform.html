@@ -77,6 +77,12 @@ button{
 <label>Full Name</label>
 <input id="fullName" value="remomanik">
 
+<label>Father Name</label>
+<input id="fatherName" value="Father_Name">
+
+<label>Mother Name</label>
+<input id="motherName" value="Mother_Name">
+
 <label>Date of Birth</label>
 <input id="dob" type="date">
 
@@ -124,11 +130,11 @@ Enthusiastic and dedicated professional with a strong foundation in modern techn
 <label>Projects</label>
 <textarea id="projects">Resume Builder, E-commerce Website</textarea>
 
-<label>Languages Known</label>
-<input id="Languages" value="HINDI, ENGLISH, TELUGU,">
-
 <label>Habits / Strengths</label>
 <textarea id="habits">Quick learner, disciplined, team player</textarea>
+
+<label>Languages Known</label>
+<input id="Languages" value="HINDI, ENGLISH, TELUGU,">
 
 <label>Declaration</label>
 <textarea id="declaration">
@@ -297,9 +303,9 @@ async function generatePDF() {
         });
     }
 
-    drawPageBorder(); // Draw border for first page
+    drawPageBorder();
 
-    // ================= Add New Page with Border =================
+    // ================= Add New Page =================
     function addNewPage() {
         doc.addPage();
         y = 50;
@@ -307,15 +313,16 @@ async function generatePDF() {
     }
 
     // ================= Profile Photo =================
-    if(photo.files[0]){
-        const file = photo.files[0];
+    const photoInput = document.getElementById("photo");
+    if(photoInput.files[0]){
+        const file = photoInput.files[0];
         const reader = new FileReader();
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
             reader.onload = function(e){
                 const img = new Image();
                 img.onload = function(){
                     const imgWidth = 100;
-                    const imgHeight = 100 * (img.height/img.width);
+                    const imgHeight = 100 * (img.height / img.width);
                     if(y + imgHeight > pageHeight - margin) addNewPage();
                     doc.addImage(img, 'JPEG', pageWidth - imgWidth - margin, y-10, imgWidth, imgHeight);
                     resolve();
@@ -327,24 +334,34 @@ async function generatePDF() {
     }
 
     // ================= Header =================
+    const fullNameVal = document.getElementById("fullName").value;
+    const fatherNameVal = document.getElementById("fatherName").value;
+    const motherNameVal = document.getElementById("motherName").value;
+    const dobVal = document.getElementById("dob").value;
+    const emailVal = document.getElementById("email").value;
+    const phoneVal = document.getElementById("phone").value;
+    const addressVal = document.getElementById("address").value;
+
     doc.setFontSize(26);
     doc.setFont("helvetica","bold");
     doc.setTextColor(124,77,255);
-    doc.text(fullName.value, margin, y);
-    y += 35;
+    doc.text(fullNameVal, margin, y);
+    y += 30;
 
     doc.setFontSize(12);
     doc.setFont("helvetica","normal");
     doc.setTextColor(50,50,50);
-    doc.text(`DOB: ${dob.value} | ${email.value} | ${phone.value}`, margin, y);
+    doc.text(`Father: ${fatherNameVal} | Mother: ${motherNameVal}`, margin, y);
     y += 18;
-    doc.text(`Address: ${address.value}`, margin, y);
-    y += 35;
+    doc.text(`DOB: ${dobVal} | Email: ${emailVal} | Phone: ${phoneVal}`, margin, y);
+    y += 18;
+    doc.text(`Address: ${addressVal}`, margin, y);
+    y += 25;
 
     // ================= Section Header =================
-    function sectionHeader(title, color){
-        y += 20; // space before title
-        if(y > pageHeight - margin){ addNewPage(); }
+    function sectionHeader(title,color){
+        y += 15;
+        if(y > pageHeight - margin) addNewPage();
         doc.setFontSize(14);
         doc.setFont("helvetica","bold");
         doc.setTextColor(...color);
@@ -352,34 +369,34 @@ async function generatePDF() {
         doc.setFontSize(12);
         doc.setFont("helvetica","normal");
         doc.setTextColor(50,50,50);
-        y += 15; // space after title
+        y += 15;
     }
 
     // ================= Multi-line Text =================
     function addMultilineText(text){
         const lines = doc.splitTextToSize(text, pageWidth - 2*margin);
-        lines.forEach(line => {
-            if(y > pageHeight - margin){ addNewPage(); }
+        lines.forEach(line=>{
+            if(y > pageHeight - margin) addNewPage();
             doc.text(line, margin, y);
             y += 15;
         });
-        y += 10;
+        y += 5;
     }
 
     // ================= Career Objective =================
     sectionHeader("Career Objective",[255,64,129]);
-    addMultilineText(objective.value);
+    addMultilineText(document.getElementById("objective").value);
 
     // ================= Professional Summary =================
     sectionHeader("Professional Summary",[0,153,255]);
-    addMultilineText(summary.value);
+    addMultilineText(document.getElementById("summary").value);
 
     // ================= Academics Table =================
     sectionHeader("Academic Qualifications",[76,175,80]);
     const headers = [["Course","Institute","Year","GPA"]];
-    const data = [...document.querySelectorAll(".academicRow")].map(r=>{
-        const i = r.querySelectorAll("input");
-        return [i[0].value, i[1].value, i[2].value, i[3].value];
+    const data = [...document.querySelectorAll("#academicsContainer .academicRow")].map(row=>{
+        const inputs = row.querySelectorAll("input");
+        return [inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value];
     });
     doc.autoTable({
         head: headers,
@@ -390,15 +407,20 @@ async function generatePDF() {
         alternateRowStyles: { fillColor:[245,245,245] },
         styles: { fontSize:11 },
         margin: { left:margin, right:margin },
-        didDrawPage: (dataArg) => {
-            y = dataArg.cursor.y + 25; // update y after table
-            drawPageBorder(); // redraw border if table goes to next page
-        }
+        didDrawPage: (dataArg) => { y = dataArg.cursor.y + 20; drawPageBorder(); }
     });
+
+    // ================= Education =================
+    sectionHeader("Education",[255,193,7]);
+    addMultilineText(document.getElementById("education").value);
+
+    // ================= Experience =================
+    sectionHeader("Experience",[0,200,83]);
+    addMultilineText(document.getElementById("experience").value);
 
     // ================= Technical Skills =================
     sectionHeader("Technical Skills",[255,193,7]);
-    const skillsArr = skills.value.split(",").map(s=>s.trim());
+    const skillsArr = document.getElementById("skills").value.split(",").map(s=>s.trim());
     let x = margin;
     skillsArr.forEach(skill=>{
         const textWidth = doc.getTextWidth(skill) + 8;
@@ -406,32 +428,32 @@ async function generatePDF() {
         doc.text(skill, x, y);
         x += textWidth + 10;
     });
-    y += 30;
+    y += 25;
 
     // ================= Projects =================
     sectionHeader("Projects",[0,200,83]);
-    addMultilineText(projects.value);
+    addMultilineText(document.getElementById("projects").value);
 
     // ================= Habits / Strengths =================
     sectionHeader("Habits / Strengths",[255,87,34]);
-    addMultilineText(habits.value);
+    addMultilineText(document.getElementById("habits").value);
 
     // ================= Languages Known =================
     sectionHeader("Languages Known",[63,81,181]);
-    const languagesInput = document.getElementById("languages");
+    const languagesInput = document.getElementById("Languages");
     if(languagesInput) addMultilineText(languagesInput.value);
 
     // ================= Declaration =================
     sectionHeader("Declaration",[124,77,255]);
-    addMultilineText(declaration.value);
+    addMultilineText(document.getElementById("declaration").value);
 
     // ================= Place, Date, Signature =================
-    if(y + 60 > pageHeight - margin){ addNewPage(); }
-    doc.text(`Place: ${place.value}`, margin, y);
+    if(y + 60 > pageHeight - margin) addNewPage();
+    doc.text(`Place: ${document.getElementById("place").value}`, margin, y);
     y += 18;
-    doc.text(`Date: ${date.value}`, margin, y);
+    doc.text(`Date: ${document.getElementById("date").value}`, margin, y);
     y += 18;
-    doc.text(`Signature: ${signature.value}`, margin, y);
+    doc.text(`Signature: ${document.getElementById("signature").value}`, margin, y);
 
     // ================= Save PDF =================
     doc.save("Resume.pdf");
