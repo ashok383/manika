@@ -8,69 +8,65 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
+*{box-sizing:border-box}
 
-.banner img {
-    width: 100%;
-    height: 250px;      /* balanced height */
-    object-fit: cover; /* keeps image proportional */
-}
-
-.content {
-    padding: 20px;
-}
 body{
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#fce4ec,#e8f5e9);
     margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4,#a1c4fd,#c2e9fb);
+    background-size:400% 400%;
+    animation:bgMove 10s ease infinite;
 }
+
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
 .container{
     max-width:900px;
-    margin:20px auto;
-    padding:20px;
+    margin:30px auto;
+    padding:25px;
     background:#fff;
-    border-radius:16px;
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
 }
-h1{text-align:center;color:#ad1457}
-label{font-weight:600;display:block;margin-top:12px}
+
+h1{
+    text-align:center;
+    background:linear-gradient(90deg,#ff4081,#7c4dff,#00e5ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+label{font-weight:600;margin-top:12px;display:block}
 
 input,textarea{
     width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border-radius:6px;
+    padding:12px;
+    border-radius:10px;
     border:1px solid #ccc;
-    font-size:14px;
-}
-
-input:focus, textarea:focus{
-    border-color:#4caf50;
-    outline:none;
-    box-shadow:0 0 5px rgba(76,175,80,.4);
+    margin-bottom:10px;
 }
 
 button{
-    padding:10px 20px;
+    padding:12px 22px;
     border:none;
-    border-radius:10px;
-    font-weight:600;
+    border-radius:30px;
     cursor:pointer;
+    font-weight:600;
+    margin-right:10px;
 }
 
-.preview-btn{background:#ec407a;color:#fff}
-.add-btn{background:#9e9e9e;color:#fff}
+.preview-btn{background:#ff4081;color:#fff}
+.add-btn{background:#00c853;color:#fff}
 .remove-btn{background:#f44336;color:#fff}
+.download-btn{background:#2196f3;color:#fff}
 </style>
 </head>
 
 <body>
-    <div class="banner">
-        <img src="manika.jpeg" alt="Top Banner Image">
-    </div>
 
 <div class="container">
 <h4>🌸🌿(RESUME_BUILDER) 🌿🌸</h4>
@@ -80,6 +76,12 @@ button{
 
 <label>Full Name</label>
 <input id="fullName" value="remomanik">
+
+<label>Father Name</label>
+<input id="fatherName" value="Father_Name">
+
+<label>Mother Name</label>
+<input id="motherName" value="Mother_Name">
 
 <label>Date of Birth</label>
 <input id="dob" type="date">
@@ -131,6 +133,9 @@ Enthusiastic and dedicated professional with a strong foundation in modern techn
 <label>Habits / Strengths</label>
 <textarea id="habits">Quick learner, disciplined, team player</textarea>
 
+<label>Languages Known</label>
+<input id="Languages" value="HINDI, ENGLISH, TELUGU,">
+
 <label>Declaration</label>
 <textarea id="declaration">
 I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.
@@ -145,136 +150,329 @@ I hereby declare that the information furnished above is, to the best of my know
 <label>Signature</label>
 <input id="signature" value="manikhanta">
 
-<button class="preview-btn" onclick="previewCV()">👁 Preview / Print</button>
+<div style="margin-top:15px;">
+    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
+    <button class="download-btn" onclick="payAndDownload()">💳 Pay & Download PDF</button>
 </div>
+</div>
+
+<!-- Razorpay script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- jsPDF script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function addAcademic(){
-    const container=document.getElementById("academicsContainer");
-    const div=document.createElement("div");
-    div.className="academicRow";
-    div.style.display="flex";
-    div.style.gap="5px";
-    div.innerHTML=`
-        <input value="Course">
-        <input value="Institute / University">
-        <input value="Year">
-        <input value="GPA / %">
-        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-    `;
-    container.appendChild(div);
+    const d=document.createElement("div");
+    d.className="academicRow";
+    d.style.display="flex";
+    d.style.gap="5px";
+    d.innerHTML=`
+    <input placeholder="Course">
+    <input placeholder="Institute">
+    <input placeholder="Year">
+    <input placeholder="GPA">
+    <button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
+    academicsContainer.appendChild(d);
 }
 
-function removeAcademic(btn){
-    btn.parentElement.remove();
-}
+function removeAcademic(btn){btn.parentElement.remove();}
 
+// Preview CV in new window
 function previewCV(){
-    const photo=document.getElementById("photo").files[0];
-    const reader=new FileReader();
-    reader.onload=e=>openPreview(e.target.result);
-    if(photo) reader.readAsDataURL(photo);
-    else openPreview("");
+    const f = photo.files[0];
+    if(f){
+        const r = new FileReader();
+        r.onload = e => openPreview(e.target.result);
+        r.readAsDataURL(f);
+    } else openPreview("");
 }
 
+// Open preview window
 function openPreview(photo){
-    const win=window.open("","_blank","width=900,height=1200");
-    win.document.write(`
-    <html>
-    <head>
-    <title>Resume Preview</title>
-    <style>
-    body{font-family:Poppins;margin:20px;background:#fce4ec}
-    .page{
-        background:#fff;
-        padding:25px;
-        border:10px solid #4caf50;
-        box-shadow:0 0 0 5px #ec407a inset;
-    }
-    .header{display:flex;align-items:center;gap:20px}
-    h1{color:#ad1457;margin:0}
-    h2{background:#4caf50;color:#fff;padding:6px;border-radius:14px}
-    .dob{font-size:14px;color:#555}
-    img{width:120px;height:120px;border-radius:50%;object-fit:cover}
-    span{background:#ad1457;color:#fff;padding:5px 10px;border-radius:12px;margin:3px;display:inline-block}
-    table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #555;padding:6px}
-    th{background:#4caf50;color:#fff}
-    .btns{position:fixed;top:10px;right:10px}
-    </style>
-    </head>
+    const w = window.open("", "_blank", "width=900,height=1200");
+    w.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Poppins;background:#eee;}
+.page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid;border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
+.header{display:flex;gap:20px;align-items:center;}
+img{width:120px;height:120px;border-radius:50%;}
+.header h1{margin:0;color:#4caf50;}
+h2{color:#4caf50;margin-bottom:5px;margin-top:25px;}
+p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #aaa;padding:8px;text-align:center;}
+span{display:inline-block;background:#ff4081;color:#fff;padding:6px 14px;border-radius:30px;margin:4px;}
+.close-bar{position:fixed;bottom:0;left:0;width:100%;background:#222;text-align:center;padding:12px;}
+.close-bar button{background:#f44336;color:#fff;border:none;border-radius:30px;padding:10px 28px;font-weight:600;cursor:pointer;}
+</style>
+</head>
+<body>
 
-    <body>
-    <div class="btns">
-        <button onclick="window.print()">🖨 Print</button>
-    </div>
+<div class="page">
+<div class="header">
+${photo?`<img src="${photo}">`:""}
+<div>
+<h1>${fullName.value}</h1>
+<p><b>Father:</b> ${fatherName.value} | <b>Mother:</b> ${motherName.value}</p>
+<p><b>DOB:</b> ${dob.value}</p>
+<p>${email.value} | ${phone.value}</p>
+<p>${address.value}</p>
+</div>
+</div>
 
-    <div class="page">
-        <div class="header">
-            ${photo ? `<img src="${photo}">` : ""}
-            <div>
-                <h1>${fullName.value}</h1>
-                <div class="dob"><b>Date of Birth:</b> ${dob.value}</div>
-                <p>${email.value} | ${phone.value}</p>
-                <p>${address.value}</p>
-            </div>
-        </div>
+<h2>Career Objective</h2><p>${objective.value}</p>
+<h2>Professional Summary</h2><p>${summary.value}</p>
 
-        <h2>Career Objective</h2><p>${objective.value}</p>
-        <h2>Professional Summary</h2><p>${summary.value}</p>
+<h2>Academics</h2>
+<table>
+<tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA</th></tr>
+${[...document.querySelectorAll(".academicRow")].map(r=>{
+    let i = r.querySelectorAll("input");
+    return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
+}).join("")}
+</table>
 
-        <h2>Academic Details</h2>
-        <table>
-        <tr><th>COURSE</th><th>INSTITUTE</th><th>YEAR</th><th>GPA/PERCENTAGE</th></tr>
-        ${[...document.querySelectorAll(".academicRow")].map(r=>{
-            const i=r.querySelectorAll("input");
-            return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
-        }).join("")}
-        </table>
+<h2>Education</h2><p>${education.value}</p>
+<h2>Experience</h2><p>${experience.value}</p>
 
-        <h2>Technical Skills</h2>
-        ${(skills.value||"").split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
+<h2>Technical Skills</h2>
+${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 
-        <h2>Projects</h2><p>${projects.value}</p>
-        <h2>Habits / Strengths</h2><p>${habits.value}</p>
-        <h2>Declaration</h2><p>${declaration.value}</p>
+<h2>Projects</h2><p>${projects.value}</p>
+<h2>Habits / Strengths</h2><p>${habits.value}</p>
+<h2>Languages Known</h2><p>${Languages.value}</p>
 
-        <p><b>Place:</b> ${place.value}</p>
-        <p><b>Date:</b> ${date.value}</p>
-        <p><b>Signature:</b> ${signature.value}</p>
-    </div>
-    </body>
-    </html>
-    `);
+<h2>Declaration</h2><p>${declaration.value}</p>
+
+<p><b>Place:</b> ${place.value}</p>
+<p><b>Date:</b> ${date.value}</p>
+<p><b>Signature:</b> ${signature.value}</p>
+</div>
+
+<div class="close-bar">
+<button onclick="window.close()">❌ Close Preview</button>
+</div>
+
+</body>
+</html>
+`);
 }
-</script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js">
-function payAndPreview() {
-    var options = {
-        "key": "rzp_test_1DP5mmOlF5G5ag", // Razorpay TEST key
-        "amount": 4900, // 49 INR (in paise)
-        "currency": "INR",
-        "name": "Resume Builder",
-        "description": "Resume Download & Print",
-        "handler": function (response) {
-            alert("Payment Successful ✅");
-            previewCV(); // Allow preview only after payment
-        },
-        "prefill": {
-            "name": fullName.value,
-            "email": email.value,
-            "contact": phone.value
-        },
-        "theme": {
-            "color": "#ec407a"
-        }
-    };
 
-    var rzp = new Razorpay(options);
+// Razorpay + PDF download
+async function payAndDownload(){
+    const options = {
+        key: "rzp_live_S5ex0BvHGJcmo6", // Razorpay key
+        amount: 100, // 100 INR in paise
+        currency: "INR",
+        name: "Resume Builder",
+        description: "Pay to download your resume PDF",
+        handler: async function(response){
+            alert("Payment Successful ✅ ID: " + response.razorpay_payment_id);
+            await generatePDF();
+        },
+        prefill: {
+            name: fullName.value,
+            email: email.value,
+            contact: phone.value
+        },
+        theme:{color:"#2196f3"}
+    };
+    const rzp = new Razorpay(options);
     rzp.open();
 }
 
-    </script>
-    
+// Generate PDF using jsPDF
+async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 40;
+    let y = 50;
+
+    const gradientColors = [
+        {r:255,g:64,b:129},
+        {r:124,g:77,b:255},
+        {r:0,g:229,b:255},
+        {r:76,g:175,b:80}
+    ];
+
+    // ================= Draw Page Border =================
+    function drawPageBorder() {
+        gradientColors.forEach((color, i)=>{
+            doc.setDrawColor(color.r,color.g,color.b);
+            doc.setLineWidth(4 - i);
+            doc.rect(10 + i*3, 10 + i*3, pageWidth-20 - i*6, pageHeight-20 - i*6);
+        });
+    }
+
+    drawPageBorder();
+
+    // ================= Add New Page =================
+    function addNewPage() {
+        doc.addPage();
+        y = 50;
+        drawPageBorder();
+    }
+
+    // ================= Profile Photo =================
+    const photoInput = document.getElementById("photo");
+    if(photoInput.files[0]){
+        const file = photoInput.files[0];
+        const reader = new FileReader();
+        await new Promise(resolve => {
+            reader.onload = function(e){
+                const img = new Image();
+                img.onload = function(){
+                    const imgWidth = 100;
+                    const imgHeight = 100 * (img.height / img.width);
+                    if(y + imgHeight > pageHeight - margin) addNewPage();
+                    doc.addImage(img, 'JPEG', pageWidth - imgWidth - margin, y-10, imgWidth, imgHeight);
+                    resolve();
+                }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ================= Header =================
+    const fullNameVal = document.getElementById("fullName").value;
+    const fatherNameVal = document.getElementById("fatherName").value;
+    const motherNameVal = document.getElementById("motherName").value;
+    const dobVal = document.getElementById("dob").value;
+    const emailVal = document.getElementById("email").value;
+    const phoneVal = document.getElementById("phone").value;
+    const addressVal = document.getElementById("address").value;
+
+    doc.setFontSize(26);
+    doc.setFont("helvetica","bold");
+    doc.setTextColor(124,77,255);
+    doc.text(fullNameVal, margin, y);
+    y += 30;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica","normal");
+    doc.setTextColor(50,50,50);
+    doc.text(`Father: ${fatherNameVal} | Mother: ${motherNameVal}`, margin, y);
+    y += 18;
+    doc.text(`DOB: ${dobVal} | Email: ${emailVal} | Phone: ${phoneVal}`, margin, y);
+    y += 18;
+    doc.text(`Address: ${addressVal}`, margin, y);
+    y += 25;
+
+    // ================= Section Header =================
+    function sectionHeader(title,color){
+        y += 15;
+        if(y > pageHeight - margin) addNewPage();
+        doc.setFontSize(14);
+        doc.setFont("helvetica","bold");
+        doc.setTextColor(...color);
+        doc.text(title, margin, y);
+        doc.setFontSize(12);
+        doc.setFont("helvetica","normal");
+        doc.setTextColor(50,50,50);
+        y += 15;
+    }
+
+    // ================= Multi-line Text =================
+    function addMultilineText(text){
+        const lines = doc.splitTextToSize(text, pageWidth - 2*margin);
+        lines.forEach(line=>{
+            if(y > pageHeight - margin) addNewPage();
+            doc.text(line, margin, y);
+            y += 15;
+        });
+        y += 5;
+    }
+
+    // ================= Career Objective =================
+    sectionHeader("Career Objective",[255,64,129]);
+    addMultilineText(document.getElementById("objective").value);
+
+    // ================= Professional Summary =================
+    sectionHeader("Professional Summary",[0,153,255]);
+    addMultilineText(document.getElementById("summary").value);
+
+    // ================= Academics Table =================
+    sectionHeader("Academic Qualifications",[76,175,80]);
+    const headers = [["Course","Institute","Year","GPA"]];
+    const data = [...document.querySelectorAll("#academicsContainer .academicRow")].map(row=>{
+        const inputs = row.querySelectorAll("input");
+        return [inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value];
+    });
+    doc.autoTable({
+        head: headers,
+        body: data,
+        startY: y,
+        theme: 'grid',
+        headStyles: { fillColor:[255,255,255], textColor:[0,0,0], fontStyle:'bold' },
+        alternateRowStyles: { fillColor:[245,245,245] },
+        styles: { fontSize:11 },
+        margin: { left:margin, right:margin },
+        didDrawPage: (dataArg) => { y = dataArg.cursor.y + 20; drawPageBorder(); }
+    });
+
+    // ================= Education =================
+    sectionHeader("Education",[255,193,7]);
+    addMultilineText(document.getElementById("education").value);
+
+    // ================= Experience =================
+    sectionHeader("Experience",[0,200,83]);
+    addMultilineText(document.getElementById("experience").value);
+
+    // ================= Technical Skills =================
+    sectionHeader("Technical Skills",[255,193,7]);
+    const skillsArr = document.getElementById("skills").value.split(",").map(s=>s.trim());
+    let x = margin;
+    skillsArr.forEach(skill=>{
+        const textWidth = doc.getTextWidth(skill) + 8;
+        if(x + textWidth > pageWidth - margin){ x = margin; y += 20; if(y > pageHeight - margin) addNewPage(); }
+        doc.text(skill, x, y);
+        x += textWidth + 10;
+    });
+    y += 25;
+
+    // ================= Projects =================
+    sectionHeader("Projects",[0,200,83]);
+    addMultilineText(document.getElementById("projects").value);
+
+    // ================= Habits / Strengths =================
+    sectionHeader("Habits / Strengths",[255,87,34]);
+    addMultilineText(document.getElementById("habits").value);
+
+    // ================= Languages Known =================
+    sectionHeader("Languages Known",[63,81,181]);
+    const languagesInput = document.getElementById("Languages");
+    if(languagesInput) addMultilineText(languagesInput.value);
+
+    // ================= Declaration =================
+    sectionHeader("Declaration",[124,77,255]);
+    addMultilineText(document.getElementById("declaration").value);
+
+    // ================= Place, Date, Signature =================
+    if(y + 60 > pageHeight - margin) addNewPage();
+    doc.text(`Place: ${document.getElementById("place").value}`, margin, y);
+    y += 18;
+    doc.text(`Date: ${document.getElementById("date").value}`, margin, y);
+    y += 18;
+    doc.text(`Signature: ${document.getElementById("signature").value}`, margin, y);
+
+    // ================= Save PDF =================
+    doc.save("Resume.pdf");
+}
+
+
+</script>
+
+<!-- jsPDF AutoTable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
 </body>
 </html>
