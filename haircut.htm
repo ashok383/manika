@@ -1,71 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Simple Form to CSV</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      max-width: 400px;
-      margin: auto;
-      border-radius: 8px;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-    }
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #218838;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Barber Studio</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+body{
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+    overflow-x:hidden;
+}
+
+/* ================= HEADER ================= */
+header{
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:linear-gradient(90deg,#ff512f,#dd2476);
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+header h1{
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+nav a{
+    margin-left:15px;
+    font-weight:500;
+    color:#fff;
+}
+
+/* ================= HERO ================= */
+.hero{
+    min-height:80vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+    background:
+    linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
+    url("https://images.unsplash.com/photo-1621605815971-fbc98d665033");
+    background-size:cover;
+    background-position:center;
+}
+.hero h2{
+    font-size:40px;
+    background:linear-gradient(90deg,#ffdd00,#ff512f,#ff00cc);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s infinite linear;
+}
+.hero p{
+    margin-top:15px;
+    font-size:16px;
+    opacity:.9;
+}
+@keyframes shine{
+    0%{filter:hue-rotate(0deg);}
+    100%{filter:hue-rotate(360deg);}
+}
+
+/* ================= SERVICES ================= */
+.services{
+    padding:60px 20px;
+    background:#111;
+}
+.services h2{
+    text-align:center;
+    font-size:32px;
+    margin-bottom:40px;
+    background:linear-gradient(90deg,#00f2fe,#4facfe);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.service-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+    max-width:1100px;
+    margin:auto;
+}
+.service-card{
+    background:linear-gradient(145deg,#1e1e1e,#2b2b2b);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,.6);
+    transition:.4s;
+}
+.service-card:hover{
+    transform:translateY(-10px) scale(1.03);
+    box-shadow:0 20px 60px rgba(255,64,129,.6);
+}
+.service-card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+.service-card div{
+    padding:20px;
+}
+.service-card h3{
+    color:#ff4081;
+    margin-bottom:10px;
+}
+.service-card p{
+    font-size:14px;
+    opacity:.85;
+}
+
+/* ================= BOOKING ================= */
+.booking{
+    padding:60px 20px;
+    background:linear-gradient(135deg,#ff512f,#dd2476);
+}
+.booking h2{
+    text-align:center;
+    font-size:32px;
+    margin-bottom:30px;
+}
+.booking form{
+    max-width:450px;
+    margin:auto;
+    background:rgba(0,0,0,.25);
+    padding:30px;
+    border-radius:20px;
+    backdrop-filter:blur(10px);
+}
+.booking input,
+.booking select,
+.booking textarea{
+    width:100%;
+    margin-bottom:15px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+}
+.booking button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    background:linear-gradient(90deg,#00f2fe,#4facfe);
+    color:#000;
+    box-shadow:0 5px 20px rgba(0,0,0,.4);
+}
+.booking button:hover{
+    transform:scale(1.05);
+}
+
+/* ================= FOOTER ================= */
+footer{
+    padding:25px;
+    text-align:center;
+    background:#000;
+    font-size:14px;
+    opacity:.8;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:600px){
+    .hero h2{font-size:30px;}
+    header h1{font-size:20px;}
+}
+</style>
 </head>
+
 <body>
 
-<h2 style="text-align:center;">Simple Form → CSV</h2>
+<header>
+    <h1>💈 Elite Barber</h1>
+    <nav>
+        <a href="#services">Services</a>
+        <a href="#book">Book</a>
+    </nav>
+</header>
 
-<form id="dataForm">
-  <input type="text" id="name" placeholder="Enter Name" required>
-  <input type="email" id="email" placeholder="Enter Email" required>
-  <input type="text" id="mobile" placeholder="Enter Mobile Number" required>
-  <button type="submit">Save as CSV</button>
+<section class="hero">
+    <div>
+        <h2>Smart. Stylish. Professional.</h2>
+        <p>Premium haircut & grooming experience</p>
+    </div>
+</section>
+
+<section class="services" id="services">
+<h2>Our Premium Services</h2>
+
+<div class="service-grid">
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1599351431613-18ef1fdd27e1">
+<div>
+<h3>Classic Haircut</h3>
+<p>Modern & traditional styles by expert barbers.</p>
+</div>
+</div>
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70">
+<div>
+<h3>Beard Styling</h3>
+<p>Perfect beard trim, fade & shaping.</p>
+</div>
+</div>
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35">
+<div>
+<h3>Hair Spa</h3>
+<p>Relaxing scalp massage & hair treatment.</p>
+</div>
+</div>
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1622296089864-9e9ffcc97c8f">
+<div>
+<h3>Kids Haircut</h3>
+<p>Safe & stylish cuts for kids.</p>
+</div>
+</div>
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438">
+<div>
+<h3>Hair Coloring</h3>
+<p>Professional hair coloring & highlights.</p>
+</div>
+</div>
+
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1618077360395-f3068be8e001">
+<div>
+<h3>Premium Grooming</h3>
+<p>Complete luxury grooming package.</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="booking" id="book">
+<h2>Book Appointment</h2>
+
+<form onsubmit="alert('Appointment Booked Successfully!');return false;">
+<input type="text" placeholder="Full Name" required>
+<input type="tel" placeholder="Mobile Number" required>
+<select required>
+<option value="">Select Service</option>
+<option>Classic Haircut</option>
+<option>Beard Styling</option>
+<option>Hair Spa</option>
+<option>Hair Coloring</option>
+<option>Premium Grooming</option>
+</select>
+<input type="date" required>
+<textarea rows="3" placeholder="Message (optional)"></textarea>
+<button>Confirm Booking</button>
 </form>
+</section>
 
-<script>
-  let csvData = "Name,Email,Mobile\n";
-
-  document.getElementById("dataForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let mobile = document.getElementById("mobile").value;
-
-    csvData += `${name},${email},${mobile}\n`;
-
-    let blob = new Blob([csvData], { type: "text/csv" });
-    let url = window.URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "form_data.csv";
-    a.click();
-
-    document.getElementById("dataForm").reset();
-  });
-</script>
+<footer>
+© 2026 Elite Barber Studio | Designed for Mobile & Premium Look
+</footer>
 
 </body>
 </html>
