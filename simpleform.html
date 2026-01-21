@@ -1,133 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>World Class Barber & Haircut Services</title>
-<style>
-/* ===== Reset & Base ===== */
-* {margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
-body {background:#f2f2f2;color:#333;}
-a {text-decoration:none;color:inherit;}
-
-/* ===== Header ===== */
-header {background:#222;color:#fff;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
-header h1 {font-size:28px;color:#ff4081;}
-nav a {margin-left:25px;font-weight:500;color:#fff;transition:0.3s;}
-nav a:hover {color:#ff4081;}
-
-/* ===== Hero Section ===== */
-.hero {background:url('https://images.unsplash.com/photo-1596905982188-4468638e1f87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5OTk3OTl8MHwxfHNlYXJjaHwxfHxwYXJib3J8ZW58MHx8fHwxNjg2NTQwOTYzfA&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center/cover;height:70vh;display:flex;justify-content:center;align-items:center;color:#fff;text-shadow:1px 1px 6px #000;}
-.hero h2 {font-size:48px;text-align:center;}
-.hero p {margin-top:15px;font-size:18px;text-align:center;}
-
-/* ===== Services Section ===== */
-.services {padding:60px 40px;background:#fff;}
-.services h2 {text-align:center;font-size:32px;margin-bottom:40px;color:#4caf50;}
-.service-cards {display:flex;flex-wrap:wrap;gap:30px;justify-content:center;}
-.card {background:#f9f9f9;padding:25px;width:250px;border-radius:12px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:0.3s;}
-.card:hover {transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,0.2);}
-.card img {width:80px;height:80px;margin-bottom:15px;}
-.card h3 {margin-bottom:10px;color:#ff4081;}
-.card p {font-size:14px;color:#666;}
-
-/* ===== Booking Section ===== */
-.booking {padding:60px 40px;background:#ff4081;color:#fff;}
-.booking h2 {text-align:center;font-size:32px;margin-bottom:40px;color:#fff;}
-.booking form {max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:15px;}
-.booking input, .booking select, .booking textarea {padding:12px;border-radius:8px;border:none;font-size:14px;}
-.booking button {padding:12px;background:#4caf50;border:none;color:#fff;font-weight:600;font-size:16px;border-radius:8px;cursor:pointer;transition:0.3s;}
-.booking button:hover {background:#388e3c;}
-
-/* ===== Footer ===== */
-footer {background:#222;color:#fff;padding:30px 40px;text-align:center;}
-footer p {margin-bottom:10px;}
-footer a {color:#ff4081;margin:0 10px;}
-@media(max-width:768px){.service-cards{flex-direction:column;align-items:center;}}
-</style>
+  <meta charset="UTF-8">
+  <title>Simple Form to CSV</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 8px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Header -->
-<header>
-<h1>BarberX</h1>
-<nav>
-<a href="#services">Services</a>
-<a href="#booking">Book Now</a>
-<a href="#contact">Contact</a>
-</nav>
-</header>
+<h2 style="text-align:center;">Simple Form → CSV</h2>
 
-<!-- Hero Section -->
-<section class="hero">
-<div>
-<h2>World Class Haircut & Barber Services</h2>
-<p>Get your perfect look by top professional barbers!</p>
-</div>
-</section>
-
-<!-- Services Section -->
-<section class="services" id="services">
-<h2>Our Services</h2>
-<div class="service-cards">
-<div class="card">
-<img src="https://img.icons8.com/dusk/64/haircut.png"/>
-<h3>Men Haircut</h3>
-<p>Modern and classic haircuts tailored to your style.</p>
-</div>
-<div class="card">
-<img src="https://img.icons8.com/dusk/64/beard.png"/>
-<h3>Beard Trim</h3>
-<p>Professional beard grooming and shaping services.</p>
-</div>
-<div class="card">
-<img src="https://img.icons8.com/dusk/64/scissors.png"/>
-<h3>Hair Styling</h3>
-<p>Stylish haircuts and creative designs for any occasion.</p>
-</div>
-<div class="card">
-<img src="https://img.icons8.com/dusk/64/shampoo.png"/>
-<h3>Shampoo & Spa</h3>
-<p>Relaxing hair wash and scalp massage services.</p>
-</div>
-</div>
-</section>
-
-<!-- Booking Section -->
-<section class="booking" id="booking">
-<h2>Book an Appointment</h2>
-<form onsubmit="alert('Thank you! Your appointment has been booked.'); return false;">
-<input type="text" placeholder="Full Name" required/>
-<input type="email" placeholder="Email" required/>
-<input type="tel" placeholder="Phone Number" required/>
-<select required>
-<option value="">Select Service</option>
-<option>Men Haircut</option>
-<option>Beard Trim</option>
-<option>Hair Styling</option>
-<option>Shampoo & Spa</option>
-</select>
-<input type="date" required/>
-<textarea placeholder="Additional Notes" rows="4"></textarea>
-<button type="submit">Book Now</button>
+<form id="dataForm">
+  <input type="text" id="name" placeholder="Enter Name" required>
+  <input type="email" id="email" placeholder="Enter Email" required>
+  <input type="text" id="mobile" placeholder="Enter Mobile Number" required>
+  <button type="submit">Save as CSV</button>
 </form>
-</section>
 
-<!-- Contact Section -->
-<section class="services" id="contact">
-<h2>Contact Us</h2>
-<p style="text-align:center;">📞 +91 9876543210 | ✉️ barberx@email.com</p>
-<p style="text-align:center;">🏢 123 Barber Street, Hyderabad, India</p>
-</section>
+<script>
+  let csvData = "Name,Email,Mobile\n";
 
-<!-- Footer -->
-<footer>
-<p>Follow Us:</p>
-<p>
-<a href="#">Facebook</a> | <a href="#">Instagram</a> | <a href="#">Twitter</a>
-</p>
-<p>© 2026 BarberX. All rights reserved.</p>
-</footer>
+  document.getElementById("dataForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let mobile = document.getElementById("mobile").value;
+
+    csvData += `${name},${email},${mobile}\n`;
+
+    let blob = new Blob([csvData], { type: "text/csv" });
+    let url = window.URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "form_data.csv";
+    a.click();
+
+    document.getElementById("dataForm").reset();
+  });
+</script>
 
 </body>
 </html>
