@@ -124,6 +124,9 @@ Enthusiastic and dedicated professional with a strong foundation in modern techn
 <label>Projects</label>
 <textarea id="projects">Resume Builder, E-commerce Website</textarea>
 
+<label>Languages Known</label>
+<input id="Languages" value="HINDI, ENGLISH, TELUGU,">
+
 <label>Habits / Strengths</label>
 <textarea id="habits">Quick learner, disciplined, team player</textarea>
 
@@ -270,84 +273,168 @@ async function payAndDownload(){
 }
 
 // Generate PDF using jsPDF
-async function generatePDF(){
+async function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'pt', 'a4');
-    
-    let y = 40;
-    
-    // Header
-    doc.setFontSize(22);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // ================= Page Border =================
+    const gradientColors = [
+        {r:255,g:64,b:129},
+        {r:124,g:77,b:255},
+        {r:0,g:229,b:255},
+        {r:76,g:175,b:80}
+    ];
+    gradientColors.forEach((color, i)=>{
+        doc.setDrawColor(color.r,color.g,color.b);
+        doc.setLineWidth(4 - i);
+        doc.rect(10 + i*3, 10 + i*3, pageWidth-20 - i*6, pageHeight-20 - i*6);
+    });
+
+    let y = 50;
+
+    // ================= Profile Photo =================
+    if(photo.files[0]){
+        const file = photo.files[0];
+        const reader = new FileReader();
+        await new Promise((resolve) => {
+            reader.onload = function(e){
+                const img = new Image();
+                img.onload = function(){
+                    const imgWidth = 100;
+                    const imgHeight = 100 * (img.height/img.width);
+                    doc.addImage(img, 'JPEG', pageWidth - imgWidth - 40, y-10, imgWidth, imgHeight);
+                    resolve();
+                }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ================= Header =================
+    doc.setFontSize(26);
+    doc.setFont("helvetica","bold");
+    doc.setTextColor(124,77,255);
     doc.text(fullName.value, 40, y);
-    y += 25;
+    y += 35;
+
     doc.setFontSize(12);
+    doc.setFont("helvetica","normal");
+    doc.setTextColor(50,50,50);
     doc.text(`DOB: ${dob.value} | ${email.value} | ${phone.value}`, 40, y);
-    y += 20;
+    y += 18;
     doc.text(`Address: ${address.value}`, 40, y);
-    y += 25;
+    y += 35;
 
-    // Career Objective
-    doc.setFontSize(16);
-    doc.text("Career Objective", 40, y);
-    y += 18;
-    doc.setFontSize(12);
-    doc.text(objective.value, 40, y, {maxWidth: 500});
+    // ================= Function for Section Header =================
+    function sectionHeader(title, color){
+        y += 20; // Space before title
+        const rectHeight = 25;
+        const textWidth = doc.getTextWidth(title) + 20;
+
+        doc.setFillColor(...color);
+        doc.roundedRect(40, y - rectHeight + 5, textWidth, rectHeight, 4, 4, 'F');
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica","bold");
+        doc.setTextColor(255,255,255);
+        doc.text(title, 50, y + 2);
+
+        // Reset
+        doc.setFontSize(12);
+        doc.setFont("helvetica","normal");
+        doc.setTextColor(50,50,50);
+
+        y += rectHeight + 10; // Space after title
+    }
+
+    // ================= Career Objective =================
+    sectionHeader("Career Objective",[255,64,129]);
+    doc.text(objective.value, 40, y, {maxWidth:520});
     y += 40;
 
-    // Professional Summary
-    doc.setFontSize(16);
-    doc.text("Professional Summary", 40, y);
-    y += 18;
-    doc.setFontSize(12);
-    doc.text(summary.value, 40, y, {maxWidth: 500});
+    // ================= Professional Summary =================
+    sectionHeader("Professional Summary",[0,153,255]);
+    doc.text(summary.value, 40, y, {maxWidth:520});
     y += 40;
 
-    // Academics Table
-    doc.setFontSize(16);
-    doc.text("Academics", 40, y);
-    y += 20;
+    // ================= Academics Table =================
+    sectionHeader("Academic Qualifications",[76,175,80]);
     const headers = [["Course","Institute","Year","GPA"]];
     const data = [...document.querySelectorAll(".academicRow")].map(r=>{
         let i = r.querySelectorAll("input");
         return [i[0].value,i[1].value,i[2].value,i[3].value];
     });
-    doc.autoTable({ head: headers, body: data, startY: y });
-    y = doc.lastAutoTable.finalY + 20;
 
-    // Skills
-    doc.setFontSize(16);
-    doc.text("Skills", 40, y);
-    y += 18;
+    doc.autoTable({
+        head: headers,
+        body: data,
+        startY: y,
+        theme: 'grid',
+        headStyles: { fillColor:[255,64,129], textColor:255, fontStyle:'bold' },
+        alternateRowStyles: { fillColor:[245,245,245] },
+        styles: { fontSize:11 },
+        margin: { left:40, right:40 }
+    });
+    y = doc.lastAutoTable.finalY + 25;
+
+    // ================= Technical Skills =================
+    sectionHeader("Technical Skills",[255,193,7]);
+    const skillsArr = skills.value.split(",").map(s=>s.trim());
+    let x = 40;
+    skillsArr.forEach(skill=>{
+        const textWidth = doc.getTextWidth(skill) + 12;
+        doc.setFillColor(255,64,129);
+        doc.roundedRect(x, y-12, textWidth, 16, 4, 4, 'FD');
+        doc.setTextColor(255,255,255);
+        doc.text(skill, x + 6, y);
+        x += textWidth + 8;
+        if(x + textWidth > pageWidth - 40){
+            x = 40;
+            y += 24;
+        }
+    });
+    y += 40;
+
+    // ================= Projects =================
+    sectionHeader("Projects",[0,200,83]);
+    doc.text(projects.value, 40, y, {maxWidth:520});
+    y += 40;
+
+    // ================= Habits / Strengths =================
+    sectionHeader("Habits / Strengths",[255,87,34]);
+    doc.text(habits.value, 40, y, {maxWidth:520});
+    y += 40;
+
+    // ================= Languages Known =================
+    sectionHeader("Languages",[63,81,181]);
+    const languagesInput = document.getElementById("languages");
+    if(languagesInput){
+        doc.text(languagesInput.value, 40, y, {maxWidth:520});
+        y += 40;
+    }
+
+    // ================= Declaration =================
+    sectionHeader("Declaration",[124,77,255]);
+    doc.text(declaration.value, 40, y, {maxWidth:520});
+    y += 40;
+
+    // ================= Place, Date, Signature =================
     doc.setFontSize(12);
-    doc.text(skills.value.split(",").map(s=>s.trim()).join(", "), 40, y, {maxWidth:500});
-    y += 25;
-
-    // Projects
-    doc.setFontSize(16);
-    doc.text("Projects", 40, y);
-    y += 18;
-    doc.setFontSize(12);
-    doc.text(projects.value, 40, y, {maxWidth:500});
-    y += 25;
-
-    // Declaration
-    doc.setFontSize(16);
-    doc.text("Declaration", 40, y);
-    y += 18;
-    doc.setFontSize(12);
-    doc.text(declaration.value, 40, y, {maxWidth:500});
-    y += 25;
-
-    // Place & Date
+    doc.setTextColor(50,50,50);
     doc.text(`Place: ${place.value}`, 40, y);
     y += 18;
     doc.text(`Date: ${date.value}`, 40, y);
     y += 18;
     doc.text(`Signature: ${signature.value}`, 40, y);
 
-    // Save PDF
+    // ================= Save PDF =================
     doc.save("Resume.pdf");
 }
+
+
 </script>
 
 <!-- jsPDF AutoTable plugin -->
