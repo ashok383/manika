@@ -2,183 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Premium Resume Builder</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<!-- Razorpay -->
+<title>CV Maker</title>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<!-- html2pdf -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <style>
-body{
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    margin:0;
-    padding:20px;
-    color:#fff;
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
 }
-.container{
-    max-width:1200px;
-    margin:auto;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
+.container {
+    display: flex;
+    gap: 20px;
 }
-.card{
-    background:#fff;
-    color:#000;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 20px 40px rgba(0,0,0,.3);
+.form-box, .preview-box {
+    background: #fff;
+    padding: 20px;
+    width: 50%;
+    border-radius: 8px;
 }
-input,textarea{
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-    border-radius:6px;
-    border:1px solid #ccc;
+input, button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
 }
-button{
-    padding:12px 20px;
-    background:linear-gradient(135deg,#ff512f,#dd2476);
-    border:none;
-    color:#fff;
-    font-weight:600;
-    border-radius:30px;
-    cursor:pointer;
-    margin:10px 5px 0 0;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
 }
-button:hover{opacity:.9}
-.resume{
-    border:6px solid #dd2476;
-    padding:25px;
-    border-radius:12px;
+table, th, td {
+    border: 1px solid #000;
 }
-.header{
-    display:flex;
-    align-items:center;
-    gap:20px;
+th, td {
+    padding: 6px;
+    text-align: center;
 }
-.header img{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
-    border:4px solid #dd2476;
+.preview-box img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 1px solid #000;
 }
-h1{margin:0}
-.section{margin-top:20px}
-.section h3{
-    border-bottom:2px solid #dd2476;
-    padding-bottom:5px;
+button {
+    background: #3399cc;
+    color: #fff;
+    border: none;
+    cursor: pointer;
 }
-.hidden{display:none}
+button:hover {
+    background: #287aa3;
+}
 </style>
 </head>
-
 <body>
 
-<h1 style="text-align:center">🌟 World-Class Resume Builder</h1>
+<h2>CV Maker</h2>
 
 <div class="container">
 
 <!-- FORM -->
-<div class="card">
-<h2>Enter Your Details</h2>
+<div class="form-box">
+    <h3>Enter Details</h3>
 
-<input id="name" placeholder="Full Name">
-<input id="email" placeholder="Email">
-<input id="phone" placeholder="Mobile Number">
-<textarea id="objective" placeholder="Career Objective"></textarea>
-<textarea id="skills" placeholder="Skills (comma separated)"></textarea>
-<textarea id="education" placeholder="Education"></textarea>
-<textarea id="experience" placeholder="Experience"></textarea>
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="date" id="dob">
+    <input type="file" id="photo" accept="image/*">
 
-<label>Upload Photo</label>
-<input type="file" id="photo" accept="image/*">
+    <h4>Academic Qualifications</h4>
+    <input type="text" id="exam" placeholder="Exam">
+    <input type="text" id="board" placeholder="Board/University">
+    <input type="text" id="year" placeholder="Year">
+    <input type="text" id="marks" placeholder="Marks">
+    <button onclick="addRow()">Add Qualification</button>
 
-<button onclick="preview()">Preview Resume</button>
-<button onclick="payAndDownload()">Pay & Download PDF</button>
+    <br><br>
+    <button onclick="payNow()">Pay & Download CV</button>
 </div>
 
 <!-- PREVIEW -->
-<div class="card hidden" id="previewCard">
-<div class="resume" id="resume">
-    <div class="header">
-        <img id="pimg">
-        <div>
-            <h1 id="pname"></h1>
-            <p id="pemail"></p>
-            <p id="pphone"></p>
-        </div>
-    </div>
+<div class="preview-box" id="cv">
+    <h2 id="pname">Your Name</h2>
+    <p><b>Date of Birth:</b> <span id="pdob"></span></p>
+    <img id="pphoto">
 
-    <div class="section">
-        <h3>Career Objective</h3>
-        <p id="pobjective"></p>
-    </div>
-
-    <div class="section">
-        <h3>Skills</h3>
-        <p id="pskills"></p>
-    </div>
-
-    <div class="section">
-        <h3>Education</h3>
-        <p id="pedu"></p>
-    </div>
-
-    <div class="section">
-        <h3>Experience</h3>
-        <p id="pexp"></p>
-    </div>
-</div>
+    <h3>Academic Qualifications</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Exam</th>
+                <th>Board</th>
+                <th>Year</th>
+                <th>Marks</th>
+            </tr>
+        </thead>
+        <tbody id="ptable"></tbody>
+    </table>
 </div>
 
 </div>
 
 <script>
-let imageData = "";
+let tableData = [];
 
-document.getElementById("photo").addEventListener("change", function(){
-    const reader = new FileReader();
-    reader.onload = () => imageData = reader.result;
-    reader.readAsDataURL(this.files[0]);
-});
+document.getElementById("name").oninput = () => {
+    document.getElementById("pname").innerText = name.value;
+};
 
-function preview(){
-    document.getElementById("previewCard").classList.remove("hidden");
-    pname.innerText = name.value;
-    pemail.innerText = email.value;
-    pphone.innerText = phone.value;
-    pobjective.innerText = objective.value;
-    pskills.innerText = skills.value;
-    pedu.innerText = education.value;
-    pexp.innerText = experience.value;
-    pimg.src = imageData;
+document.getElementById("dob").oninput = () => {
+    document.getElementById("pdob").innerText = dob.value;
+};
+
+document.getElementById("photo").onchange = (e) => {
+    let reader = new FileReader();
+    reader.onload = () => {
+        document.getElementById("pphoto").src = reader.result;
+    };
+    reader.readAsDataURL(e.target.files[0]);
+};
+
+function addRow() {
+    let row = {
+        exam: exam.value,
+        board: board.value,
+        year: year.value,
+        marks: marks.value
+    };
+    tableData.push(row);
+    renderTable();
+    exam.value = board.value = year.value = marks.value = "";
 }
 
-function payAndDownload(){
+function renderTable() {
+    let html = "";
+    tableData.forEach(r => {
+        html += `<tr>
+            <td>${r.exam}</td>
+            <td>${r.board}</td>
+            <td>${r.year}</td>
+            <td>${r.marks}</td>
+        </tr>`;
+    });
+    document.getElementById("ptable").innerHTML = html;
+}
+
+function payNow() {
     var options = {
-        "key": "ashok3;£+",
-        "amount": 9900,
+        "key": "ashokj73459834",
+        "amount": 5000, // ₹50
         "currency": "INR",
-        "name": "Premium Resume Builder",
-        "description": "Resume PDF Download",
-        "handler": function () {
-            html2pdf().from(document.getElementById("resume")).save("Resume.pdf");
+        "name": "CV Maker",
+        "description": "Download CV",
+        "handler": function (response) {
+            downloadCV();
         },
         "theme": {
-            "color": "#dd2476"
+            "color": "#3399cc"
         }
     };
     var rzp = new Razorpay(options);
     rzp.open();
+}
+
+function downloadCV() {
+    let cvContent = document.getElementById("cv").outerHTML;
+    let blob = new Blob([cvContent], { type: "text/html" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "My_CV.html";
+    link.click();
 }
 </script>
 
