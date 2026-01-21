@@ -62,7 +62,7 @@ button{
 .preview-btn{background:#ff4081;color:#fff}
 .add-btn{background:#00c853;color:#fff}
 .remove-btn{background:#f44336;color:#fff}
-.download-btn{background:#2196f3;color:#fff}
+.download-btn{background:#00c853;color:#fff}
 </style>
 </head>
 
@@ -152,7 +152,7 @@ I hereby declare that the information furnished above is, to the best of my know
 
 <div style="margin-top:15px;">
     <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-    <button class="download-btn" onclick="payAndDownload()">💳 Pay & Download PDF</button>
+    <button class="download-btn" onclick="payAndDownload()">💳 PAY_&_DOWNLOAD_YOUR_RESUME_PDF</button>
 </div>
 </div>
 
@@ -268,7 +268,7 @@ ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 async function payAndDownload(){
     const options = {
         key: "rzp_live_S5ex0BvHGJcmo6", // Razorpay key
-        amount: 1000, // 100 INR in paise
+        amount: 100, // 100 INR in paise
         currency: "INR",
         name: "Resume Builder",
         description: "Pay to download your resume PDF",
@@ -291,182 +291,175 @@ async function payAndDownload(){
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'pt', 'a4');
+
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 40;
-    let y = 50;
+    let y = 60;
 
-    const gradientColors = [
-        {r:255,g:64,b:129},
-        {r:124,g:77,b:255},
-        {r:0,g:229,b:255},
-        {r:76,g:175,b:80}
-    ];
+    /* ========= COLORS ========= */
+    const COLORS = {
+        pink: [255,64,129],
+        purple: [124,77,255],
+        blue: [0,153,255],
+        green: [0,200,83],
+        orange: [255,152,0],
+        dark: [40,40,40],
+        gray: [90,90,90],
+        lightBg: [245,247,255]
+    };
 
-    // ================= Draw Page Border =================
-    function drawPageBorder() {
-        gradientColors.forEach((color, i)=>{
-            doc.setDrawColor(color.r,color.g,color.b);
-            doc.setLineWidth(4 - i);
-            doc.rect(10 + i*3, 10 + i*3, pageWidth-20 - i*6, pageHeight-20 - i*6);
-        });
+    /* ========= PAGE BORDER ========= */
+    function drawBorder(){
+        doc.setDrawColor(...COLORS.purple);
+        doc.setLineWidth(2);
+        doc.rect(15,15,pageWidth-30,pageHeight-30);
     }
+    drawBorder();
 
-    drawPageBorder();
-
-    // ================= Add New Page =================
-    function addNewPage() {
+    function addNewPage(){
         doc.addPage();
-        y = 50;
-        drawPageBorder();
+        y = 60;
+        drawBorder();
     }
 
-    // ================= Profile Photo =================
-    const photoInput = document.getElementById("photo");
-    if(photoInput.files[0]){
-        const file = photoInput.files[0];
+    /* ========= HEADER SHINE BAR ========= */
+    doc.setFillColor(...COLORS.purple);
+    doc.rect(0,0,pageWidth,90,'F');
+
+    /* ========= PHOTO ========= */
+    const photo = document.getElementById("photo");
+    if(photo.files[0]){
         const reader = new FileReader();
-        await new Promise(resolve => {
-            reader.onload = function(e){
-                const img = new Image();
-                img.onload = function(){
-                    const imgWidth = 100;
-                    const imgHeight = 100 * (img.height / img.width);
-                    if(y + imgHeight > pageHeight - margin) addNewPage();
-                    doc.addImage(img, 'JPEG', pageWidth - imgWidth - margin, y-10, imgWidth, imgHeight);
-                    resolve();
+        await new Promise(res=>{
+            reader.onload=e=>{
+                const img=new Image();
+                img.onload=()=>{
+                    doc.addImage(img,'JPEG',pageWidth-140,20,90,90);
+                    res();
                 }
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                img.src=e.target.result;
+            }
+            reader.readAsDataURL(photo.files[0]);
         });
     }
 
-    // ================= Header =================
-    const fullNameVal = document.getElementById("fullName").value;
-    const fatherNameVal = document.getElementById("fatherName").value;
-    const motherNameVal = document.getElementById("motherName").value;
-    const dobVal = document.getElementById("dob").value;
-    const emailVal = document.getElementById("email").value;
-    const phoneVal = document.getElementById("phone").value;
-    const addressVal = document.getElementById("address").value;
-
-    doc.setFontSize(26);
+    /* ========= NAME ========= */
     doc.setFont("helvetica","bold");
-    doc.setTextColor(124,77,255);
-    doc.text(fullNameVal, margin, y);
-    y += 30;
+    doc.setFontSize(26);
+    doc.setTextColor(255,255,255);
+    doc.text(fullName.value, margin, 50);
 
     doc.setFontSize(12);
     doc.setFont("helvetica","normal");
-    doc.setTextColor(50,50,50);
-    doc.text(`Father: ${fatherNameVal} | Mother: ${motherNameVal}`, margin, y);
-    y += 18;
-    doc.text(`DOB: ${dobVal} | Email: ${emailVal} | Phone: ${phoneVal}`, margin, y);
-    y += 18;
-    doc.text(`Address: ${addressVal}`, margin, y);
-    y += 25;
+    doc.text(
+        `Father: ${fatherName.value} | Mother: ${motherName.value}`,
+        margin, 70
+    );
 
-    // ================= Section Header =================
-    function sectionHeader(title,color){
-        y += 15;
-        if(y > pageHeight - margin) addNewPage();
-        doc.setFontSize(14);
+    y = 120;
+    doc.setTextColor(...COLORS.dark);
+
+    /* ========= BASIC INFO PANEL ========= */
+    doc.setFillColor(...COLORS.lightBg);
+    doc.roundedRect(margin-10,y-20,pageWidth-(margin*2)+20,70,10,10,'F');
+
+    doc.text(`DOB: ${dob.value}`, margin, y);
+    y+=16;
+    doc.text(`Email: ${email.value} | Phone: ${phone.value}`, margin, y);
+    y+=16;
+    doc.text(`Address: ${address.value}`, margin, y);
+
+    y+=35;
+
+    /* ========= SECTION HEADER ========= */
+    function section(title,color){
+        if(y>pageHeight-80) addNewPage();
         doc.setFont("helvetica","bold");
+        doc.setFontSize(15);
         doc.setTextColor(...color);
         doc.text(title, margin, y);
-        doc.setFontSize(12);
+        y+=5;
+        doc.setDrawColor(...color);
+        doc.setLineWidth(2);
+        doc.line(margin,y,pageWidth-margin,y);
+        y+=15;
         doc.setFont("helvetica","normal");
-        doc.setTextColor(50,50,50);
-        y += 15;
+        doc.setFontSize(12);
+        doc.setTextColor(...COLORS.gray);
     }
 
-    // ================= Multi-line Text =================
-    function addMultilineText(text){
-        const lines = doc.splitTextToSize(text, pageWidth - 2*margin);
-        lines.forEach(line=>{
-            if(y > pageHeight - margin) addNewPage();
-            doc.text(line, margin, y);
-            y += 15;
+    function paragraph(text){
+        const lines = doc.splitTextToSize(text,pageWidth-margin*2);
+        lines.forEach(l=>{
+            if(y>pageHeight-margin) addNewPage();
+            doc.text(l,margin,y);
+            y+=15;
         });
-        y += 5;
+        y+=10;
     }
 
-    // ================= Career Objective =================
-    sectionHeader("Career Objective",[255,64,129]);
-    addMultilineText(document.getElementById("objective").value);
+    /* ========= CONTENT ========= */
+    section("Career Objective",COLORS.pink);
+    paragraph(objective.value);
 
-    // ================= Professional Summary =================
-    sectionHeader("Professional Summary",[0,153,255]);
-    addMultilineText(document.getElementById("summary").value);
+    section("Professional Summary",COLORS.blue);
+    paragraph(summary.value);
 
-    // ================= Academics Table =================
-    sectionHeader("Academic Qualifications",[76,175,80]);
-    const headers = [["Course","Institute","Year","GPA"]];
-    const data = [...document.querySelectorAll("#academicsContainer .academicRow")].map(row=>{
-        const inputs = row.querySelectorAll("input");
-        return [inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value];
-    });
+    section("Academic Qualifications",COLORS.green);
     doc.autoTable({
-        head: headers,
-        body: data,
-        startY: y,
-        theme: 'grid',
-        headStyles: { fillColor:[255,255,255], textColor:[0,0,0], fontStyle:'bold' },
-        alternateRowStyles: { fillColor:[245,245,245] },
-        styles: { fontSize:11 },
-        margin: { left:margin, right:margin },
-        didDrawPage: (dataArg) => { y = dataArg.cursor.y + 20; drawPageBorder(); }
+        startY:y,
+        head:[["Course","Institute","Year","GPA"]],
+        body:[...document.querySelectorAll(".academicRow")].map(r=>{
+            const i=r.querySelectorAll("input");
+            return [i[0].value,i[1].value,i[2].value,i[3].value];
+        }),
+        theme:"grid",
+        styles:{fontSize:11},
+        margin:{left:margin,right:margin},
+        didDrawPage:()=>drawBorder()
     });
+    y=doc.lastAutoTable.finalY+20;
 
-    // ================= Education =================
-    sectionHeader("Education",[255,193,7]);
-    addMultilineText(document.getElementById("education").value);
+    section("Education",COLORS.orange);
+    paragraph(education.value);
 
-    // ================= Experience =================
-    sectionHeader("Experience",[0,200,83]);
-    addMultilineText(document.getElementById("experience").value);
+    section("Experience",COLORS.green);
+    paragraph(experience.value);
 
-    // ================= Technical Skills =================
-    sectionHeader("Technical Skills",[255,193,7]);
-    const skillsArr = document.getElementById("skills").value.split(",").map(s=>s.trim());
-    let x = margin;
-    skillsArr.forEach(skill=>{
-        const textWidth = doc.getTextWidth(skill) + 8;
-        if(x + textWidth > pageWidth - margin){ x = margin; y += 20; if(y > pageHeight - margin) addNewPage(); }
-        doc.text(skill, x, y);
-        x += textWidth + 10;
+    section("Technical Skills",COLORS.orange);
+    skills.value.split(",").forEach(skill=>{
+        if(y>pageHeight-margin) addNewPage();
+        doc.text("• "+skill.trim(),margin,y);
+        y+=14;
     });
-    y += 25;
+    y+=10;
 
-    // ================= Projects =================
-    sectionHeader("Projects",[0,200,83]);
-    addMultilineText(document.getElementById("projects").value);
+    section("Projects",COLORS.green);
+    paragraph(projects.value);
 
-    // ================= Habits / Strengths =================
-    sectionHeader("Habits / Strengths",[255,87,34]);
-    addMultilineText(document.getElementById("habits").value);
+    section("Habits / Strengths",COLORS.pink);
+    paragraph(habits.value);
 
-    // ================= Languages Known =================
-    sectionHeader("Languages Known",[63,81,181]);
-    const languagesInput = document.getElementById("Languages");
-    if(languagesInput) addMultilineText(languagesInput.value);
+    section("Languages Known",COLORS.blue);
+    paragraph(Languages.value);
 
-    // ================= Declaration =================
-    sectionHeader("Declaration",[124,77,255]);
-    addMultilineText(document.getElementById("declaration").value);
+    section("Declaration",COLORS.purple);
+    paragraph(declaration.value);
 
-    // ================= Place, Date, Signature =================
-    if(y + 60 > pageHeight - margin) addNewPage();
-    doc.text(`Place: ${document.getElementById("place").value}`, margin, y);
-    y += 18;
-    doc.text(`Date: ${document.getElementById("date").value}`, margin, y);
-    y += 18;
-    doc.text(`Signature: ${document.getElementById("signature").value}`, margin, y);
+    /* ========= FOOTER ========= */
+    if(y>pageHeight-80) addNewPage();
+    doc.setTextColor(...COLORS.dark);
+    doc.text(`Place: ${place.value}`,margin,y);
+    y+=16;
+    doc.text(`Date: ${date.value}`,margin,y);
+    y+=16;
+    doc.text(`Signature: ${signature.value}`,margin,y);
 
-    // ================= Save PDF =================
-    doc.save("Resume.pdf");
+    /* ========= SAVE ========= */
+    doc.save("MY_RESUME.pdf");
 }
+
 
 
 </script>
