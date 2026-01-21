@@ -278,21 +278,33 @@ async function generatePDF() {
     const doc = new jsPDF('p', 'pt', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 40;
+    let y = 50;
 
-    // ================= Page Border =================
     const gradientColors = [
         {r:255,g:64,b:129},
         {r:124,g:77,b:255},
         {r:0,g:229,b:255},
         {r:76,g:175,b:80}
     ];
-    gradientColors.forEach((color, i)=>{
-        doc.setDrawColor(color.r,color.g,color.b);
-        doc.setLineWidth(4 - i);
-        doc.rect(10 + i*3, 10 + i*3, pageWidth-20 - i*6, pageHeight-20 - i*6);
-    });
 
-    let y = 50;
+    // ================= Draw Page Border =================
+    function drawPageBorder() {
+        gradientColors.forEach((color, i)=>{
+            doc.setDrawColor(color.r,color.g,color.b);
+            doc.setLineWidth(4 - i);
+            doc.rect(10 + i*3, 10 + i*3, pageWidth-20 - i*6, pageHeight-20 - i*6);
+        });
+    }
+
+    drawPageBorder(); // Draw border for first page
+
+    // ================= Add New Page with Border =================
+    function addNewPage() {
+        doc.addPage();
+        y = 50;
+        drawPageBorder();
+    }
 
     // ================= Profile Photo =================
     if(photo.files[0]){
@@ -304,7 +316,8 @@ async function generatePDF() {
                 img.onload = function(){
                     const imgWidth = 100;
                     const imgHeight = 100 * (img.height/img.width);
-                    doc.addImage(img, 'JPEG', pageWidth - imgWidth - 40, y-10, imgWidth, imgHeight);
+                    if(y + imgHeight > pageHeight - margin) addNewPage();
+                    doc.addImage(img, 'JPEG', pageWidth - imgWidth - margin, y-10, imgWidth, imgHeight);
                     resolve();
                 }
                 img.src = e.target.result;
@@ -317,118 +330,108 @@ async function generatePDF() {
     doc.setFontSize(26);
     doc.setFont("helvetica","bold");
     doc.setTextColor(124,77,255);
-    doc.text(fullName.value, 40, y);
+    doc.text(fullName.value, margin, y);
     y += 35;
 
     doc.setFontSize(12);
     doc.setFont("helvetica","normal");
     doc.setTextColor(50,50,50);
-    doc.text(`DOB: ${dob.value} | ${email.value} | ${phone.value}`, 40, y);
+    doc.text(`DOB: ${dob.value} | ${email.value} | ${phone.value}`, margin, y);
     y += 18;
-    doc.text(`Address: ${address.value}`, 40, y);
+    doc.text(`Address: ${address.value}`, margin, y);
     y += 35;
 
-    // ================= Function for Section Header =================
+    // ================= Section Header =================
     function sectionHeader(title, color){
-        y += 20; // Space before title
-        const rectHeight = 25;
-        const textWidth = doc.getTextWidth(title) + 20;
-
-        doc.setFillColor(...color);
-        doc.roundedRect(40, y - rectHeight + 5, textWidth, rectHeight, 4, 4, 'F');
-
+        y += 20; // space before title
+        if(y > pageHeight - margin){ addNewPage(); }
         doc.setFontSize(14);
         doc.setFont("helvetica","bold");
-        doc.setTextColor(255,255,255);
-        doc.text(title, 50, y + 2);
-
-        // Reset
+        doc.setTextColor(...color);
+        doc.text(title, margin, y);
         doc.setFontSize(12);
         doc.setFont("helvetica","normal");
         doc.setTextColor(50,50,50);
+        y += 15; // space after title
+    }
 
-        y += rectHeight + 10; // Space after title
+    // ================= Multi-line Text =================
+    function addMultilineText(text){
+        const lines = doc.splitTextToSize(text, pageWidth - 2*margin);
+        lines.forEach(line => {
+            if(y > pageHeight - margin){ addNewPage(); }
+            doc.text(line, margin, y);
+            y += 15;
+        });
+        y += 10;
     }
 
     // ================= Career Objective =================
     sectionHeader("Career Objective",[255,64,129]);
-    doc.text(objective.value, 40, y, {maxWidth:520});
-    y += 40;
+    addMultilineText(objective.value);
 
     // ================= Professional Summary =================
     sectionHeader("Professional Summary",[0,153,255]);
-    doc.text(summary.value, 40, y, {maxWidth:520});
-    y += 40;
+    addMultilineText(summary.value);
 
     // ================= Academics Table =================
     sectionHeader("Academic Qualifications",[76,175,80]);
     const headers = [["Course","Institute","Year","GPA"]];
     const data = [...document.querySelectorAll(".academicRow")].map(r=>{
-        let i = r.querySelectorAll("input");
-        return [i[0].value,i[1].value,i[2].value,i[3].value];
+        const i = r.querySelectorAll("input");
+        return [i[0].value, i[1].value, i[2].value, i[3].value];
     });
-
     doc.autoTable({
         head: headers,
         body: data,
         startY: y,
         theme: 'grid',
-        headStyles: { fillColor:[255,64,129], textColor:255, fontStyle:'bold' },
+        headStyles: { fillColor:[255,255,255], textColor:[0,0,0], fontStyle:'bold' },
         alternateRowStyles: { fillColor:[245,245,245] },
         styles: { fontSize:11 },
-        margin: { left:40, right:40 }
+        margin: { left:margin, right:margin },
+        didDrawPage: (dataArg) => {
+            y = dataArg.cursor.y + 25; // update y after table
+            drawPageBorder(); // redraw border if table goes to next page
+        }
     });
-    y = doc.lastAutoTable.finalY + 25;
 
     // ================= Technical Skills =================
     sectionHeader("Technical Skills",[255,193,7]);
     const skillsArr = skills.value.split(",").map(s=>s.trim());
-    let x = 40;
+    let x = margin;
     skillsArr.forEach(skill=>{
-        const textWidth = doc.getTextWidth(skill) + 12;
-        doc.setFillColor(255,64,129);
-        doc.roundedRect(x, y-12, textWidth, 16, 4, 4, 'FD');
-        doc.setTextColor(255,255,255);
-        doc.text(skill, x + 6, y);
-        x += textWidth + 8;
-        if(x + textWidth > pageWidth - 40){
-            x = 40;
-            y += 24;
-        }
+        const textWidth = doc.getTextWidth(skill) + 8;
+        if(x + textWidth > pageWidth - margin){ x = margin; y += 20; if(y > pageHeight - margin) addNewPage(); }
+        doc.text(skill, x, y);
+        x += textWidth + 10;
     });
-    y += 40;
+    y += 30;
 
     // ================= Projects =================
     sectionHeader("Projects",[0,200,83]);
-    doc.text(projects.value, 40, y, {maxWidth:520});
-    y += 40;
+    addMultilineText(projects.value);
 
     // ================= Habits / Strengths =================
     sectionHeader("Habits / Strengths",[255,87,34]);
-    doc.text(habits.value, 40, y, {maxWidth:520});
-    y += 40;
+    addMultilineText(habits.value);
 
     // ================= Languages Known =================
-    sectionHeader("Languages",[63,81,181]);
+    sectionHeader("Languages Known",[63,81,181]);
     const languagesInput = document.getElementById("languages");
-    if(languagesInput){
-        doc.text(languagesInput.value, 40, y, {maxWidth:520});
-        y += 40;
-    }
+    if(languagesInput) addMultilineText(languagesInput.value);
 
     // ================= Declaration =================
     sectionHeader("Declaration",[124,77,255]);
-    doc.text(declaration.value, 40, y, {maxWidth:520});
-    y += 40;
+    addMultilineText(declaration.value);
 
     // ================= Place, Date, Signature =================
-    doc.setFontSize(12);
-    doc.setTextColor(50,50,50);
-    doc.text(`Place: ${place.value}`, 40, y);
+    if(y + 60 > pageHeight - margin){ addNewPage(); }
+    doc.text(`Place: ${place.value}`, margin, y);
     y += 18;
-    doc.text(`Date: ${date.value}`, 40, y);
+    doc.text(`Date: ${date.value}`, margin, y);
     y += 18;
-    doc.text(`Signature: ${signature.value}`, 40, y);
+    doc.text(`Signature: ${signature.value}`, margin, y);
 
     // ================= Save PDF =================
     doc.save("Resume.pdf");
