@@ -180,18 +180,18 @@ function removeAcademic(btn){btn.parentElement.remove();}
 
 // Preview CV in new window
 function previewCV(){
-    const f=photo.files[0];
+    const f = photo.files[0];
     if(f){
-        const r=new FileReader();
-        r.onload=e=>openPreview(e.target.result);
+        const r = new FileReader();
+        r.onload = e => openPreview(e.target.result);
         r.readAsDataURL(f);
-    }else openPreview("");
+    } else openPreview("");
 }
 
 // Open preview window
 function openPreview(photo){
-const w=window.open("","_blank","width=900,height=1200");
-w.document.write(`
+    const w = window.open("", "_blank", "width=900,height=1200");
+    w.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -200,11 +200,13 @@ w.document.write(`
 <style>
 body{margin:0;font-family:Poppins;background:#eee;}
 .page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid;border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
-.header{display:flex;gap:20px}
-img{width:120px;height:120px;border-radius:50%}
-h2{color:#4caf50}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #aaa;padding:8px;text-align:center}
+.header{display:flex;gap:20px;align-items:center;}
+img{width:120px;height:120px;border-radius:50%;}
+.header h1{margin:0;color:#4caf50;}
+h2{color:#4caf50;margin-bottom:5px;margin-top:25px;}
+p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #aaa;padding:8px;text-align:center;}
 span{display:inline-block;background:#ff4081;color:#fff;padding:6px 14px;border-radius:30px;margin:4px;}
 .close-bar{position:fixed;bottom:0;left:0;width:100%;background:#222;text-align:center;padding:12px;}
 .close-bar button{background:#f44336;color:#fff;border:none;border-radius:30px;padding:10px 28px;font-weight:600;cursor:pointer;}
@@ -217,6 +219,7 @@ span{display:inline-block;background:#ff4081;color:#fff;padding:6px 14px;border-
 ${photo?`<img src="${photo}">`:""}
 <div>
 <h1>${fullName.value}</h1>
+<p><b>Father:</b> ${fatherName.value} | <b>Mother:</b> ${motherName.value}</p>
 <p><b>DOB:</b> ${dob.value}</p>
 <p>${email.value} | ${phone.value}</p>
 <p>${address.value}</p>
@@ -230,15 +233,21 @@ ${photo?`<img src="${photo}">`:""}
 <table>
 <tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA</th></tr>
 ${[...document.querySelectorAll(".academicRow")].map(r=>{
-let i=r.querySelectorAll("input");
-return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
+    let i = r.querySelectorAll("input");
+    return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
 }).join("")}
 </table>
 
-<h2>Skills</h2>
+<h2>Education</h2><p>${education.value}</p>
+<h2>Experience</h2><p>${experience.value}</p>
+
+<h2>Technical Skills</h2>
 ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 
 <h2>Projects</h2><p>${projects.value}</p>
+<h2>Habits / Strengths</h2><p>${habits.value}</p>
+<h2>Languages Known</h2><p>${Languages.value}</p>
+
 <h2>Declaration</h2><p>${declaration.value}</p>
 
 <p><b>Place:</b> ${place.value}</p>
