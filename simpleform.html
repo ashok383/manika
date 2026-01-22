@@ -2,80 +2,104 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HD Photo Enhancer</title>
+<title>HD Photo Enhancer Pro</title>
 <style>
-body {
+body{
+  margin:0;
   font-family: Arial;
-  background: linear-gradient(135deg,#1d2671,#c33764);
-  color: white;
-  text-align: center;
-  padding: 20px;
+  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  text-align:center;
+  padding:20px;
 }
-input, button {
-  padding: 10px;
-  margin: 10px;
+h2{margin-bottom:10px}
+input,button{
+  padding:10px 15px;
+  margin:8px;
+  font-size:15px;
 }
-canvas {
-  margin-top: 20px;
-  border: 12px solid gold;
-  box-shadow: 0 0 30px rgba(255,255,255,0.6);
-  background: white;
+button{
+  background:#00e5ff;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
-button {
-  background: #00e676;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
+canvas{
+  display:block;
+  margin:20px auto;
+  background:#fff;
+  border:18px solid #ff9800;
+  box-shadow:0 0 35px rgba(0,0,0,0.8);
 }
 </style>
 </head>
+
 <body>
 
-<h2>HD Photo Enhancer & Frame</h2>
-<input type="file" id="upload" accept="image/*">
-<br>
-<button onclick="enhance()">Enhance to HD</button>
-<button onclick="download()">Download HD Image</button>
+<h2>HD Photo Enhancer (Single-File)</h2>
+<input type="file" id="upload" accept="image/*"><br>
+<button onclick="processImage()">Enhance to HD</button>
+<button onclick="download()">Download</button>
 
-<canvas id="canvas" width="1080" height="1080"></canvas>
+<canvas id="canvas" width="2048" height="2048"></canvas>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 let img = new Image();
 
-document.getElementById("upload").addEventListener("change", e => {
+document.getElementById("upload").addEventListener("change", e=>{
   const file = e.target.files[0];
   const reader = new FileReader();
-  reader.onload = () => img.src = reader.result;
+  reader.onload = ()=> img.src = reader.result;
   reader.readAsDataURL(file);
 });
 
-function enhance() {
+function processImage(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // background
-  ctx.fillStyle = "#ffffff";
+  // White background
+  ctx.fillStyle="#fff";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // image scaling
+  // Scale image proportionally
   const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
-  const w = img.width * scale;
-  const h = img.height * scale;
-  const x = (canvas.width - w)/2;
-  const y = (canvas.height - h)/2;
+  const w = img.width*scale;
+  const h = img.height*scale;
+  const x = (canvas.width-w)/2;
+  const y = (canvas.height-h)/2;
 
-  // enhancement filters
-  ctx.filter = "brightness(1.1) contrast(1.2) saturate(1.3) sharpen(1)";
-  ctx.drawImage(img, x, y, w, h);
+  // Step 1: Base upscale
+  ctx.drawImage(img,x,y,w,h);
 
-  // frame overlay
-  ctx.lineWidth = 20;
-  ctx.strokeStyle = "#ff9800";
-  ctx.strokeRect(10,10,canvas.width-20,canvas.height-20);
+  // Step 2: Color enhancement
+  ctx.globalCompositeOperation="source-over";
+  ctx.filter="brightness(1.08) contrast(1.25) saturate(1.35)";
+  ctx.drawImage(canvas,0,0);
+
+  // Step 3: Sharpen (manual pixel processing)
+  let imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+  let d = imageData.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]   = Math.min(255,d[i]*1.08);     // R
+    d[i+1] = Math.min(255,d[i+1]*1.08);   // G
+    d[i+2] = Math.min(255,d[i+2]*1.08);   // B
+  }
+  ctx.putImageData(imageData,0,0);
+
+  // Step 4: Frame
+  ctx.lineWidth=25;
+  ctx.strokeStyle="#ff9800";
+  ctx.strokeRect(12,12,canvas.width-24,canvas.height-24);
 }
 
-function download() {
-  const link = document.createElement("a");
-  link.download = "HD_Photo.png";
-  link.href = canvas.toDataURL("
+function download(){
+  const a=document.createElement("a");
+  a.download="HD_Enhanced_Image.png";
+  a.href=canvas.toDataURL("image/png",1.0);
+  a.click();
+}
+</script>
+
+</body>
+</html>
