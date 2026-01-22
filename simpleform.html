@@ -1,88 +1,81 @@
-// app.js - Single file Razorpay integration demo
-
-const express = require('express');
-const Razorpay = require('razorpay');
-const bodyParser = require('body-parser');
-const path = require('path');
-
-const app = express();
-app.use(bodyParser.json());
-app.use(express.static(__dirname)); // serve static HTML
-
-// ============ CONFIGURATION ============
-const razorpay = new Razorpay({
-    key_id: "rzp_live_S5ex0BvHGJcmo6",       // replace with your Razorpay key_id
-    key_secret: "ZvWJBmFchb1zNW8Enetwmpop" // replace with your Razorpay key_secret
-});
-
-// ============ SERVE HTML PAGE ============
-app.get("/", (req, res) => {
-    res.send(`
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Razorpay Payment Demo</title>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<meta charset="UTF-8">
+<title>HD Photo Enhancer</title>
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg,#1d2671,#c33764);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+input, button {
+  padding: 10px;
+  margin: 10px;
+}
+canvas {
+  margin-top: 20px;
+  border: 12px solid gold;
+  box-shadow: 0 0 30px rgba(255,255,255,0.6);
+  background: white;
+}
+button {
+  background: #00e676;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
-    <h2>Razorpay Payment Demo</h2>
-    <button id="payBtn">Pay ₹100</button>
 
-    <script>
-        document.getElementById("payBtn").onclick = async function() {
-            // call backend to create order
-            const res = await fetch("/create-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: 10000 }) // ₹100 in paise
-            });
-            const order = await res.json();
+<h2>HD Photo Enhancer & Frame</h2>
+<input type="file" id="upload" accept="image/*">
+<br>
+<button onclick="enhance()">Enhance to HD</button>
+<button onclick="download()">Download HD Image</button>
 
-            var options = {
-                "key": "${razorpay.key_id}", // your key_id
-                "amount": order.amount,
-                "currency": order.currency,
-                "name": "Test Payment",
-                "description": "Razorpay Demo",
-                "order_id": order.id,
-                "handler": function (response){
-                    alert("Payment Success! Payment ID: " + response.razorpay_payment_id);
-                },
-                "prefill": {
-                    "name": "John Doe",
-                    "email": "john@example.com",
-                    "contact": "9999999999"
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        }
-    </script>
-</body>
-</html>
-    `);
+<canvas id="canvas" width="1080" height="1080"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let img = new Image();
+
+document.getElementById("upload").addEventListener("change", e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => img.src = reader.result;
+  reader.readAsDataURL(file);
 });
 
-// ============ CREATE ORDER ============
-app.post("/create-order", async (req, res) => {
-    const { amount } = req.body;
-    try {
-        const order = await razorpay.orders.create({
-            amount: amount,
-            currency: "INR",
-            receipt: "receipt#1"
-        });
-        res.json(order);
-    } catch(err) {
-        res.status(500).send(err);
-    }
-});
+function enhance() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-// ============ START SERVER ============
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+  // background
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // image scaling
+  const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
+  const w = img.width * scale;
+  const h = img.height * scale;
+  const x = (canvas.width - w)/2;
+  const y = (canvas.height - h)/2;
+
+  // enhancement filters
+  ctx.filter = "brightness(1.1) contrast(1.2) saturate(1.3) sharpen(1)";
+  ctx.drawImage(img, x, y, w, h);
+
+  // frame overlay
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = "#ff9800";
+  ctx.strokeRect(10,10,canvas.width-20,canvas.height-20);
+}
+
+function download() {
+  const link = document.createElement("a");
+  link.download = "HD_Photo.png";
+  link.href = canvas.toDataURL("
