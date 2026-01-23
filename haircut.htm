@@ -2,182 +2,133 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Haircut Appointment Booking</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Barber Studio</title>
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= RESET ================= */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
-body{
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:#fff;
-    overflow-x:hidden;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f7fa;
 }
 
-/* ================= HEADER ================= */
-header{
-    padding:20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:linear-gradient(90deg,#ff512f,#dd2476);
-    box-shadow:0 10px 30px rgba(0,0,0,.4);
-}
-header h1{
-    font-size:24px;
-    font-weight:700;
-    letter-spacing:1px;
-}
-nav a{
-    margin-left:15px;
-    font-weight:500;
-    color:#fff;
+/* HEADER */
+header {
+    background: linear-gradient(90deg, #2ecc71, #ff69b4);
+    padding: 15px;
+    text-align: center;
+    color: white;
 }
 
-/* ================= HERO ================= */
-.hero{
-    min-height:80vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:20px;
-    background:
-    linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
-    url("https://images.unsplash.com/photo-1621605815971-fbc98d665033");
-    background-size:cover;
-    background-position:center;
-}
-.hero h2{
-    font-size:40px;
-    background:linear-gradient(90deg,#ffdd00,#ff512f,#ff00cc);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:shine 3s infinite linear;
-}
-.hero p{
-    margin-top:15px;
-    font-size:16px;
-    opacity:.9;
-}
-@keyframes shine{
-    0%{filter:hue-rotate(0deg);}
-    100%{filter:hue-rotate(360deg);}
+header h1 {
+    margin: 0;
 }
 
-/* ================= SERVICES ================= */
-.services{
-    padding:60px 20px;
-    background:#111;
-}
-.services h2{
-    text-align:center;
-    font-size:32px;
-    margin-bottom:40px;
-    background:linear-gradient(90deg,#00f2fe,#4facfe);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-.service-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:25px;
-    max-width:1100px;
-    margin:auto;
-}
-.service-card{
-    background:linear-gradient(145deg,#1e1e1e,#2b2b2b);
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 15px 40px rgba(0,0,0,.6);
-    transition:.4s;
-}
-.service-card:hover{
-    transform:translateY(-10px) scale(1.03);
-    box-shadow:0 20px 60px rgba(255,64,129,.6);
-}
-.service-card img{
-    width:100%;
-    height:180px;
-    object-fit:cover;
-}
-.service-card div{
-    padding:20px;
-}
-.service-card h3{
-    color:#ff4081;
-    margin-bottom:10px;
-}
-.service-card p{
-    font-size:14px;
-    opacity:.85;
+/* SALON CARD */
+.container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
 }
 
-/* ================= BOOKING ================= */
-.booking{
-    padding:60px 20px;
-    background:linear-gradient(135deg,#ff512f,#dd2476);
-}
-.booking h2{
-    text-align:center;
-    font-size:32px;
-    margin-bottom:30px;
-}
-.booking form{
-    max-width:450px;
-    margin:auto;
-    background:rgba(0,0,0,.25);
-    padding:30px;
-    border-radius:20px;
-    backdrop-filter:blur(10px);
-}
-.booking input,
-.booking select,
-.booking textarea{
-    width:100%;
-    margin-bottom:15px;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    outline:none;
-}
-.booking button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:30px;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-    background:linear-gradient(90deg,#00f2fe,#4facfe);
-    color:#000;
-    box-shadow:0 5px 20px rgba(0,0,0,.4);
-}
-.booking button:hover{
-    transform:scale(1.05);
+.card {
+    background: white;
+    width: 350px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 20px;
+    text-align: center;
 }
 
-/* ================= FOOTER ================= */
-footer{
-    padding:25px;
-    text-align:center;
-    background:#000;
-    font-size:14px;
-    opacity:.8;
+.card img {
+    width: 100%;
+    border-radius: 10px;
 }
 
-/* ================= MOBILE ================= */
-@media(max-width:600px){
-    .hero h2{font-size:30px;}
-    header h1{font-size:20px;}
+.card h2 {
+    margin: 10px 0;
+}
+
+.card button {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.card button:hover {
+    background: #27ae60;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    width: 350px;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.modal-content h3 {
+    text-align: center;
+    color: #ff69b4;
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* FORM */
+form input, form select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+form input:focus, form select:focus {
+    border-color: #2ecc71;
+    outline: none;
+}
+
+form button {
+    width: 100%;
+    background: #ff69b4;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background: #e0569b;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
 }
 </style>
 </head>
@@ -185,99 +136,63 @@ footer{
 <body>
 
 <header>
-    <h1>💈 Elite Barber</h1>
-    <nav>
-        <a href="#services">Services</a>
-        <a href="#book">Book</a>
-    </nav>
+    <h1>💈 Book Your Haircut</h1>
+    <p>Easy • Fast • Reliable</p>
 </header>
 
-<section class="hero">
-    <div>
-        <h2>Smart. Stylish. Professional.</h2>
-        <p>Premium haircut & grooming experience</p>
+<div class="container">
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9" alt="Salon">
+        <h2>Royal Men's Salon</h2>
+        <p>📍 Hyderabad</p>
+        <p>⭐ 4.8 Rating</p>
+        <button onclick="openModal()">Book Appointment</button>
     </div>
-</section>
-
-<section class="services" id="services">
-<h2>Our Premium Services</h2>
-
-<div class="service-grid">
-
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1599351431613-18ef1fdd27e1">
-<div>
-<h3>Classic Haircut</h3>
-<p>Modern & traditional styles by expert barbers.</p>
-</div>
 </div>
 
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70">
-<div>
-<h3>Beard Styling</h3>
-<p>Perfect beard trim, fade & shaping.</p>
-</div>
-</div>
+<!-- MODAL -->
+<div class="modal" id="bookingModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Book Appointment</h3>
 
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35">
-<div>
-<h3>Hair Spa</h3>
-<p>Relaxing scalp massage & hair treatment.</p>
-</div>
-</div>
+        <form onsubmit="submitBooking(event)">
+            <input type="text" placeholder="Customer Name" required>
+            <input type="tel" placeholder="Mobile Number" required>
+            <select required>
+                <option value="">Select Service</option>
+                <option>Haircut</option>
+                <option>Haircut + Beard</option>
+                <option>Beard Trim</option>
+                <option>Hair Spa</option>
+            </select>
+            <input type="date" required>
+            <input type="time" required>
 
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1622296089864-9e9ffcc97c8f">
-<div>
-<h3>Kids Haircut</h3>
-<p>Safe & stylish cuts for kids.</p>
+            <button type="submit">Confirm Booking</button>
+        </form>
+    </div>
 </div>
-</div>
-
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438">
-<div>
-<h3>Hair Coloring</h3>
-<p>Professional hair coloring & highlights.</p>
-</div>
-</div>
-
-<div class="service-card">
-<img src="https://images.unsplash.com/photo-1618077360395-f3068be8e001">
-<div>
-<h3>Premium Grooming</h3>
-<p>Complete luxury grooming package.</p>
-</div>
-</div>
-
-</div>
-</section>
-
-<section class="booking" id="book">
-<h2>Book Appointment</h2>
-
-<form onsubmit="alert('Appointment Booked Successfully!');return false;">
-<input type="text" placeholder="Full Name" required>
-<input type="tel" placeholder="Mobile Number" required>
-<select required>
-<option value="">Select Service</option>
-<option>Classic Haircut</option>
-<option>Beard Styling</option>
-<option>Hair Spa</option>
-<option>Hair Coloring</option>
-<option>Premium Grooming</option>
-</select>
-<input type="date" required>
-<textarea rows="3" placeholder="Message (optional)"></textarea>
-<button>Confirm Booking</button>
-</form>
-</section>
 
 <footer>
-© 2026 Elite Barber Studio | Designed for Mobile & Premium Look
+    © 2026 Haircut Booking Platform
 </footer>
+
+<script>
+function openModal() {
+    document.getElementById("bookingModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("bookingModal").style.display = "none";
+}
+
+function submitBooking(e) {
+    e.preventDefault();
+    alert("✅ Appointment booked successfully!");
+    closeModal();
+}
+</script>
 
 </body>
 </html>
