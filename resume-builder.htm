@@ -266,27 +266,33 @@ ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 
 // Razorpay + PDF download
 async function payAndDownload() {
-    // Razorpay Payment Link options
-    const options = {
-        key: "rzp_live_S5ex0BvHGJcmo6", // Your Razorpay Key
-        payment_link: "https://rzp.io/rzp/SatLieJ", // Fixed Payment Link
-        handler: async function(response) {
-            // This runs only after successful payment
-            alert("Payment Successful ✅ Payment ID: " + response.razorpay_payment_id);
-            await generatePDF(); // Trigger PDF download
-        },
-        prefill: {
-            name: fullName.value,
-            email: email.value,
-            contact: phone.value
-        },
-        theme: { color: "#2196f3" }
-    };
 
-    const rzp = new Razorpay(options);
-    rzp.open();
+  const options = {
+    key: "rzp_live_S5ex0BvHGJcmo6", // Key ID only
+    payment_link: "https://rzp.io/rzp/SatLieJ", // FIXED PAYMENT LINK (₹ locked)
+
+    handler: async function (response) {
+      // ⚠️ Payment is ALREADY CAPTURED by Razorpay
+      alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
+
+      // Allow download
+      await generatePDF();
+    },
+
+    prefill: {
+      name: fullName.value,
+      email: email.value,
+      contact: phone.value
+    },
+
+    theme: {
+      color: "#2196f3"
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
 }
-
 // Generate PDF using jsPDF
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
