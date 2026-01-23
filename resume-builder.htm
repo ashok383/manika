@@ -265,24 +265,24 @@ ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 }
 
 // Razorpay + PDF download
-async function payAndDownload(){
+async function payAndDownload() {
+    // Razorpay Payment Link options
     const options = {
-        key: "rzp_live_S5ex0BvHGJcmo6", // Razorpay key
-        amount: 1000, // 100 INR in paise
-        currency: "INR",
-        name: "Resume Builder",
-        description: "Pay to download your resume PDF",
-        handler: async function(response){
-            alert("Payment Successful ✅ ID: " + response.razorpay_payment_id);
-            await generatePDF();
+        key: "rzp_live_S5ex0BvHGJcmo6", // Your Razorpay Key
+        payment_link: "https://rzp.io/rzp/SatLieJ", // Fixed Payment Link
+        handler: async function(response) {
+            // This runs only after successful payment
+            alert("Payment Successful ✅ Payment ID: " + response.razorpay_payment_id);
+            await generatePDF(); // Trigger PDF download
         },
         prefill: {
             name: fullName.value,
             email: email.value,
             contact: phone.value
         },
-        theme:{color:"#2196f3"}
+        theme: { color: "#2196f3" }
     };
+
     const rzp = new Razorpay(options);
     rzp.open();
 }
