@@ -1,237 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>(MANIK_A_RNIKA)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-        body{background:#f5f7fb;color:#333;overflow-x:hidden;}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>(MANIK_A_RNIKA)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#f5f7fb;color:#333;overflow-x:hidden;}
 
-        /* ===== HEADER / BANNER ===== */
-        header.top-banner{
-            position: relative;
-            height: 450px;
-            overflow: hidden;
-        }
-        header.top-banner img.banner-img{
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-        header.top-banner img.banner-img:hover{
-            transform: scale(1.05);
-        }
-        /* Gradient overlay */
-        header.top-banner::after{
-            content:"";
-            position:absolute;
-            top:0; left:0;
-            width:100%; height:100%;
-            background: linear-gradient(135deg, rgba(255,106,0,0.3), rgba(238,9,121,0.3), rgba(0,212,255,0.25));
-            mix-blend-mode: overlay;
-            pointer-events:none;
-        }
-        /* Floating shine overlay */
-        header.top-banner::before{
-            content:"";
-            position:absolute;
-            width:200%;
-            height:200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 25s linear infinite;
-            top:-50%;
-            left:-50%;
-        }
-        @keyframes float{
-            0%{ transform: rotate(0deg);}
-            100%{ transform: rotate(360deg);}
-        }
+/* ===== HEADER / BANNER ===== */
+header.top-banner{
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+header.top-banner img.banner-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+header.top-banner img.banner-img:hover{
+    transform: scale(1.05);
+}
+/* Gradient overlay */
+header.top-banner::after{
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: linear-gradient(135deg, rgba(255,106,0,0.3), rgba(238,9,121,0.3), rgba(0,212,255,0.25));
+    mix-blend-mode: overlay;
+    pointer-events:none;
+}
+/* Floating shine overlay */
+header.top-banner::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 25s linear infinite;
+    top:-50%;
+    left:-50%;
+}
+@keyframes float{
+    0%{ transform: rotate(0deg);}
+    100%{ transform: rotate(360deg);}
+}
 
-        /* ===== NAVBAR ===== */
-        nav{
-            position:absolute;
-            top:0;
-            left:0;
-            width:100%;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:20px 8%;
-            z-index:5;
-        }
-        nav h1{
-            font-size:28px;
-            font-weight:700;
-            color:#fff;
-            text-shadow: 2px 2px 12px rgba(0,0,0,0.6);
-        }
-        nav ul{
-            display:flex;
-            gap:25px;
-            list-style:none;
-        }
-        nav ul li a{
-            color:#fff;
-            text-decoration:none;
-            font-weight:500;
-            font-size:16px;
-            position:relative;
-        }
-        nav ul li a::after{
-            content:"";
-            position:absolute;
-            width:0;
-            height:2px;
-            background:#fff;
-            left:0; bottom:-4px;
-            transition:0.3s;
-        }
-        nav ul li a:hover::after{
-            width:100%;
-        }
+/* ===== NAVBAR ===== */
+nav{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 8%;
+    z-index:5;
+}
+nav h1{
+    font-size:28px;
+    font-weight:700;
+    color:#fff;
+    text-shadow: 2px 2px 12px rgba(0,0,0,0.6);
+}
+nav ul{
+    display:flex;
+    gap:25px;
+    list-style:none;
+}
+nav ul li a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:500;
+    font-size:16px;
+    position:relative;
+}
+nav ul li a::after{
+    content:"";
+    position:absolute;
+    width:0;
+    height:2px;
+    background:#fff;
+    left:0; bottom:-4px;
+    transition:0.3s;
+}
+nav ul li a:hover::after{
+    width:100%;
+}
 
-        /* ===== HERO SECTION ===== */
-        .hero{
-            position:relative;
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            align-items:center;
-            padding:80px 8%;
-            margin-top:-80px;
-            gap:40px;
-        }
-        .hero-text h2{
-            font-size:50px;
-            margin-bottom:20px;
-            background: linear-gradient(90deg, #ff6a00, #ee0979, #fcb045, #6a11cb, #00ffcc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-        }
-        @keyframes shine{
-            0%{background-position:0% 50%;}
-            50%{background-position:100% 50%;}
-            100%{background-position:0% 50%;}
-        }
-        .hero-text p{
-            font-size:18px;
-            margin-bottom:30px;
-            line-height:1.6;
-            color:#333;
-        }
+/* ===== HERO SECTION ===== */
+.hero{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    align-items:center;
+    padding:80px 8%;
+    gap:40px;
+}
+.hero-text h2{
+    font-size:50px;
+    margin-bottom:20px;
+    background: linear-gradient(90deg, #ff6a00, #ee0979, #fcb045, #6a11cb, #00ffcc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+}
+@keyframes shine{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+.hero-text p{
+    font-size:18px;
+    margin-bottom:30px;
+    line-height:1.6;
+    color:#333;
+}
+.hero img{
+    width:100%;
+    max-width:450px;
+    border-radius:20px;
+    box-shadow:0 25px 50px rgba(0,0,0,0.35);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.hero img:hover{
+    transform: scale(1.05);
+    box-shadow:0 35px 60px rgba(0,0,0,0.45);
+}
 
-        .hero img{
-            width:100%;
-            max-width:480px;
-            justify-self:center;
-            border-radius:25px;
-            box-shadow:0 25px 50px rgba(0,0,0,0.35);
-            transition: transform 0.5s ease, box-shadow 0.5s ease;
-        }
-        .hero img:hover{
-            transform: scale(1.05);
-            box-shadow:0 35px 60px rgba(0,0,0,0.45);
-        }
+/* ===== BUTTONS ===== */
+.btn, .btm {
+    padding: 16px 36px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-right: 15px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    color: #fff;
+    background: linear-gradient(45deg, #ff6a00, #ee0979, #fcb045);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.btn:hover, .btm:hover{
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.35);
+}
+.btn.resume, .btm.resume {
+    background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffcc);
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+}
+.btn.resume:hover, .btm.resume:hover{
+    background: linear-gradient(135deg, #ff512f, #dd2476, #fcb045, #00ffcc);
+}
 
-        /* ===== BUTTONS ===== */
-        .btn, .btm {
-            padding: 16px 36px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 700;
-            margin-right: 15px;
-            display: inline-block;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            color: #fff;
-            background: linear-gradient(45deg, #ff6a00, #ee0979, #fcb045);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        .btn:hover, .btm:hover{
-            transform: translateY(-4px) scale(1.06);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.35);
-        }
-        .btn.resume, .btm.resume {
-            background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffcc);
-            color: #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-        }
-        .btn.resume:hover, .btm.resume:hover{
-            background: linear-gradient(135deg, #ff512f, #dd2476, #fcb045, #00ffcc);
-        }
+/* ===== SECTIONS ===== */
+section{
+    padding:90px 8%;
+}
+.section-title{
+    text-align:center;
+    margin-bottom:60px;
+}
+.section-title h2{
+    font-size:40px;
+    background: linear-gradient(90deg, #ff6a00, #ee0979, #fcb045, #6a11cb, #00ffcc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+}
 
-        /* ===== SECTIONS ===== */
-        section{
-            padding:90px 8%;
-        }
-        .section-title{
-            text-align:center;
-            margin-bottom:60px;
-        }
-        .section-title h2{
-            font-size:40px;
-            background: linear-gradient(90deg, #ff6a00, #ee0979, #fcb045, #6a11cb, #00ffcc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-        }
+/* ===== FOOTER ===== */
+footer{
+    background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffcc);
+    color:#fff;
+    text-align:center;
+    padding:35px;
+    margin-top:50px;
+    box-shadow:0 -10px 30px rgba(0,0,0,0.3);
+}
 
-        .products, .features{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-            gap:30px;
-        }
-
-        .card, .feature{
-            background:#fff;
-            border-radius:25px;
-            padding:30px;
-            text-align:center;
-            box-shadow:0 18px 40px rgba(0,0,0,0.1);
-            transition:.4s;
-        }
-        .card:hover, .feature:hover{
-            transform:translateY(-12px);
-            box-shadow:0 25px 50px rgba(0,0,0,0.2);
-        }
-
-        .card img{
-            width:100%;
-            height:240px;
-            object-fit:cover;
-            border-radius:20px;
-        }
-        .card h3{
-            margin:18px 0 8px;
-        }
-        .price{
-            font-weight:700;
-            color:#2575fc;
-            margin-bottom:12px;
-        }
-
-        footer{
-            background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffcc);
-            color:#fff;
-            text-align:center;
-            padding:35px;
-            margin-top:50px;
-            box-shadow:0 -10px 30px rgba(0,0,0,0.3);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width:1000px){
-            .hero{grid-template-columns:1fr;text-align:center;margin-top:-50px;gap:30px;}
-            .hero img{margin-top:30px;}
-            nav ul{flex-direction:column;gap:15px;background:rgba(0,0,0,0.3);padding:15px;border-radius:15px;}
-        }
-    </style>
+/* ===== RESPONSIVE ===== */
+@media(max-width:1000px){
+    .hero{grid-template-columns:1fr;text-align:center;gap:30px;}
+    .hero img{margin-top:30px;}
+    nav ul{flex-direction:column;gap:15px;background:rgba(0,0,0,0.3);padding:15px;border-radius:15px;}
+}
+</style>
 </head>
 <body>
 
