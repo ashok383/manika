@@ -19,42 +19,43 @@
         .hero-text h2{font-size:48px;margin-bottom:15px}
         .hero-text p{font-size:16px;margin-bottom:25px;line-height:1.6}
 
-        .btn{
-            background:#ffcc00;
-            color:#000;
-            padding:14px 28px;
-            border-radius:30px;
-            text-decoration:none;
-            font-weight:600;
-            margin-right:12px;
-            display:inline-block;
-            border:none;
-            cursor:pointer;
-            font-size:16px;
-        }
+        /* ===== Base Button Styles ===== */
+.btn, .btm {
+    padding: 14px 28px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-right: 12px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    color: #fff;
+    background: linear-gradient(45deg, #ff6a00, #ee0979); /* default gradient */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
 
-        .btn.resume{
-            background:#2575fc;
-            color:#fff;
-        }
-        .btm{
-            background:#ffcc00;
-            color:#000;
-            padding:14px 28px;
-            border-radius:30px;
-            text-decoration:none;
-            font-weight:600;
-            margin-right:12px;
-            display:inline-block;
-            border:none;
-            cursor:pointer;
-            font-size:16px;
-        }
+/* ===== Hover Effect ===== */
+.btn:hover, .btm:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+}
 
-        .btm.resume{
-            background:#2575fc;
-            color:#fff;
-        }
+/* ===== Specific Resume Button Styles ===== */
+.btn.resume, .btm.resume {
+    background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc); /* vibrant gradient */
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* ===== Hover Effect for Resume Button ===== */
+.btn.resume:hover, .btm.resume:hover {
+    background: linear-gradient(135deg, #ff512f, #dd2476, #fcb045);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+}
+
 
         .hero img{width:100%;max-width:420px;justify-self:center}
         section{padding:70px 8%}
