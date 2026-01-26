@@ -296,176 +296,230 @@ async function payAndDownload() {
 // Generate PDF using jsPDF
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'pt', 'a4');
+    const doc = new jsPDF("p", "pt", "a4");
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 40;
-    let y = 60;
+    const margin = 45;
+    let y = 75;
 
-    /* ========= COLORS ========= */
+    /* ========= COLOR THEME ========= */
     const COLORS = {
-        pink: [255,64,129],
-        purple: [124,77,255],
-        blue: [0,153,255],
-        green: [0,200,83],
-        orange: [255,152,0],
-        dark: [40,40,40],
-        gray: [90,90,90],
-        lightBg: [245,247,255]
+        black: [0, 0, 0],
+        text: [40, 40, 40],
+        gray: [90, 90, 90],
+
+        purple: [106, 17, 203],
+        blue: [37, 117, 252],
+        pink: [233, 30, 99],
+        green: [0, 150, 136],
+        orange: [255, 152, 0],
+
+        panelBg: [248, 250, 255],
+        lightGreen: [224, 242, 241],
+        mint: [240, 255, 250]
     };
 
-    /* ========= PAGE BORDER ========= */
-    function drawBorder(){
-        doc.setDrawColor(...COLORS.purple);
-        doc.setLineWidth(2);
-        doc.rect(15,15,pageWidth-30,pageHeight-30);
+    /* ========= THICK 4-SIDE BORDER ========= */
+    function drawBorder() {
+        doc.setDrawColor(...COLORS.black);
+        doc.setLineWidth(4);
+        doc.rect(20, 20, pageWidth - 40, pageHeight - 40);
     }
+
+    function addNewPage() {
+        doc.addPage();
+        drawBorder();
+        y = 75;
+    }
+
     drawBorder();
 
-    function addNewPage(){
-        doc.addPage();
-        y = 60;
-        drawBorder();
+    /* ========= GRADIENT HEADER ========= */
+    const headerHeight = 95;
+    for (let i = 0; i < headerHeight; i++) {
+        const r = COLORS.purple[0] + (COLORS.blue[0] - COLORS.purple[0]) * (i / headerHeight);
+        const g = COLORS.purple[1] + (COLORS.blue[1] - COLORS.purple[1]) * (i / headerHeight);
+        const b = COLORS.purple[2] + (COLORS.blue[2] - COLORS.purple[2]) * (i / headerHeight);
+        doc.setDrawColor(r, g, b);
+        doc.line(20, 20 + i, pageWidth - 20, 20 + i);
     }
 
-    /* ========= HEADER SHINE BAR ========= */
-    doc.setFillColor(...COLORS.purple);
-    doc.rect(0,0,pageWidth,90,'F');
-
-    /* ========= PHOTO ========= */
+    /* ========= PHOTO (HIGH DP) ========= */
     const photo = document.getElementById("photo");
-    if(photo.files[0]){
+    if (photo.files[0]) {
         const reader = new FileReader();
-        await new Promise(res=>{
-            reader.onload=e=>{
-                const img=new Image();
-                img.onload=()=>{
-                    doc.addImage(img,'JPEG',pageWidth-140,20,90,90);
-                    res();
-                }
-                img.src=e.target.result;
-            }
+        await new Promise(resolve => {
+            reader.onload = e => {
+                doc.addImage(
+                    e.target.result,
+                    "JPEG",
+                    pageWidth - 135,
+                    30,
+                    85,
+                    85,
+                    undefined,
+                    "FAST"
+                );
+                resolve();
+            };
             reader.readAsDataURL(photo.files[0]);
         });
     }
 
     /* ========= NAME ========= */
-    doc.setFont("helvetica","bold");
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(26);
-    doc.setTextColor(255,255,255);
-    doc.text(fullName.value, margin, 50);
+    doc.setTextColor(255, 255, 255);
+    doc.text(fullName.value, margin, 58);
 
-    doc.setFontSize(12);
-    doc.setFont("helvetica","normal");
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
     doc.text(
         `Father: ${fatherName.value} | Mother: ${motherName.value}`,
-        margin, 70
+        margin, 75
     );
 
-    y = 120;
-    doc.setTextColor(...COLORS.dark);
+    y = 140;
+    doc.setTextColor(...COLORS.text);
 
     /* ========= BASIC INFO PANEL ========= */
-    doc.setFillColor(...COLORS.lightBg);
-    doc.roundedRect(margin-10,y-20,pageWidth-(margin*2)+20,70,10,10,'F');
+    doc.setFillColor(...COLORS.panelBg);
+    doc.roundedRect(
+        margin - 10,
+        y - 25,
+        pageWidth - margin * 2 + 20,
+        80,
+        10,
+        10,
+        "F"
+    );
 
     doc.text(`DOB: ${dob.value}`, margin, y);
-    y+=16;
+    y += 16;
     doc.text(`Email: ${email.value} | Phone: ${phone.value}`, margin, y);
-    y+=16;
+    y += 16;
     doc.text(`Address: ${address.value}`, margin, y);
+    y += 40;
 
-    y+=35;
-
-    /* ========= SECTION HEADER ========= */
-    function section(title,color){
-        if(y>pageHeight-80) addNewPage();
-        doc.setFont("helvetica","bold");
+    /* ========= SECTION FUNCTIONS ========= */
+    function section(title, color) {
+        if (y > pageHeight - 120) addNewPage();
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(15);
         doc.setTextColor(...color);
         doc.text(title, margin, y);
-        y+=5;
-        doc.setDrawColor(...color);
-        doc.setLineWidth(2);
-        doc.line(margin,y,pageWidth-margin,y);
-        y+=15;
-        doc.setFont("helvetica","normal");
-        doc.setFontSize(12);
+        y += 6;
+        doc.setLineWidth(2.5);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 18;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11.5);
         doc.setTextColor(...COLORS.gray);
     }
 
-    function paragraph(text){
-        const lines = doc.splitTextToSize(text,pageWidth-margin*2);
-        lines.forEach(l=>{
-            if(y>pageHeight-margin) addNewPage();
-            doc.text(l,margin,y);
-            y+=15;
+    function paragraph(text) {
+        const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
+        lines.forEach(line => {
+            if (y > pageHeight - margin) addNewPage();
+            doc.text(line, margin, y);
+            y += 14;
         });
-        y+=10;
+        y += 10;
     }
 
     /* ========= CONTENT ========= */
-    section("Career Objective",COLORS.pink);
+    section("Career Objective", COLORS.pink);
     paragraph(objective.value);
 
-    section("Professional Summary",COLORS.blue);
+    section("Professional Summary", COLORS.blue);
     paragraph(summary.value);
 
-    section("Academic Qualifications",COLORS.green);
-    doc.autoTable({
-        startY:y,
-        head:[["Course","Institute","Year","GPA"]],
-        body:[...document.querySelectorAll(".academicRow")].map(r=>{
-            const i=r.querySelectorAll("input");
-            return [i[0].value,i[1].value,i[2].value,i[3].value];
-        }),
-        theme:"grid",
-        styles:{fontSize:11},
-        margin:{left:margin,right:margin},
-        didDrawPage:()=>drawBorder()
-    });
-    y=doc.lastAutoTable.finalY+20;
+    /* ========= ACADEMIC TABLE ========= */
+    section("Academic Qualifications", COLORS.green);
 
-    section("Education",COLORS.orange);
+    doc.autoTable({
+        startY: y,
+        head: [[
+            "COURSE / DEGREE",
+            "INSTITUTE / UNIVERSITY",
+            "YEAR",
+            "CGPA / %"
+        ]],
+        body: [...document.querySelectorAll(".academicRow")].map(row => {
+            const i = row.querySelectorAll("input");
+            return [i[0].value, i[1].value, i[2].value, i[3].value];
+        }),
+        theme: "grid",
+        styles: {
+            fontSize: 12,
+            textColor: COLORS.black,
+            lineColor: COLORS.black,
+            lineWidth: 1.6,
+            cellPadding: 6
+        },
+        headStyles: {
+            fillColor: COLORS.green,
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            halign: "center",
+            lineWidth: 2
+        },
+        bodyStyles: {
+            fillColor: COLORS.mint
+        },
+        alternateRowStyles: {
+            fillColor: COLORS.lightGreen
+        },
+        columnStyles: {
+            2: { halign: "center" },
+            3: { halign: "center" }
+        },
+        margin: { left: margin, right: margin },
+        didDrawPage: () => drawBorder()
+    });
+
+    y = doc.lastAutoTable.finalY + 28;
+
+    section("Education", COLORS.orange);
     paragraph(education.value);
 
-    section("Experience",COLORS.green);
+    section("Experience", COLORS.green);
     paragraph(experience.value);
 
-    section("Technical Skills",COLORS.orange);
-    skills.value.split(",").forEach(skill=>{
-        if(y>pageHeight-margin) addNewPage();
-        doc.text("• "+skill.trim(),margin,y);
-        y+=14;
+    section("Technical Skills", COLORS.orange);
+    skills.value.split(",").forEach(skill => {
+        if (y > pageHeight - margin) addNewPage();
+        doc.text("• " + skill.trim(), margin, y);
+        y += 14;
     });
-    y+=10;
+    y += 12;
 
-    section("Projects",COLORS.green);
+    section("Projects", COLORS.blue);
     paragraph(projects.value);
 
-    section("Habits / Strengths",COLORS.pink);
+    section("Habits / Strengths", COLORS.pink);
     paragraph(habits.value);
 
-    section("Languages Known",COLORS.blue);
+    section("Languages Known", COLORS.green);
     paragraph(Languages.value);
 
-    section("Declaration",COLORS.purple);
+    section("Declaration", COLORS.purple);
     paragraph(declaration.value);
 
     /* ========= FOOTER ========= */
-    if(y>pageHeight-80) addNewPage();
-    doc.setTextColor(...COLORS.dark);
-    doc.text(`Place: ${place.value}`,margin,y);
-    y+=16;
-    doc.text(`Date: ${date.value}`,margin,y);
-    y+=16;
-    doc.text(`Signature: ${signature.value}`,margin,y);
+    if (y > pageHeight - 90) addNewPage();
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...COLORS.text);
+    doc.text(`Place: ${place.value}`, margin, y);
+    y += 16;
+    doc.text(`Date: ${date.value}`, margin, y);
+    y += 16;
+    doc.text(`Signature: ${signature.value}`, margin, y);
 
     /* ========= SAVE ========= */
-    doc.save("MY_RESUME.pdf");
+    doc.save(`${fullName.value}_ATS_Modern_Resume.pdf`);
 }
-
 
 
 </script>
