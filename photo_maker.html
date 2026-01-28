@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title> (MANIK-A-RNIKA) Photo Tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  min-height:100vh;
+  font-family:'Segoe UI',sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
+  background-size:400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+
+/* Animation for gradient */
+@keyframes gradientBG{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* APP CONTAINER */
+.app{
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 30px;
+  width: min(1200px,95%);
+  max-width: 100%;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  color: #fff;
+}
+
+/* HEADER */
+header{
+  text-align:center;
+  margin-bottom:20px;
+}
+header h2{
+  font-size:2em;
+  background: linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation: gradientText 8s ease infinite;
+}
+
+/* Text gradient animation */
+@keyframes gradientText{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* CONTROLS */
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  justify-content:center;
+  margin-bottom:20px;
+}
+.controls div{
+  display:flex;
+  flex-direction:column;
+  min-width:220px;
+}
+input[type="file"]{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+/* BUTTONS */
+button{
+  padding:12px 25px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  font-weight:bold;
+  color:#fff;
+  background: linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
+  background-size:300% 300%;
+  animation: gradientButton 5s ease infinite;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+button:hover{
+  transform: translateY(-3px);
+  box-shadow:0 12px 30px rgba(0,0,0,0.35);
+}
+
+@keyframes gradientButton{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* WORK AREA */
+.work-area{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:25px;
+  margin-top:15px;
+}
+
+canvas{
+  display:block;
+  margin:10px auto;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-content{
+  background:rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  border-radius:18px;
+  padding:20px;
+  max-width:95%;
+  text-align:center;
+  color:#fff;
+}
+.close{
+  float:right;
+  font-size:22px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  margin-top:20px;
+  font-size:13px;
+  opacity:0.8;
+  color:#fff;
+}
+
+/* MEDIA */
+@media(max-width:600px){
+  .controls{flex-direction:column;align-items:center;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<header>
+  <h2>(MANIK-A-RNIKA) Photo Tool</h2>
+</header>
+
+<div class="controls">
+  <div>
+    <label>Upload Photo</label>
+    <input type="file" id="upload" accept="image/*" capture="environment">
+  </div>
+  <div>
+    <button onclick="processImage()">Process Photo</button>
+  </div>
+</div>
+
+<div class="work-area">
+  <div>
+    <h3>35 × 45 mm Photo</h3>
+    <canvas id="photoCanvas"></canvas>
+    <button onclick="downloadPhoto()">Download Photo</button>
+  </div>
+  <div>
+    <h3>6 × 4 Sheet</h3>
+    <button onclick="openModal()">Preview & Download</button>
+  </div>
+</div>
+
+<footer>Web-App & Desktop Ready | Modern Gradient Design</footer>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">✖</span>
+    <h3>6 × 4 Inch Photo Sheet (8 Copies)</h3>
+    <canvas id="sheetCanvas"></canvas>
+    <br><br>
+    <button onclick="downloadSheet()">Download Sheet</button>
+  </div>
+</div>
+
+<script>
+const upload=document.getElementById("upload");
+const photoCanvas=document.getElementById("photoCanvas");
+const sheetCanvas=document.getElementById("sheetCanvas");
+const modal=document.getElementById("modal");
+
+const ctx=photoCanvas.getContext("2d");
+const sheetCtx=sheetCanvas.getContext("2d");
+let img=new Image();
+
+upload.onchange=e=>{
+  const r=new FileReader();
+  r.onload=()=>img.src=r.result;
+  r.readAsDataURL(e.target.files[0]);
+};
+
+const mmToPx=mm=>Math.round(mm*11.81);
+
+function processImage(){
+  const w=mmToPx(35);
+  const h=mmToPx(45);
+  photoCanvas.width=w;
+  photoCanvas.height=h;
+  ctx.clearRect(0,0,w,h);
+  drawRoundedImage(img,12);
+  drawBlackBorder();
+  createPhotoSheet();
+}
+
+function drawRoundedImage(image,r){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(r,0);
+  ctx.lineTo(photoCanvas.width-r,0);
+  ctx.quadraticCurveTo(photoCanvas.width,0,photoCanvas.width,r);
+  ctx.lineTo(photoCanvas.width,photoCanvas.height-r);
+  ctx.quadraticCurveTo(photoCanvas.width,photoCanvas.height,photoCanvas.width-r,photoCanvas.height);
+  ctx.lineTo(r,photoCanvas.height);
+  ctx.quadraticCurveTo(0,photoCanvas.height,0,photoCanvas.height-r);
+  ctx.lineTo(0,r);
+  ctx.quadraticCurveTo(0,0,r,0);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(image,0,0,photoCanvas.width,photoCanvas.height);
+  ctx.restore();
+}
+
+function drawBlackBorder(){
+  const bw=16;
+  ctx.strokeStyle="#000";
+  ctx.lineWidth=bw;
+  ctx.strokeRect(bw/2,bw/2,photoCanvas.width-bw,photoCanvas.height-bw);
+}
+
+function createPhotoSheet(){
+  sheetCanvas.width=1800;
+  sheetCanvas.height=1200;
+  sheetCtx.fillStyle="#fff";
+  sheetCtx.fillRect(0,0,sheetCanvas.width,sheetCanvas.height);
+  let x=40,y=40;
+  for(let r=0;r<2;r++){
+    for(let c=0;c<4;c++){
+      sheetCtx.drawImage(photoCanvas,x,y);
+      x+=photoCanvas.width+20;
+    }
+    x=40;
+    y+=photoCanvas.height+20;
+  }
+}
+
+function openModal(){modal.style.display="flex"}
+function closeModal(){modal.style.display="none"}
+
+function downloadPhoto(){
+  const a=document.createElement("a");
+  a.download="passport_35x45.png";
+  a.href=photoCanvas.toDataURL("image/png");
+  a.click();
+}
+
+function downloadSheet(){
+  const a=document.createElement("a");
+  a.download="photosheet_6x4.png";
+  a.href=sheetCanvas.toDataURL("image/png");
+  a.click();
+}
+</script>
+
+</body>
+</html>
