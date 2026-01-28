@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title> (MANIK-A-RNIKA) Photo Tool</title>
+<title>(MANIK-A-RNIKA) Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,13 +12,14 @@ body{
   font-family:'Segoe UI',sans-serif;
   display:flex;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
+  padding:20px;
   background: linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-size:400% 400%;
   animation: gradientBG 15s ease infinite;
 }
 
-/* Animation for gradient */
+/* Gradient animation for background */
 @keyframes gradientBG{
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
@@ -27,31 +28,29 @@ body{
 
 /* APP CONTAINER */
 .app{
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.2);
   backdrop-filter: blur(15px);
-  border-radius: 20px;
+  border-radius: 25px;
   padding: 30px;
   width: min(1200px,95%);
   max-width: 100%;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
   color: #fff;
 }
 
 /* HEADER */
 header{
   text-align:center;
-  margin-bottom:20px;
+  margin-bottom:25px;
 }
 header h2{
-  font-size:2em;
+  font-size:2.2em;
   background: linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-clip:text;
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   animation: gradientText 8s ease infinite;
 }
-
-/* Text gradient animation */
 @keyframes gradientText{
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
@@ -62,9 +61,9 @@ header h2{
 .controls{
   display:flex;
   flex-wrap:wrap;
-  gap:20px;
+  gap:25px;
   justify-content:center;
-  margin-bottom:20px;
+  margin-bottom:25px;
 }
 .controls div{
   display:flex;
@@ -72,30 +71,32 @@ header h2{
   min-width:220px;
 }
 input[type="file"]{
-  padding:10px;
-  border-radius:10px;
+  padding:12px;
+  border-radius:12px;
   border:none;
+  font-size:14px;
 }
 
 /* BUTTONS */
 button{
-  padding:12px 25px;
+  padding:18px 40px;
   border:none;
-  border-radius:25px;
+  border-radius:35px;
   cursor:pointer;
   font-weight:bold;
   color:#fff;
+  font-size:18px;
   background: linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-size:300% 300%;
   animation: gradientButton 5s ease infinite;
-  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
   transition: transform 0.3s, box-shadow 0.3s;
+  margin-top:10px;
 }
 button:hover{
-  transform: translateY(-3px);
-  box-shadow:0 12px 30px rgba(0,0,0,0.35);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
-
 @keyframes gradientButton{
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
@@ -106,55 +107,67 @@ button:hover{
 .work-area{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:25px;
-  margin-top:15px;
+  gap:30px;
+  margin-top:20px;
 }
-
+.work-area div{
+  text-align:center;
+}
 canvas{
   display:block;
-  margin:10px auto;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  margin:15px auto;
+  border-radius:15px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.35);
+  max-width:100%;
 }
 
 /* MODAL */
 .modal{
   position:fixed;
   inset:0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.85);
   display:none;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
+  padding:20px;
+  overflow-y:auto;
   z-index:1000;
 }
 .modal-content{
   background:rgba(255,255,255,0.15);
   backdrop-filter: blur(20px);
-  border-radius:18px;
+  border-radius:20px;
   padding:20px;
-  max-width:95%;
+  max-width:700px;
+  width:95%;
   text-align:center;
   color:#fff;
 }
 .close{
   float:right;
-  font-size:22px;
+  font-size:24px;
   cursor:pointer;
   font-weight:bold;
+  margin-top:-10px;
 }
 
 /* FOOTER */
 footer{
   text-align:center;
-  margin-top:20px;
-  font-size:13px;
-  opacity:0.8;
+  margin-top:25px;
+  font-size:14px;
+  opacity:0.85;
   color:#fff;
 }
 
-/* MEDIA */
-@media(max-width:600px){
+/* MEDIA QUERIES */
+@media(max-width:800px){
   .controls{flex-direction:column;align-items:center;}
+  .work-area{grid-template-columns:1fr;}
+}
+@media(max-width:500px){
+  button{padding:16px 30px; font-size:16px;}
+  header h2{font-size:1.8em;}
 }
 </style>
 </head>
@@ -183,7 +196,7 @@ footer{
     <button onclick="downloadPhoto()">Download Photo</button>
   </div>
   <div>
-    <h3>6 × 4 Sheet</h3>
+    <h3>6 × 4 Sheet (8 Copies)</h3>
     <button onclick="openModal()">Preview & Download</button>
   </div>
 </div>
@@ -226,7 +239,7 @@ function processImage(){
   photoCanvas.width=w;
   photoCanvas.height=h;
   ctx.clearRect(0,0,w,h);
-  drawRoundedImage(img,12);
+  drawRoundedImage(img,15);
   drawBlackBorder();
   createPhotoSheet();
 }
@@ -272,8 +285,8 @@ function createPhotoSheet(){
   }
 }
 
-function openModal(){modal.style.display="flex"}
-function closeModal(){modal.style.display="none"}
+function openModal(){modal.style.display="flex";}
+function closeModal(){modal.style.display="none";}
 
 function downloadPhoto(){
   const a=document.createElement("a");
