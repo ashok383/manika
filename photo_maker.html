@@ -47,6 +47,7 @@ header h2{
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   animation: gradientText 8s ease infinite;
+  /* Removed any text shadow */
 }
 @keyframes gradientText{
   0%{background-position:0% 50%;}
@@ -191,7 +192,7 @@ footer{
   <div>
     <h3>35 × 45 mm Photo</h3>
     <canvas id="photoCanvas"></canvas>
-    <button onclick="downloadPhoto()">Download Photo</button>
+    <!-- Removed Download Photo button -->
   </div>
   <div>
     <h3>6 × 4 Sheet (8 Copies)</h3>
@@ -285,13 +286,6 @@ function createPhotoSheet(){
 
 function openModal(){modal.style.display="flex";}
 function closeModal(){modal.style.display="none";}
-
-function downloadPhoto(){
-  const a=document.createElement("a");
-  a.download="passport_35x45.png";
-  a.href=photoCanvas.toDataURL("image/png");
-  a.click();
-}
 
 function downloadSheet(){
   const a=document.createElement("a");
