@@ -25,7 +25,6 @@ body{
   100%{background-position:0% 50%;}
 }
 
-/* ===== MAIN APP WITH DECORATIVE BORDER ===== */
 .app{
   position:relative;
   background:rgba(255,255,255,0.22);
@@ -39,7 +38,6 @@ body{
   color:#fff;
 }
 
-/* OUTER GRADIENT FRAME */
 .app::before{
   content:"";
   position:absolute;
@@ -57,7 +55,6 @@ body{
   z-index:-2;
 }
 
-/* INNER GLOW RING */
 .app::after{
   content:"";
   position:absolute;
@@ -67,7 +64,6 @@ body{
   pointer-events:none;
 }
 
-/* CORNER DECORATIONS */
 .app span.corner{
   position:absolute;
   width:30px;
@@ -115,6 +111,7 @@ input[type="file"]{
   border:none;
 }
 
+/* BUTTON STYLES WITH FIXED RED/GREEN GRADIENTS */
 button{
   padding:18px 40px;
   border:none;
@@ -123,20 +120,26 @@ button{
   font-weight:bold;
   color:#fff;
   font-size:18px;
-  background:linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
-  background-size:300% 300%;
-  animation:gradientButton 5s ease infinite;
   box-shadow:0 10px 30px rgba(0,0,0,0.35);
   transition:transform 0.3s,box-shadow 0.3s;
 }
-button:hover{
-  transform:translateY(-4px) scale(1.05);
+
+/* Red button - Process Photo */
+button.process{
+  background: linear-gradient(90deg, #ff4d4d, #ff1a1a);
+}
+button.process:hover{
+  transform: translateY(-4px) scale(1.05);
   box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
-@keyframes gradientButton{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+
+/* Green button - Preview & Download */
+button.preview{
+  background: linear-gradient(90deg, #4dff88, #1aff55);
+}
+button.preview:hover{
+  transform: translateY(-4px) scale(1.05);
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
 
 .work-area{
@@ -209,7 +212,7 @@ footer{
     <input type="file" id="upload" accept="image/*">
   </div>
   <div>
-    <button onclick="processImage()">Process Photo</button>
+    <button class="process" onclick="processImage()">Process Photo</button>
   </div>
 </div>
 
@@ -220,7 +223,7 @@ footer{
   </div>
   <div>
     <h3>6 × 4 Sheet (8 Copies)</h3>
-    <button onclick="openModal()">Preview & Download</button>
+    <button class="preview" onclick="openModal()">Preview & Download</button>
   </div>
 </div>
 
@@ -233,7 +236,7 @@ footer{
     <h3>6 × 4 Inch Photo Sheet</h3>
     <canvas id="sheetCanvas"></canvas>
     <br>
-    <button onclick="downloadSheet()">Download Sheet</button>
+    <button class="preview" onclick="downloadSheet()">Download Sheet</button>
   </div>
 </div>
 
