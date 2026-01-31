@@ -303,28 +303,26 @@ async function generatePDF() {
     const margin = 45;
     let y = 75;
 
-    /* ========= COLOR THEME ========= */
+    /* ========= COLOR THEME (SOLID DISTINCT COLORS) ========= */
     const COLORS = {
         black: [0, 0, 0],
-        text: [40, 40, 40],
-        gray: [90, 90, 90],
+        text: [45, 45, 45],
+        gray: [110, 110, 110],
 
-        purple: [106, 17, 203],
-        blue: [37, 117, 252],
-        pink: [233, 30, 99],
-        green: [0, 150, 136],
-        orange: [255, 152, 0],
-
-        panelBg: [248, 250, 255],
-        lightGreen: [224, 242, 241],
-        mint: [240, 255, 250]
+        red: [200, 30, 30],
+        skyblue: [0, 168, 255],
+        darkGreen: [21, 128, 61],
+        yellow: [245, 166, 35],
+        orange: [217, 119, 6],
+        purple: [88, 28, 135],
+        blue: [37, 117, 252]
     };
 
-    /* ========= THICK 4-SIDE BORDER ========= */
+    /* ========= BORDER ========= */
     function drawBorder() {
         doc.setDrawColor(...COLORS.black);
-        doc.setLineWidth(4);
-        doc.rect(20, 20, pageWidth - 40, pageHeight - 40);
+        doc.setLineWidth(3);
+        doc.rect(22, 22, pageWidth - 44, pageHeight - 44);
     }
 
     function addNewPage() {
@@ -335,87 +333,65 @@ async function generatePDF() {
 
     drawBorder();
 
-    /* ========= GRADIENT HEADER ========= */
-    const headerHeight = 95;
-    for (let i = 0; i < headerHeight; i++) {
-        const r = COLORS.purple[0] + (COLORS.blue[0] - COLORS.purple[0]) * (i / headerHeight);
-        const g = COLORS.purple[1] + (COLORS.blue[1] - COLORS.purple[1]) * (i / headerHeight);
-        const b = COLORS.purple[2] + (COLORS.blue[2] - COLORS.purple[2]) * (i / headerHeight);
-        doc.setDrawColor(r, g, b);
-        doc.line(20, 20 + i, pageWidth - 20, 20 + i);
-    }
+    /* ========= HEADER (TYPOGRAPHIC) ========= */
+    doc.setFont("helvetica", "bolditalic");
+    doc.setFontSize(28);
+    doc.setTextColor(...COLORS.purple);
+    doc.text(fullName.value, margin, 60);
 
-    /* ========= PHOTO (HIGH DP) ========= */
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(11);
+    doc.setTextColor(...COLORS.gray);
+    doc.text(`Father: ${fatherName.value} | Mother: ${motherName.value}`, margin, 78);
+
+    y = 110;
+
+    /* ========= PHOTO ========= */
     const photo = document.getElementById("photo");
     if (photo.files[0]) {
         const reader = new FileReader();
         await new Promise(resolve => {
             reader.onload = e => {
-                doc.addImage(
-                    e.target.result,
-                    "JPEG",
-                    pageWidth - 135,
-                    30,
-                    85,
-                    85,
-                    undefined,
-                    "FAST"
-                );
+                doc.addImage(e.target.result, "JPEG", pageWidth - 125, 40, 90, 90, undefined, "FAST");
                 resolve();
             };
             reader.readAsDataURL(photo.files[0]);
         });
     }
 
-    /* ========= NAME ========= */
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(26);
-    doc.setTextColor(255, 255, 255);
-    doc.text(fullName.value, margin, 58);
-
-    doc.setFontSize(11);
+    /* ========= BASIC INFO ========= */
     doc.setFont("helvetica", "normal");
-    doc.text(
-        `Father: ${fatherName.value} | Mother: ${motherName.value}`,
-        margin, 75
-    );
-
-    y = 140;
+    doc.setFontSize(11.5);
     doc.setTextColor(...COLORS.text);
-
-    /* ========= BASIC INFO PANEL ========= */
-    doc.setFillColor(...COLORS.panelBg);
-    doc.roundedRect(
-        margin - 10,
-        y - 25,
-        pageWidth - margin * 2 + 20,
-        80,
-        10,
-        10,
-        "F"
-    );
 
     doc.text(`DOB: ${dob.value}`, margin, y);
     y += 16;
     doc.text(`Email: ${email.value} | Phone: ${phone.value}`, margin, y);
     y += 16;
     doc.text(`Address: ${address.value}`, margin, y);
-    y += 40;
+    y += 28;
 
-    /* ========= SECTION FUNCTIONS ========= */
+    /* ========= SECTION FUNCTION ========= */
     function section(title, color) {
         if (y > pageHeight - 120) addNewPage();
-        doc.setFont("helvetica", "bold");
+
+        doc.setFont("helvetica", "bolditalic");
         doc.setFontSize(15);
         doc.setTextColor(...color);
-        doc.text(title, margin, y);
-        y += 6;
-        doc.setLineWidth(2.5);
+        doc.text(title.toUpperCase(), margin, y);
+
+        y += 4;
+        doc.setLineWidth(1.8);
         doc.line(margin, y, pageWidth - margin, y);
+
+        y += 4;
+        doc.setLineWidth(0.8);
+        doc.line(margin, y, pageWidth - margin - 80, y);
+
         y += 18;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11.5);
-        doc.setTextColor(...COLORS.gray);
+        doc.setTextColor(...COLORS.text);
     }
 
     function paragraph(text) {
@@ -428,96 +404,75 @@ async function generatePDF() {
         y += 10;
     }
 
-    /* ========= CONTENT ========= */
-    section("Career Objective", COLORS.pink);
+    /* ========= CONTENT WITH DISTINCT COLORS ========= */
+    section("Career Objective", COLORS.red);
     paragraph(objective.value);
 
-    section("Professional Summary", COLORS.blue);
+    section("Professional Summary", COLORS.skyblue);
     paragraph(summary.value);
 
-    /* ========= ACADEMIC TABLE ========= */
-    section("Academic Qualifications", COLORS.green);
-
+    section("Academic Qualifications", COLORS.yellow);
     doc.autoTable({
         startY: y,
-        head: [[
-            "COURSE / DEGREE",
-            "INSTITUTE / UNIVERSITY",
-            "YEAR",
-            "CGPA / %"
-        ]],
+        head: [["COURSE / DEGREE", "INSTITUTE", "YEAR", "CGPA / %"]],
         body: [...document.querySelectorAll(".academicRow")].map(row => {
             const i = row.querySelectorAll("input");
             return [i[0].value, i[1].value, i[2].value, i[3].value];
         }),
         theme: "grid",
         styles: {
-            fontSize: 12,
-            textColor: COLORS.black,
+            fontSize: 11,
+            textColor: COLORS.text,
             lineColor: COLORS.black,
-            lineWidth: 1.6,
-            cellPadding: 6
+            lineWidth: 1
         },
         headStyles: {
-            fillColor: COLORS.green,
-            textColor: [255, 255, 255],
-            fontStyle: "bold",
-            halign: "center",
-            lineWidth: 2
-        },
-        bodyStyles: {
-            fillColor: COLORS.mint
-        },
-        alternateRowStyles: {
-            fillColor: COLORS.lightGreen
-        },
-        columnStyles: {
-            2: { halign: "center" },
-            3: { halign: "center" }
+            textColor: COLORS.black,
+            fontStyle: "bold"
         },
         margin: { left: margin, right: margin },
-        didDrawPage: () => drawBorder()
+        didDrawPage: drawBorder
     });
-
-    y = doc.lastAutoTable.finalY + 28;
+    y = doc.lastAutoTable.finalY + 24;
 
     section("Education", COLORS.orange);
     paragraph(education.value);
 
-    section("Experience", COLORS.green);
+    section("Experience", COLORS.darkGreen);
     paragraph(experience.value);
 
-    section("Technical Skills", COLORS.orange);
+    section("Technical Skills", COLORS.blue);
     skills.value.split(",").forEach(skill => {
         if (y > pageHeight - margin) addNewPage();
-        doc.text("• " + skill.trim(), margin, y);
+        doc.text("– " + skill.trim(), margin, y);
         y += 14;
     });
-    y += 12;
+    y += 10;
 
-    section("Projects", COLORS.blue);
+    section("Projects", COLORS.purple);
     paragraph(projects.value);
 
-    section("Habits / Strengths", COLORS.pink);
+    section("Habits / Strengths", COLORS.orange);
     paragraph(habits.value);
 
-    section("Languages Known", COLORS.green);
+    section("Languages Known", COLORS.skyblue);
     paragraph(Languages.value);
 
-    section("Declaration", COLORS.purple);
+    section("Declaration", COLORS.red);
     paragraph(declaration.value);
 
-    /* ========= FOOTER ========= */
+    /* ========= FOOTER (LINEAR) ========= */
     if (y > pageHeight - 90) addNewPage();
-    doc.setFont("helvetica", "bold");
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(11);
     doc.setTextColor(...COLORS.text);
-    doc.text(`Place: ${place.value}`, margin, y);
-    y += 16;
-    doc.text(`Date: ${date.value}`, margin, y);
-    y += 16;
-    doc.text(`Signature: ${signature.value}`, margin, y);
 
-    /* ========= SAVE ========= */
+    const footerY = y;
+    doc.text(place.value, margin, footerY); // left
+    doc.text(date.value, pageWidth / 2, footerY, { align: "center" }); // center
+    doc.text(signature.value, pageWidth - margin, footerY, { align: "right" }); // right
+
+    /* ========= SAVE PDF ========= */
     doc.save(`${fullName.value}_ATS_Modern_Resume.pdf`);
 }
 
