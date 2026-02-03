@@ -13,12 +13,10 @@ header{text-align:center;margin-bottom:15px;}
 header h2{font-size:1.8em;}
 .controls{display:flex;flex-direction:column;gap:15px;margin-bottom:20px;}
 .controls input[type="file"], .controls input[type="color"]{padding:10px;border-radius:12px;border:none;}
-.controls button{padding:12px;border-radius:28px;font-weight:bold;font-size:16px;border:none;cursor:pointer;color:#fff;transition:0.2s;}
-button.process{background:#ff4444;}
-button.process:hover{transform:scale(1.05);}
-button.download{background:#3399ff;margin-top:5px;}
 canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.3);}
 .sheet-preview{margin-top:20px;text-align:center;}
+button.download{padding:12px;border-radius:28px;font-weight:bold;font-size:16px;border:none;cursor:pointer;color:#fff;background:#3399ff;margin-top:5px;transition:0.2s;}
+button.download:hover{transform:scale(1.05);}
 </style>
 </head>
 
@@ -29,7 +27,6 @@ canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shad
 <div class="controls">
   <input type="file" id="upload" accept="image/*">
   <input type="color" id="bgColor" value="#ffffff">
-  <button class="process" onclick="processImage()">Process Photo</button>
 </div>
 
 <canvas id="photoCanvas"></canvas>
@@ -54,9 +51,10 @@ const sheetCanvas = document.getElementById("sheetCanvas");
 let imageBitmap = null;
 let sheetCanvasData = null;
 
-/* ===== LOAD IMAGE ===== */
+/* ===== LOAD IMAGE & AUTOMATIC PROCESS ===== */
 upload.onchange = async e => {
   imageBitmap = await createImageBitmap(e.target.files[0]);
+  processImage();
 };
 
 /* ===== AI SEGMENTATION ===== */
@@ -89,7 +87,7 @@ segmenter.onResults(async results => {
   tmpCtx.fillRect(0,0,w,h);
   tmpCtx.restore();
 
-  drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 6);
+  drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 10); // thick black border
 
   // Generate full-res sheet and show inline
   sheetCanvasData = createSheet(photoCanvas, true);
@@ -100,17 +98,18 @@ segmenter.onResults(async results => {
 
 /* ===== PROCESS PHOTO ===== */
 function processImage(){
-  if(!imageBitmap) return alert("Upload image first");
+  if(!imageBitmap) return;
   segmenter.send({image:imageBitmap});
 }
 
-/* ===== DRAW ROUNDED PHOTO ===== */
+/* ===== DRAW ROUNDED PHOTO WITH BORDER ===== */
 function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   targetCanvas.width = sourceCanvas.width;
   targetCanvas.height = sourceCanvas.height;
   const tctx = targetCanvas.getContext("2d");
 
   tctx.clearRect(0,0,targetCanvas.width,targetCanvas.height);
+
   tctx.save();
   tctx.beginPath();
   tctx.moveTo(radius,0);
@@ -128,6 +127,7 @@ function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   tctx.drawImage(sourceCanvas,0,0);
   tctx.restore();
 
+  // draw border
   tctx.save();
   tctx.strokeStyle = "#000";
   tctx.lineWidth = borderWidth;
@@ -146,12 +146,16 @@ function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   tctx.restore();
 }
 
-/* ===== CREATE SHEET ===== */
+/* ===== CREATE 6x4 PHOTO SHEET ===== */
 function createSheet(photoCanvas, forDownload=false){
-  const cols = 4, rows = 2, gap = 20;
-  const pw = photoCanvas.width, ph = photoCanvas.height;
-  const fullWidth = cols*pw + (cols+1)*gap;
-  const fullHeight = rows*ph + (rows+1)*gap;
+  const cols = 6;
+  const rows = 4;
+  const gap = 20;          // space between photos
+  const pageMargin = 30;    // space between sheet border and photos
+  const pw = photoCanvas.width;
+  const ph = photoCanvas.height;
+  const fullWidth = cols*pw + (cols-1)*gap + pageMargin*2;
+  const fullHeight = rows*ph + (rows-1)*gap + pageMargin*2;
 
   let sheet = forDownload ? document.createElement("canvas") : sheetCanvas;
   sheet.width = fullWidth;
@@ -163,8 +167,8 @@ function createSheet(photoCanvas, forDownload=false){
 
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
-      const x = gap + c*(pw+gap);
-      const y = gap + r*(ph+gap);
+      const x = pageMargin + c*(pw+gap);
+      const y = pageMargin + r*(ph+gap);
       ctx2.drawImage(photoCanvas, x, y, pw, ph);
     }
   }
