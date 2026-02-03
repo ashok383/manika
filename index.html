@@ -1,195 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>(MANIK_A_RNIKA)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIK_A_RNIKA | World Class Resume Maker</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-/* ===== GENERAL ===== */
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-body { background:#f5f7fb; color:#333; overflow-x:hidden; }
-
-/* ===== HEADER / BANNER ===== */
-header.top-banner {
-    position: relative;
-    width: 100%;
-    height: auto;
-    overflow: hidden;
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+body{
+    background:#0b0f1a;
+    color:#fff;
+    overflow-x:hidden;
 }
 
-/* Banner image with gradient overlay */
-header.top-banner img.banner-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    filter: brightness(0.8);
-    transition: transform 0.5s ease;
+/* ================= HEADER ================= */
+header{
+    position:relative;
+    min-height:100vh;
+    overflow:hidden;
 }
-
-header.top-banner img.banner-img:hover {
-    transform: scale(1.05);
-}
-
-/* Gradient overlay on top of banner */
-header.top-banner::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(255,106,0,0.4), rgba(238,9,121,0.4), rgba(0,212,255,0.3));
-    pointer-events: none;
-}
-
-/* ===== NAVBAR ===== */
-nav {
+.banner-img{
     position:absolute;
-    top:0;
-    left:0;
+    inset:0;
     width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:brightness(0.55);
+}
+header::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,
+        rgba(255,106,0,0.35),
+        rgba(238,9,121,0.35),
+        rgba(0,212,255,0.25));
+}
+
+/* ================= NAV ================= */
+nav{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    max-width:1200px;
+    padding:14px 30px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:20px 8%;
-    z-index:5;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(14px);
+    border-radius:60px;
+    z-index:10;
 }
-nav h1 {
-    font-size:28px;
+nav h1{
+    font-size:22px;
     font-weight:700;
-    color:#fff;
-    text-shadow: 2px 2px 12px rgba(0,0,0,0.6);
+    letter-spacing:1px;
 }
-nav ul {
-    display:flex;
-    gap:25px;
+nav ul{
     list-style:none;
+    display:flex;
+    gap:24px;
 }
-nav ul li a {
+nav ul li a{
     color:#fff;
     text-decoration:none;
     font-weight:500;
-    font-size:16px;
     position:relative;
 }
-nav ul li a::after {
+nav ul li a::after{
     content:"";
     position:absolute;
+    left:0;
+    bottom:-6px;
     width:0;
     height:2px;
-    background:#fff;
-    left:0; bottom:-4px;
-    transition:0.3s;
+    background:linear-gradient(90deg,#ff6a00,#ee0979);
+    transition:.3s;
 }
-nav ul li a:hover::after {
-    width:100%;
-}
+nav ul li a:hover::after{width:100%;}
 
-/* ===== HERO SECTION ===== */
-.hero {
+/* ================= HERO ================= */
+.hero{
+    position:relative;
+    z-index:2;
+    min-height:100vh;
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:1.2fr 1fr;
     align-items:center;
-    padding:80px 8%;
-    gap:40px;
-    position: relative;
+    padding:0 8%;
+    gap:60px;
 }
-
-.hero-text h2 {
-    font-size:48px;
+.hero-text h2{
+    font-size:56px;
+    line-height:1.1;
     margin-bottom:20px;
-    background: linear-gradient(90deg, #ff6a00, #ee0979, #6a11cb, #00ffe0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 3s linear infinite;
+    background:linear-gradient(90deg,#ff6a00,#ee0979,#6a11cb,#00ffe0);
+    background-size:300% 300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 4s linear infinite;
 }
-
-@keyframes shine {
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+@keyframes shine{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
 }
-
-.hero-text p {
+.hero-text p{
     font-size:18px;
-    margin-bottom:30px;
-    line-height:1.6;
-    color:#fff;
-    text-shadow: 1px 1px 8px rgba(0,0,0,0.4);
+    max-width:520px;
+    opacity:.9;
+    margin-bottom:40px;
 }
 
-/* Hero image with shadow/glow */
-.hero img.hero-img {
-    width:100%;
-    max-width:400px;
-    height:auto;
-    border-radius:20px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.35), 0 0 20px rgba(0,255,255,0.2);
-    transition: transform 0.5s ease, box-shadow 0.5s ease;
-}
-.hero img.hero-img:hover {
-    transform: scale(1.05);
-    box-shadow:0 25px 70px rgba(0,0,0,0.45), 0 0 25px rgba(255,0,255,0.3);
+/* ================= WORLD CLASS BUTTONS ================= */
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
 }
 
-/* ===== BUTTONS ===== */
-.btn, .btm {
-    padding:16px 36px;
-    border-radius:40px;
-    text-decoration:none;
+/* Base Button */
+.wc-btn{
+    position:relative;
+    padding:18px 42px;
+    font-size:16px;
     font-weight:700;
-    margin-right:15px;
-    display:inline-block;
+    letter-spacing:1px;
+    color:#fff;
     border:none;
+    border-radius:60px;
+    background:transparent;
     cursor:pointer;
-    font-size:18px;
-    transition: all 0.3s ease;
-    color:#fff;
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    margin-bottom:10px;
-}
-.btn:hover, .btm:hover {
-    transform: translateY(-4px) scale(1.06);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.35);
+    overflow:hidden;
+    text-transform:uppercase;
 }
 
-.btn.resume, .btm.resume {
-    background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffe0);
-}
-.btn.resume:hover, .btm.resume:hover {
-    background: linear-gradient(135deg, #ff512f, #dd2476, #fcb045, #00ffcc);
+/* Gradient Border */
+.wc-btn::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:60px;
+    padding:2px;
+    background:linear-gradient(135deg,#ff6a00,#ee0979,#6a11cb,#00ffe0);
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
 }
 
-/* ===== FOOTER ===== */
-footer {
-    background: linear-gradient(135deg, #2575fc, #6a11cb, #ff00cc, #00ffe0);
-    color:#fff;
+/* Button Fill */
+.wc-btn span{
+    position:relative;
+    z-index:2;
+}
+.wc-btn::after{
+    content:"";
+    position:absolute;
+    inset:3px;
+    border-radius:55px;
+    background:linear-gradient(135deg,#1b1f3b,#11152b);
+    z-index:1;
+}
+
+/* Glow */
+.wc-btn{
+    box-shadow:
+        0 0 20px rgba(255,0,255,0.25),
+        0 0 40px rgba(0,255,255,0.15);
+}
+
+/* Hover Animation */
+.wc-btn:hover{
+    transform:translateY(-4px) scale(1.06);
+    box-shadow:
+        0 0 30px rgba(255,0,255,0.5),
+        0 0 60px rgba(0,255,255,0.4);
+}
+
+/* Shimmer Sweep */
+.wc-btn:hover::after{
+    background:linear-gradient(
+        120deg,
+        #11152b 30%,
+        rgba(255,255,255,0.15) 50%,
+        #11152b 70%
+    );
+    animation:sweep 1.2s linear;
+}
+@keyframes sweep{
+    from{background-position:-200%}
+    to{background-position:200%}
+}
+
+/* ================= IMAGE ================= */
+.hero-img{
+    width:100%;
+    max-width:420px;
+    border-radius:24px;
+    box-shadow:0 30px 90px rgba(0,0,0,.6);
+    animation:float 6s ease-in-out infinite;
+}
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-14px)}
+}
+
+/* ================= FOOTER ================= */
+footer{
+    background:linear-gradient(135deg,#2575fc,#6a11cb,#ff00cc,#00ffe0);
     text-align:center;
-    padding:35px;
-    margin-top:50px;
+    padding:30px;
+    font-size:14px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media(max-width:1000px){
-    .hero {grid-template-columns:1fr;text-align:center;gap:30px;padding:60px 5%;}
-    .hero img.hero-img {max-width:300px;margin:0 auto;}
+/* ================= RESPONSIVE ================= */
+@media(max-width:900px){
+    .hero{
+        grid-template-columns:1fr;
+        text-align:center;
+        padding-top:140px;
+    }
+    .hero-text p{margin:auto;}
+    .actions{justify-content:center;}
 }
-@media(max-width:600px){
-    header.top-banner {height:auto;}
-    .hero img.hero-img {max-width:250px;margin:0 auto;}
-    .hero-text h2 {font-size:28px;}
-    .hero-text p {font-size:14px;}
-    .btn, .btm {padding:12px 24px;font-size:16px;margin-bottom:12px;}
+@media(max-width:500px){
+    nav ul{display:none;}
+    .hero-text h2{font-size:34px;}
 }
 </style>
 </head>
+
 <body>
 
-<header class="top-banner">
-    <img src="manika.jpeg" alt="Banner Image" class="banner-img"/>
+<header>
+    <img src="manika.jpeg" class="banner-img">
+
     <nav>
-        <h1>(MANIK_A_RNIKA)</h1>
+        <h1>MANIK_A_RNIKA</h1>
         <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#">Resume</a></li>
@@ -197,21 +257,34 @@ footer {
             <li><a href="#">Contact</a></li>
         </ul>
     </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h2>WORLD CLASS RESUME MAKER</h2>
+            <p>Create ultra-modern resumes with premium visuals, glowing UI,
+               and professional elegance.</p>
+
+            <div class="actions">
+                <button class="wc-btn" onclick="location.href='resume-builder.htm'">
+                    <span>Resume Maker</span>
+                </button>
+
+                <button class="wc-btn" onclick="location.href='simpleform.html'">
+                    <span>World Class Resume</span>
+                </button>
+
+                <button class="wc-btn" onclick="location.href='photo_maker.html'">
+                    <span>Photo Maker</span>
+                </button>
+            </div>
+        </div>
+
+        <img src="manika.jpeg" class="hero-img">
+    </section>
 </header>
 
-<div class="hero">
-    <div class="hero-text">
-        <h2>WORLD CLASS RESUME MAKER</h2>
-        <p>Create stunning, professional resumes with ease. Upgrade your career with premium designs, gradients, and shining effects.</p>
-        <button class="btn resume" onclick="window.location.href='resume-builder.htm'">RESUME_MAKER</button>
-        <button class="btm resume" onclick="window.location.href='simpleform.html'">WORLD_CLASS_RESUME_MAKER</button>
-        <button class="btm resume" onclick="window.location.href='photo_maker.html'">PHOTO_MAKER</button>
-    </div>
-    <img src="manika.jpeg" alt="Hero Image" class="hero-img"/>
-</div>
-
 <footer>
-    <p>(MANIK_A_RNIKA). All Rights Reserved.</p>
+    © 2026 MANIK_A_RNIKA — All Rights Reserved
 </footer>
 
 </body>
