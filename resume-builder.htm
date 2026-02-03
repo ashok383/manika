@@ -9,7 +9,6 @@
 
 <style>
 *{box-sizing:border-box}
-
 body{
     margin:0;
     font-family:'Poppins',sans-serif;
@@ -17,13 +16,11 @@ body{
     background-size:400% 400%;
     animation:bgMove 10s ease infinite;
 }
-
 @keyframes bgMove{
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
     100%{background-position:0% 50%}
 }
-
 .container{
     max-width:900px;
     margin:30px auto;
@@ -32,16 +29,13 @@ body{
     border-radius:20px;
     box-shadow:0 15px 35px rgba(0,0,0,.25);
 }
-
 h1{
     text-align:center;
     background:linear-gradient(90deg,#ff4081,#7c4dff,#00e5ff);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
-
 label{font-weight:600;margin-top:12px;display:block}
-
 input,textarea{
     width:100%;
     padding:12px;
@@ -49,7 +43,6 @@ input,textarea{
     border:1px solid #ccc;
     margin-bottom:10px;
 }
-
 button{
     padding:12px 22px;
     border:none;
@@ -58,7 +51,6 @@ button{
     font-weight:600;
     margin-right:10px;
 }
-
 .preview-btn{background:#ff4081;color:#fff}
 .add-btn{background:#00c853;color:#fff}
 .remove-btn{background:#f44336;color:#fff}
@@ -75,13 +67,13 @@ button{
 <input type="file" id="photo" accept="image/*">
 
 <label>Full Name</label>
-<input id="fullName" value="GUGULOTH MANIKHANTA">
+<input id="fullName" value="MANIKHANTA">
 
 <label>Father Name</label>
-<input id="fatherName" value="Father_Name">
+<input id="fatherName" value="FATHER_NAME">
 
 <label>Mother Name</label>
-<input id="motherName" value="Mother_Name">
+<input id="motherName" value="MOTHER_NAME">
 
 <label>Date of Birth</label>
 <input id="dob" type="date">
@@ -111,11 +103,10 @@ Enthusiastic and dedicated professional with a strong foundation in modern techn
         <input value="B.Tech in Computer Science">
         <input value="University">
         <input value="2026 - 2027">
-        <input value="  8.5 CGPA  ">
+        <input value="8.5 CGPA">
         <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
     </div>
 </div>
-
 <button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
 
 <label>Education</label>
@@ -148,7 +139,73 @@ I hereby declare that the information furnished above is, to the best of my know
 <input id="date" type="date">
 
 <label>Signature</label>
-<input id="signature" value="manikhanta">
+<input id="signature" value="(manikhanta)">
+
+<!-- ===== MODEL / TEMPLATE SELECTION ===== -->
+<label>🌍 Select Resume Model / Template</label>
+<div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
+
+  <label>
+    <input type="radio" name="resumeModel" value="ats" checked>
+    <b>1. ATS-Friendly (Modern Professional)</b><br>
+    <small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="reverse">
+    <b>2. Reverse-Chronological Resume</b><br>
+    <small>✔ Latest job first • Recruiter favorite</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="hybrid">
+    <b>3. Hybrid / Combination Resume</b><br>
+    <small>✔ Skills + Experience • Mid–Senior roles</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="onepage">
+    <b>4. One-Page Resume (Global Gold Standard)</b><br>
+    <small>✔ Concise • Students • Freshers • &lt;10 yrs</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="targeted">
+    <b>5. Targeted Resume</b><br>
+    <small>✔ Job-specific • Keyword optimized • FAANG</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="functional">
+    <b>6. Functional (Skills-Based) Resume</b><br>
+    <small>✔ Career change • Employment gaps</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="executive">
+    <b>7. Executive Resume</b><br>
+    <small>✔ Leadership • Metrics • CEOs / Managers</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="academic">
+    <b>8. Academic CV (International)</b><br>
+    <small>✔ Research • Publications • PhD / Professors</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="creative">
+    <b>9. Creative / Visual Resume</b><br>
+    <small>✔ Designers • UI/UX • Media (Not ATS)</small>
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="resumeModel" value="europass">
+    <b>10. Europass CV (EU Standard)</b><br>
+    <small>✔ Europe • Structured • Multi-language</small>
+  </label>
+
+</div>
 
 <div style="margin-top:15px;">
     <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
@@ -160,8 +217,11 @@ I hereby declare that the information furnished above is, to the best of my know
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <!-- jsPDF script -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF AutoTable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
+// ========== ACADEMIC HANDLING ==========
 function addAcademic(){
     const d=document.createElement("div");
     d.className="academicRow";
@@ -175,10 +235,14 @@ function addAcademic(){
     <button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
     academicsContainer.appendChild(d);
 }
-
 function removeAcademic(btn){btn.parentElement.remove();}
 
-// Preview CV in new window
+// ========== GET SELECTED RESUME MODEL ==========
+function getSelectedResumeModel(){
+    return document.querySelector('input[name="resumeModel"]:checked').value;
+}
+
+// ========== PREVIEW CV ==========
 function previewCV(){
     const f = photo.files[0];
     if(f){
@@ -187,19 +251,18 @@ function previewCV(){
         r.readAsDataURL(f);
     } else openPreview("");
 }
-
-// Open preview window
 function openPreview(photo){
     const w = window.open("", "_blank", "width=900,height=1200");
+    const selectedModel = getSelectedResumeModel();
     w.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
-<title>Preview</title>
+<title>Preview - ${selectedModel}</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body{margin:0;font-family:Poppins;background:#eee;}
-.page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid;border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
+.page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid; border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
 .header{display:flex;gap:20px;align-items:center;}
 img{width:120px;height:120px;border-radius:50%;}
 .header h1{margin:0;color:#4caf50;}
@@ -253,6 +316,7 @@ ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 <p><b>Place:</b> ${place.value}</p>
 <p><b>Date:</b> ${date.value}</p>
 <p><b>Signature:</b> ${signature.value}</p>
+<p><b>Selected Model:</b> ${selectedModel}</p>
 </div>
 
 <div class="close-bar">
@@ -264,223 +328,12 @@ ${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
 `);
 }
 
-// Razorpay + PDF download
-async function payAndDownload() {
 
-  const options = {
-    key: "rzp_live_S5ex0BvHGJcmo6", // Key ID only
-    payment_link: "https://rzp.io/rzp/SatLieJ", // FIXED PAYMENT LINK (₹ locked)
-
-    handler: async function (response) {
-      // ⚠️ Payment is ALREADY CAPTURED by Razorpay
-      alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
-
-      // Allow download
-      await generatePDF();
-    },
-
-    prefill: {
-      name: fullName.value,
-      email: email.value,
-      contact: phone.value
-    },
-
-    theme: {
-      color: "#2196f3"
-    }
-  };
-
-  const rzp = new Razorpay(options);
-  rzp.open();
-}
-// Generate PDF using jsPDF
-async function generatePDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("p", "pt", "a4");
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 45;
-    let y = 75;
-
-    /* ========= COLOR THEME (SOLID DISTINCT COLORS) ========= */
-    const COLORS = {
-        black: [0, 0, 0],
-        text: [45, 45, 45],
-        gray: [110, 110, 110],
-
-        red: [200, 30, 30],
-        skyblue: [0, 168, 255],
-        darkGreen: [21, 128, 61],
-        yellow: [245, 166, 35],
-        orange: [217, 119, 6],
-        purple: [88, 28, 135],
-        blue: [37, 117, 252]
-    };
-
-    /* ========= BORDER ========= */
-    function drawBorder() {
-        doc.setDrawColor(...COLORS.black);
-        doc.setLineWidth(3);
-        doc.rect(22, 22, pageWidth - 44, pageHeight - 44);
-    }
-
-    function addNewPage() {
-        doc.addPage();
-        drawBorder();
-        y = 75;
-    }
-
-    drawBorder();
-
-    /* ========= HEADER (TYPOGRAPHIC) ========= */
-    doc.setFont("helvetica", "bolditalic");
-    doc.setFontSize(28);
-    doc.setTextColor(...COLORS.purple);
-    doc.text(fullName.value, margin, 60);
-
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(11);
-    doc.setTextColor(...COLORS.gray);
-    doc.text(`Father: ${fatherName.value} | Mother: ${motherName.value}`, margin, 78);
-
-    y = 110;
-
-    /* ========= PHOTO ========= */
-    const photo = document.getElementById("photo");
-    if (photo.files[0]) {
-        const reader = new FileReader();
-        await new Promise(resolve => {
-            reader.onload = e => {
-                doc.addImage(e.target.result, "JPEG", pageWidth - 125, 40, 90, 90, undefined, "FAST");
-                resolve();
-            };
-            reader.readAsDataURL(photo.files[0]);
-        });
-    }
-
-    /* ========= BASIC INFO ========= */
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11.5);
-    doc.setTextColor(...COLORS.text);
-
-    doc.text(`DOB: ${dob.value}`, margin, y);
-    y += 16;
-    doc.text(`Email: ${email.value} | Phone: ${phone.value}`, margin, y);
-    y += 16;
-    doc.text(`Address: ${address.value}`, margin, y);
-    y += 28;
-
-    /* ========= SECTION FUNCTION ========= */
-    function section(title, color) {
-        if (y > pageHeight - 120) addNewPage();
-
-        doc.setFont("helvetica", "bolditalic");
-        doc.setFontSize(15);
-        doc.setTextColor(...color);
-        doc.text(title.toUpperCase(), margin, y);
-
-        y += 4;
-        doc.setLineWidth(1.8);
-        doc.line(margin, y, pageWidth - margin, y);
-
-        y += 4;
-        doc.setLineWidth(0.8);
-        doc.line(margin, y, pageWidth - margin - 80, y);
-
-        y += 18;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(11.5);
-        doc.setTextColor(...COLORS.text);
-    }
-
-    function paragraph(text) {
-        const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
-        lines.forEach(line => {
-            if (y > pageHeight - margin) addNewPage();
-            doc.text(line, margin, y);
-            y += 14;
-        });
-        y += 10;
-    }
-
-    /* ========= CONTENT WITH DISTINCT COLORS ========= */
-    section("Career Objective", COLORS.red);
-    paragraph(objective.value);
-
-    section("Professional Summary", COLORS.skyblue);
-    paragraph(summary.value);
-
-    section("Academic Qualifications", COLORS.yellow);
-    doc.autoTable({
-        startY: y,
-        head: [["COURSE / DEGREE", "INSTITUTE", "YEAR", "CGPA / %"]],
-        body: [...document.querySelectorAll(".academicRow")].map(row => {
-            const i = row.querySelectorAll("input");
-            return [i[0].value, i[1].value, i[2].value, i[3].value];
-        }),
-        theme: "grid",
-        styles: {
-            fontSize: 11,
-            textColor: COLORS.text,
-            lineColor: COLORS.black,
-            lineWidth: 1
-        },
-        headStyles: {
-            textColor: COLORS.black,
-            fontStyle: "bold"
-        },
-        margin: { left: margin, right: margin },
-        didDrawPage: drawBorder
-    });
-    y = doc.lastAutoTable.finalY + 24;
-
-    section("Education", COLORS.orange);
-    paragraph(education.value);
-
-    section("Experience", COLORS.darkGreen);
-    paragraph(experience.value);
-
-    section("Technical Skills", COLORS.blue);
-    skills.value.split(",").forEach(skill => {
-        if (y > pageHeight - margin) addNewPage();
-        doc.text("– " + skill.trim(), margin, y);
-        y += 14;
-    });
-    y += 10;
-
-    section("Projects", COLORS.purple);
-    paragraph(projects.value);
-
-    section("Habits / Strengths", COLORS.orange);
-    paragraph(habits.value);
-
-    section("Languages Known", COLORS.skyblue);
-    paragraph(Languages.value);
-
-    section("Declaration", COLORS.red);
-    paragraph(declaration.value);
-
-    /* ========= FOOTER (LINEAR) ========= */
-    if (y > pageHeight - 90) addNewPage();
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(11);
-    doc.setTextColor(...COLORS.text);
-
-    const footerY = y;
-    doc.text(place.value, margin, footerY); // left
-    doc.text(date.value, pageWidth / 2, footerY, { align: "center" }); // center
-    doc.text(signature.value, pageWidth - margin, footerY, { align: "right" }); // right
-
-    /* ========= SAVE PDF ========= */
-    doc.save(`${fullName.value}_ATS_Modern_Resume.pdf`);
-}
+//====================================================================================
 
 
 </script>
-
-<!-- jsPDF AutoTable plugin -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
