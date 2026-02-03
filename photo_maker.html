@@ -16,8 +16,6 @@ header h2{font-size:1.8em;}
 .controls button{padding:12px;border-radius:28px;font-weight:bold;font-size:16px;border:none;cursor:pointer;color:#fff;transition:0.2s;}
 button.process{background:#ff4444;}
 button.process:hover{transform:scale(1.05);}
-button.preview{background:#22c55e;}
-button.preview:hover{transform:scale(1.05);}
 button.download{background:#3399ff;margin-top:5px;}
 canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.3);}
 .sheet-preview{margin-top:20px;text-align:center;}
@@ -36,7 +34,6 @@ canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shad
 
 <canvas id="photoCanvas"></canvas>
 <button class="download" onclick="downloadPhoto()">Download Photo</button>
-<button class="preview" onclick="showSheetPreview()">Preview Sheet</button>
 
 <div class="sheet-preview">
   <canvas id="sheetCanvas"></canvas><br>
@@ -55,7 +52,7 @@ const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 
 let imageBitmap = null;
-let sheetCanvasData = null; // offscreen full-res sheet
+let sheetCanvasData = null;
 
 /* ===== LOAD IMAGE ===== */
 upload.onchange = async e => {
@@ -94,8 +91,9 @@ segmenter.onResults(async results => {
 
   drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 6);
 
-  // Generate full-res sheet
+  // Generate full-res sheet and show inline
   sheetCanvasData = createSheet(photoCanvas, true);
+  showSheetPreview();
 
   await upscalePhoto(photoCanvas);
 });
@@ -183,11 +181,16 @@ function createSheet(photoCanvas, forDownload=false){
   return sheet;
 }
 
-/* ===== SHOW SHEET PREVIEW INLINE ===== */
+/* ===== SHOW SHEET INLINE ===== */
 function showSheetPreview(){
-  if(!sheetCanvasData) return alert("Generate photo first");
+  if(!sheetCanvasData) return;
   const ctx2 = sheetCanvas.getContext("2d");
   ctx2.clearRect(0,0,sheetCanvas.width,sheetCanvas.height);
+  const scale = Math.min(400/sheetCanvasData.width, 300/sheetCanvasData.height);
+  sheetCanvas.width = sheetCanvasData.width;
+  sheetCanvas.height = sheetCanvasData.height;
+  sheetCanvas.style.width = sheetCanvas.width*scale + "px";
+  sheetCanvas.style.height = sheetCanvas.height*scale + "px";
   ctx2.drawImage(sheetCanvasData,0,0);
 }
 
