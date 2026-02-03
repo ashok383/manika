@@ -52,8 +52,8 @@ let imageBitmap = null;
 let sheetCanvasData = null;
 
 // Photo size in pixels (35x45 mm @ 300 DPI)
-const PHOTO_WIDTH = Math.round(35 / 25.4 * 300);  // ≈ 413
-const PHOTO_HEIGHT = Math.round(45 / 25.4 * 300); // ≈ 531
+const PHOTO_WIDTH = Math.round(35 / 25.4 * 300);  // ≈ 413 px
+const PHOTO_HEIGHT = Math.round(45 / 25.4 * 300); // ≈ 531 px
 
 /* ===== LOAD IMAGE & AUTOMATIC PROCESS ===== */
 upload.onchange = async e => {
@@ -68,7 +68,6 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(async results => {
   if(!imageBitmap) return;
 
-  // Draw resized photo 35x45 mm
   const tmpCanvas = document.createElement("canvas");
   tmpCanvas.width = PHOTO_WIDTH;
   tmpCanvas.height = PHOTO_HEIGHT;
@@ -77,7 +76,6 @@ segmenter.onResults(async results => {
   tmpCtx.fillStyle = bgColorInput.value;
   tmpCtx.fillRect(0,0,PHOTO_WIDTH,PHOTO_HEIGHT);
 
-  // Draw original image scaled to fit 35x45mm
   tmpCtx.save();
   tmpCtx.drawImage(imageBitmap, 0, 0, PHOTO_WIDTH, PHOTO_HEIGHT);
   tmpCtx.globalCompositeOperation = "destination-in";
@@ -92,7 +90,7 @@ segmenter.onResults(async results => {
 
   drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 10); // thick black border
 
-  // Generate sheet (2x4 = 8 photos)
+  // Generate sheet (4 rows x 2 columns = 8 photos)
   sheetCanvasData = createSheet(photoCanvas, true);
   showSheetPreview();
 
@@ -149,7 +147,7 @@ function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   tctx.restore();
 }
 
-/* ===== CREATE 2x4 PHOTO SHEET ===== */
+/* ===== CREATE 4 ROWS × 2 COLUMNS PHOTO SHEET ===== */
 function createSheet(photoCanvas, forDownload=false){
   const cols = 2;
   const rows = 4;
