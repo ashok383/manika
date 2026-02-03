@@ -34,16 +34,25 @@ body{
 header{text-align:center;margin-bottom:18px}
 header h2{font-size:1.9em;font-weight:700}
 
-.upload-btn{
-  background:linear-gradient(135deg,#00c6ff,#0072ff);
+/* Buttons */
+.upload-btn, .btn{
+  width:100%;
   padding:14px;
-  border-radius:18px;
-  text-align:center;
-  font-weight:600;
+  border:none;
+  border-radius:28px;
+  font-size:16px;
+  font-weight:bold;
+  color:#fff;
   cursor:pointer;
+  margin-top:8px;
+  text-align:center;
 }
-.upload-btn input{display:none}
+.upload-btn{background:linear-gradient(135deg,#00c6ff,#0072ff);}
+.upload-btn input{display:none;}
+.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);}
+.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
 
+/* Color picker */
 .color-box{
   margin-top:12px;
   display:flex;
@@ -54,6 +63,7 @@ header h2{font-size:1.9em;font-weight:700}
   border-radius:16px;
 }
 
+/* Canvas styling */
 canvas{
   display:block;
   margin:15px auto;
@@ -61,20 +71,6 @@ canvas{
   border-radius:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.35);
 }
-
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:28px;
-  font-size:16px;
-  font-weight:bold;
-  color:#fff;
-  cursor:pointer;
-  margin-top:8px;
-}
-.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200)}
-.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6)}
 </style>
 </head>
 
@@ -129,11 +125,12 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(res=>{
   if(!imageBitmap) return;
 
+  // High-res temp canvas
   const temp=document.createElement("canvas");
   temp.width=PW*2;
   temp.height=PH*2;
   const ctx=temp.getContext("2d");
-  ctx.imageSmoothingEnabled=false;
+  ctx.imageSmoothingEnabled=true;
 
   ctx.drawImage(imageBitmap,0,0,temp.width,temp.height);
   ctx.globalCompositeOperation="destination-in";
@@ -144,6 +141,7 @@ segmenter.onResults(res=>{
   ctx.fillRect(0,0,temp.width,temp.height);
   ctx.globalCompositeOperation="source-over";
 
+  // Downscale for final photo
   const final=document.createElement("canvas");
   final.width=PW;
   final.height=PH;
@@ -152,7 +150,8 @@ segmenter.onResults(res=>{
   sharpen(final);
   drawRounded(final,photoCanvas,28,8);
 
-  finalSheet=createLandscapeSheet(photoCanvas);
+  // High-quality sheet generation
+  finalSheet=createHighQualitySheet(photoCanvas);
   previewSheet(finalSheet);
 });
 
@@ -191,24 +190,41 @@ function drawRounded(src,dst,r,b){
   c.stroke();
 }
 
-/* LANDSCAPE SHEET (2x4) */
-function createLandscapeSheet(photo){
+/* High-quality landscape sheet (2x4) */
+function createHighQualitySheet(photo){
   const rows=2,cols=4,gap=25,margin=35;
-  const c=document.createElement("canvas");
-  c.width=cols*photo.width+(cols-1)*gap+margin*2;
-  c.height=rows*photo.height+(rows-1)*gap+margin*2;
-  const x=c.getContext("2d");
-  x.fillStyle="#fff";
-  x.fillRect(0,0,c.width,c.height);
+
+  // Use double size for AI-quality
+  const tempCanvas=document.createElement("canvas");
+  tempCanvas.width=cols*photo.width*2 + (cols-1)*gap*2 + margin*4;
+  tempCanvas.height=rows*photo.height*2 + (rows-1)*gap*2 + margin*4;
+  const ctx=tempCanvas.getContext("2d");
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,tempCanvas.width,tempCanvas.height);
+
   for(let r=0;r<rows;r++){
-    for(let i=0;i<cols;i++){
-      x.drawImage(photo,
-        margin+i*(photo.width+gap),
-        margin+r*(photo.height+gap)
+    for(let c=0;c<cols;c++){
+      ctx.drawImage(photo, 
+        margin*2 + c*(photo.width*2 + gap*2),
+        margin*2 + r*(photo.height*2 + gap*2),
+        photo.width*2,
+        photo.height*2
       );
     }
   }
-  return c;
+
+  // Apply sharpening for AI-quality
+  sharpen(tempCanvas);
+
+  // Downscale to normal size for canvas display
+  const finalSheetCanvas=document.createElement("canvas");
+  finalSheetCanvas.width=tempCanvas.width/2;
+  finalSheetCanvas.height=tempCanvas.height/2;
+  const finalCtx=finalSheetCanvas.getContext("2d");
+  finalCtx.imageSmoothingEnabled=true;
+  finalCtx.drawImage(tempCanvas,0,0,finalSheetCanvas.width,finalSheetCanvas.height);
+
+  return finalSheetCanvas;
 }
 
 /* Preview */
@@ -222,7 +238,7 @@ function previewSheet(sheet){
   ctx.drawImage(sheet,0,0);
 }
 
-/* Manual Downloads ONLY */
+/* Manual download */
 function downloadPhoto(){
   if(!photoCanvas.width) return alert("Upload photo first");
   const a=document.createElement("a");
