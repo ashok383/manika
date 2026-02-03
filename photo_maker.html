@@ -12,83 +12,50 @@ body{
   font-family:'Segoe UI',sans-serif;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
   padding:20px;
   background: linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
-  background-size:400% 400%;
-  animation: gradientBG 15s ease infinite;
-}
-@keyframes gradientBG{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
 }
 .app{
-  position:relative;
-  background:rgba(255,255,255,0.22);
+  background:rgba(255,255,255,0.25);
   backdrop-filter:blur(18px);
-  border-radius:32px;
-  padding:35px;
+  border-radius:28px;
+  padding:30px;
   width:min(1200px,95%);
-  box-shadow:0 30px 70px rgba(0,0,0,0.45);
   color:#fff;
 }
-header{text-align:center;margin-bottom:25px;}
-header h2{
-  font-size:2.2em;
-  background:linear-gradient(90deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
+header{text-align:center;margin-bottom:20px;}
 .controls{
   display:flex;
+  gap:20px;
   flex-wrap:wrap;
-  gap:25px;
   justify-content:center;
-  margin-bottom:25px;
 }
-.controls div{display:flex;flex-direction:column;min-width:220px;}
 button{
-  padding:18px 40px;
+  padding:16px 35px;
   border:none;
-  border-radius:35px;
-  cursor:pointer;
+  border-radius:30px;
   font-weight:bold;
+  cursor:pointer;
   color:#fff;
-  font-size:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
-button.process{background:linear-gradient(90deg,#ff4d4d,#ff1a1a);}
-button.preview{background:linear-gradient(90deg,#4dff88,#1aff55);}
-.work-area{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:30px;
-}
+.process{background:#ff3333;}
+.preview{background:#22c55e;}
 canvas{
   display:block;
-  margin:15px auto;
-  border-radius:15px;
-  box-shadow:0 15px 40px rgba(0,0,0,0.35);
+  margin:20px auto;
+  box-shadow:0 15px 40px rgba(0,0,0,.35);
 }
 .modal{
   position:fixed;inset:0;
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,.85);
   display:none;
   justify-content:center;
-  align-items:flex-start;
-  padding:15px;
 }
 .modal-content{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(20px);
-  border-radius:20px;
+  background:rgba(255,255,255,.15);
   padding:20px;
-  max-width:95%;
-  width:700px;
-  color:#fff;
+  border-radius:20px;
 }
-.close{float:right;font-size:24px;cursor:pointer;}
 </style>
 </head>
 
@@ -98,95 +65,87 @@ canvas{
 <header><h2>(MANIK-A-RNIKA) Photo Tool</h2></header>
 
 <div class="controls">
-  <div>
-    <label>Upload Photo</label>
-    <input type="file" id="upload" accept="image/*">
-  </div>
-  <div>
-    <label>Select Background Color</label>
-    <input type="color" id="bgColor" value="#ffffff">
-  </div>
-  <div>
-    <button class="process" onclick="processImage()">Process Photo</button>
-  </div>
+  <input type="file" id="upload" accept="image/*">
+  <input type="color" id="bgColor" value="#ffffff">
+  <button class="process" onclick="processImage()">Process Photo</button>
 </div>
 
-<div class="work-area">
-  <div>
-    <h3>35 × 45 mm Photo</h3>
-    <canvas id="photoCanvas"></canvas>
-  </div>
-  <div>
-    <h3>6 × 4 Sheet (8 Copies)</h3>
-    <button class="preview" onclick="openModal()">Preview & Download</button>
-  </div>
-</div>
+<canvas id="photoCanvas"></canvas>
+<button class="preview" onclick="openModal()">Preview & Download</button>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal()">✖</span>
-    <h3>6 × 4 Inch Photo Sheet</h3>
-    <canvas id="sheetCanvas"></canvas>
-    <br><br>
+    <canvas id="sheetCanvas"></canvas><br><br>
     <button class="preview" onclick="downloadSheet()">Download Sheet</button>
   </div>
 </div>
 
+<!-- AI MODEL -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+
 <script>
 const upload = document.getElementById("upload");
-const bgColorInput = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
+const bgColor = document.getElementById("bgColor");
 const modal = document.getElementById("modal");
 
 const ctx = photoCanvas.getContext("2d");
 const sheetCtx = sheetCanvas.getContext("2d");
-let img = new Image();
 
-upload.onchange = e => {
-  const r = new FileReader();
-  r.onload = () => img.src = r.result;
-  r.readAsDataURL(e.target.files[0]);
+let imageBitmap;
+
+/* ========= LOAD IMAGE ========= */
+upload.onchange = async e => {
+  imageBitmap = await createImageBitmap(e.target.files[0]);
 };
 
-const mmToPx = mm => Math.round(mm * 11.81);
+/* ========= AI SEGMENTATION ========= */
+const segmenter = new SelfieSegmentation({
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+});
+segmenter.setOptions({ modelSelection: 1 });
 
-function processImage(){
-  const w = mmToPx(35);
-  const h = mmToPx(45);
-  photoCanvas.width = w;
-  photoCanvas.height = h;
+segmenter.onResults(results => {
+  const w = photoCanvas.width;
+  const h = photoCanvas.height;
 
-  ctx.drawImage(img,0,0,w,h);
-  removeBackground(bgColorInput.value);
+  ctx.clearRect(0,0,w,h);
+
+  // Background color
+  ctx.fillStyle = bgColor.value;
+  ctx.fillRect(0,0,w,h);
+
+  // Mask
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.drawImage(results.segmentationMask,0,0,w,h);
+
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(results.segmentationMask,0,0,w,h);
+
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.drawImage(imageBitmap,0,0,w,h);
+
+  ctx.globalCompositeOperation = "source-over";
+
   roundPhoto(15);
   drawBorder();
   createSheet();
+});
+
+/* ========= PROCESS ========= */
+function processImage(){
+  const w = Math.round(35 * 11.81);
+  const h = Math.round(45 * 11.81);
+
+  photoCanvas.width = w;
+  photoCanvas.height = h;
+
+  segmenter.send({ image: imageBitmap });
 }
 
-function removeBackground(hex){
-  const imgData = ctx.getImageData(0,0,photoCanvas.width,photoCanvas.height);
-  const d = imgData.data;
-  const bg = hexToRgb(hex);
-  const tolerance = 80;
-
-  for(let i=0;i<d.length;i+=4){
-    const dist = Math.sqrt(
-      (d[i]-bg.r)**2 +
-      (d[i+1]-bg.g)**2 +
-      (d[i+2]-bg.b)**2
-    );
-    if(dist < tolerance) d[i+3] = 0;
-  }
-  ctx.putImageData(imgData,0,0);
-}
-
-function hexToRgb(hex){
-  const n = parseInt(hex.slice(1),16);
-  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
-}
-
+/* ========= ROUND + BORDER ========= */
 function roundPhoto(r){
   const temp=document.createElement("canvas");
   temp.width=photoCanvas.width;
@@ -217,6 +176,7 @@ function drawBorder(){
   ctx.strokeRect(7,7,photoCanvas.width-14,photoCanvas.height-14);
 }
 
+/* ========= SHEET ========= */
 function createSheet(){
   sheetCanvas.width=1800;
   sheetCanvas.height=1200;
@@ -235,7 +195,6 @@ function createSheet(){
 }
 
 function openModal(){modal.style.display="flex";}
-function closeModal(){modal.style.display="none";}
 function downloadSheet(){
   const a=document.createElement("a");
   a.download="photosheet_6x4.png";
