@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MANIK-A-RNIKA | Marriage Bureau Photo Tool</title>
+<title>(MANIK-A-RNIKA) Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
 
 body{
   min-height:100vh;
@@ -15,30 +15,31 @@ body{
   padding:15px;
   background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-size:400% 400%;
-  animation:bg 15s ease infinite;
+  animation:gradBG 15s ease infinite;
 }
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+@keyframes gradBG{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 .app{
   width:100%;
-  max-width:540px;
-  background:rgba(255,255,255,.25);
+  max-width:520px;
+  background:rgba(255,255,255,0.25);
   backdrop-filter:blur(18px);
   border-radius:26px;
   padding:22px;
   color:#fff;
-  box-shadow:0 15px 40px rgba(0,0,0,.35);
+  box-shadow:0 12px 35px rgba(0,0,0,0.3);
 }
 
-h2{text-align:center;margin-bottom:15px}
+header{text-align:center;margin-bottom:18px;}
+header h2{font-size:1.9em;font-weight:700;}
 
-.controls{display:flex;flex-direction:column;gap:12px}
+.controls{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
 
-.upload{
+.upload-btn{
   background:linear-gradient(135deg,#00c6ff,#0072ff);
   padding:14px;
   border-radius:18px;
@@ -46,23 +47,23 @@ h2{text-align:center;margin-bottom:15px}
   font-weight:600;
   cursor:pointer;
 }
-.upload input{display:none}
+.upload-btn input{display:none}
 
-.color{
+.color-box{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:rgba(255,255,255,.3);
+  background:rgba(255,255,255,0.25);
   padding:10px 14px;
   border-radius:16px;
 }
 
 canvas{
   display:block;
-  margin:15px auto;
+  margin:12px auto;
   max-width:100%;
-  border-radius:22px;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.35);
 }
 
 .btn{
@@ -70,41 +71,45 @@ canvas{
   padding:14px;
   border:none;
   border-radius:30px;
-  font-size:15px;
-  font-weight:700;
+  font-size:16px;
+  font-weight:bold;
   color:#fff;
   cursor:pointer;
   margin-top:8px;
 }
-.photo{background:linear-gradient(135deg,#f7971e,#ffd200)}
-.sheet{background:linear-gradient(135deg,#00f260,#0575e6)}
+
+.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);}
+.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
 </style>
 </head>
 
 <body>
 <div class="app">
-<h2>💍 Marriage Bureau Photo Tool</h2>
+
+<header>
+  <h2>(MANIK-A-RNIKA) Photo Tool</h2>
+</header>
 
 <div class="controls">
-  <label class="upload">
+  <label class="upload-btn">
     📸 Upload Photo
     <input type="file" id="upload" accept="image/*">
   </label>
 
-  <div class="color">
-    <span>🎨 Background</span>
-    <input type="color" id="bgColor" value="#ffffff">
+  <div class="color-box">
+    <span>🎨 Photo Background</span>
+    <input type="color" id="bgColor" value="#87CEEB">
   </div>
 </div>
 
 <canvas id="photoCanvas"></canvas>
-<button class="btn photo" onclick="downloadPhoto()">⬇ Download Photo (HQ JPEG)</button>
+<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
 
 <canvas id="sheetCanvas"></canvas>
-<button class="btn sheet" onclick="downloadSheet()">⬇ Download 8-Copy Sheet</button>
+<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
+
 </div>
 
-<!-- AI BACKGROUND REMOVAL -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
 <script>
@@ -113,103 +118,118 @@ const bgColor = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 
-let img = null;
-let sheet = null;
+let imageBitmap = null;
+let sheetData = null;
 
-/* 35x45 mm passport/marriage size @300DPI */
+// 35x45mm @300DPI
 const PW = Math.round(35 / 25.4 * 300);
 const PH = Math.round(45 / 25.4 * 300);
 
 /* Upload */
 upload.onchange = async e => {
-  img = await createImageBitmap(e.target.files[0]);
-  segmenter.send({image: img});
+  imageBitmap = await createImageBitmap(e.target.files[0]);
+  segmenter.send({image:imageBitmap});
 };
 
-/* AI Segmentation */
+/* Segmentation */
 const segmenter = new SelfieSegmentation({
-  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+  locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
 segmenter.setOptions({modelSelection:1});
 
-/* Result */
 segmenter.onResults(res=>{
-  if(!img) return;
+  if(!imageBitmap) return;
 
-  const temp = document.createElement("canvas");
-  temp.width = PW;
-  temp.height = PH;
-  const ctx = temp.getContext("2d");
+  const temp=document.createElement("canvas");
+  temp.width=PW; temp.height=PH;
+  const ctx=temp.getContext("2d");
 
-  ctx.fillStyle = bgColor.value;
+  /* PHOTO BACKGROUND ONLY */
+  ctx.fillStyle=bgColor.value;
   ctx.fillRect(0,0,PW,PH);
 
-  ctx.drawImage(img,0,0,PW,PH);
+  ctx.save();
+  ctx.drawImage(imageBitmap,0,0,PW,PH);
   ctx.globalCompositeOperation="destination-in";
   ctx.drawImage(res.segmentationMask,0,0,PW,PH);
-  ctx.globalCompositeOperation="source-over";
+  ctx.restore();
 
-  drawRounded(temp,photoCanvas);
-  sheet = makeSheet(photoCanvas);
+  drawRounded(temp,photoCanvas,30,10);
+  sheetData=createSheet4x2(photoCanvas);
   previewSheet();
 });
 
-/* Rounded photo */
-function drawRounded(src,dst){
+/* Rounded Photo */
+function drawRounded(src,dst,r,b){
   dst.width=src.width;
   dst.height=src.height;
   const c=dst.getContext("2d");
-  c.clearRect(0,0,dst.width,dst.height);
 
+  c.clearRect(0,0,dst.width,dst.height);
+  c.save();
   c.beginPath();
-  c.moveTo(20,0);
-  c.arcTo(dst.width,0,dst.width,dst.height,20);
-  c.arcTo(dst.width,dst.height,0,dst.height,20);
-  c.arcTo(0,dst.height,0,0,20);
-  c.arcTo(0,0,dst.width,0,20);
+  c.moveTo(r,0);
+  c.arcTo(dst.width,0,dst.width,dst.height,r);
+  c.arcTo(dst.width,dst.height,0,dst.height,r);
+  c.arcTo(0,dst.height,0,0,r);
+  c.arcTo(0,0,dst.width,0,r);
   c.closePath();
   c.clip();
   c.drawImage(src,0,0);
+  c.restore();
+
+  c.lineWidth=b;
+  c.strokeStyle="#000";
+  c.stroke();
 }
 
-/* 8 copies (2x4) */
-function makeSheet(photo){
-  const rows=2, cols=4, gap=20, margin=30;
+/* SHEET: 4 ROWS × 2 COLUMNS (WHITE BACKGROUND) */
+function createSheet4x2(photo){
+  const rows=4, cols=2, gap=20, margin=30;
   const c=document.createElement("canvas");
+
   c.width=cols*photo.width+(cols-1)*gap+margin*2;
   c.height=rows*photo.height+(rows-1)*gap+margin*2;
 
   const x=c.getContext("2d");
-  x.fillStyle="#fff";
+  x.fillStyle="#ffffff";   // sheet background ONLY
   x.fillRect(0,0,c.width,c.height);
 
-  for(let r=0;r<rows;r++)
-    for(let i=0;i<cols;i++)
+  for(let r=0;r<rows;r++){
+    for(let i=0;i<cols;i++){
       x.drawImage(photo,
         margin+i*(photo.width+gap),
-        margin+r*(photo.height+gap));
-
+        margin+r*(photo.height+gap)
+      );
+    }
+  }
   return c;
 }
 
 /* Preview */
 function previewSheet(){
-  sheetCanvas.width=sheet.width;
-  sheetCanvas.height=sheet.height;
-  sheetCanvas.getContext("2d").drawImage(sheet,0,0);
+  const ctx=sheetCanvas.getContext("2d");
+  const scale=Math.min(420/sheetData.width,350/sheetData.height);
+  sheetCanvas.width=sheetData.width;
+  sheetCanvas.height=sheetData.height;
+  sheetCanvas.style.width=sheetCanvas.width*scale+"px";
+  sheetCanvas.style.height=sheetCanvas.height*scale+"px";
+  ctx.drawImage(sheetData,0,0);
 }
 
 /* Downloads */
 function downloadPhoto(){
+  if(!photoCanvas.width) return alert("Upload photo first");
   const a=document.createElement("a");
-  a.download="Marriage_Photo_HQ.jpg";
-  a.href=photoCanvas.toDataURL("image/jpeg",0.98);
+  a.href=photoCanvas.toDataURL("image/png");
+  a.download="photo.png";
   a.click();
 }
 function downloadSheet(){
+  if(!sheetData) return alert("Sheet not ready");
   const a=document.createElement("a");
-  a.download="Marriage_Photo_8_Copy.jpg";
-  a.href=sheet.toDataURL("image/jpeg",0.98);
+  a.href=sheetData.toDataURL("image/png");
+  a.download="photosheet.png";
   a.click();
 }
 </script>
