@@ -9,14 +9,14 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   min-height:100vh;
-  font-family:'Segoe UI',sans-serif;
+  font-family:Segoe UI,sans-serif;
   display:flex;
   justify-content:center;
   padding:20px;
-  background: linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
+  background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
 }
 .app{
-  background:rgba(255,255,255,0.25);
+  background:rgba(255,255,255,.25);
   backdrop-filter:blur(18px);
   border-radius:28px;
   padding:30px;
@@ -29,6 +29,7 @@ header{text-align:center;margin-bottom:20px;}
   gap:20px;
   flex-wrap:wrap;
   justify-content:center;
+  margin-bottom:20px;
 }
 button{
   padding:16px 35px;
@@ -42,7 +43,7 @@ button{
 .preview{background:#22c55e;}
 canvas{
   display:block;
-  margin:20px auto;
+  margin:15px auto;
   box-shadow:0 15px 40px rgba(0,0,0,.35);
 }
 .modal{
@@ -50,6 +51,7 @@ canvas{
   background:rgba(0,0,0,.85);
   display:none;
   justify-content:center;
+  padding-top:20px;
 }
 .modal-content{
   background:rgba(255,255,255,.15);
@@ -81,27 +83,27 @@ canvas{
   </div>
 </div>
 
-<!-- AI MODEL -->
+<!-- MediaPipe AI -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
 <script>
 const upload = document.getElementById("upload");
+const bgColorInput = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
-const bgColor = document.getElementById("bgColor");
 const modal = document.getElementById("modal");
 
 const ctx = photoCanvas.getContext("2d");
 const sheetCtx = sheetCanvas.getContext("2d");
 
-let imageBitmap;
+let imageBitmap = null;
 
-/* ========= LOAD IMAGE ========= */
+/* ===== LOAD IMAGE ===== */
 upload.onchange = async e => {
   imageBitmap = await createImageBitmap(e.target.files[0]);
 };
 
-/* ========= AI SEGMENTATION ========= */
+/* ===== AI SEGMENTATION ===== */
 const segmenter = new SelfieSegmentation({
   locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
@@ -113,44 +115,42 @@ segmenter.onResults(results => {
 
   ctx.clearRect(0,0,w,h);
 
-  // Background color
-  ctx.fillStyle = bgColor.value;
-  ctx.fillRect(0,0,w,h);
-
-  // Mask
-  ctx.globalCompositeOperation = "destination-over";
+  /* ---- 1. DRAW PERSON ONLY ---- */
+  ctx.save();
   ctx.drawImage(results.segmentationMask,0,0,w,h);
-
-  ctx.globalCompositeOperation = "destination-in";
-  ctx.drawImage(results.segmentationMask,0,0,w,h);
-
-  ctx.globalCompositeOperation = "destination-over";
+  ctx.globalCompositeOperation = "source-in";
   ctx.drawImage(imageBitmap,0,0,w,h);
+  ctx.restore();
+
+  /* ---- 2. DRAW BACKGROUND BEHIND ---- */
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = bgColorInput.value;
+  ctx.fillRect(0,0,w,h);
 
   ctx.globalCompositeOperation = "source-over";
 
+  /* ---- 3. ROUND + BORDER ---- */
   roundPhoto(15);
   drawBorder();
   createSheet();
 });
 
-/* ========= PROCESS ========= */
+/* ===== PROCESS ===== */
 function processImage(){
+  if(!imageBitmap) return alert("Upload image first");
   const w = Math.round(35 * 11.81);
   const h = Math.round(45 * 11.81);
-
   photoCanvas.width = w;
   photoCanvas.height = h;
-
   segmenter.send({ image: imageBitmap });
 }
 
-/* ========= ROUND + BORDER ========= */
+/* ===== ROUND PHOTO ===== */
 function roundPhoto(r){
-  const temp=document.createElement("canvas");
-  temp.width=photoCanvas.width;
-  temp.height=photoCanvas.height;
-  temp.getContext("2d").drawImage(photoCanvas,0,0);
+  const t=document.createElement("canvas");
+  t.width=photoCanvas.width;
+  t.height=photoCanvas.height;
+  t.getContext("2d").drawImage(photoCanvas,0,0);
 
   ctx.clearRect(0,0,photoCanvas.width,photoCanvas.height);
   ctx.save();
@@ -166,17 +166,18 @@ function roundPhoto(r){
   ctx.quadraticCurveTo(0,0,r,0);
   ctx.closePath();
   ctx.clip();
-  ctx.drawImage(temp,0,0);
+  ctx.drawImage(t,0,0);
   ctx.restore();
 }
 
+/* ===== BORDER ===== */
 function drawBorder(){
   ctx.lineWidth=14;
   ctx.strokeStyle="#000";
   ctx.strokeRect(7,7,photoCanvas.width-14,photoCanvas.height-14);
 }
 
-/* ========= SHEET ========= */
+/* ===== SHEET ===== */
 function createSheet(){
   sheetCanvas.width=1800;
   sheetCanvas.height=1200;
