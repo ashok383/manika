@@ -21,7 +21,7 @@ button.preview:hover{transform:scale(1.05);}
 button.download{background:#3399ff;margin-top:5px;}
 canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.3);}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;justify-content:center;align-items:flex-start;padding-top:30px;overflow-y:auto;z-index:999;}
-.modal-content{background:rgba(255,255,255,0.1);padding:15px;border-radius:20px;width:95%;max-width:450px;color:#fff;text-align:center;position:relative;}
+.modal-content{background:rgba(255,255,255,0.1);padding:15px;border-radius:20px;width:95%;max-width:600px;color:#fff;text-align:center;position:relative;}
 .close{position:absolute;right:20px;top:20px;font-size:22px;cursor:pointer;}
 </style>
 </head>
@@ -49,9 +49,7 @@ canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shad
   </div>
 </div>
 
-<!-- MediaPipe Selfie Segmentation -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
-<!-- TensorFlow.js & ESRGAN for AI upscaling -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/esrgan"></script>
 
@@ -61,8 +59,9 @@ const bgColorInput = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 const modal = document.getElementById("modal");
+
 let imageBitmap = null;
-let sheetCanvasData = null; // off-screen full-res sheet
+let sheetCanvasData = null; // offscreen full-res sheet
 
 /* ===== LOAD IMAGE ===== */
 upload.onchange = async e => {
@@ -84,31 +83,26 @@ segmenter.onResults(async results => {
   tmpCanvas.height = h;
   const tmpCtx = tmpCanvas.getContext("2d");
 
-  // Fill background
   tmpCtx.fillStyle = bgColorInput.value;
   tmpCtx.fillRect(0,0,w,h);
 
-  // Draw person using mask
   tmpCtx.save();
   tmpCtx.drawImage(imageBitmap,0,0,w,h);
   tmpCtx.globalCompositeOperation = "destination-in";
   tmpCtx.drawImage(results.segmentationMask,0,0,w,h);
   tmpCtx.restore();
 
-  // Fill background behind person
   tmpCtx.save();
   tmpCtx.globalCompositeOperation = "destination-over";
   tmpCtx.fillStyle = bgColorInput.value;
   tmpCtx.fillRect(0,0,w,h);
   tmpCtx.restore();
 
-  // Rounded corners + border
   drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 6);
 
-  // Generate full-res sheet for download
+  // Generate full-res sheet
   sheetCanvasData = createSheet(photoCanvas, true);
 
-  // Optional: upscale photo for better quality
   await upscalePhoto(photoCanvas);
 });
 
@@ -142,7 +136,6 @@ function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   tctx.drawImage(sourceCanvas,0,0);
   tctx.restore();
 
-  // Border
   tctx.save();
   tctx.strokeStyle = "#000";
   tctx.lineWidth = borderWidth;
@@ -186,8 +179,7 @@ function createSheet(photoCanvas, forDownload=false){
 
   if(!forDownload){
     // scale for modal preview
-    const maxW = 400, maxH = 300;
-    const scale = Math.min(maxW/sheet.width, maxH/sheet.height);
+    const scale = Math.min(500/sheet.width, 400/sheet.height);
     sheetCanvas.width = sheet.width;
     sheetCanvas.height = sheet.height;
     sheetCanvas.style.width = sheet.width*scale + "px";
@@ -202,7 +194,7 @@ function createSheet(photoCanvas, forDownload=false){
 function downloadPhoto(){
   if(!photoCanvas.width) return alert("No photo to download");
   const a = document.createElement("a");
-  a.download = "high_quality_photo.png";
+  a.download = "photo.png";
   a.href = photoCanvas.toDataURL("image/png");
   a.click();
 }
@@ -211,7 +203,7 @@ function downloadPhoto(){
 function downloadSheet(){
   if(!sheetCanvasData) return alert("Sheet not ready");
   const a = document.createElement("a");
-  a.download = "photosheet_6x4.png";
+  a.download = "photosheet.png";
   a.href = sheetCanvasData.toDataURL("image/png");
   a.click();
 }
@@ -221,12 +213,12 @@ function openModal(){
   if(!sheetCanvasData) return alert("Generate photo first");
   const ctx2 = sheetCanvas.getContext("2d");
   ctx2.clearRect(0,0,sheetCanvas.width,sheetCanvas.height);
-  ctx2.drawImage(sheetCanvasData,0,0); // copy full sheet to modal canvas
+  ctx2.drawImage(sheetCanvasData,0,0);
   modal.style.display="flex";
 }
 function closeModal(){modal.style.display="none";}
 
-/* ===== OPTIONAL AI UPSCALER ===== */
+/* ===== OPTIONAL UPSCALER ===== */
 async function upscalePhoto(canvas){
   try{
     const model = await esrgan.load();
@@ -234,7 +226,7 @@ async function upscalePhoto(canvas){
     const upscaled = await model.predict(tensor);
     await tf.browser.toPixels(upscaled, canvas);
   }catch(err){
-    console.log("Upscaling failed, using original:", err);
+    console.log("Upscaling failed:", err);
   }
 }
 </script>
