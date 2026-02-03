@@ -4,74 +4,29 @@
 <meta charset="UTF-8">
 <title>(MANIK-A-RNIKA) Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  min-height:100vh;
-  font-family:Segoe UI,sans-serif;
-  display:flex;
-  justify-content:center;
-  padding:20px;
-  background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
-}
-.app{
-  background:rgba(255,255,255,.25);
-  backdrop-filter:blur(18px);
-  border-radius:28px;
-  padding:30px;
-  width:min(1200px,95%);
-  color:#fff;
-}
+body{min-height:100vh;font-family:Segoe UI,sans-serif;display:flex;justify-content:center;padding:20px;background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);}
+.app{background:rgba(255,255,255,.25);backdrop-filter:blur(18px);border-radius:28px;padding:30px;width:min(1200px,95%);color:#fff;}
 header{text-align:center;margin-bottom:20px;}
-.controls{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-bottom:20px;
-}
-button{
-  padding:16px 35px;
-  border:none;
-  border-radius:30px;
-  font-weight:bold;
-  cursor:pointer;
-  color:#fff;
-}
+.controls{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+button{padding:16px 35px;border:none;border-radius:30px;font-weight:bold;cursor:pointer;color:#fff;}
 .process{background:#ff3333;}
 .preview{background:#22c55e;}
-canvas{
-  display:block;
-  margin:15px auto;
-  box-shadow:0 15px 40px rgba(0,0,0,.35);
-}
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.85);
-  display:none;
-  justify-content:center;
-  padding-top:20px;
-}
-.modal-content{
-  background:rgba(255,255,255,.15);
-  padding:20px;
-  border-radius:20px;
-}
+canvas{display:block;margin:15px auto;box-shadow:0 15px 40px rgba(0,0,0,.35);}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;padding-top:20px;}
+.modal-content{background:rgba(255,255,255,.15);padding:20px;border-radius:20px;}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 <header><h2>(MANIK-A-RNIKA) Photo Tool</h2></header>
-
 <div class="controls">
   <input type="file" id="upload" accept="image/*">
   <input type="color" id="bgColor" value="#ffffff">
   <button class="process" onclick="processImage()">Process Photo</button>
 </div>
-
 <canvas id="photoCanvas"></canvas>
 <button class="preview" onclick="openModal()">Preview & Download</button>
 </div>
@@ -85,7 +40,6 @@ canvas{
 
 <!-- MediaPipe AI -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
-
 <script>
 const upload = document.getElementById("upload");
 const bgColorInput = document.getElementById("bgColor");
@@ -104,32 +58,30 @@ upload.onchange = async e => {
 };
 
 /* ===== AI SEGMENTATION ===== */
-const segmenter = new SelfieSegmentation({
-  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
-});
-segmenter.setOptions({ modelSelection: 1 });
+const segmenter = new SelfieSegmentation({locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`});
+segmenter.setOptions({modelSelection:1});
 
 segmenter.onResults(results => {
   const w = photoCanvas.width;
   const h = photoCanvas.height;
-
   ctx.clearRect(0,0,w,h);
 
-  /* ---- 1. DRAW PERSON ONLY ---- */
-  ctx.save();
-  ctx.drawImage(results.segmentationMask,0,0,w,h);
-  ctx.globalCompositeOperation = "source-in";
-  ctx.drawImage(imageBitmap,0,0,w,h);
-  ctx.restore();
-
-  /* ---- 2. DRAW BACKGROUND BEHIND ---- */
-  ctx.globalCompositeOperation = "destination-over";
+  // 1️⃣ Draw background first
   ctx.fillStyle = bgColorInput.value;
   ctx.fillRect(0,0,w,h);
 
-  ctx.globalCompositeOperation = "source-over";
+  // 2️⃣ Draw person using mask, keeping colors unchanged
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(results.segmentationMask,0,0,w,h);
+  ctx.restore();
 
-  /* ---- 3. ROUND + BORDER ---- */
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.drawImage(imageBitmap,0,0,w,h);
+  ctx.restore();
+
+  // 3️⃣ Round + border
   roundPhoto(15);
   drawBorder();
   createSheet();
@@ -142,7 +94,7 @@ function processImage(){
   const h = Math.round(45 * 11.81);
   photoCanvas.width = w;
   photoCanvas.height = h;
-  segmenter.send({ image: imageBitmap });
+  segmenter.send({image: imageBitmap});
 }
 
 /* ===== ROUND PHOTO ===== */
@@ -203,6 +155,5 @@ function downloadSheet(){
   a.click();
 }
 </script>
-
 </body>
 </html>
