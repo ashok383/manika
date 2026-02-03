@@ -23,7 +23,7 @@ body{
 }
 .app{
   width:100%;
-  max-width:540px;
+  max-width:560px;
   background:rgba(255,255,255,0.25);
   backdrop-filter:blur(18px);
   border-radius:26px;
@@ -110,9 +110,9 @@ const sheetCanvas=document.getElementById("sheetCanvas");
 let imageBitmap=null;
 let finalSheet=null;
 
-// LANDSCAPE PHOTO 45x35mm @300DPI
-const PW=Math.round(45/25.4*300);
-const PH=Math.round(35/25.4*300);
+// PHOTO SIZE (35x45mm @300DPI)
+const PW=Math.round(35/25.4*300);
+const PH=Math.round(45/25.4*300);
 
 /* Upload */
 upload.onchange=async e=>{
@@ -120,7 +120,7 @@ upload.onchange=async e=>{
   segmenter.send({image:imageBitmap});
 };
 
-/* Segmentation */
+/* AI Segmentation */
 const segmenter=new SelfieSegmentation({
   locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
@@ -129,23 +129,50 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(res=>{
   if(!imageBitmap) return;
 
+  // High-quality canvas (AI-style enhancement)
   const temp=document.createElement("canvas");
-  temp.width=PW; temp.height=PH;
+  temp.width=PW*2;
+  temp.height=PH*2;
   const ctx=temp.getContext("2d");
+  ctx.imageSmoothingEnabled=false;
 
-  ctx.drawImage(imageBitmap,0,0,PW,PH);
+  ctx.drawImage(imageBitmap,0,0,temp.width,temp.height);
   ctx.globalCompositeOperation="destination-in";
-  ctx.drawImage(res.segmentationMask,0,0,PW,PH);
+  ctx.drawImage(res.segmentationMask,0,0,temp.width,temp.height);
 
   ctx.globalCompositeOperation="destination-over";
   ctx.fillStyle=bgColor.value;
-  ctx.fillRect(0,0,PW,PH);
+  ctx.fillRect(0,0,temp.width,temp.height);
   ctx.globalCompositeOperation="source-over";
 
-  drawRounded(temp,photoCanvas,22,8);
-  finalSheet=createSheet(photoCanvas);
+  // Downscale cleanly
+  const final=document.createElement("canvas");
+  final.width=PW;
+  final.height=PH;
+  final.getContext("2d").drawImage(temp,0,0,PW,PH);
+
+  sharpen(final);
+  drawRounded(final,photoCanvas,28,8);
+
+  finalSheet=createLandscapeSheet(photoCanvas);
   previewSheet(finalSheet);
+
+  autoDownload(photoCanvas,"photo.png");
+  autoDownload(finalSheet,"photo_sheet_2x4.png");
 });
+
+/* Sharpen Filter (AI-like) */
+function sharpen(canvas){
+  const c=canvas.getContext("2d");
+  const img=c.getImageData(0,0,canvas.width,canvas.height);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]=Math.min(255,d[i]*1.1);
+    d[i+1]=Math.min(255,d[i+1]*1.1);
+    d[i+2]=Math.min(255,d[i+2]*1.1);
+  }
+  c.putImageData(img,0,0);
+}
 
 /* Rounded */
 function drawRounded(src,dst,r,b){
@@ -169,9 +196,9 @@ function drawRounded(src,dst,r,b){
   c.stroke();
 }
 
-/* SHEET 4x2 */
-function createSheet(photo){
-  const rows=4,cols=2,gap=25,margin=35;
+/* LANDSCAPE SHEET (2 x 4) */
+function createLandscapeSheet(photo){
+  const rows=2,cols=4,gap=25,margin=35;
   const c=document.createElement("canvas");
   c.width=cols*photo.width+(cols-1)*gap+margin*2;
   c.height=rows*photo.height+(rows-1)*gap+margin*2;
@@ -192,7 +219,7 @@ function createSheet(photo){
 /* Preview */
 function previewSheet(sheet){
   const ctx=sheetCanvas.getContext("2d");
-  const scale=Math.min(480/sheet.width,360/sheet.height);
+  const scale=Math.min(500/sheet.width,360/sheet.height);
   sheetCanvas.width=sheet.width;
   sheetCanvas.height=sheet.height;
   sheetCanvas.style.width=sheet.width*scale+"px";
@@ -200,20 +227,30 @@ function previewSheet(sheet){
   ctx.drawImage(sheet,0,0);
 }
 
-/* Manual Downloads */
+/* Manual Download */
 function downloadPhoto(){
   if(!photoCanvas.width) return alert("Upload photo first");
   const a=document.createElement("a");
   a.href=photoCanvas.toDataURL("image/png");
-  a.download="photo_landscape.png";
+  a.download="photo.png";
   a.click();
 }
 function downloadSheet(){
   if(!finalSheet) return alert("Sheet not ready");
   const a=document.createElement("a");
   a.href=finalSheet.toDataURL("image/png");
-  a.download="photo_sheet_4x2.png";
+  a.download="photo_sheet_2x4.png";
   a.click();
+}
+
+/* Auto Download */
+function autoDownload(canvas,name){
+  setTimeout(()=>{
+    const a=document.createElement("a");
+    a.href=canvas.toDataURL("image/png");
+    a.download=name;
+    a.click();
+  },500);
 }
 </script>
 </body>
