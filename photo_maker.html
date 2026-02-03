@@ -12,7 +12,6 @@ body{
   min-height:100vh;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
   padding:15px;
   background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-size:400% 400%;
@@ -38,14 +37,8 @@ body{
 header{text-align:center;margin-bottom:18px;}
 header h2{font-size:1.9em;font-weight:700;}
 
-.controls{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  margin-bottom:18px;
-}
+.controls{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
 
-/* Upload Button */
 .upload-btn{
   background:linear-gradient(135deg,#00c6ff,#0072ff);
   padding:14px;
@@ -58,11 +51,10 @@ header h2{font-size:1.9em;font-weight:700;}
 .upload-btn:hover{transform:scale(1.05);}
 .upload-btn input{display:none}
 
-/* Color Picker */
 .color-box{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   background:rgba(255,255,255,0.25);
   padding:10px 14px;
   border-radius:16px;
@@ -76,13 +68,9 @@ canvas{
   box-shadow:0 10px 25px rgba(0,0,0,.35);
 }
 
-.sheet-preview{text-align:center;margin-top:20px}
-
-/* Buttons */
 .btn{
   width:100%;
   padding:14px;
-  margin-top:8px;
   border:none;
   border-radius:30px;
   font-size:16px;
@@ -90,16 +78,11 @@ canvas{
   color:#fff;
   cursor:pointer;
   transition:.25s;
+  margin-top:8px;
 }
 
-.btn-photo{
-  background:linear-gradient(135deg,#f7971e,#ffd200);
-}
-
-.btn-sheet{
-  background:linear-gradient(135deg,#00f260,#0575e6);
-}
-
+.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);}
+.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
 .btn:hover{transform:scale(1.05)}
 </style>
 </head>
@@ -112,28 +95,22 @@ canvas{
 </header>
 
 <div class="controls">
-
-  <!-- Upload -->
   <label class="upload-btn">
     📸 Upload Photo
     <input type="file" id="upload" accept="image/*">
   </label>
 
-  <!-- Background Color -->
   <div class="color-box">
-    <span>🎨 Background Color</span>
-    <input type="color" id="bgColor" value="#ffffff">
+    <span>🎨 Background</span>
+    <input type="color" id="bgColor" value="#87CEEB">
   </div>
-
 </div>
 
 <canvas id="photoCanvas"></canvas>
 <button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
 
-<div class="sheet-preview">
-  <canvas id="sheetCanvas"></canvas>
-  <button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
-</div>
+<canvas id="sheetCanvas"></canvas>
+<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
 
 </div>
 
@@ -141,65 +118,61 @@ canvas{
 
 <script>
 const upload = document.getElementById("upload");
-const bgColorInput = document.getElementById("bgColor");
+const bgColor = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 
 let imageBitmap = null;
-let sheetCanvasData = null;
+let sheetData = null;
 
 // 35x45 mm @ 300 DPI
-const PHOTO_WIDTH = Math.round(35 / 25.4 * 300);
-const PHOTO_HEIGHT = Math.round(45 / 25.4 * 300);
+const PW = Math.round(35 / 25.4 * 300);
+const PH = Math.round(45 / 25.4 * 300);
 
-/* ===== Upload ===== */
+/* Upload */
 upload.onchange = async e => {
   imageBitmap = await createImageBitmap(e.target.files[0]);
-  processImage();
+  segmenter.send({image:imageBitmap});
 };
 
-/* ===== AI Segmentation ===== */
+/* Segmentation */
 const segmenter = new SelfieSegmentation({
   locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
 segmenter.setOptions({modelSelection:1});
 
-segmenter.onResults(results => {
+segmenter.onResults(res=>{
   if(!imageBitmap) return;
 
-  const tmp = document.createElement("canvas");
-  tmp.width = PHOTO_WIDTH;
-  tmp.height = PHOTO_HEIGHT;
-  const ctx = tmp.getContext("2d");
+  const temp = document.createElement("canvas");
+  temp.width = PW;
+  temp.height = PH;
+  const ctx = temp.getContext("2d");
 
-  ctx.fillStyle = bgColorInput.value;
-  ctx.fillRect(0,0,tmp.width,tmp.height);
+  ctx.fillStyle = bgColor.value;
+  ctx.fillRect(0,0,PW,PH);
 
   ctx.save();
-  ctx.drawImage(imageBitmap,0,0,tmp.width,tmp.height);
+  ctx.drawImage(imageBitmap,0,0,PW,PH);
   ctx.globalCompositeOperation="destination-in";
-  ctx.drawImage(results.segmentationMask,0,0,tmp.width,tmp.height);
+  ctx.drawImage(res.segmentationMask,0,0,PW,PH);
   ctx.restore();
 
-  drawRoundedPhoto(tmp, photoCanvas, 30, 10);
+  drawRounded(temp, photoCanvas, 30, 10);
 
-  sheetCanvasData = createSheet(photoCanvas);
-  showSheetPreview();
+  sheetData = createLandscapeSheet(photoCanvas);
+  previewSheet();
 });
 
-bgColorInput.oninput = ()=> imageBitmap && processImage();
+bgColor.oninput=()=>imageBitmap && segmenter.send({image:imageBitmap});
 
-function processImage(){
-  segmenter.send({image:imageBitmap});
-}
-
-/* ===== Rounded Photo ===== */
-function drawRoundedPhoto(src, dst, r, bw){
-  dst.width = src.width;
-  dst.height = src.height;
-  const c = dst.getContext("2d");
-
+/* Rounded Photo */
+function drawRounded(src,dst,r,b){
+  dst.width=src.width;
+  dst.height=src.height;
+  const c=dst.getContext("2d");
   c.clearRect(0,0,dst.width,dst.height);
+
   c.save();
   c.beginPath();
   c.moveTo(r,0);
@@ -212,61 +185,55 @@ function drawRoundedPhoto(src, dst, r, bw){
   c.drawImage(src,0,0);
   c.restore();
 
-  c.lineWidth=bw;
+  c.lineWidth=b;
   c.strokeStyle="#000";
   c.stroke();
 }
 
-/* ===== AUTO ORIENTATION SHEET ===== */
-function createSheet(photo){
-  const isPortrait = photo.height > photo.width;
-  const rows = isPortrait ? 4 : 2;
-  const cols = isPortrait ? 2 : 4;
+/* Landscape Sheet 2x4 */
+function createLandscapeSheet(photo){
+  const rows=2, cols=4, gap=20, margin=30;
+  const c=document.createElement("canvas");
+  c.width=cols*photo.width+(cols-1)*gap+margin*2;
+  c.height=rows*photo.height+(rows-1)*gap+margin*2;
 
-  const gap = 20, margin = 30;
-  const pw = photo.width, ph = photo.height;
-
-  const canvas = document.createElement("canvas");
-  canvas.width = cols*pw + (cols-1)*gap + margin*2;
-  canvas.height = rows*ph + (rows-1)*gap + margin*2;
-
-  const c = canvas.getContext("2d");
-  c.fillStyle = bgColorInput.value;
-  c.fillRect(0,0,canvas.width,canvas.height);
+  const x=c.getContext("2d");
+  x.fillStyle=bgColor.value;
+  x.fillRect(0,0,c.width,c.height);
 
   for(let r=0;r<rows;r++){
-    for(let cl=0;cl<cols;cl++){
-      c.drawImage(photo,
-        margin + cl*(pw+gap),
-        margin + r*(ph+gap)
+    for(let i=0;i<cols;i++){
+      x.drawImage(photo,
+        margin+i*(photo.width+gap),
+        margin+r*(photo.height+gap)
       );
     }
   }
-  return canvas;
+  return c;
 }
 
-/* ===== Preview ===== */
-function showSheetPreview(){
-  const ctx = sheetCanvas.getContext("2d");
-  const scale = Math.min(420/sheetCanvasData.width,300/sheetCanvasData.height);
-  sheetCanvas.width = sheetCanvasData.width;
-  sheetCanvas.height = sheetCanvasData.height;
-  sheetCanvas.style.width = sheetCanvas.width*scale+"px";
-  sheetCanvas.style.height = sheetCanvas.height*scale+"px";
-  ctx.drawImage(sheetCanvasData,0,0);
+/* Preview */
+function previewSheet(){
+  const ctx=sheetCanvas.getContext("2d");
+  const scale=Math.min(420/sheetData.width,300/sheetData.height);
+  sheetCanvas.width=sheetData.width;
+  sheetCanvas.height=sheetData.height;
+  sheetCanvas.style.width=sheetCanvas.width*scale+"px";
+  sheetCanvas.style.height=sheetCanvas.height*scale+"px";
+  ctx.drawImage(sheetData,0,0);
 }
 
-/* ===== Downloads ===== */
+/* Downloads */
 function downloadPhoto(){
   const a=document.createElement("a");
   a.download="photo.png";
-  a.href=photoCanvas.toDataURL();
+  a.href=photoCanvas.toDataURL("image/png");
   a.click();
 }
 function downloadSheet(){
   const a=document.createElement("a");
   a.download="photosheet.png";
-  a.href=sheetCanvasData.toDataURL();
+  a.href=sheetData.toDataURL("image/png");
   a.click();
 }
 </script>
