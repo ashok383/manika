@@ -2,338 +2,91 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Builder</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Marriage Profile Generator</title>
 
 <style>
-*{box-sizing:border-box}
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#ff9a9e,#fad0c4,#a1c4fd,#c2e9fb);
-    background-size:400% 400%;
-    animation:bgMove 10s ease infinite;
-}
-@keyframes bgMove{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-}
-.container{
-    max-width:900px;
-    margin:30px auto;
-    padding:25px;
-    background:#fff;
-    border-radius:20px;
-    box-shadow:0 15px 35px rgba(0,0,0,.25);
-}
-h1{
-    text-align:center;
-    background:linear-gradient(90deg,#ff4081,#7c4dff,#00e5ff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-label{font-weight:600;margin-top:12px;display:block}
-input,textarea{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    margin-bottom:10px;
-}
-button{
-    padding:12px 22px;
-    border:none;
-    border-radius:30px;
-    cursor:pointer;
-    font-weight:600;
-    margin-right:10px;
-}
-.preview-btn{background:#ff4081;color:#fff}
-.add-btn{background:#00c853;color:#fff}
-.remove-btn{background:#f44336;color:#fff}
-.download-btn{background:#00c853;color:#fff}
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    h2 {
+        margin-bottom: 10px;
+    }
+    .form input {
+        display: block;
+        margin: 8px 0;
+        padding: 8px;
+        width: 250px;
+    }
+    button {
+        padding: 8px 15px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+    #profileCard {
+        margin-top: 20px;
+        width: 300px;
+        padding: 15px;
+        border: 2px solid #333;
+        border-radius: 10px;
+        background: #f9f9f9;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<h4>🌸🌿(RESUME_BUILDER) 🌿🌸</h4>
+<h2>Marriage Profile Form</h2>
 
-<label>Upload Photo</label>
-<input type="file" id="photo" accept="image/*">
+<div class="form">
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="religion" placeholder="Religion">
+    <input type="text" id="education" placeholder="Education">
+    <input type="text" id="profession" placeholder="Profession">
 
-<label>Full Name</label>
-<input id="fullName" value="MANIKHANTA">
-
-<label>Father Name</label>
-<input id="fatherName" value="FATHER_NAME">
-
-<label>Mother Name</label>
-<input id="motherName" value="MOTHER_NAME">
-
-<label>Date of Birth</label>
-<input id="dob" type="date">
-
-<label>Email</label>
-<input id="email" value="yourname@email.com">
-
-<label>Phone</label>
-<input id="phone" value="+91 9XXXXXXXXX">
-
-<label>Address</label>
-<textarea id="address">Hyderabad, Telangana, India</textarea>
-
-<label>Career Objective</label>
-<textarea id="objective" rows="6">
-A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.
-</textarea>
-
-<label>Professional Summary</label>
-<textarea id="summary">
-Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.
-</textarea>
-
-<label>Academic Details</label>
-<div id="academicsContainer">
-    <div class="academicRow" style="display:flex;gap:5px;">
-        <input value="B.Tech in Computer Science">
-        <input value="University">
-        <input value="2026 - 2027">
-        <input value="8.5 CGPA">
-        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-    </div>
-</div>
-<button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
-
-<label>Education</label>
-<textarea id="education">Bachelor of Technology in Computer Science</textarea>
-
-<label>Experience</label>
-<textarea id="experience">Fresher / Internship experience</textarea>
-
-<label>Technical Skills</label>
-<input id="skills" value="HTML, CSS, JavaScript, React, Node.js">
-
-<label>Projects</label>
-<textarea id="projects">Resume Builder, E-commerce Website</textarea>
-
-<label>Habits / Strengths</label>
-<textarea id="habits">Quick learner, disciplined, team player</textarea>
-
-<label>Languages Known</label>
-<input id="Languages" value="Hindi, English,Telugu,">
-
-<label>Declaration</label>
-<textarea id="declaration">
-I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.
-</textarea>
-
-<label>Place</label>
-<input id="place" value="Hyderabad">
-
-<label>Date</label>
-<input id="date" type="date">
-
-<label>Signature</label>
-<input id="signature" value="(manikhanta)">
-
-<!-- ===== MODEL / TEMPLATE SELECTION ===== -->
-<label>🌍 Select Resume Model / Template</label>
-<div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
-
-  <label>
-    <input type="radio" name="resumeModel" value="ats" checked>
-    <b>1. ATS-Friendly (Modern Professional)</b><br>
-    <small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="reverse">
-    <b>2. Reverse-Chronological Resume</b><br>
-    <small>✔ Latest job first • Recruiter favorite</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="hybrid">
-    <b>3. Hybrid / Combination Resume</b><br>
-    <small>✔ Skills + Experience • Mid–Senior roles</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="onepage">
-    <b>4. One-Page Resume (Global Gold Standard)</b><br>
-    <small>✔ Concise • Students • Freshers • &lt;10 yrs</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="targeted">
-    <b>5. Targeted Resume</b><br>
-    <small>✔ Job-specific • Keyword optimized • FAANG</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="functional">
-    <b>6. Functional (Skills-Based) Resume</b><br>
-    <small>✔ Career change • Employment gaps</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="executive">
-    <b>7. Executive Resume</b><br>
-    <small>✔ Leadership • Metrics • CEOs / Managers</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="academic">
-    <b>8. Academic CV (International)</b><br>
-    <small>✔ Research • Publications • PhD / Professors</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="creative">
-    <b>9. Creative / Visual Resume</b><br>
-    <small>✔ Designers • UI/UX • Media (Not ATS)</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="europass">
-    <b>10. Europass CV (EU Standard)</b><br>
-    <small>✔ Europe • Structured • Multi-language</small>
-  </label>
-
+    <button onclick="generateProfile()">Generate Profile</button>
+    <button onclick="downloadJPEG()">Download JPEG</button>
 </div>
 
-<div style="margin-top:15px;">
-    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-    <button class="download-btn" onclick="payAndDownload()">💳 PAY_&_DOWNLOAD_YOUR_RESUME_PDF</button>
-</div>
+<div id="profileCard">
+    <h3 id="pName"></h3>
+    <p id="pAge"></p>
+    <p id="pReligion"></p>
+    <p id="pEducation"></p>
+    <p id="pProfession"></p>
 </div>
 
-<!-- Razorpay script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<!-- jsPDF script -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- jsPDF AutoTable plugin -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<!-- html2canvas CDN -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-// ========== ACADEMIC HANDLING ==========
-function addAcademic(){
-    const d=document.createElement("div");
-    d.className="academicRow";
-    d.style.display="flex";
-    d.style.gap="5px";
-    d.innerHTML=`
-    <input placeholder="Course">
-    <input placeholder="Institute">
-    <input placeholder="Year">
-    <input placeholder="GPA">
-    <button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
-    academicsContainer.appendChild(d);
-}
-function removeAcademic(btn){btn.parentElement.remove();}
+function generateProfile() {
+    document.getElementById("pName").innerText =
+        "Name: " + document.getElementById("name").value;
 
-// ========== GET SELECTED RESUME MODEL ==========
-function getSelectedResumeModel(){
-    return document.querySelector('input[name="resumeModel"]:checked').value;
+    document.getElementById("pAge").innerText =
+        "Age: " + document.getElementById("age").value;
+
+    document.getElementById("pReligion").innerText =
+        "Religion: " + document.getElementById("religion").value;
+
+    document.getElementById("pEducation").innerText =
+        "Education: " + document.getElementById("education").value;
+
+    document.getElementById("pProfession").innerText =
+        "Profession: " + document.getElementById("profession").value;
 }
 
-// ========== PREVIEW CV ==========
-function previewCV(){
-    const f = photo.files[0];
-    if(f){
-        const r = new FileReader();
-        r.onload = e => openPreview(e.target.result);
-        r.readAsDataURL(f);
-    } else openPreview("");
+function downloadJPEG() {
+    html2canvas(document.getElementById("profileCard")).then(canvas => {
+        let link = document.createElement("a");
+        link.download = "marriage_profile.jpeg";
+        link.href = canvas.toDataURL("image/jpeg");
+        link.click();
+    });
 }
-function openPreview(photo){
-    const w = window.open("", "_blank", "width=900,height=1200");
-    const selectedModel = getSelectedResumeModel();
-    w.document.write(`
-<!DOCTYPE html>
-<html>
-<head>
-<title>Preview - ${selectedModel}</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:Poppins;background:#eee;}
-.page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid; border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
-.header{display:flex;gap:20px;align-items:center;}
-img{width:120px;height:120px;border-radius:50%;}
-.header h1{margin:0;color:#4caf50;}
-h2{color:#4caf50;margin-bottom:5px;margin-top:25px;}
-p{margin:4px 0;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border:1px solid #aaa;padding:8px;text-align:center;}
-span{display:inline-block;background:#ff4081;color:#fff;padding:6px 14px;border-radius:30px;margin:4px;}
-.close-bar{position:fixed;bottom:0;left:0;width:100%;background:#222;text-align:center;padding:12px;}
-.close-bar button{background:#f44336;color:#fff;border:none;border-radius:30px;padding:10px 28px;font-weight:600;cursor:pointer;}
-</style>
-</head>
-<body>
-
-<div class="page">
-<div class="header">
-${photo?`<img src="${photo}">`:""}
-<div>
-<h1>${fullName.value}</h1>
-<p><b>Father:</b> ${fatherName.value} | <b>Mother:</b> ${motherName.value}</p>
-<p><b>DOB:</b> ${dob.value}</p>
-<p>${email.value} | ${phone.value}</p>
-<p>${address.value}</p>
-</div>
-</div>
-
-<h2>Career Objective</h2><p>${objective.value}</p>
-<h2>Professional Summary</h2><p>${summary.value}</p>
-
-<h2>Academics</h2>
-<table>
-<tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA</th></tr>
-${[...document.querySelectorAll(".academicRow")].map(r=>{
-    let i = r.querySelectorAll("input");
-    return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
-}).join("")}
-</table>
-
-<h2>Education</h2><p>${education.value}</p>
-<h2>Experience</h2><p>${experience.value}</p>
-
-<h2>Technical Skills</h2>
-${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
-
-<h2>Projects</h2><p>${projects.value}</p>
-<h2>Habits / Strengths</h2><p>${habits.value}</p>
-<h2>Languages Known</h2><p>${Languages.value}</p>
-
-<h2>Declaration</h2><p>${declaration.value}</p>
-
-<p><b>Place:</b> ${place.value}</p>
-<p><b>Date:</b> ${date.value}</p>
-<p><b>Signature:</b> ${signature.value}</p>
-<p><b>Selected Model:</b> ${selectedModel}</p>
-</div>
-
-<div class="close-bar">
-<button onclick="window.close()">❌ Close Preview</button>
-</div>
-
-</body>
-</html>
-`);
-}
-
-
-//====================================================================================
-
-
 </script>
-<script src="script.js"></script>
 
 </body>
 </html>
