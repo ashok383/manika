@@ -49,18 +49,20 @@ canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shad
   </div>
 </div>
 
+<!-- MediaPipe Selfie Segmentation -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+<!-- TensorFlow.js & ESRGAN for AI upscaling -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/esrgan"></script>
+
 <script>
 const upload = document.getElementById("upload");
 const bgColorInput = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 const modal = document.getElementById("modal");
-const ctx = photoCanvas.getContext("2d");
-const sheetCtx = sheetCanvas.getContext("2d");
-
 let imageBitmap = null;
-let sheetData = null; // keep full-quality sheet for download
+let sheetCanvasData = null; // store full-res sheet
 
 /* ===== LOAD IMAGE ===== */
 upload.onchange = async e => {
@@ -71,38 +73,43 @@ upload.onchange = async e => {
 const segmenter = new SelfieSegmentation({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`});
 segmenter.setOptions({modelSelection:1});
 
-segmenter.onResults(results=>{
+segmenter.onResults(async results => {
   if(!imageBitmap) return;
 
   const w = imageBitmap.width;
   const h = imageBitmap.height;
-  photoCanvas.width = w;
-  photoCanvas.height = h;
-  ctx.clearRect(0,0,w,h);
 
-  // Step 1: Fill background first
-  ctx.fillStyle = bgColorInput.value;
-  ctx.fillRect(0,0,w,h);
+  const tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = w;
+  tmpCanvas.height = h;
+  const tmpCtx = tmpCanvas.getContext("2d");
 
-  // Step 2: Draw person using mask
-  ctx.save();
-  ctx.drawImage(imageBitmap,0,0,w,h);
-  ctx.globalCompositeOperation = "destination-in";
-  ctx.drawImage(results.segmentationMask,0,0,w,h);
-  ctx.restore();
+  // Fill background
+  tmpCtx.fillStyle = bgColorInput.value;
+  tmpCtx.fillRect(0,0,w,h);
 
-  // Step 3: Fill background behind person
-  ctx.save();
-  ctx.globalCompositeOperation = "destination-over";
-  ctx.fillStyle = bgColorInput.value;
-  ctx.fillRect(0,0,w,h);
-  ctx.restore();
+  // Draw person using mask
+  tmpCtx.save();
+  tmpCtx.drawImage(imageBitmap,0,0,w,h);
+  tmpCtx.globalCompositeOperation = "destination-in";
+  tmpCtx.drawImage(results.segmentationMask,0,0,w,h);
+  tmpCtx.restore();
 
-  // Step 4: Rounded corners + border
-  drawRoundedPhoto(30,6);
+  // Fill background behind person
+  tmpCtx.save();
+  tmpCtx.globalCompositeOperation = "destination-over";
+  tmpCtx.fillStyle = bgColorInput.value;
+  tmpCtx.fillRect(0,0,w,h);
+  tmpCtx.restore();
 
-  // Step 5: Create full-quality sheet
-  sheetData = createSheet(true);
+  // Rounded corners + border
+  drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 6);
+
+  // Generate full-res sheet for download
+  sheetCanvasData = createSheet(photoCanvas, true);
+
+  // Optional: upscale photo for better quality
+  await upscalePhoto(photoCanvas);
 });
 
 /* ===== PROCESS PHOTO ===== */
@@ -111,59 +118,51 @@ function processImage(){
   segmenter.send({image:imageBitmap});
 }
 
-/* ===== ROUNDED PHOTO + BORDER ===== */
-function drawRoundedPhoto(radius,borderWidth){
-  const tmp = document.createElement("canvas");
-  tmp.width = photoCanvas.width;
-  tmp.height = photoCanvas.height;
-  tmp.getContext("2d").drawImage(photoCanvas,0,0);
+/* ===== DRAW ROUNDED PHOTO ===== */
+function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
+  targetCanvas.width = sourceCanvas.width;
+  targetCanvas.height = sourceCanvas.height;
+  const tctx = targetCanvas.getContext("2d");
 
-  ctx.clearRect(0,0,photoCanvas.width,photoCanvas.height);
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(radius,0);
-  ctx.lineTo(photoCanvas.width-radius,0);
-  ctx.quadraticCurveTo(photoCanvas.width,0,photoCanvas.width,radius);
-  ctx.lineTo(photoCanvas.width,photoCanvas.height-radius);
-  ctx.quadraticCurveTo(photoCanvas.width,photoCanvas.height,photoCanvas.width-radius,photoCanvas.height);
-  ctx.lineTo(radius,photoCanvas.height);
-  ctx.quadraticCurveTo(0,photoCanvas.height,0,photoCanvas.height-radius);
-  ctx.lineTo(0,radius);
-  ctx.quadraticCurveTo(0,0,radius,0);
-  ctx.closePath();
-  ctx.clip();
-  ctx.drawImage(tmp,0,0);
-  ctx.restore();
+  tctx.clearRect(0,0,targetCanvas.width,targetCanvas.height);
+  tctx.save();
+  tctx.beginPath();
+  tctx.moveTo(radius,0);
+  tctx.lineTo(targetCanvas.width-radius,0);
+  tctx.quadraticCurveTo(targetCanvas.width,0,targetCanvas.width,radius);
+  tctx.lineTo(targetCanvas.width,targetCanvas.height-radius);
+  tctx.quadraticCurveTo(targetCanvas.width,targetCanvas.height,targetCanvas.width-radius,targetCanvas.height);
+  tctx.lineTo(radius,targetCanvas.height);
+  tctx.quadraticCurveTo(0,targetCanvas.height,0,targetCanvas.height-radius);
+  tctx.lineTo(0,radius);
+  tctx.quadraticCurveTo(0,0,radius,0);
+  tctx.closePath();
+  tctx.clip();
+
+  tctx.drawImage(sourceCanvas,0,0);
+  tctx.restore();
 
   // Border
-  ctx.save();
-  ctx.strokeStyle = "#000";
-  ctx.lineWidth = borderWidth;
-  ctx.beginPath();
-  ctx.moveTo(radius,0);
-  ctx.lineTo(photoCanvas.width-radius,0);
-  ctx.quadraticCurveTo(photoCanvas.width,0,photoCanvas.width,radius);
-  ctx.lineTo(photoCanvas.width,photoCanvas.height-radius);
-  ctx.quadraticCurveTo(photoCanvas.width,photoCanvas.height,photoCanvas.width-radius,photoCanvas.height);
-  ctx.lineTo(radius,photoCanvas.height);
-  ctx.quadraticCurveTo(0,photoCanvas.height,0,photoCanvas.height-radius);
-  ctx.lineTo(0,radius);
-  ctx.quadraticCurveTo(0,0,radius,0);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.restore();
+  tctx.save();
+  tctx.strokeStyle = "#000";
+  tctx.lineWidth = borderWidth;
+  tctx.beginPath();
+  tctx.moveTo(radius,0);
+  tctx.lineTo(targetCanvas.width-radius,0);
+  tctx.quadraticCurveTo(targetCanvas.width,0,targetCanvas.width,radius);
+  tctx.lineTo(targetCanvas.width,targetCanvas.height-radius);
+  tctx.quadraticCurveTo(targetCanvas.width,targetCanvas.height,targetCanvas.width-radius,targetCanvas.height);
+  tctx.lineTo(radius,targetCanvas.height);
+  tctx.quadraticCurveTo(0,targetCanvas.height,0,targetCanvas.height-radius);
+  tctx.lineTo(0,radius);
+  tctx.quadraticCurveTo(0,0,radius,0);
+  tctx.closePath();
+  tctx.stroke();
+  tctx.restore();
 }
 
-/* ===== PHOTO DOWNLOAD ===== */
-function downloadPhoto(){
-  const a = document.createElement("a");
-  a.download = "high_quality_photo.png";
-  a.href = photoCanvas.toDataURL("image/png");
-  a.click();
-}
-
-/* ===== SHEET PREVIEW ===== */
-function createSheet(forDownload=false){
+/* ===== CREATE SHEET ===== */
+function createSheet(photoCanvas, forDownload=false){
   const cols = 4, rows = 2, gap = 20;
   const pw = photoCanvas.width, ph = photoCanvas.height;
   const fullWidth = cols*pw + (cols+1)*gap;
@@ -174,11 +173,9 @@ function createSheet(forDownload=false){
   sheet.height = fullHeight;
   const ctx2 = sheet.getContext("2d");
 
-  // Background
   ctx2.fillStyle = "#fff";
   ctx2.fillRect(0,0,fullWidth,fullHeight);
 
-  // Draw photos
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
       const x = gap + c*(pw+gap);
@@ -187,7 +184,6 @@ function createSheet(forDownload=false){
     }
   }
 
-  // If preview, scale to fit modal
   if(!forDownload){
     const maxW = 400, maxH = 300;
     const scale = Math.min(maxW/sheet.width, maxH/sheet.height);
@@ -198,14 +194,37 @@ function createSheet(forDownload=false){
   return sheet;
 }
 
-function openModal(){modal.style.display="flex";}
-function closeModal(){modal.style.display="none";}
+/* ===== DOWNLOAD PHOTO ===== */
+function downloadPhoto(){
+  const a = document.createElement("a");
+  a.download = "high_quality_photo.png";
+  a.href = photoCanvas.toDataURL("image/png");
+  a.click();
+}
+
+/* ===== DOWNLOAD SHEET ===== */
 function downloadSheet(){
-  if(!sheetData) return alert("No sheet generated yet");
+  if(!sheetCanvasData) return alert("Sheet not ready");
   const a = document.createElement("a");
   a.download = "photosheet_6x4.png";
-  a.href = sheetData.toDataURL("image/png");
+  a.href = sheetCanvasData.toDataURL("image/png");
   a.click();
+}
+
+/* ===== MODAL ===== */
+function openModal(){modal.style.display="flex";}
+function closeModal(){modal.style.display="none";}
+
+/* ===== OPTIONAL AI UPSCALER ===== */
+async function upscalePhoto(canvas){
+  try{
+    const model = await esrgan.load();
+    const tensor = tf.browser.fromPixels(canvas);
+    const upscaled = await model.predict(tensor);
+    await tf.browser.toPixels(upscaled, canvas);
+  }catch(err){
+    console.log("Upscaling failed, using original:", err);
+  }
 }
 </script>
 </body>
