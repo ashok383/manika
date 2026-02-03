@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>(MANIK-A-RNIKA) Photo Tool</title>
+<title>MANIK-A-RNIKA | Marriage Bureau Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
 
 body{
   min-height:100vh;
@@ -15,57 +15,54 @@ body{
   padding:15px;
   background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
   background-size:400% 400%;
-  animation:gradBG 15s ease infinite;
+  animation:bg 15s ease infinite;
 }
-@keyframes gradBG{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
 
 .app{
   width:100%;
-  max-width:520px;
-  background:rgba(255,255,255,0.25);
+  max-width:540px;
+  background:rgba(255,255,255,.25);
   backdrop-filter:blur(18px);
   border-radius:26px;
   padding:22px;
   color:#fff;
-  box-shadow:0 12px 35px rgba(0,0,0,0.3);
+  box-shadow:0 15px 40px rgba(0,0,0,.35);
 }
 
-header{text-align:center;margin-bottom:18px;}
-header h2{font-size:1.9em;font-weight:700;}
+h2{text-align:center;margin-bottom:15px}
 
-.controls{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
+.controls{display:flex;flex-direction:column;gap:12px}
 
-.upload-btn{
+.upload{
   background:linear-gradient(135deg,#00c6ff,#0072ff);
   padding:14px;
   border-radius:18px;
   text-align:center;
   font-weight:600;
   cursor:pointer;
-  transition:.25s;
 }
-.upload-btn:hover{transform:scale(1.05);}
-.upload-btn input{display:none}
+.upload input{display:none}
 
-.color-box{
+.color{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:rgba(255,255,255,0.25);
+  background:rgba(255,255,255,.3);
   padding:10px 14px;
   border-radius:16px;
 }
 
 canvas{
   display:block;
-  margin:12px auto;
+  margin:15px auto;
   max-width:100%;
   border-radius:22px;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
 }
 
 .btn{
@@ -73,47 +70,41 @@ canvas{
   padding:14px;
   border:none;
   border-radius:30px;
-  font-size:16px;
-  font-weight:bold;
+  font-size:15px;
+  font-weight:700;
   color:#fff;
   cursor:pointer;
-  transition:.25s;
   margin-top:8px;
 }
-
-.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);}
-.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
-.btn:hover{transform:scale(1.05)}
+.photo{background:linear-gradient(135deg,#f7971e,#ffd200)}
+.sheet{background:linear-gradient(135deg,#00f260,#0575e6)}
 </style>
 </head>
 
 <body>
 <div class="app">
-
-<header>
-  <h2>(MANIK-A-RNIKA) Photo Tool</h2>
-</header>
+<h2>💍 Marriage Bureau Photo Tool</h2>
 
 <div class="controls">
-  <label class="upload-btn">
+  <label class="upload">
     📸 Upload Photo
     <input type="file" id="upload" accept="image/*">
   </label>
 
-  <div class="color-box">
+  <div class="color">
     <span>🎨 Background</span>
-    <input type="color" id="bgColor" value="#87CEEB">
+    <input type="color" id="bgColor" value="#ffffff">
   </div>
 </div>
 
 <canvas id="photoCanvas"></canvas>
-<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
+<button class="btn photo" onclick="downloadPhoto()">⬇ Download Photo (HQ JPEG)</button>
 
 <canvas id="sheetCanvas"></canvas>
-<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
-
+<button class="btn sheet" onclick="downloadSheet()">⬇ Download 8-Copy Sheet</button>
 </div>
 
+<!-- AI BACKGROUND REMOVAL -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
 <script>
@@ -122,27 +113,28 @@ const bgColor = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
 
-let imageBitmap = null;
-let sheetData = null;
+let img = null;
+let sheet = null;
 
-// 35x45 mm @ 300 DPI
+/* 35x45 mm passport/marriage size @300DPI */
 const PW = Math.round(35 / 25.4 * 300);
 const PH = Math.round(45 / 25.4 * 300);
 
 /* Upload */
 upload.onchange = async e => {
-  imageBitmap = await createImageBitmap(e.target.files[0]);
-  segmenter.send({image:imageBitmap});
+  img = await createImageBitmap(e.target.files[0]);
+  segmenter.send({image: img});
 };
 
-/* Segmentation */
+/* AI Segmentation */
 const segmenter = new SelfieSegmentation({
-  locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
 segmenter.setOptions({modelSelection:1});
 
+/* Result */
 segmenter.onResults(res=>{
-  if(!imageBitmap) return;
+  if(!img) return;
 
   const temp = document.createElement("canvas");
   temp.width = PW;
@@ -152,88 +144,72 @@ segmenter.onResults(res=>{
   ctx.fillStyle = bgColor.value;
   ctx.fillRect(0,0,PW,PH);
 
-  ctx.save();
-  ctx.drawImage(imageBitmap,0,0,PW,PH);
+  ctx.drawImage(img,0,0,PW,PH);
   ctx.globalCompositeOperation="destination-in";
   ctx.drawImage(res.segmentationMask,0,0,PW,PH);
-  ctx.restore();
+  ctx.globalCompositeOperation="source-over";
 
-  drawRounded(temp, photoCanvas, 30, 10);
-
-  sheetData = createLandscapeSheet(photoCanvas);
+  drawRounded(temp,photoCanvas);
+  sheet = makeSheet(photoCanvas);
   previewSheet();
 });
 
-bgColor.oninput=()=>imageBitmap && segmenter.send({image:imageBitmap});
-
-/* Rounded Photo */
-function drawRounded(src,dst,r,b){
+/* Rounded photo */
+function drawRounded(src,dst){
   dst.width=src.width;
   dst.height=src.height;
   const c=dst.getContext("2d");
   c.clearRect(0,0,dst.width,dst.height);
 
-  c.save();
   c.beginPath();
-  c.moveTo(r,0);
-  c.arcTo(dst.width,0,dst.width,dst.height,r);
-  c.arcTo(dst.width,dst.height,0,dst.height,r);
-  c.arcTo(0,dst.height,0,0,r);
-  c.arcTo(0,0,dst.width,0,r);
+  c.moveTo(20,0);
+  c.arcTo(dst.width,0,dst.width,dst.height,20);
+  c.arcTo(dst.width,dst.height,0,dst.height,20);
+  c.arcTo(0,dst.height,0,0,20);
+  c.arcTo(0,0,dst.width,0,20);
   c.closePath();
   c.clip();
   c.drawImage(src,0,0);
-  c.restore();
-
-  c.lineWidth=b;
-  c.strokeStyle="#000";
-  c.stroke();
 }
 
-/* Landscape Sheet 2x4 */
-function createLandscapeSheet(photo){
+/* 8 copies (2x4) */
+function makeSheet(photo){
   const rows=2, cols=4, gap=20, margin=30;
   const c=document.createElement("canvas");
   c.width=cols*photo.width+(cols-1)*gap+margin*2;
   c.height=rows*photo.height+(rows-1)*gap+margin*2;
 
   const x=c.getContext("2d");
-  x.fillStyle=bgColor.value;
+  x.fillStyle="#fff";
   x.fillRect(0,0,c.width,c.height);
 
-  for(let r=0;r<rows;r++){
-    for(let i=0;i<cols;i++){
+  for(let r=0;r<rows;r++)
+    for(let i=0;i<cols;i++)
       x.drawImage(photo,
         margin+i*(photo.width+gap),
-        margin+r*(photo.height+gap)
-      );
-    }
-  }
+        margin+r*(photo.height+gap));
+
   return c;
 }
 
 /* Preview */
 function previewSheet(){
-  const ctx=sheetCanvas.getContext("2d");
-  const scale=Math.min(420/sheetData.width,300/sheetData.height);
-  sheetCanvas.width=sheetData.width;
-  sheetCanvas.height=sheetData.height;
-  sheetCanvas.style.width=sheetCanvas.width*scale+"px";
-  sheetCanvas.style.height=sheetCanvas.height*scale+"px";
-  ctx.drawImage(sheetData,0,0);
+  sheetCanvas.width=sheet.width;
+  sheetCanvas.height=sheet.height;
+  sheetCanvas.getContext("2d").drawImage(sheet,0,0);
 }
 
 /* Downloads */
 function downloadPhoto(){
   const a=document.createElement("a");
-  a.download="photo.png";
-  a.href=photoCanvas.toDataURL("image/png");
+  a.download="Marriage_Photo_HQ.jpg";
+  a.href=photoCanvas.toDataURL("image/jpeg",0.98);
   a.click();
 }
 function downloadSheet(){
   const a=document.createElement("a");
-  a.download="photosheet.png";
-  a.href=sheetData.toDataURL("image/png");
+  a.download="Marriage_Photo_8_Copy.jpg";
+  a.href=sheet.toDataURL("image/jpeg",0.98);
   a.click();
 }
 </script>
