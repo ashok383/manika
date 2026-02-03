@@ -8,7 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
 body{min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:15px;background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);background-size:400% 400%;animation:gradBG 15s ease infinite;}
 @keyframes gradBG{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-.app{width:100%;max-width:450px;background:rgba(255,255,255,0.2);backdrop-filter:blur(18px);border-radius:24px;padding:20px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.25);}
+.app{width:100%;max-width:500px;background:rgba(255,255,255,0.2);backdrop-filter:blur(18px);border-radius:24px;padding:20px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.25);}
 header{text-align:center;margin-bottom:15px;}
 header h2{font-size:1.8em;}
 .controls{display:flex;flex-direction:column;gap:15px;margin-bottom:20px;}
@@ -51,6 +51,10 @@ const sheetCanvas = document.getElementById("sheetCanvas");
 let imageBitmap = null;
 let sheetCanvasData = null;
 
+// Photo size in pixels (35x45 mm @ 300 DPI)
+const PHOTO_WIDTH = Math.round(35 / 25.4 * 300);  // ≈ 413
+const PHOTO_HEIGHT = Math.round(45 / 25.4 * 300); // ≈ 531
+
 /* ===== LOAD IMAGE & AUTOMATIC PROCESS ===== */
 upload.onchange = async e => {
   imageBitmap = await createImageBitmap(e.target.files[0]);
@@ -64,32 +68,31 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(async results => {
   if(!imageBitmap) return;
 
-  const w = imageBitmap.width;
-  const h = imageBitmap.height;
-
+  // Draw resized photo 35x45 mm
   const tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = w;
-  tmpCanvas.height = h;
+  tmpCanvas.width = PHOTO_WIDTH;
+  tmpCanvas.height = PHOTO_HEIGHT;
   const tmpCtx = tmpCanvas.getContext("2d");
 
   tmpCtx.fillStyle = bgColorInput.value;
-  tmpCtx.fillRect(0,0,w,h);
+  tmpCtx.fillRect(0,0,PHOTO_WIDTH,PHOTO_HEIGHT);
 
+  // Draw original image scaled to fit 35x45mm
   tmpCtx.save();
-  tmpCtx.drawImage(imageBitmap,0,0,w,h);
+  tmpCtx.drawImage(imageBitmap, 0, 0, PHOTO_WIDTH, PHOTO_HEIGHT);
   tmpCtx.globalCompositeOperation = "destination-in";
-  tmpCtx.drawImage(results.segmentationMask,0,0,w,h);
+  tmpCtx.drawImage(results.segmentationMask, 0, 0, PHOTO_WIDTH, PHOTO_HEIGHT);
   tmpCtx.restore();
 
   tmpCtx.save();
   tmpCtx.globalCompositeOperation = "destination-over";
   tmpCtx.fillStyle = bgColorInput.value;
-  tmpCtx.fillRect(0,0,w,h);
+  tmpCtx.fillRect(0,0,PHOTO_WIDTH,PHOTO_HEIGHT);
   tmpCtx.restore();
 
   drawRoundedPhoto(tmpCanvas, photoCanvas, 30, 10); // thick black border
 
-  // Generate full-res sheet and show inline
+  // Generate sheet (2x4 = 8 photos)
   sheetCanvasData = createSheet(photoCanvas, true);
   showSheetPreview();
 
@@ -146,12 +149,12 @@ function drawRoundedPhoto(sourceCanvas, targetCanvas, radius, borderWidth){
   tctx.restore();
 }
 
-/* ===== CREATE 6x4 PHOTO SHEET ===== */
+/* ===== CREATE 2x4 PHOTO SHEET ===== */
 function createSheet(photoCanvas, forDownload=false){
-  const cols = 6;
+  const cols = 2;
   const rows = 4;
   const gap = 20;          // space between photos
-  const pageMargin = 30;    // space between sheet border and photos
+  const pageMargin = 30;    // margin around sheet
   const pw = photoCanvas.width;
   const ph = photoCanvas.height;
   const fullWidth = cols*pw + (cols-1)*gap + pageMargin*2;
