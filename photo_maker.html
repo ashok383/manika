@@ -110,7 +110,7 @@ const sheetCanvas=document.getElementById("sheetCanvas");
 let imageBitmap=null;
 let finalSheet=null;
 
-// PHOTO SIZE (35x45mm @300DPI)
+// 35x45mm @300DPI
 const PW=Math.round(35/25.4*300);
 const PH=Math.round(45/25.4*300);
 
@@ -129,7 +129,6 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(res=>{
   if(!imageBitmap) return;
 
-  // High-quality canvas (AI-style enhancement)
   const temp=document.createElement("canvas");
   temp.width=PW*2;
   temp.height=PH*2;
@@ -145,7 +144,6 @@ segmenter.onResults(res=>{
   ctx.fillRect(0,0,temp.width,temp.height);
   ctx.globalCompositeOperation="source-over";
 
-  // Downscale cleanly
   const final=document.createElement("canvas");
   final.width=PW;
   final.height=PH;
@@ -156,12 +154,9 @@ segmenter.onResults(res=>{
 
   finalSheet=createLandscapeSheet(photoCanvas);
   previewSheet(finalSheet);
-
-  autoDownload(photoCanvas,"photo.png");
-  autoDownload(finalSheet,"photo_sheet_2x4.png");
 });
 
-/* Sharpen Filter (AI-like) */
+/* Sharpen */
 function sharpen(canvas){
   const c=canvas.getContext("2d");
   const img=c.getImageData(0,0,canvas.width,canvas.height);
@@ -196,7 +191,7 @@ function drawRounded(src,dst,r,b){
   c.stroke();
 }
 
-/* LANDSCAPE SHEET (2 x 4) */
+/* LANDSCAPE SHEET (2x4) */
 function createLandscapeSheet(photo){
   const rows=2,cols=4,gap=25,margin=35;
   const c=document.createElement("canvas");
@@ -227,7 +222,7 @@ function previewSheet(sheet){
   ctx.drawImage(sheet,0,0);
 }
 
-/* Manual Download */
+/* Manual Downloads ONLY */
 function downloadPhoto(){
   if(!photoCanvas.width) return alert("Upload photo first");
   const a=document.createElement("a");
@@ -235,22 +230,13 @@ function downloadPhoto(){
   a.download="photo.png";
   a.click();
 }
+
 function downloadSheet(){
   if(!finalSheet) return alert("Sheet not ready");
   const a=document.createElement("a");
   a.href=finalSheet.toDataURL("image/png");
   a.download="photo_sheet_2x4.png";
   a.click();
-}
-
-/* Auto Download */
-function autoDownload(canvas,name){
-  setTimeout(()=>{
-    const a=document.createElement("a");
-    a.href=canvas.toDataURL("image/png");
-    a.download=name;
-    a.click();
-  },500);
 }
 </script>
 </body>
