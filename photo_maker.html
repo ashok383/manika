@@ -20,9 +20,7 @@ button.preview{background:#22c55e;}
 button.preview:hover{transform:scale(1.05);}
 button.download{background:#3399ff;margin-top:5px;}
 canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.3);}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;justify-content:center;align-items:flex-start;padding-top:30px;overflow-y:auto;z-index:999;}
-.modal-content{background:rgba(255,255,255,0.1);padding:15px;border-radius:20px;width:95%;max-width:600px;color:#fff;text-align:center;position:relative;}
-.close{position:absolute;right:20px;top:20px;font-size:22px;cursor:pointer;}
+.sheet-preview{margin-top:20px;text-align:center;}
 </style>
 </head>
 
@@ -38,15 +36,12 @@ canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shad
 
 <canvas id="photoCanvas"></canvas>
 <button class="download" onclick="downloadPhoto()">Download Photo</button>
-<button class="preview" onclick="openModal()">Preview Sheet</button>
-</div>
+<button class="preview" onclick="showSheetPreview()">Preview Sheet</button>
 
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">✖</span>
-    <canvas id="sheetCanvas"></canvas><br>
-    <button class="preview" onclick="downloadSheet()">Download Sheet</button>
-  </div>
+<div class="sheet-preview">
+  <canvas id="sheetCanvas"></canvas><br>
+  <button class="download" onclick="downloadSheet()">Download Sheet</button>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
@@ -58,7 +53,6 @@ const upload = document.getElementById("upload");
 const bgColorInput = document.getElementById("bgColor");
 const photoCanvas = document.getElementById("photoCanvas");
 const sheetCanvas = document.getElementById("sheetCanvas");
-const modal = document.getElementById("modal");
 
 let imageBitmap = null;
 let sheetCanvasData = null; // offscreen full-res sheet
@@ -178,8 +172,7 @@ function createSheet(photoCanvas, forDownload=false){
   }
 
   if(!forDownload){
-    // scale for modal preview
-    const scale = Math.min(500/sheet.width, 400/sheet.height);
+    const scale = Math.min(400/sheet.width, 300/sheet.height);
     sheetCanvas.width = sheet.width;
     sheetCanvas.height = sheet.height;
     sheetCanvas.style.width = sheet.width*scale + "px";
@@ -188,6 +181,14 @@ function createSheet(photoCanvas, forDownload=false){
   }
 
   return sheet;
+}
+
+/* ===== SHOW SHEET PREVIEW INLINE ===== */
+function showSheetPreview(){
+  if(!sheetCanvasData) return alert("Generate photo first");
+  const ctx2 = sheetCanvas.getContext("2d");
+  ctx2.clearRect(0,0,sheetCanvas.width,sheetCanvas.height);
+  ctx2.drawImage(sheetCanvasData,0,0);
 }
 
 /* ===== DOWNLOAD PHOTO ===== */
@@ -207,16 +208,6 @@ function downloadSheet(){
   a.href = sheetCanvasData.toDataURL("image/png");
   a.click();
 }
-
-/* ===== MODAL ===== */
-function openModal(){
-  if(!sheetCanvasData) return alert("Generate photo first");
-  const ctx2 = sheetCanvas.getContext("2d");
-  ctx2.clearRect(0,0,sheetCanvas.width,sheetCanvas.height);
-  ctx2.drawImage(sheetCanvasData,0,0);
-  modal.style.display="flex";
-}
-function closeModal(){modal.style.display="none";}
 
 /* ===== OPTIONAL UPSCALER ===== */
 async function upscalePhoto(canvas){
