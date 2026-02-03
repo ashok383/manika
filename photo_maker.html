@@ -21,7 +21,7 @@ button.preview:hover{transform:scale(1.05);}
 button.download{background:#3399ff;margin-top:5px;}
 canvas{display:block;margin:10px auto;max-width:100%;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.3);}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;justify-content:center;align-items:flex-start;padding-top:30px;overflow-y:auto;z-index:999;}
-.modal-content{background:rgba(255,255,255,0.1);padding:15px;border-radius:20px;width:95%;max-width:450px;color:#fff;text-align:center;}
+.modal-content{background:rgba(255,255,255,0.1);padding:15px;border-radius:20px;width:95%;max-width:450px;color:#fff;text-align:center;position:relative;}
 .close{position:absolute;right:20px;top:20px;font-size:22px;cursor:pointer;}
 </style>
 </head>
@@ -60,6 +60,7 @@ const ctx = photoCanvas.getContext("2d");
 const sheetCtx = sheetCanvas.getContext("2d");
 
 let imageBitmap = null;
+let sheetData = null; // keep full-quality sheet for download
 
 /* ===== LOAD IMAGE ===== */
 upload.onchange = async e => {
@@ -83,14 +84,14 @@ segmenter.onResults(results=>{
   ctx.fillStyle = bgColorInput.value;
   ctx.fillRect(0,0,w,h);
 
-  // Step 2: Draw person using mask to keep foreground colors intact
+  // Step 2: Draw person using mask
   ctx.save();
   ctx.drawImage(imageBitmap,0,0,w,h);
   ctx.globalCompositeOperation = "destination-in";
   ctx.drawImage(results.segmentationMask,0,0,w,h);
   ctx.restore();
 
-  // Step 3: Draw mask inverted area as background to replace old background
+  // Step 3: Fill background behind person
   ctx.save();
   ctx.globalCompositeOperation = "destination-over";
   ctx.fillStyle = bgColorInput.value;
@@ -100,15 +101,13 @@ segmenter.onResults(results=>{
   // Step 4: Rounded corners + border
   drawRoundedPhoto(30,6);
 
-  // Step 5: Create sheet
-  createSheet();
+  // Step 5: Create full-quality sheet
+  sheetData = createSheet(true);
 });
 
 /* ===== PROCESS PHOTO ===== */
 function processImage(){
   if(!imageBitmap) return alert("Upload image first");
-
-  // Keep full resolution internally for quality
   segmenter.send({image:imageBitmap});
 }
 
@@ -164,31 +163,48 @@ function downloadPhoto(){
 }
 
 /* ===== SHEET PREVIEW ===== */
-function createSheet(){
+function createSheet(forDownload=false){
   const cols = 4, rows = 2, gap = 20;
   const pw = photoCanvas.width, ph = photoCanvas.height;
+  const fullWidth = cols*pw + (cols+1)*gap;
+  const fullHeight = rows*ph + (rows+1)*gap;
 
-  sheetCanvas.width = cols*pw + (cols+1)*gap;
-  sheetCanvas.height = rows*ph + (rows+1)*gap;
+  let sheet = forDownload ? document.createElement("canvas") : sheetCanvas;
+  sheet.width = fullWidth;
+  sheet.height = fullHeight;
+  const ctx2 = sheet.getContext("2d");
 
-  sheetCtx.fillStyle = "#fff";
-  sheetCtx.fillRect(0,0,sheetCanvas.width,sheetCanvas.height);
+  // Background
+  ctx2.fillStyle = "#fff";
+  ctx2.fillRect(0,0,fullWidth,fullHeight);
 
-  for(let r=0; r<rows; r++){
-    for(let c=0; c<cols; c++){
+  // Draw photos
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
       const x = gap + c*(pw+gap);
       const y = gap + r*(ph+gap);
-      sheetCtx.drawImage(photoCanvas, x, y, pw, ph);
+      ctx2.drawImage(photoCanvas, x, y, pw, ph);
     }
   }
+
+  // If preview, scale to fit modal
+  if(!forDownload){
+    const maxW = 400, maxH = 300;
+    const scale = Math.min(maxW/sheet.width, maxH/sheet.height);
+    sheetCanvas.style.width = sheet.width*scale + "px";
+    sheetCanvas.style.height = sheet.height*scale + "px";
+  }
+
+  return sheet;
 }
 
 function openModal(){modal.style.display="flex";}
 function closeModal(){modal.style.display="none";}
 function downloadSheet(){
+  if(!sheetData) return alert("No sheet generated yet");
   const a = document.createElement("a");
   a.download = "photosheet_6x4.png";
-  a.href = sheetCanvas.toDataURL("image/png");
+  a.href = sheetData.toDataURL("image/png");
   a.click();
 }
 </script>
