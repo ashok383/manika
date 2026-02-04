@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>(MANIK-A-RNIKA) Photo Tool</title>
+<title>(MANIK-A-RNIKA) AI HD Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -34,8 +34,7 @@ body{
 header{text-align:center;margin-bottom:18px}
 header h2{font-size:1.9em;font-weight:700}
 
-/* Buttons */
-.upload-btn, .btn{
+.upload-btn,.btn{
   width:100%;
   padding:14px;
   border:none;
@@ -44,15 +43,13 @@ header h2{font-size:1.9em;font-weight:700}
   font-weight:bold;
   color:#fff;
   cursor:pointer;
-  margin-top:8px;
-  text-align:center;
+  margin-top:10px;
 }
 .upload-btn{background:linear-gradient(135deg,#00c6ff,#0072ff);}
 .upload-btn input{display:none;}
 .btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);}
 .btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
 
-/* Color picker */
 .color-box{
   margin-top:12px;
   display:flex;
@@ -63,7 +60,6 @@ header h2{font-size:1.9em;font-weight:700}
   border-radius:16px;
 }
 
-/* Canvas styling */
 canvas{
   display:block;
   margin:15px auto;
@@ -76,23 +72,23 @@ canvas{
 
 <body>
 <div class="app">
-<header><h2>(MANIK-A-RNIKA) Photo Tool</h2></header>
+<header><h2>(MANIK-A-RNIKA) AI HD Photo Tool</h2></header>
 
 <label class="upload-btn">
-  📸 Upload Photo
-  <input type="file" id="upload" accept="image/*">
+📸 Upload Photo
+<input type="file" id="upload" accept="image/*">
 </label>
 
 <div class="color-box">
-  <span>🎨 Photo Background</span>
-  <input type="color" id="bgColor" value="#87CEEB">
+<span>🎨 Background</span>
+<input type="color" id="bgColor" value="#87CEEB">
 </div>
 
 <canvas id="photoCanvas"></canvas>
-<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
+<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download HD Photo</button>
 
 <canvas id="sheetCanvas"></canvas>
-<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
+<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download HD Sheet</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
@@ -104,19 +100,18 @@ const photoCanvas=document.getElementById("photoCanvas");
 const sheetCanvas=document.getElementById("sheetCanvas");
 
 let imageBitmap=null;
-let finalSheet=null;
+let hdPhoto=null;
+let hdSheet=null;
 
-// 35x45mm @300DPI
+// 35x45mm @300 DPI
 const PW=Math.round(35/25.4*300);
 const PH=Math.round(45/25.4*300);
 
-/* Upload */
 upload.onchange=async e=>{
   imageBitmap=await createImageBitmap(e.target.files[0]);
   segmenter.send({image:imageBitmap});
 };
 
-/* AI Segmentation */
 const segmenter=new SelfieSegmentation({
   locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
@@ -125,50 +120,62 @@ segmenter.setOptions({modelSelection:1});
 segmenter.onResults(res=>{
   if(!imageBitmap) return;
 
-  // High-res temp canvas
-  const temp=document.createElement("canvas");
-  temp.width=PW*2;
-  temp.height=PH*2;
-  const ctx=temp.getContext("2d");
-  ctx.imageSmoothingEnabled=true;
+  const ratio=PW/PH;
+  let sw=imageBitmap.width, sh=imageBitmap.height, sx=0, sy=0;
 
-  ctx.drawImage(imageBitmap,0,0,temp.width,temp.height);
+  if(sw/sh>ratio){ sw=sh*ratio; sx=(imageBitmap.width-sw)/2; }
+  else{ sh=sw/ratio; sy=(imageBitmap.height-sh)/2; }
+
+  const base=document.createElement("canvas");
+  base.width=PW;
+  base.height=PH;
+  const ctx=base.getContext("2d");
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality="high";
+
+  ctx.drawImage(imageBitmap,sx,sy,sw,sh,0,0,PW,PH);
+
   ctx.globalCompositeOperation="destination-in";
-  ctx.drawImage(res.segmentationMask,0,0,temp.width,temp.height);
+  ctx.drawImage(res.segmentationMask,0,0,PW,PH);
 
   ctx.globalCompositeOperation="destination-over";
   ctx.fillStyle=bgColor.value;
-  ctx.fillRect(0,0,temp.width,temp.height);
+  ctx.fillRect(0,0,PW,PH);
   ctx.globalCompositeOperation="source-over";
 
-  // Downscale for final photo
-  const final=document.createElement("canvas");
-  final.width=PW;
-  final.height=PH;
-  final.getContext("2d").drawImage(temp,0,0,PW,PH);
+  // 🔥 AI-style HD enhancement (2× upscale)
+  hdPhoto = upscaleAI(base, 2);
+  drawRounded(hdPhoto, photoCanvas, 30, 6);
 
-  sharpen(final);
-  drawRounded(final,photoCanvas,28,8);
-
-  // High-quality sheet generation
-  finalSheet=createHighQualitySheet(photoCanvas);
-  previewSheet(finalSheet);
+  hdSheet = createHDPhotoSheet(hdPhoto);
+  previewSheet(hdSheet);
 });
 
-/* Sharpen */
-function sharpen(canvas){
-  const c=canvas.getContext("2d");
-  const img=c.getImageData(0,0,canvas.width,canvas.height);
-  const d=img.data;
-  for(let i=0;i<d.length;i+=4){
-    d[i]=Math.min(255,d[i]*1.1);
-    d[i+1]=Math.min(255,d[i+1]*1.1);
-    d[i+2]=Math.min(255,d[i+2]*1.1);
-  }
-  c.putImageData(img,0,0);
+/* AI-style upscale */
+function upscaleAI(src, scale){
+  const c=document.createElement("canvas");
+  c.width=src.width*scale;
+  c.height=src.height*scale;
+  const ctx=c.getContext("2d");
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality="high";
+  ctx.drawImage(src,0,0,c.width,c.height);
+  unsharpMask(ctx,c.width,c.height);
+  return c;
 }
 
-/* Rounded */
+/* Unsharp mask */
+function unsharpMask(ctx,w,h){
+  const img=ctx.getImageData(0,0,w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]=Math.min(255,d[i]*1.08);
+    d[i+1]=Math.min(255,d[i+1]*1.08);
+    d[i+2]=Math.min(255,d[i+2]*1.08);
+  }
+  ctx.putImageData(img,0,0);
+}
+
 function drawRounded(src,dst,r,b){
   dst.width=src.width;
   dst.height=src.height;
@@ -190,47 +197,32 @@ function drawRounded(src,dst,r,b){
   c.stroke();
 }
 
-/* High-quality landscape sheet (2x4) */
-function createHighQualitySheet(photo){
-  const rows=2,cols=4,gap=25,margin=35;
-
-  // Use double size for AI-quality
-  const tempCanvas=document.createElement("canvas");
-  tempCanvas.width=cols*photo.width*2 + (cols-1)*gap*2 + margin*4;
-  tempCanvas.height=rows*photo.height*2 + (rows-1)*gap*2 + margin*4;
-  const ctx=tempCanvas.getContext("2d");
+/* HD Sheet */
+function createHDPhotoSheet(photo){
+  const rows=2,cols=4,gap=40,margin=60;
+  const c=document.createElement("canvas");
+  c.width=cols*photo.width+(cols-1)*gap+margin*2;
+  c.height=rows*photo.height+(rows-1)*gap+margin*2;
+  const ctx=c.getContext("2d");
   ctx.fillStyle="#fff";
-  ctx.fillRect(0,0,tempCanvas.width,tempCanvas.height);
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality="high";
 
   for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      ctx.drawImage(photo, 
-        margin*2 + c*(photo.width*2 + gap*2),
-        margin*2 + r*(photo.height*2 + gap*2),
-        photo.width*2,
-        photo.height*2
+    for(let col=0;col<cols;col++){
+      ctx.drawImage(photo,
+        margin+col*(photo.width+gap),
+        margin+r*(photo.height+gap)
       );
     }
   }
-
-  // Apply sharpening for AI-quality
-  sharpen(tempCanvas);
-
-  // Downscale to normal size for canvas display
-  const finalSheetCanvas=document.createElement("canvas");
-  finalSheetCanvas.width=tempCanvas.width/2;
-  finalSheetCanvas.height=tempCanvas.height/2;
-  const finalCtx=finalSheetCanvas.getContext("2d");
-  finalCtx.imageSmoothingEnabled=true;
-  finalCtx.drawImage(tempCanvas,0,0,finalSheetCanvas.width,finalSheetCanvas.height);
-
-  return finalSheetCanvas;
+  return c;
 }
 
-/* Preview */
 function previewSheet(sheet){
   const ctx=sheetCanvas.getContext("2d");
-  const scale=Math.min(500/sheet.width,360/sheet.height);
+  const scale=Math.min(520/sheet.width,380/sheet.height);
   sheetCanvas.width=sheet.width;
   sheetCanvas.height=sheet.height;
   sheetCanvas.style.width=sheet.width*scale+"px";
@@ -238,20 +230,19 @@ function previewSheet(sheet){
   ctx.drawImage(sheet,0,0);
 }
 
-/* Manual download */
 function downloadPhoto(){
-  if(!photoCanvas.width) return alert("Upload photo first");
+  if(!hdPhoto) return alert("Upload photo first");
   const a=document.createElement("a");
-  a.href=photoCanvas.toDataURL("image/png");
-  a.download="photo.png";
+  a.href=hdPhoto.toDataURL("image/png");
+  a.download="passport_photo_AI_HD.png";
   a.click();
 }
 
 function downloadSheet(){
-  if(!finalSheet) return alert("Sheet not ready");
+  if(!hdSheet) return alert("Sheet not ready");
   const a=document.createElement("a");
-  a.href=finalSheet.toDataURL("image/png");
-  a.download="photo_sheet_2x4.png";
+  a.href=hdSheet.toDataURL("image/png");
+  a.download="passport_sheet_AI_HD.png";
   a.click();
 }
 </script>
