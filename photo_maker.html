@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>(MANIK-A-RNIKA) AI HD Photo Tool</title>
+<title>(MANIK-A-RNIKA) Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -72,7 +72,7 @@ canvas{
 
 <body>
 <div class="app">
-<header><h2>(MANIK-A-RNIKA) AI HD Photo Tool</h2></header>
+<header><h2>(MANIK-A-RNIKA) Photo Tool</h2></header>
 
 <label class="upload-btn">
 📸 Upload Photo
@@ -80,169 +80,162 @@ canvas{
 </label>
 
 <div class="color-box">
-<span>🎨 Background</span>
+<span>🎨 Background Color</span>
 <input type="color" id="bgColor" value="#87CEEB">
 </div>
 
 <canvas id="photoCanvas"></canvas>
-<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download HD Photo</button>
+<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
 
 <canvas id="sheetCanvas"></canvas>
-<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download HD Sheet</button>
+<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
 <script>
-const upload=document.getElementById("upload");
-const bgColor=document.getElementById("bgColor");
-const photoCanvas=document.getElementById("photoCanvas");
-const sheetCanvas=document.getElementById("sheetCanvas");
+const upload = document.getElementById("upload");
+const bgColor = document.getElementById("bgColor");
+const photoCanvas = document.getElementById("photoCanvas");
+const sheetCanvas = document.getElementById("sheetCanvas");
 
-let imageBitmap=null;
-let hdPhoto=null;
-let hdSheet=null;
+let imageBitmap = null;
+let finalSheet = null;
 
-// 35x45mm @300 DPI
-const PW=Math.round(35/25.4*300);
-const PH=Math.round(45/25.4*300);
+// Passport size 35x45mm @300 DPI
+const PW = Math.round(35 / 25.4 * 300);
+const PH = Math.round(45 / 25.4 * 300);
 
-upload.onchange=async e=>{
-  imageBitmap=await createImageBitmap(e.target.files[0]);
-  segmenter.send({image:imageBitmap});
+// Load image
+upload.onchange = async e => {
+  imageBitmap = await createImageBitmap(e.target.files[0]);
+  segmenter.send({ image: imageBitmap });
 };
 
-const segmenter=new SelfieSegmentation({
-  locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+// AI segmentation
+const segmenter = new SelfieSegmentation({
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
 });
-segmenter.setOptions({modelSelection:1});
+segmenter.setOptions({ modelSelection: 1 });
 
-segmenter.onResults(res=>{
-  if(!imageBitmap) return;
+segmenter.onResults(res => {
+  if (!imageBitmap) return;
 
-  const ratio=PW/PH;
-  let sw=imageBitmap.width, sh=imageBitmap.height, sx=0, sy=0;
+  // --- Maintain aspect ratio (NO stretching) ---
+  const targetRatio = PW / PH;
+  let sw = imageBitmap.width;
+  let sh = imageBitmap.height;
+  let sx = 0, sy = 0;
 
-  if(sw/sh>ratio){ sw=sh*ratio; sx=(imageBitmap.width-sw)/2; }
-  else{ sh=sw/ratio; sy=(imageBitmap.height-sh)/2; }
-
-  const base=document.createElement("canvas");
-  base.width=PW;
-  base.height=PH;
-  const ctx=base.getContext("2d");
-  ctx.imageSmoothingEnabled=true;
-  ctx.imageSmoothingQuality="high";
-
-  ctx.drawImage(imageBitmap,sx,sy,sw,sh,0,0,PW,PH);
-
-  ctx.globalCompositeOperation="destination-in";
-  ctx.drawImage(res.segmentationMask,0,0,PW,PH);
-
-  ctx.globalCompositeOperation="destination-over";
-  ctx.fillStyle=bgColor.value;
-  ctx.fillRect(0,0,PW,PH);
-  ctx.globalCompositeOperation="source-over";
-
-  // 🔥 AI-style HD enhancement (2× upscale)
-  hdPhoto = upscaleAI(base, 2);
-  drawRounded(hdPhoto, photoCanvas, 30, 6);
-
-  hdSheet = createHDPhotoSheet(hdPhoto);
-  previewSheet(hdSheet);
-});
-
-/* AI-style upscale */
-function upscaleAI(src, scale){
-  const c=document.createElement("canvas");
-  c.width=src.width*scale;
-  c.height=src.height*scale;
-  const ctx=c.getContext("2d");
-  ctx.imageSmoothingEnabled=true;
-  ctx.imageSmoothingQuality="high";
-  ctx.drawImage(src,0,0,c.width,c.height);
-  unsharpMask(ctx,c.width,c.height);
-  return c;
-}
-
-/* Unsharp mask */
-function unsharpMask(ctx,w,h){
-  const img=ctx.getImageData(0,0,w,h);
-  const d=img.data;
-  for(let i=0;i<d.length;i+=4){
-    d[i]=Math.min(255,d[i]*1.08);
-    d[i+1]=Math.min(255,d[i+1]*1.08);
-    d[i+2]=Math.min(255,d[i+2]*1.08);
+  if (sw / sh > targetRatio) {
+    sw = sh * targetRatio;
+    sx = (imageBitmap.width - sw) / 2;
+  } else {
+    sh = sw / targetRatio;
+    sy = (imageBitmap.height - sh) / 2;
   }
-  ctx.putImageData(img,0,0);
-}
 
-function drawRounded(src,dst,r,b){
-  dst.width=src.width;
-  dst.height=src.height;
-  const c=dst.getContext("2d");
-  c.clearRect(0,0,dst.width,dst.height);
+  // Final high-quality canvas
+  const final = document.createElement("canvas");
+  final.width = PW;
+  final.height = PH;
+  const ctx = final.getContext("2d");
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.drawImage(imageBitmap, sx, sy, sw, sh, 0, 0, PW, PH);
+
+  // Apply AI mask
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(res.segmentationMask, 0, 0, PW, PH);
+
+  // Background
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = bgColor.value;
+  ctx.fillRect(0, 0, PW, PH);
+  ctx.globalCompositeOperation = "source-over";
+
+  drawRounded(final, photoCanvas, 28, 6);
+
+  finalSheet = createHighQualitySheet(photoCanvas);
+  previewSheet(finalSheet);
+});
+
+// Rounded preview
+function drawRounded(src, dst, r, b) {
+  dst.width = src.width;
+  dst.height = src.height;
+  const c = dst.getContext("2d");
+  c.clearRect(0, 0, dst.width, dst.height);
   c.save();
   c.beginPath();
-  c.moveTo(r,0);
-  c.arcTo(dst.width,0,dst.width,dst.height,r);
-  c.arcTo(dst.width,dst.height,0,dst.height,r);
-  c.arcTo(0,dst.height,0,0,r);
-  c.arcTo(0,0,dst.width,0,r);
+  c.moveTo(r, 0);
+  c.arcTo(dst.width, 0, dst.width, dst.height, r);
+  c.arcTo(dst.width, dst.height, 0, dst.height, r);
+  c.arcTo(0, dst.height, 0, 0, r);
+  c.arcTo(0, 0, dst.width, 0, r);
   c.closePath();
   c.clip();
-  c.drawImage(src,0,0);
+  c.drawImage(src, 0, 0);
   c.restore();
-  c.lineWidth=b;
-  c.strokeStyle="#000";
+  c.lineWidth = b;
+  c.strokeStyle = "#000";
   c.stroke();
 }
 
-/* HD Sheet */
-function createHDPhotoSheet(photo){
-  const rows=2,cols=4,gap=40,margin=60;
-  const c=document.createElement("canvas");
-  c.width=cols*photo.width+(cols-1)*gap+margin*2;
-  c.height=rows*photo.height+(rows-1)*gap+margin*2;
-  const ctx=c.getContext("2d");
-  ctx.fillStyle="#fff";
-  ctx.fillRect(0,0,c.width,c.height);
-  ctx.imageSmoothingEnabled=true;
-  ctx.imageSmoothingQuality="high";
+// Create 2x4 sheet (print quality)
+function createHighQualitySheet(photo) {
+  const rows = 2, cols = 4, gap = 25, margin = 35;
+  const canvas = document.createElement("canvas");
 
-  for(let r=0;r<rows;r++){
-    for(let col=0;col<cols;col++){
-      ctx.drawImage(photo,
-        margin+col*(photo.width+gap),
-        margin+r*(photo.height+gap)
+  canvas.width = cols * photo.width + (cols - 1) * gap + margin * 2;
+  canvas.height = rows * photo.height + (rows - 1) * gap + margin * 2;
+
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      ctx.drawImage(
+        photo,
+        margin + c * (photo.width + gap),
+        margin + r * (photo.height + gap)
       );
     }
   }
-  return c;
+  return canvas;
 }
 
-function previewSheet(sheet){
-  const ctx=sheetCanvas.getContext("2d");
-  const scale=Math.min(520/sheet.width,380/sheet.height);
-  sheetCanvas.width=sheet.width;
-  sheetCanvas.height=sheet.height;
-  sheetCanvas.style.width=sheet.width*scale+"px";
-  sheetCanvas.style.height=sheet.height*scale+"px";
-  ctx.drawImage(sheet,0,0);
+// Preview
+function previewSheet(sheet) {
+  const ctx = sheetCanvas.getContext("2d");
+  const scale = Math.min(520 / sheet.width, 380 / sheet.height);
+  sheetCanvas.width = sheet.width;
+  sheetCanvas.height = sheet.height;
+  sheetCanvas.style.width = sheet.width * scale + "px";
+  sheetCanvas.style.height = sheet.height * scale + "px";
+  ctx.drawImage(sheet, 0, 0);
 }
 
-function downloadPhoto(){
-  if(!hdPhoto) return alert("Upload photo first");
-  const a=document.createElement("a");
-  a.href=hdPhoto.toDataURL("image/png");
-  a.download="passport_photo_AI_HD.png";
+// Download
+function downloadPhoto() {
+  if (!photoCanvas.width) return alert("Upload photo first");
+  const a = document.createElement("a");
+  a.href = photoCanvas.toDataURL("image/png");
+  a.download = "passport_photo.png";
   a.click();
 }
 
-function downloadSheet(){
-  if(!hdSheet) return alert("Sheet not ready");
-  const a=document.createElement("a");
-  a.href=hdSheet.toDataURL("image/png");
-  a.download="passport_sheet_AI_HD.png";
+function downloadSheet() {
+  if (!finalSheet) return alert("Sheet not ready");
+  const a = document.createElement("a");
+  a.href = finalSheet.toDataURL("image/png");
+  a.download = "passport_sheet_2x4.png";
   a.click();
 }
 </script>
