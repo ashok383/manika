@@ -49,14 +49,14 @@ small{opacity:.7}
 
 <body>
 <div class="app">
-<h2>AI HD Photo Enhancer</h2>
+  <h2>AI HD Photo Enhancer</h2>
 
-<input type="file" id="upload" accept="image/*">
-<button id="run" disabled>✨ Enhance with AI</button>
-<small id="status">Loading AI model…</small>
+  <input type="file" id="upload" accept="image/*">
+  <button id="run" disabled>✨ Enhance with AI</button>
+  <small id="status">Loading AI model…</small>
 
-<canvas id="canvas"></canvas>
-<button onclick="download()">⬇ Download HD</button>
+  <canvas id="canvas"></canvas>
+  <button onclick="download()">⬇ Download HD</button>
 </div>
 
 <!-- TensorFlow.js -->
@@ -73,23 +73,26 @@ let imgElement = new Image();
 let imageReady = false;
 let hdCanvas = null;
 
-/* Load ESRGAN-lite model (STABLE) */
+/* ✅ LOAD ESRGAN MODEL (BROWSER-SAFE & WORKING) */
 (async () => {
   try {
     statusText.innerText = "Downloading AI model…";
+
     model = await tf.loadGraphModel(
-      "https://tfhub.dev/captain-pool/esrgan-tf2/1",
+      "https://tfhub.dev/captain-pool/esrgan-tf2/1/model.json?tfjs-format=file",
       { fromTFHub: true }
     );
+
     statusText.innerText = "AI model ready ✔";
     runBtn.disabled = false;
+
   } catch (err) {
     statusText.innerText = "Model failed to load ❌";
     console.error(err);
   }
 })();
 
-/* Image upload */
+/* IMAGE UPLOAD */
 upload.addEventListener("change", e => {
   const file = e.target.files[0];
   if(!file) return;
@@ -103,7 +106,7 @@ upload.addEventListener("change", e => {
   imgElement.src = URL.createObjectURL(file);
 });
 
-/* Run AI enhancement */
+/* RUN AI UPSCALING */
 runBtn.onclick = async () => {
   if(!model || !imageReady) return;
 
@@ -117,13 +120,13 @@ runBtn.onclick = async () => {
       .expandDims(0);
 
     const output = model.execute(input);
-    const squeezed = output.squeeze();
+    const result = output.squeeze();
 
-    await tf.browser.toPixels(squeezed, canvas);
+    await tf.browser.toPixels(result, canvas);
 
     input.dispose();
     output.dispose();
-    squeezed.dispose();
+    result.dispose();
   });
 
   hdCanvas = canvas;
@@ -131,7 +134,7 @@ runBtn.onclick = async () => {
   statusText.innerText = "Done ✔ AI Enhanced";
 };
 
-/* Download */
+/* DOWNLOAD */
 function download(){
   if(!hdCanvas) return alert("Enhance image first");
   const a = document.createElement("a");
