@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Normal to HD Image Converter</title>
+<title>AI Image Enhancer</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -39,7 +39,7 @@ canvas {
 </head>
 <body>
 
-<h1>Normal to HD Image Converter</h1>
+<h1>AI Image Enhancer</h1>
 
 <div class="box">
     <input type="file" id="upload" accept="image/*"><br>
@@ -47,7 +47,7 @@ canvas {
         <option value="2">2× HD</option>
         <option value="4">4× Ultra HD</option>
     </select><br>
-    <button onclick="upscale()">Upscale Image</button>
+    <button onclick="enhance()">Enhance Image</button>
     <button onclick="download()">Download</button>
 </div>
 
@@ -67,18 +67,42 @@ document.getElementById("upload").addEventListener("change", function(e) {
     reader.readAsDataURL(file);
 });
 
-function upscale() {
+// AI-enhance placeholder function
+async function enhance() {
+    if (!img.src) {
+        alert("Please upload an image first!");
+        return;
+    }
+
     const scale = parseInt(document.getElementById("scale").value);
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    canvas.width = img.width * scale;
-    canvas.height = img.height * scale;
+    // Show "processing" message
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "#fff";
+    ctx.fillText("Enhancing with AI...", 20, 50);
 
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+    try {
+        // Convert image to base64
+        const base64 = await imageToBase64(img);
 
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Send to AI API (placeholder)
+        const enhancedBase64 = await sendToAI(base64, scale);
+
+        // Display enhanced image
+        const enhancedImg = new Image();
+        enhancedImg.src = enhancedBase64;
+        enhancedImg.onload = () => {
+            canvas.width = enhancedImg.width;
+            canvas.height = enhancedImg.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(enhancedImg, 0, 0);
+        };
+    } catch (err) {
+        alert("Error enhancing image: " + err.message);
+    }
 }
 
 function download() {
@@ -87,6 +111,48 @@ function download() {
     link.download = "hd-image.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
+}
+
+// Helper: Convert Image to Base64
+function imageToBase64(image) {
+    return new Promise((resolve, reject) => {
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = image.width;
+        tempCanvas.height = image.height;
+        const ctx = tempCanvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+        tempCanvas.toDataURL("image/png", (dataUrl) => resolve(dataUrl));
+        resolve(tempCanvas.toDataURL("image/png"));
+    });
+}
+
+// Placeholder: Send to AI server/API
+async function sendToAI(base64, scale) {
+    // Replace this with actual AI API call
+    // Example with fetch:
+    // const response = await fetch("YOUR_AI_API_URL", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ image: base64, scale: scale })
+    // });
+    // const data = await response.json();
+    // return data.enhanced_image_base64;
+
+    // For now, just upscale in browser as fallback
+    return new Promise((resolve) => {
+        const tempImg = new Image();
+        tempImg.src = base64;
+        tempImg.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = tempImg.width * scale;
+            canvas.height = tempImg.height * scale;
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/png"));
+        };
+    });
 }
 </script>
 
