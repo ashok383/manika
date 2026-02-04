@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Normal Photo → HD AI Enhancer</title>
+<title>Photo → HD Enhancer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -47,11 +47,11 @@ canvas{
 
 <body>
 <div class="app">
-<h2>AI HD Photo Enhancer</h2>
+<h2>HD Photo Enhancer</h2>
 
 <input type="file" id="upload" accept="image/*">
 <select id="scale">
-  <option value="2">2× HD (Safe)</option>
+  <option value="2">2× HD (Recommended)</option>
   <option value="3">3× HD</option>
 </select>
 
@@ -81,10 +81,9 @@ upload.addEventListener("change", () => {
   img.src = URL.createObjectURL(file);
 });
 
-/* AI-style HD Enhancement (SAFE) */
+/* 🔥 HD Enhancement */
 function enhanceToHD(img, scale){
 
-  // 🔒 Safety limit (important!)
   const MAX = 3000;
   let w = img.width;
   let h = img.height;
@@ -104,25 +103,34 @@ function enhanceToHD(img, scale){
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, c.width, c.height);
 
-  // AI-style enhancement
-  const imgData = ctx.getImageData(0,0,c.width,c.height);
-  const d = imgData.data;
+  let imgData = ctx.getImageData(0,0,c.width,c.height);
+  let d = imgData.data;
 
   for(let i=0;i<d.length;i+=4){
-    d[i]   = Math.min(255, d[i] * 1.1);
-    d[i+1] = Math.min(255, d[i+1] * 1.1);
-    d[i+2] = Math.min(255, d[i+2] * 1.1);
-  }
-  ctx.putImageData(imgData,0,0);
+    // Contrast boost
+    d[i]   = clamp((d[i] - 128) * 1.2 + 128);
+    d[i+1] = clamp((d[i+1] - 128) * 1.2 + 128);
+    d[i+2] = clamp((d[i+2] - 128) * 1.2 + 128);
 
+    // Sharpness illusion
+    d[i]   = clamp(d[i] * 1.08);
+    d[i+1] = clamp(d[i+1] * 1.08);
+    d[i+2] = clamp(d[i+2] * 1.08);
+  }
+
+  ctx.putImageData(imgData,0,0);
   return c;
+}
+
+function clamp(v){
+  return Math.max(0, Math.min(255, v));
 }
 
 function download(){
   if(!hdCanvas) return alert("Upload image first");
   const a = document.createElement("a");
   a.href = hdCanvas.toDataURL("image/png");
-  a.download = "AI_HD_Image.png";
+  a.download = "HD_Image.png";
   a.click();
 }
 </script>
