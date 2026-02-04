@@ -34,6 +34,10 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
 canvas{
   margin-top:15px;
   max-width:100%;
@@ -48,8 +52,8 @@ small{opacity:.7}
 <h2>AI HD Photo Enhancer</h2>
 
 <input type="file" id="upload" accept="image/*">
-<button id="run">✨ Enhance with AI</button>
-<small id="status">Loading model…</small>
+<button id="run" disabled>✨ Enhance with AI</button>
+<small id="status">Loading AI model…</small>
 
 <canvas id="canvas"></canvas>
 <button onclick="download()">⬇ Download HD</button>
@@ -58,29 +62,34 @@ small{opacity:.7}
 <!-- TensorFlow.js -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0/dist/tf.min.js"></script>
 
-<!-- Super Resolution Model -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/super-resolution"></script>
-
 <script>
 const upload = document.getElementById("upload");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const statusText = document.getElementById("status");
 const runBtn = document.getElementById("run");
+const statusText = document.getElementById("status");
+const canvas = document.getElementById("canvas");
 
 let model = null;
-let imageReady = false;
 let imgElement = new Image();
+let imageReady = false;
 let hdCanvas = null;
 
-/* Load AI model */
+/* Load ESRGAN-lite model (STABLE) */
 (async () => {
-  statusText.innerText = "Loading AI model…";
-  model = await superResolution.load();
-  statusText.innerText = "AI model ready ✔";
+  try {
+    statusText.innerText = "Downloading AI model…";
+    model = await tf.loadGraphModel(
+      "https://tfhub.dev/captain-pool/esrgan-tf2/1",
+      { fromTFHub: true }
+    );
+    statusText.innerText = "AI model ready ✔";
+    runBtn.disabled = false;
+  } catch (err) {
+    statusText.innerText = "Model failed to load ❌";
+    console.error(err);
+  }
 })();
 
-/* Handle image upload */
+/* Image upload */
 upload.addEventListener("change", e => {
   const file = e.target.files[0];
   if(!file) return;
@@ -94,38 +103,35 @@ upload.addEventListener("change", e => {
   imgElement.src = URL.createObjectURL(file);
 });
 
-/* Run AI upscaling */
+/* Run AI enhancement */
 runBtn.onclick = async () => {
-  if(!model) {
-    alert("Model still loading");
-    return;
-  }
-  if(!imageReady) {
-    alert("Image not loaded yet");
-    return;
-  }
+  if(!model || !imageReady) return;
 
   statusText.innerText = "Enhancing image… (AI)";
+  runBtn.disabled = true;
 
   await tf.tidy(async () => {
-    // Convert image → tensor
-    const inputTensor = tf.browser.fromPixels(imgElement).toFloat().div(255);
+    const input = tf.browser.fromPixels(imgElement)
+      .toFloat()
+      .div(255)
+      .expandDims(0);
 
-    // AI upscale (2×)
-    const outputTensor = await model.upscale(inputTensor);
+    const output = model.execute(input);
+    const squeezed = output.squeeze();
 
-    // Convert tensor → canvas
-    await tf.browser.toPixels(outputTensor, canvas);
+    await tf.browser.toPixels(squeezed, canvas);
 
-    inputTensor.dispose();
-    outputTensor.dispose();
+    input.dispose();
+    output.dispose();
+    squeezed.dispose();
   });
 
   hdCanvas = canvas;
+  runBtn.disabled = false;
   statusText.innerText = "Done ✔ AI Enhanced";
 };
 
-/* Download result */
+/* Download */
 function download(){
   if(!hdCanvas) return alert("Enhance image first");
   const a = document.createElement("a");
