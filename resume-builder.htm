@@ -2,91 +2,111 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Marriage Profile Generator</title>
+<title>Normal Photo → HD AI Enhancer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-    }
-    h2 {
-        margin-bottom: 10px;
-    }
-    .form input {
-        display: block;
-        margin: 8px 0;
-        padding: 8px;
-        width: 250px;
-    }
-    button {
-        padding: 8px 15px;
-        margin-top: 10px;
-        cursor: pointer;
-    }
-    #profileCard {
-        margin-top: 20px;
-        width: 300px;
-        padding: 15px;
-        border: 2px solid #333;
-        border-radius: 10px;
-        background: #f9f9f9;
-    }
+body{
+  font-family:Segoe UI,sans-serif;
+  background:#111;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+.app{
+  width:360px;
+  background:#1e1e1e;
+  padding:20px;
+  border-radius:16px;
+  text-align:center;
+  box-shadow:0 0 30px rgba(0,0,0,.6);
+}
+h2{margin-bottom:15px}
+input,button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:15px;
+}
+button{
+  background:#00c6ff;
+  font-weight:bold;
+  cursor:pointer;
+}
+canvas{
+  margin-top:15px;
+  max-width:100%;
+  border-radius:12px;
+}
 </style>
 </head>
 
 <body>
+<div class="app">
+<h2>AI HD Photo Enhancer</h2>
 
-<h2>Marriage Profile Form</h2>
+<input type="file" id="upload" accept="image/*">
+<select id="scale">
+  <option value="2">2× HD</option>
+  <option value="3">3× HD</option>
+  <option value="4">4× HD</option>
+</select>
 
-<div class="form">
-    <input type="text" id="name" placeholder="Name">
-    <input type="number" id="age" placeholder="Age">
-    <input type="text" id="religion" placeholder="Religion">
-    <input type="text" id="education" placeholder="Education">
-    <input type="text" id="profession" placeholder="Profession">
+<canvas id="canvas"></canvas>
 
-    <button onclick="generateProfile()">Generate Profile</button>
-    <button onclick="downloadJPEG()">Download JPEG</button>
+<button onclick="download()">⬇ Download HD Photo</button>
 </div>
-
-<div id="profileCard">
-    <h3 id="pName"></h3>
-    <p id="pAge"></p>
-    <p id="pReligion"></p>
-    <p id="pEducation"></p>
-    <p id="pProfession"></p>
-</div>
-
-<!-- html2canvas CDN -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-function generateProfile() {
-    document.getElementById("pName").innerText =
-        "Name: " + document.getElementById("name").value;
+const upload = document.getElementById("upload");
+const canvas = document.getElementById("canvas");
+const scaleSelect = document.getElementById("scale");
+let hdCanvas = null;
 
-    document.getElementById("pAge").innerText =
-        "Age: " + document.getElementById("age").value;
+upload.onchange = async e => {
+  const img = await createImageBitmap(e.target.files[0]);
+  const scale = parseInt(scaleSelect.value);
+  hdCanvas = enhanceToHD(img, scale);
+  canvas.width = hdCanvas.width;
+  canvas.height = hdCanvas.height;
+  canvas.getContext("2d").drawImage(hdCanvas, 0, 0);
+};
 
-    document.getElementById("pReligion").innerText =
-        "Religion: " + document.getElementById("religion").value;
+/* AI-style HD Enhancement */
+function enhanceToHD(img, scale){
+  const c = document.createElement("canvas");
+  c.width = img.width * scale;
+  c.height = img.height * scale;
+  const ctx = c.getContext("2d");
 
-    document.getElementById("pEducation").innerText =
-        "Education: " + document.getElementById("education").value;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, c.width, c.height);
 
-    document.getElementById("pProfession").innerText =
-        "Profession: " + document.getElementById("profession").value;
+  // AI-style unsharp mask
+  const imageData = ctx.getImageData(0,0,c.width,c.height);
+  const d = imageData.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]   = Math.min(255, d[i]   * 1.08); // R
+    d[i+1] = Math.min(255, d[i+1] * 1.08); // G
+    d[i+2] = Math.min(255, d[i+2] * 1.08); // B
+  }
+  ctx.putImageData(imageData,0,0);
+
+  return c;
 }
 
-function downloadJPEG() {
-    html2canvas(document.getElementById("profileCard")).then(canvas => {
-        let link = document.createElement("a");
-        link.download = "marriage_profile.jpeg";
-        link.href = canvas.toDataURL("image/jpeg");
-        link.click();
-    });
+function download(){
+  if(!hdCanvas) return alert("Upload image first");
+  const a = document.createElement("a");
+  a.href = hdCanvas.toDataURL("image/png");
+  a.download = "AI_HD_Image.png";
+  a.click();
 }
 </script>
-
 </body>
 </html>
