@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Photo → HD Enhancer</title>
+<title>AI HD Photo Enhancer (ML)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -21,16 +21,13 @@ body{
   padding:20px;
   border-radius:16px;
   text-align:center;
-  box-shadow:0 0 30px rgba(0,0,0,.6);
 }
-h2{margin-bottom:15px}
-input,select,button{
+input,button{
   width:100%;
-  margin-top:10px;
+  margin-top:12px;
   padding:12px;
   border-radius:10px;
   border:none;
-  font-size:15px;
 }
 button{
   background:#00c6ff;
@@ -42,95 +39,74 @@ canvas{
   max-width:100%;
   border-radius:12px;
 }
+small{opacity:.7}
 </style>
 </head>
 
 <body>
 <div class="app">
-<h2>HD Photo Enhancer</h2>
+<h2>AI HD Photo Enhancer</h2>
 
 <input type="file" id="upload" accept="image/*">
-<select id="scale">
-  <option value="2">2× HD (Recommended)</option>
-  <option value="3">3× HD</option>
-</select>
+<button id="run">✨ Enhance with AI</button>
+<small id="status">Model not loaded</small>
 
 <canvas id="canvas"></canvas>
-
-<button onclick="download()">⬇ Download HD Photo</button>
+<button onclick="download()">⬇ Download HD</button>
 </div>
+
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0/dist/tf.min.js"></script>
+
+<!-- Super Resolution Model -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/super-resolution"></script>
 
 <script>
 const upload = document.getElementById("upload");
 const canvas = document.getElementById("canvas");
-const scaleSelect = document.getElementById("scale");
+const statusText = document.getElementById("status");
+const runBtn = document.getElementById("run");
+
+let model;
+let imgElement = new Image();
 let hdCanvas = null;
 
-upload.addEventListener("change", () => {
-  const file = upload.files[0];
-  if(!file) return;
+// Load ML model
+(async () => {
+  statusText.innerText = "Loading AI model...";
+  model = await superResolution.load();
+  statusText.innerText = "AI model ready ✔";
+})();
 
-  const img = new Image();
-  img.onload = () => {
-    const scale = parseInt(scaleSelect.value);
-    hdCanvas = enhanceToHD(img, scale);
-    canvas.width = hdCanvas.width;
-    canvas.height = hdCanvas.height;
-    canvas.getContext("2d").drawImage(hdCanvas, 0, 0);
-  };
-  img.src = URL.createObjectURL(file);
+upload.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  imgElement.src = URL.createObjectURL(file);
 });
 
-/* 🔥 HD Enhancement */
-function enhanceToHD(img, scale){
-
-  const MAX = 3000;
-  let w = img.width;
-  let h = img.height;
-
-  if (w > MAX || h > MAX) {
-    const ratio = Math.min(MAX / w, MAX / h);
-    w = Math.round(w * ratio);
-    h = Math.round(h * ratio);
+runBtn.onclick = async () => {
+  if(!model || !imgElement.src) {
+    alert("Model or image not ready");
+    return;
   }
 
-  const c = document.createElement("canvas");
-  c.width = w * scale;
-  c.height = h * scale;
-  const ctx = c.getContext("2d");
+  statusText.innerText = "Enhancing image…";
 
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, 0, 0, c.width, c.height);
+  const result = await model.predict(imgElement);
 
-  let imgData = ctx.getImageData(0,0,c.width,c.height);
-  let d = imgData.data;
+  canvas.width = result.width;
+  canvas.height = result.height;
+  canvas.getContext("2d").drawImage(result, 0, 0);
 
-  for(let i=0;i<d.length;i+=4){
-    // Contrast boost
-    d[i]   = clamp((d[i] - 128) * 1.2 + 128);
-    d[i+1] = clamp((d[i+1] - 128) * 1.2 + 128);
-    d[i+2] = clamp((d[i+2] - 128) * 1.2 + 128);
-
-    // Sharpness illusion
-    d[i]   = clamp(d[i] * 1.08);
-    d[i+1] = clamp(d[i+1] * 1.08);
-    d[i+2] = clamp(d[i+2] * 1.08);
-  }
-
-  ctx.putImageData(imgData,0,0);
-  return c;
-}
-
-function clamp(v){
-  return Math.max(0, Math.min(255, v));
-}
+  hdCanvas = canvas;
+  statusText.innerText = "Done ✔ (AI Enhanced)";
+};
 
 function download(){
-  if(!hdCanvas) return alert("Upload image first");
+  if(!hdCanvas) return alert("Enhance image first");
   const a = document.createElement("a");
-  a.href = hdCanvas.toDataURL("image/png");
-  a.download = "HD_Image.png";
+  a.href = canvas.toDataURL("image/png");
+  a.download = "AI_HD_Image.png";
   a.click();
 }
 </script>
