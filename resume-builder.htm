@@ -1,43 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PDF to Word Converter</title>
+<title>PDF to JPG Converter</title>
+
+<!-- PDF.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#111;
+  color:#fff;
+  text-align:center;
+  padding:30px;
+}
+input{
+  margin:15px 0;
+}
+canvas{
+  display:none;
+}
+img{
+  width:90%;
+  max-width:600px;
+  margin:15px 0;
+  border-radius:8px;
+}
+button{
+  padding:10px 20px;
+  font-size:16px;
+  cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-<h2>PDF to Word Converter</h2>
+<h2>📄 PDF → JPG Converter (Single HTML)</h2>
 
-<input type="file" id="pdfFile" accept="application/pdf">
-<br><br>
-<button onclick="convert()">Convert to Word</button>
+<input type="file" id="pdfInput" accept="application/pdf">
+<br>
+<button onclick="convertPDF()">Convert</button>
+
+<div id="output"></div>
+
+<canvas id="pdfCanvas"></canvas>
 
 <script>
-function convert() {
-    const fileInput = document.getElementById("pdfFile");
-    if (!fileInput.files.length) {
-        alert("Please select a PDF file");
-        return;
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function convertPDF() {
+  const file = document.getElementById("pdfInput").files[0];
+  if (!file) {
+    alert("Please select a PDF file");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+
+  reader.onload = async function () {
+    const pdf = await pdfjsLib.getDocument({ data: reader.result }).promise;
+    const output = document.getElementById("output");
+    output.innerHTML = "";
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 2 });
+
+      const canvas = document.getElementById("pdfCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      const img = document.createElement("img");
+      img.src = canvas.toDataURL("image/jpeg", 1.0);
+      img.download = `page_${pageNum}.jpg`;
+
+      output.appendChild(img);
     }
-
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-
-    fetch("https://api.cloudmersive.com/convert/pdf/to/docx", {
-        method: "POST",
-        headers: {
-            "Apikey": "YOUR_API_KEY_HERE"
-        },
-        body: formData
-    })
-    .then(response => response.blob())
-    .then(blob => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "converted.docx";
-        link.click();
-    })
-    .catch(err => alert("Conversion failed"));
+  };
 }
 </script>
 
