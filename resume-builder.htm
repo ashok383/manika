@@ -26,18 +26,34 @@ img{
   max-width:600px;
   margin:15px 0;
   border-radius:8px;
+  display:block;
 }
-button{
+button, a.download-btn{
   padding:10px 20px;
   font-size:16px;
   cursor:pointer;
+  margin:10px;
+  border:none;
+  border-radius:5px;
+}
+button{
+  background:#0ff;
+}
+a.download-btn{
+  background:#222;
+  color:#0ff;
+  text-decoration:none;
+  display:inline-block;
+}
+.page{
+  margin-bottom:30px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>📄 PDF → JPG Converter (Single HTML)</h2>
+<h2>📄 PDF → JPG Converter</h2>
 
 <input type="file" id="pdfInput" accept="application/pdf">
 <br>
@@ -51,6 +67,8 @@ button{
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+let generatedImages = [];
+
 async function convertPDF() {
   const file = document.getElementById("pdfInput").files[0];
   if (!file) {
@@ -58,13 +76,15 @@ async function convertPDF() {
     return;
   }
 
+  generatedImages = [];
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
   const reader = new FileReader();
   reader.readAsArrayBuffer(file);
 
   reader.onload = async function () {
     const pdf = await pdfjsLib.getDocument({ data: reader.result }).promise;
-    const output = document.getElementById("output");
-    output.innerHTML = "";
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
@@ -77,13 +97,42 @@ async function convertPDF() {
 
       await page.render({ canvasContext: ctx, viewport }).promise;
 
-      const img = document.createElement("img");
-      img.src = canvas.toDataURL("image/jpeg", 1.0);
-      img.download = `page_${pageNum}.jpg`;
+      const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+      generatedImages.push({ pageNum, dataURL });
 
-      output.appendChild(img);
+      const pageDiv = document.createElement("div");
+      pageDiv.className = "page";
+
+      const img = document.createElement("img");
+      img.src = dataURL;
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = dataURL;
+      downloadLink.download = `page_${pageNum}.jpg`;
+      downloadLink.className = "download-btn";
+      downloadLink.innerText = `⬇ Download Page ${pageNum}`;
+
+      pageDiv.appendChild(img);
+      pageDiv.appendChild(downloadLink);
+      output.appendChild(pageDiv);
     }
+
+    const downloadAllBtn = document.createElement("button");
+    downloadAllBtn.innerText = "⬇ Download All Pages";
+    downloadAllBtn.onclick = downloadAllImages;
+    output.appendChild(downloadAllBtn);
   };
+}
+
+function downloadAllImages() {
+  generatedImages.forEach(img => {
+    const a = document.createElement("a");
+    a.href = img.dataURL;
+    a.download = `page_${img.pageNum}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
 }
 </script>
 
