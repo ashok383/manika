@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANIK_A_RNIKA | World Class Tools</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<title>MANIK_A_RNIKA | Premium Digital Tools</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+
 :root{
-  --g1:#ff6a00;
-  --g2:#ee0979;
-  --g3:#6a11cb;
-  --g4:#00ffe0;
+  --bg:#050816;
+  --card:rgba(255,255,255,0.08);
+
+  --g1:#ff6b00;
+  --g2:#ff00c8;
+  --g3:#7a00ff;
+  --g4:#00f0ff;
+
+  --white:#ffffff;
 }
 
 *{
@@ -22,57 +29,68 @@
   font-family:'Poppins',sans-serif;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
-  min-height:100vh;
-  background:#05060f;
-  color:#fff;
+  background:var(--bg);
+  color:white;
   overflow-x:hidden;
 }
 
-/* ===== CINEMATIC BACKGROUND ===== */
+/* ================= BACKGROUND ================= */
+
 .bg{
   position:fixed;
   inset:0;
-  z-index:-3;
+  z-index:-5;
   background:
-    radial-gradient(circle at 20% 20%, var(--g1), transparent 35%),
-    radial-gradient(circle at 80% 30%, var(--g4), transparent 40%),
-    radial-gradient(circle at 50% 85%, var(--g3), transparent 45%);
+    radial-gradient(circle at 10% 20%, var(--g1), transparent 30%),
+    radial-gradient(circle at 80% 30%, var(--g4), transparent 30%),
+    radial-gradient(circle at 50% 90%, var(--g3), transparent 35%);
   filter:blur(120px);
-  animation:floatbg 18s linear infinite;
+  animation:bgmove 14s ease infinite;
 }
-@keyframes floatbg{
+
+@keyframes bgmove{
   0%{transform:translate(0,0)}
-  50%{transform:translate(-60px,40px)}
+  50%{transform:translate(-50px,30px)}
   100%{transform:translate(0,0)}
 }
 
-/* ===== NOISE ===== */
 .noise{
   position:fixed;
   inset:0;
   background:url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity:.06;
-  z-index:-2;
+  opacity:.05;
+  z-index:-4;
 }
 
-/* ===== NAV ===== */
+/* ================= NAVBAR ================= */
+
 nav{
   position:fixed;
-  top:20px;
+  top:18px;
   left:50%;
   transform:translateX(-50%);
   width:94%;
-  max-width:1250px;
-  padding:16px 36px;
+  max-width:1300px;
+
+  padding:16px 34px;
+
   display:flex;
   justify-content:space-between;
   align-items:center;
+
   background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+
   backdrop-filter:blur(22px);
+
   border-radius:80px;
-  border:1px solid rgba(255,255,255,0.15);
-  z-index:10;
+
+  z-index:100;
 }
 
 .logo{
@@ -82,16 +100,24 @@ nav{
 }
 
 .logo img{
-  width:48px;
-  height:48px;
-  border-radius:14px;
+  width:52px;
+  height:52px;
+  border-radius:16px;
+  object-fit:cover;
 }
 
 .logo span{
+  font-size:20px;
   font-weight:800;
   letter-spacing:2px;
-  font-size:18px;
-  background:linear-gradient(90deg,var(--g1),var(--g2),var(--g4));
+
+  background:linear-gradient(
+    90deg,
+    var(--g1),
+    var(--g2),
+    var(--g4)
+  );
+
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -99,52 +125,75 @@ nav{
 nav ul{
   list-style:none;
   display:flex;
-  gap:30px;
+  gap:32px;
 }
 
 nav a{
-  color:#fff;
+  color:white;
   text-decoration:none;
   font-weight:500;
-  opacity:.85;
   position:relative;
 }
 
 nav a::after{
-  content:"";
+  content:'';
   position:absolute;
   left:0;
-  bottom:-6px;
-  width:0;
+  bottom:-7px;
+  width:0%;
   height:2px;
-  background:linear-gradient(90deg,var(--g1),var(--g4));
+
+  background:linear-gradient(
+    90deg,
+    var(--g1),
+    var(--g4)
+  );
+
   transition:.4s;
 }
-nav a:hover::after{width:100%}
 
-/* ===== HERO ===== */
+nav a:hover::after{
+  width:100%;
+}
+
+/* ================= HERO ================= */
+
 .hero{
   min-height:100vh;
+
   display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:80px;
+  grid-template-columns:1.1fr 1fr;
+  gap:70px;
+
   align-items:center;
-  padding:180px 8% 80px;
+
+  padding:180px 8% 100px;
 }
 
-/* ===== TEXT ===== */
 .hero-text h1{
-  font-size:70px;
-  font-weight:800;
+  font-size:78px;
   line-height:1.05;
-  margin-bottom:22px;
-  background:linear-gradient(120deg,var(--g1),var(--g2),var(--g3),var(--g4));
+  font-weight:900;
+
+  margin-bottom:26px;
+
+  background:linear-gradient(
+    130deg,
+    var(--g1),
+    var(--g2),
+    var(--g3),
+    var(--g4)
+  );
+
   background-size:300% 300%;
+
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:shine 7s linear infinite;
+
+  animation:textshine 6s linear infinite;
 }
-@keyframes shine{
+
+@keyframes textshine{
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
@@ -152,13 +201,67 @@ nav a:hover::after{width:100%}
 
 .hero-text p{
   font-size:19px;
-  max-width:560px;
+  line-height:1.9;
   opacity:.9;
-  margin-bottom:46px;
+
+  max-width:620px;
+
+  margin-bottom:40px;
 }
 
-/* ===== ACTION CARDS ===== */
-.actions{
+/* ================= BUTTONS ================= */
+
+.buttons{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:16px 34px;
+  border-radius:60px;
+  border:none;
+  cursor:pointer;
+
+  font-size:15px;
+  font-weight:700;
+
+  transition:.4s;
+
+  color:white;
+  text-decoration:none;
+}
+
+.primary{
+  background:linear-gradient(
+    90deg,
+    var(--g1),
+    var(--g2)
+  );
+
+  box-shadow:
+    0 0 20px rgba(255,0,150,.5);
+}
+
+.primary:hover{
+  transform:translateY(-6px) scale(1.05);
+}
+
+.secondary{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.14);
+  backdrop-filter:blur(20px);
+}
+
+.secondary:hover{
+  transform:translateY(-6px);
+}
+
+/* ================= CARDS ================= */
+
+.tools{
+  margin-top:60px;
+
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:26px;
@@ -166,84 +269,212 @@ nav a:hover::after{width:100%}
 
 .card{
   position:relative;
-  padding:32px;
-  border-radius:28px;
+
+  padding:34px;
+
+  border-radius:30px;
+
   background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.15);
-  cursor:pointer;
-  transition:.5s;
+
+  border:1px solid rgba(255,255,255,0.14);
+
+  backdrop-filter:blur(24px);
+
   overflow:hidden;
+
+  transition:.5s;
+
+  cursor:pointer;
 }
 
 .card::before{
-  content:"";
+  content:'';
+
   position:absolute;
-  inset:-1px;
-  background:linear-gradient(135deg,var(--g1),var(--g2),var(--g3),var(--g4));
+  inset:-2px;
+
+  background:linear-gradient(
+    135deg,
+    var(--g1),
+    var(--g2),
+    var(--g3),
+    var(--g4)
+  );
+
   opacity:.25;
+
   filter:blur(40px);
+
   z-index:-1;
 }
 
 .card:hover{
   transform:translateY(-14px) scale(1.05);
+
   box-shadow:
-    0 0 40px rgba(255,0,255,.4),
+    0 0 40px rgba(255,0,200,.45),
     0 0 90px rgba(0,255,255,.35);
 }
 
 .card h3{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:10px;
+  font-size:22px;
+  margin-bottom:14px;
 }
 
 .card p{
-  font-size:14px;
   opacity:.85;
+  line-height:1.7;
+  font-size:14px;
 }
 
-/* ===== VISUAL PANEL ===== */
+/* ================= VISUAL ================= */
+
 .visual{
-  border-radius:36px;
-  padding:22px;
-  background:rgba(255,255,255,0.1);
+  position:relative;
+
+  border-radius:38px;
+  overflow:hidden;
+
+  background:rgba(255,255,255,0.08);
+
+  border:1px solid rgba(255,255,255,0.14);
+
   backdrop-filter:blur(20px);
+
+  padding:20px;
+
+  animation:float 7s ease-in-out infinite;
+
   box-shadow:
-    0 60px 160px rgba(0,0,0,.8),
-    inset 0 0 0 1px rgba(255,255,255,.25);
-  animation:float 8s ease-in-out infinite;
+    0 40px 120px rgba(0,0,0,.7);
 }
 
 .visual img{
   width:100%;
-  border-radius:26px;
+  border-radius:28px;
+  display:block;
 }
 
 @keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-20px)}
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-20px);
+  }
 }
 
-/* ===== FOOTER ===== */
+/* ================= STATS ================= */
+
+.stats{
+  display:flex;
+  gap:24px;
+  margin-top:34px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  padding:18px 28px;
+  border-radius:24px;
+
+  background:rgba(255,255,255,0.08);
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(20px);
+}
+
+.stat h2{
+  font-size:28px;
+  color:var(--g4);
+}
+
+.stat p{
+  font-size:13px;
+  opacity:.8;
+}
+
+/* ================= FOOTER ================= */
+
 footer{
+  margin-top:60px;
+
+  padding:34px;
+
   text-align:center;
-  padding:36px;
+
   font-size:13px;
   letter-spacing:1px;
-  background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3),var(--g4));
+
+  background:linear-gradient(
+    90deg,
+    var(--g1),
+    var(--g2),
+    var(--g3),
+    var(--g4)
+  );
 }
 
-/* ===== RESPONSIVE ===== */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;text-align:center}
-  .hero-text p{margin:auto}
+/* ================= MOBILE ================= */
+
+@media(max-width:980px){
+
+  .hero{
+    grid-template-columns:1fr;
+    text-align:center;
+    gap:50px;
+  }
+
+  .hero-text p{
+    margin:auto;
+  }
+
+  .buttons{
+    justify-content:center;
+  }
+
+  .stats{
+    justify-content:center;
+  }
+
+  .hero-text h1{
+    font-size:54px;
+  }
 }
-@media(max-width:520px){
-  nav ul{display:none}
-  .hero-text h1{font-size:42px}
+
+@media(max-width:650px){
+
+  nav{
+    padding:14px 22px;
+  }
+
+  nav ul{
+    display:none;
+  }
+
+  .hero{
+    padding-top:140px;
+  }
+
+  .hero-text h1{
+    font-size:40px;
+  }
+
+  .hero-text p{
+    font-size:16px;
+  }
+
+  .card{
+    padding:26px;
+  }
+
+  .btn{
+    width:100%;
+    text-align:center;
+  }
+
 }
+
 </style>
 </head>
 
@@ -252,54 +483,117 @@ footer{
 <div class="bg"></div>
 <div class="noise"></div>
 
+<!-- ================= NAV ================= -->
+
 <nav>
+
   <div class="logo">
-    <img src="manika.jpeg" alt="logo">
+    <img src="manika.jpeg" alt="">
     <span>MANIK_A_RNIKA</span>
   </div>
+
   <ul>
     <li><a href="#">Home</a></li>
     <li><a href="#">Tools</a></li>
+    <li><a href="#">Services</a></li>
     <li><a href="#">Portfolio</a></li>
     <li><a href="#">Contact</a></li>
   </ul>
+
 </nav>
+
+<!-- ================= HERO ================= -->
 
 <section class="hero">
 
+  <!-- LEFT -->
   <div class="hero-text">
-    <h1>World-Class Digital Tools</h1>
+
+    <h1>
+      Future Level <br>
+      Digital Tools
+    </h1>
+
     <p>
-      Elite-grade converters, resume builders, and AI-inspired utilities
-      designed with cinematic visuals and professional precision.
+      Experience world-class AI-powered utilities, cinematic visuals,
+      premium resume builders, ultra-fast converters,
+      and next-generation creative tools built with perfection.
     </p>
 
-    <div class="actions">
-      <div class="card" onclick="location.href='resume-builder.htm'">
-        <h3>PDF → JPG</h3>
-        <p>Ultra-clear image conversion directly in your browser.</p>
+    <div class="buttons">
+
+      <a href="#" class="btn primary">
+        Explore Tools
+      </a>
+
+      <a href="#" class="btn secondary">
+        Learn More
+      </a>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+        <h2>10K+</h2>
+        <p>Happy Users</p>
       </div>
 
-      <div class="card" onclick="location.href='simpleform.html'">
+      <div class="stat">
+        <h2>99%</h2>
+        <p>Performance</p>
+      </div>
+
+      <div class="stat">
+        <h2>24/7</h2>
+        <p>Support</p>
+      </div>
+
+    </div>
+
+    <!-- TOOL CARDS -->
+
+    <div class="tools">
+
+      <div class="card" onclick="location.href='resume-builder.html'">
         <h3>Resume Maker</h3>
-        <p>Premium resumes with modern typography & layout.</p>
+        <p>
+          Build elegant premium resumes with modern layouts.
+        </p>
+      </div>
+
+      <div class="card" onclick="location.href='pdf-tools.html'">
+        <h3>PDF Tools</h3>
+        <p>
+          Convert PDF to JPG, PNG and more with ultra quality.
+        </p>
       </div>
 
       <div class="card" onclick="location.href='photo_maker.html'">
         <h3>Photo Studio</h3>
-        <p>Professional photos with instant enhancements.</p>
+        <p>
+          AI-enhanced photos with cinematic editing effects.
+        </p>
       </div>
+
     </div>
+
   </div>
 
+  <!-- RIGHT -->
+
   <div class="visual">
-    <img src="manika.jpeg" alt="preview">
+    <img src="manika.jpeg" alt="">
   </div>
 
 </section>
 
+<!-- ================= FOOTER ================= -->
+
 <footer>
-© 2026 MANIK_A_RNIKA — Engineered for Excellence
+  © 2026 MANIK_A_RNIKA — Crafted With Innovation & Excellence
 </footer>
 
 </body>
