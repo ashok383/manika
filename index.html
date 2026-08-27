@@ -1,600 +1,1202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 
-<title>MANIK_A_RNIKA | Premium Digital Tools</title>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
+>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta
+    name="description"
+    content="MANIK_A_RNIKA - Fast and simple digital tools"
+>
+
+<title>MANIK_A_RNIKA</title>
 
 <style>
 
+/* ==================================================
+   FAST ANDROID STYLE
+================================================== */
+
 :root{
-  --bg:#050816;
-  --card:rgba(255,255,255,0.08);
+    --blue:#2563eb;
+    --blue-dark:#1d4ed8;
+    --blue-light:#eff6ff;
 
-  --g1:#ff6b00;
-  --g2:#ff00c8;
-  --g3:#7a00ff;
-  --g4:#00f0ff;
+    --bg:#f6f7fb;
+    --card:#ffffff;
 
-  --white:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+
+    --border:#e5e7eb;
+
+    --radius:18px;
 }
 
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
 html{
-  scroll-behavior:smooth;
+    scroll-behavior:smooth;
 }
 
 body{
-  background:var(--bg);
-  color:white;
-  overflow-x:hidden;
+    background:var(--bg);
+    color:var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height:100vh;
+
+    -webkit-font-smoothing:antialiased;
 }
 
-/* ================= BACKGROUND ================= */
-
-.bg{
-  position:fixed;
-  inset:0;
-  z-index:-5;
-  background:
-    radial-gradient(circle at 10% 20%, var(--g1), transparent 30%),
-    radial-gradient(circle at 80% 30%, var(--g4), transparent 30%),
-    radial-gradient(circle at 50% 90%, var(--g3), transparent 35%);
-  filter:blur(120px);
-  animation:bgmove 14s ease infinite;
+a{
+    color:inherit;
+    text-decoration:none;
 }
 
-@keyframes bgmove{
-  0%{transform:translate(0,0)}
-  50%{transform:translate(-50px,30px)}
-  100%{transform:translate(0,0)}
+button{
+    font-family:inherit;
 }
 
-.noise{
-  position:fixed;
-  inset:0;
-  background:url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity:.05;
-  z-index:-4;
+
+/* ==================================================
+   APP HEADER
+================================================== */
+
+.header{
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
+
+    height:64px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+        0 18px;
+
+    background:#ffffff;
+
+    border-bottom:
+        1px solid var(--border);
 }
 
-/* ================= NAVBAR ================= */
+.brand{
+    display:flex;
 
-nav{
-  position:fixed;
-  top:18px;
-  left:50%;
-  transform:translateX(-50%);
-  width:94%;
-  max-width:1300px;
+    align-items:center;
 
-  padding:16px 34px;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.12);
-
-  backdrop-filter:blur(22px);
-
-  border-radius:80px;
-
-  z-index:100;
+    gap:10px;
 }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:14px;
+.brand img{
+    width:40px;
+    height:40px;
+
+    object-fit:cover;
+
+    border-radius:12px;
 }
 
-.logo img{
-  width:52px;
-  height:52px;
-  border-radius:16px;
-  object-fit:cover;
+.brand-name{
+    font-size:17px;
+
+    font-weight:800;
+
+    letter-spacing:-.4px;
 }
 
-.logo span{
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:2px;
+.menu{
+    width:40px;
+    height:40px;
 
-  background:linear-gradient(
-    90deg,
-    var(--g1),
-    var(--g2),
-    var(--g4)
-  );
+    display:flex;
 
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+    align-items:center;
+    justify-content:center;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:var(--blue-light);
+
+    color:var(--blue);
+
+    font-size:20px;
+
+    cursor:pointer;
 }
 
-nav ul{
-  list-style:none;
-  display:flex;
-  gap:32px;
+
+/* ==================================================
+   MOBILE MENU
+================================================== */
+
+.mobile-nav{
+    display:none;
+
+    position:absolute;
+
+    top:64px;
+
+    left:0;
+    right:0;
+
+    padding:10px;
+
+    background:#fff;
+
+    border-bottom:
+        1px solid var(--border);
 }
 
-nav a{
-  color:white;
-  text-decoration:none;
-  font-weight:500;
-  position:relative;
+.mobile-nav.show{
+    display:block;
 }
 
-nav a::after{
-  content:'';
-  position:absolute;
-  left:0;
-  bottom:-7px;
-  width:0%;
-  height:2px;
+.mobile-nav a{
+    display:block;
 
-  background:linear-gradient(
-    90deg,
-    var(--g1),
-    var(--g4)
-  );
+    padding:14px;
 
-  transition:.4s;
+    border-radius:12px;
+
+    font-size:14px;
+
+    font-weight:600;
 }
 
-nav a:hover::after{
-  width:100%;
+.mobile-nav a:hover{
+    background:var(--blue-light);
+
+    color:var(--blue);
 }
 
-/* ================= HERO ================= */
+
+/* ==================================================
+   MAIN
+================================================== */
+
+main{
+    width:100%;
+
+    max-width:1050px;
+
+    margin:auto;
+
+    padding:
+        25px 18px 90px;
+}
+
+
+/* ==================================================
+   WELCOME CARD
+================================================== */
 
 .hero{
-  min-height:100vh;
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
 
-  display:grid;
-  grid-template-columns:1.1fr 1fr;
-  gap:70px;
+    color:#fff;
 
-  align-items:center;
+    border-radius:24px;
 
-  padding:180px 8% 100px;
+    padding:30px 25px;
+
+    margin-bottom:22px;
+
+    position:relative;
+
+    overflow:hidden;
 }
 
-.hero-text h1{
-  font-size:78px;
-  line-height:1.05;
-  font-weight:900;
+.hero::after{
+    content:"";
 
-  margin-bottom:26px;
+    position:absolute;
 
-  background:linear-gradient(
-    130deg,
-    var(--g1),
-    var(--g2),
-    var(--g3),
-    var(--g4)
-  );
+    width:180px;
+    height:180px;
 
-  background-size:300% 300%;
+    right:-70px;
+    top:-70px;
 
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+    background:
+        rgba(255,255,255,.12);
 
-  animation:textshine 6s linear infinite;
+    border-radius:50%;
 }
 
-@keyframes textshine{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+.hero small{
+    font-size:12px;
+
+    opacity:.8;
+
+    font-weight:600;
 }
 
-.hero-text p{
-  font-size:19px;
-  line-height:1.9;
-  opacity:.9;
+.hero h1{
+    margin-top:8px;
 
-  max-width:620px;
+    font-size:34px;
 
-  margin-bottom:40px;
+    line-height:1.15;
+
+    letter-spacing:-1.3px;
 }
 
-/* ================= BUTTONS ================= */
+.hero p{
+    margin-top:12px;
 
-.buttons{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
+    max-width:600px;
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    opacity:.9;
 }
 
-.btn{
-  padding:16px 34px;
-  border-radius:60px;
-  border:none;
-  cursor:pointer;
+.hero-button{
+    display:inline-flex;
 
-  font-size:15px;
-  font-weight:700;
+    margin-top:20px;
 
-  transition:.4s;
+    padding:12px 18px;
 
-  color:white;
-  text-decoration:none;
+    background:#fff;
+
+    color:var(--blue);
+
+    border-radius:12px;
+
+    font-size:13px;
+
+    font-weight:700;
 }
 
-.primary{
-  background:linear-gradient(
-    90deg,
-    var(--g1),
-    var(--g2)
-  );
 
-  box-shadow:
-    0 0 20px rgba(255,0,150,.5);
+/* ==================================================
+   SECTION TITLE
+================================================== */
+
+.section-title{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin:
+        25px 2px
+        12px;
 }
 
-.primary:hover{
-  transform:translateY(-6px) scale(1.05);
+.section-title h2{
+    font-size:19px;
+
+    letter-spacing:-.3px;
 }
 
-.secondary{
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.14);
-  backdrop-filter:blur(20px);
+.section-title span{
+    color:var(--blue);
+
+    font-size:12px;
+
+    font-weight:700;
 }
 
-.secondary:hover{
-  transform:translateY(-6px);
-}
 
-/* ================= CARDS ================= */
+/* ==================================================
+   TOOL GRID
+================================================== */
 
 .tools{
-  margin-top:60px;
+    display:grid;
 
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:26px;
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:14px;
 }
 
-.card{
-  position:relative;
+.tool{
+    background:var(--card);
 
-  padding:34px;
+    border:
+        1px solid var(--border);
 
-  border-radius:30px;
+    border-radius:var(--radius);
 
-  background:rgba(255,255,255,0.08);
+    padding:20px;
 
-  border:1px solid rgba(255,255,255,0.14);
+    cursor:pointer;
 
-  backdrop-filter:blur(24px);
-
-  overflow:hidden;
-
-  transition:.5s;
-
-  cursor:pointer;
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
 }
 
-.card::before{
-  content:'';
+.tool:hover{
+    transform:translateY(-3px);
 
-  position:absolute;
-  inset:-2px;
-
-  background:linear-gradient(
-    135deg,
-    var(--g1),
-    var(--g2),
-    var(--g3),
-    var(--g4)
-  );
-
-  opacity:.25;
-
-  filter:blur(40px);
-
-  z-index:-1;
+    box-shadow:
+        0 8px 25px
+        rgba(17,24,39,.08);
 }
 
-.card:hover{
-  transform:translateY(-14px) scale(1.05);
-
-  box-shadow:
-    0 0 40px rgba(255,0,200,.45),
-    0 0 90px rgba(0,255,255,.35);
+.tool:active{
+    transform:scale(.98);
 }
 
-.card h3{
-  font-size:22px;
-  margin-bottom:14px;
+.icon{
+    width:48px;
+    height:48px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:14px;
+
+    margin-bottom:15px;
+
+    background:var(--blue-light);
+
+    color:var(--blue);
+
+    font-size:22px;
 }
 
-.card p{
-  opacity:.85;
-  line-height:1.7;
-  font-size:14px;
+.tool:nth-child(2) .icon{
+    background:#ecfdf5;
+    color:#059669;
 }
 
-/* ================= VISUAL ================= */
-
-.visual{
-  position:relative;
-
-  border-radius:38px;
-  overflow:hidden;
-
-  background:rgba(255,255,255,0.08);
-
-  border:1px solid rgba(255,255,255,0.14);
-
-  backdrop-filter:blur(20px);
-
-  padding:20px;
-
-  animation:float 7s ease-in-out infinite;
-
-  box-shadow:
-    0 40px 120px rgba(0,0,0,.7);
+.tool:nth-child(3) .icon{
+    background:#fff7ed;
+    color:#ea580c;
 }
 
-.visual img{
-  width:100%;
-  border-radius:28px;
-  display:block;
+.tool h3{
+    font-size:16px;
+
+    margin-bottom:7px;
 }
 
-@keyframes float{
-  0%,100%{
-    transform:translateY(0);
-  }
-  50%{
-    transform:translateY(-20px);
-  }
+.tool p{
+    color:var(--muted);
+
+    font-size:12px;
+
+    line-height:1.6;
 }
 
-/* ================= STATS ================= */
+.open{
+    display:inline-block;
+
+    margin-top:15px;
+
+    color:var(--blue);
+
+    font-size:12px;
+
+    font-weight:700;
+}
+
+
+/* ==================================================
+   QUICK ACTIONS
+================================================== */
+
+.quick-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:12px;
+}
+
+.quick{
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:105px;
+
+    padding:15px;
+
+    background:#fff;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:16px;
+
+    text-align:center;
+
+    transition:.15s;
+}
+
+.quick:hover{
+    background:var(--blue-light);
+
+    color:var(--blue);
+}
+
+.quick-icon{
+    font-size:22px;
+
+    margin-bottom:8px;
+}
+
+.quick span{
+    font-size:12px;
+
+    font-weight:700;
+}
+
+
+/* ==================================================
+   INFO CARD
+================================================== */
+
+.info{
+    margin-top:25px;
+
+    padding:22px;
+
+    background:#fff;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:18px;
+}
+
+.info h2{
+    font-size:18px;
+
+    margin-bottom:8px;
+}
+
+.info p{
+    color:var(--muted);
+
+    font-size:13px;
+
+    line-height:1.7;
+}
+
+
+/* ==================================================
+   STATS
+================================================== */
 
 .stats{
-  display:flex;
-  gap:24px;
-  margin-top:34px;
-  flex-wrap:wrap;
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:12px;
+
+    margin-top:14px;
 }
 
 .stat{
-  padding:18px 28px;
-  border-radius:24px;
+    padding:18px;
 
-  background:rgba(255,255,255,0.08);
+    background:#fff;
 
-  border:1px solid rgba(255,255,255,0.12);
+    border:
+        1px solid var(--border);
 
-  backdrop-filter:blur(20px);
+    border-radius:16px;
 }
 
-.stat h2{
-  font-size:28px;
-  color:var(--g4);
+.stat strong{
+    display:block;
+
+    color:var(--blue);
+
+    font-size:22px;
 }
 
-.stat p{
-  font-size:13px;
-  opacity:.8;
+.stat span{
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--muted);
+
+    font-size:11px;
 }
 
-/* ================= FOOTER ================= */
+
+/* ==================================================
+   BOTTOM APP NAV
+================================================== */
+
+.bottom-nav{
+    position:fixed;
+
+    bottom:0;
+
+    left:0;
+    right:0;
+
+    height:64px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:60px;
+
+    background:#fff;
+
+    border-top:
+        1px solid var(--border);
+
+    z-index:100;
+}
+
+.bottom-nav a{
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:4px;
+
+    color:#6b7280;
+
+    font-size:10px;
+
+    font-weight:600;
+}
+
+.bottom-nav a:first-child{
+    color:var(--blue);
+}
+
+.bottom-icon{
+    font-size:20px;
+}
+
+
+/* ==================================================
+   FOOTER
+================================================== */
 
 footer{
-  margin-top:60px;
+    text-align:center;
 
-  padding:34px;
+    padding:
+        25px 15px
+        90px;
 
-  text-align:center;
+    color:#9ca3af;
 
-  font-size:13px;
-  letter-spacing:1px;
-
-  background:linear-gradient(
-    90deg,
-    var(--g1),
-    var(--g2),
-    var(--g3),
-    var(--g4)
-  );
+    font-size:11px;
 }
 
-/* ================= MOBILE ================= */
 
-@media(max-width:980px){
+/* ==================================================
+   TABLET
+================================================== */
 
-  .hero{
-    grid-template-columns:1fr;
-    text-align:center;
-    gap:50px;
-  }
+@media(max-width:800px){
 
-  .hero-text p{
-    margin:auto;
-  }
+    .tools{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
 
-  .buttons{
-    justify-content:center;
-  }
+    .quick-grid{
+        grid-template-columns:
+            repeat(4,1fr);
+    }
 
-  .stats{
-    justify-content:center;
-  }
-
-  .hero-text h1{
-    font-size:54px;
-  }
 }
 
-@media(max-width:650px){
 
-  nav{
-    padding:14px 22px;
-  }
+/* ==================================================
+   MOBILE
+================================================== */
 
-  nav ul{
-    display:none;
-  }
+@media(max-width:550px){
 
-  .hero{
-    padding-top:140px;
-  }
+    main{
+        padding:
+            18px 12px 80px;
+    }
 
-  .hero-text h1{
-    font-size:40px;
-  }
+    .header{
+        padding:
+            0 14px;
+    }
 
-  .hero-text p{
-    font-size:16px;
-  }
+    .hero{
+        padding:25px 20px;
 
-  .card{
-    padding:26px;
-  }
+        border-radius:20px;
+    }
 
-  .btn{
-    width:100%;
-    text-align:center;
-  }
+    .hero h1{
+        font-size:28px;
+    }
+
+    .hero p{
+        font-size:13px;
+    }
+
+    .tools{
+        grid-template-columns:1fr;
+
+        gap:11px;
+    }
+
+    .tool{
+        display:grid;
+
+        grid-template-columns:
+            50px 1fr;
+
+        column-gap:14px;
+
+        padding:16px;
+    }
+
+    .tool .icon{
+        grid-row:
+            span 3;
+
+        margin:0;
+    }
+
+    .tool h3{
+        margin-top:2px;
+    }
+
+    .open{
+        margin-top:8px;
+    }
+
+    .quick-grid{
+        grid-template-columns:
+            repeat(2,1fr);
+
+        gap:10px;
+    }
+
+    .stats{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .stat{
+        padding:14px 10px;
+
+        text-align:center;
+    }
+
+    .stat strong{
+        font-size:18px;
+    }
+
+    .bottom-nav{
+        gap:45px;
+    }
+
+}
+
+
+/* ==================================================
+   VERY SMALL PHONES
+================================================== */
+
+@media(max-width:360px){
+
+    .brand-name{
+        font-size:14px;
+    }
+
+    .hero h1{
+        font-size:25px;
+    }
+
+    .bottom-nav{
+        gap:28px;
+    }
 
 }
 
 </style>
 </head>
 
+
 <body>
 
-<div class="bg"></div>
-<div class="noise"></div>
 
-<!-- ================= NAV ================= -->
+<!-- ==================================================
+     HEADER
+================================================== -->
 
-<nav>
+<header class="header">
 
-  <div class="logo">
-    <img src="manika.jpeg" alt="">
-    <span>MANIK_A_RNIKA</span>
-  </div>
+    <a href="#" class="brand">
 
-  <ul>
-    <li><a href="#">Home</a></li>
-    <li><a href="#">Tools</a></li>
-    <li><a href="#">Services</a></li>
-    <li><a href="#">Portfolio</a></li>
-    <li><a href="#">Contact</a></li>
-  </ul>
+        <img
+            src="manika.jpeg"
+            alt="MANIK_A_RNIKA"
+            width="40"
+            height="40"
+        >
 
-</nav>
+        <span class="brand-name">
+            MANIK_A_RNIKA
+        </span>
 
-<!-- ================= HERO ================= -->
+    </a>
 
-<section class="hero">
 
-  <!-- LEFT -->
-  <div class="hero-text">
+    <button
+        class="menu"
+        id="menuButton"
+        aria-label="Open menu"
+    >
+        ☰
+    </button>
 
-    <h1>
-      Future Level <br>
-      Digital Tools
-    </h1>
 
-    <p>
-      Experience world-class AI-powered utilities, cinematic visuals,
-      premium resume builders, ultra-fast converters,
-      and next-generation creative tools built with perfection.
-    </p>
+    <nav class="mobile-nav" id="mobileNav">
 
-    <div class="buttons">
+        <a href="#home">
+            Home
+        </a>
 
-      <a href="#" class="btn primary">
-        Explore Tools
-      </a>
+        <a href="#tools">
+            Tools
+        </a>
 
-      <a href="#" class="btn secondary">
-        Learn More
-      </a>
+        <a href="#services">
+            Services
+        </a>
+
+        <a href="#about">
+            About
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main id="home">
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <small>
+            ✦ DIGITAL TOOLS
+        </small>
+
+        <h1>
+            Simple tools.
+            <br>
+            Powerful results.
+        </h1>
+
+        <p>
+            Fast, simple and useful digital tools
+            designed for everyday work.
+        </p>
+
+        <a
+            href="#tools"
+            class="hero-button"
+        >
+            Explore Tools →
+        </a>
+
+    </section>
+
+
+
+    <!-- TOOLS -->
+
+    <div
+        class="section-title"
+        id="tools"
+    >
+
+        <h2>
+            My Tools
+        </h2>
+
+        <span>
+            VIEW ALL
+        </span>
 
     </div>
+
+
+    <section class="tools">
+
+
+        <!-- RESUME -->
+
+        <article
+            class="tool"
+            onclick="location.href='simpleform.html'"
+        >
+
+            <div class="icon">
+                📄
+            </div>
+
+            <div>
+                <h3>
+                    Resume Maker
+                </h3>
+
+                <p>
+                    Create a clean professional resume quickly.
+                </p>
+
+                <span class="open">
+                    Open →
+                </span>
+            </div>
+
+        </article>
+
+
+        <!-- PDF -->
+
+        <article
+            class="tool"
+            onclick="location.href='pdf-tools.html'"
+        >
+
+            <div class="icon">
+                📑
+            </div>
+
+            <div>
+                <h3>
+                    PDF Tools
+                </h3>
+
+                <p>
+                    Easy PDF conversion and file utilities.
+                </p>
+
+                <span class="open">
+                    Open →
+                </span>
+            </div>
+
+        </article>
+
+
+        <!-- PHOTO -->
+
+        <article
+            class="tool"
+            onclick="location.href='photo_maker.html'"
+        >
+
+            <div class="icon">
+                🖼️
+            </div>
+
+            <div>
+                <h3>
+                    Photo Studio
+                </h3>
+
+                <p>
+                    Simple photo editing and enhancement tools.
+                </p>
+
+                <span class="open">
+                    Open →
+                </span>
+            </div>
+
+        </article>
+
+
+    </section>
+
+
+
+    <!-- QUICK ACTIONS -->
+
+    <div
+        class="section-title"
+        id="services"
+    >
+
+        <h2>
+            Quick Actions
+        </h2>
+
+    </div>
+
+
+    <section class="quick-grid">
+
+        <a href="simpleform.html" class="quick">
+
+            <div class="quick-icon">
+                📝
+            </div>
+
+            <span>
+                Resume
+            </span>
+
+        </a>
+
+
+        <a href="pdf-tools.html" class="quick">
+
+            <div class="quick-icon">
+                📂
+            </div>
+
+            <span>
+                PDF
+            </span>
+
+        </a>
+
+
+        <a href="photo_maker.html" class="quick">
+
+            <div class="quick-icon">
+                📷
+            </div>
+
+            <span>
+                Photos
+            </span>
+
+        </a>
+
+
+        <a href="#about" class="quick">
+
+            <div class="quick-icon">
+                ℹ️
+            </div>
+
+            <span>
+                About
+            </span>
+
+        </a>
+
+    </section>
+
+
 
     <!-- STATS -->
 
-    <div class="stats">
+    <div class="section-title">
 
-      <div class="stat">
-        <h2>10K+</h2>
-        <p>Happy Users</p>
-      </div>
-
-      <div class="stat">
-        <h2>99%</h2>
-        <p>Performance</p>
-      </div>
-
-      <div class="stat">
-        <h2>24/7</h2>
-        <p>Support</p>
-      </div>
+        <h2>
+            Platform
+        </h2>
 
     </div>
 
-    <!-- TOOL CARDS -->
 
-    <div class="tools">
+    <section class="stats">
 
-      <div class="card" onclick="location.href='simpleform.html'">
-        <h3>Resume Maker</h3>
+        <div class="stat">
+            <strong>10K+</strong>
+            <span>Users</span>
+        </div>
+
+        <div class="stat">
+            <strong>99%</strong>
+            <span>Performance</span>
+        </div>
+
+        <div class="stat">
+            <strong>24/7</strong>
+            <span>Available</span>
+        </div>
+
+    </section>
+
+
+
+    <!-- ABOUT -->
+
+    <section
+        class="info"
+        id="about"
+    >
+
+        <h2>
+            About MANIK_A_RNIKA
+        </h2>
+
         <p>
-          Build elegant premium resumes with modern layouts.
+            A simple collection of useful digital tools
+            built with speed, clean design and ease of use
+            in mind. Open a tool and get your work done
+            without unnecessary steps.
         </p>
-      </div>
 
-      <div class="card" onclick="location.href='pdf-tools.html'">
-        <h3>PDF Tools</h3>
-        <p>
-          Convert PDF to JPG, PNG and more with ultra quality.
-        </p>
-      </div>
+    </section>
 
-      <div class="card" onclick="location.href='photo_maker.html'">
-        <h3>Photo Studio</h3>
-        <p>
-          AI-enhanced photos with cinematic editing effects.
-        </p>
-      </div>
 
-    </div>
+</main>
 
-  </div>
 
-  <!-- RIGHT -->
 
-  <div class="visual">
-    <img src="manika.jpeg" alt="">
-  </div>
-
-</section>
-
-<!-- ================= FOOTER ================= -->
+<!-- ==================================================
+     FOOTER
+================================================== -->
 
 <footer>
-  © 2026 MANIK_A_RNIKA — Crafted With Innovation & Excellence
+
+    © 2026 MANIK_A_RNIKA
+
 </footer>
+
+
+
+<!-- ==================================================
+     ANDROID BOTTOM NAV
+================================================== -->
+
+<nav class="bottom-nav">
+
+    <a href="#home">
+
+        <span class="bottom-icon">
+            ⌂
+        </span>
+
+        Home
+
+    </a>
+
+
+    <a href="#tools">
+
+        <span class="bottom-icon">
+            ▦
+        </span>
+
+        Tools
+
+    </a>
+
+
+    <a href="#about">
+
+        <span class="bottom-icon">
+            ●
+        </span>
+
+        About
+
+    </a>
+
+</nav>
+
+
+
+<!-- ==================================================
+     MINIMAL JAVASCRIPT
+================================================== -->
+
+<script>
+
+const menuButton =
+    document.getElementById("menuButton");
+
+const mobileNav =
+    document.getElementById("mobileNav");
+
+
+menuButton.addEventListener(
+    "click",
+    function(){
+
+        mobileNav.classList.toggle("show");
+
+    }
+);
+
+
+/* Close menu after selecting a link */
+
+mobileNav.querySelectorAll("a").forEach(
+    function(link){
+
+        link.addEventListener(
+            "click",
+            function(){
+
+                mobileNav.classList.remove("show");
+
+            }
+        );
+
+    }
+);
+
+</script>
+
 
 </body>
 </html>
