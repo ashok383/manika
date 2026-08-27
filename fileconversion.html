@@ -9,24 +9,12 @@
 
 <style>
 
-/* =========================================
-   RESET
-========================================= */
-
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
-    font-family:
-        Arial,
-        "Segoe UI",
-        sans-serif;
+    font-family:Arial,"Segoe UI",sans-serif;
 }
-
-
-/* =========================================
-   BODY
-========================================= */
 
 body{
     min-height:100vh;
@@ -35,50 +23,35 @@ body{
     padding:12px;
 }
 
-
-/* =========================================
-   APP
-========================================= */
-
 .app{
     width:100%;
     max-width:650px;
     margin:auto;
 }
 
-
-/* =========================================
-   TOP BAR
-========================================= */
+/* TOP BAR */
 
 .topbar{
-    background:#ffffff;
+    background:#fff;
     border-radius:22px;
-
     padding:16px;
-
     display:flex;
     align-items:center;
     gap:13px;
-
-    box-shadow:
-        0 4px 18px rgba(0,0,0,.08);
-
+    box-shadow:0 4px 18px rgba(0,0,0,.08);
     margin-bottom:14px;
 }
 
 .logo{
     width:48px;
     height:48px;
-
     border-radius:15px;
 
-    background:
-        linear-gradient(
-            135deg,
-            #1769e0,
-            #42a5f5
-        );
+    background:linear-gradient(
+        135deg,
+        #1769e0,
+        #42a5f5
+    );
 
     display:flex;
     align-items:center;
@@ -88,7 +61,8 @@ body{
     font-size:25px;
 
     box-shadow:
-        0 5px 15px rgba(23,105,224,.25);
+        0 5px 15px
+        rgba(23,105,224,.25);
 }
 
 .title{
@@ -106,16 +80,11 @@ body{
     color:#777;
 }
 
-
-/* =========================================
-   SEARCH
-========================================= */
+/* SEARCH */
 
 .search{
     background:#fff;
-
     border-radius:18px;
-
     padding:12px 15px;
 
     display:flex;
@@ -123,7 +92,8 @@ body{
     gap:10px;
 
     box-shadow:
-        0 3px 15px rgba(0,0,0,.06);
+        0 3px 15px
+        rgba(0,0,0,.06);
 
     margin-bottom:15px;
 }
@@ -134,78 +104,65 @@ body{
 
 .search input{
     width:100%;
-
     border:0;
     outline:0;
-
     font-size:14px;
-
     background:transparent;
 }
 
-
-/* =========================================
-   SECTION
-========================================= */
+/* SECTION */
 
 .section-title{
     font-size:16px;
     font-weight:bold;
-
-    margin:
-        5px
-        5px
-        10px;
+    margin:5px 5px 10px;
 }
 
-
-/* =========================================
-   FEATURE GRID
-========================================= */
+/* FEATURES */
 
 .features{
     display:grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
+    grid-template-columns:repeat(2,1fr);
     gap:12px;
 }
 
-
-/* =========================================
-   FEATURE CARD
-========================================= */
+/* CARD */
 
 .feature{
     position:relative;
-
     background:#fff;
-
     border-radius:21px;
-
     padding:17px;
-
     min-height:155px;
 
     box-shadow:
-        0 4px 18px rgba(0,0,0,.07);
+        0 4px 18px
+        rgba(0,0,0,.07);
 
     text-decoration:none;
-
     color:#202124;
 
+    cursor:pointer;
+
     transition:
-        transform .18s ease,
-        box-shadow .18s ease;
+        transform .15s ease,
+        box-shadow .15s ease;
 
     overflow:hidden;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+.feature:hover{
+    box-shadow:
+        0 7px 22px
+        rgba(0,0,0,.11);
 }
 
 .feature:active{
-    transform:scale(.97);
+    transform:scale(.96);
 }
-
 
 /* Shine */
 
@@ -224,12 +181,11 @@ body{
 
     background:
         rgba(23,105,224,.08);
+
+    pointer-events:none;
 }
 
-
-/* =========================================
-   ICON
-========================================= */
+/* ICON */
 
 .icon{
     width:52px;
@@ -238,7 +194,6 @@ body{
     border-radius:16px;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
@@ -246,13 +201,10 @@ body{
 
     margin-bottom:13px;
 
-    color:white;
+    color:#fff;
 }
 
-
-/* =========================================
-   COLORS
-========================================= */
+/* COLORS */
 
 .blue{
     background:
@@ -326,10 +278,7 @@ body{
         );
 }
 
-
-/* =========================================
-   CARD TEXT
-========================================= */
+/* TEXT */
 
 .feature h3{
     font-size:15px;
@@ -339,14 +288,10 @@ body{
 .feature p{
     font-size:11px;
     color:#777;
-
     line-height:1.5;
 }
 
-
-/* =========================================
-   ARROW
-========================================= */
+/* ARROW */
 
 .arrow{
     position:absolute;
@@ -370,17 +315,13 @@ body{
     font-size:15px;
 }
 
-
-/* =========================================
-   QUICK ACTION
-========================================= */
+/* QUICK */
 
 .quick{
     margin-top:18px;
 
     background:#1769e0;
-
-    color:white;
+    color:#fff;
 
     border-radius:22px;
 
@@ -397,20 +338,14 @@ body{
 
 .quick p{
     font-size:11px;
-
     opacity:.85;
-
     margin-top:5px;
 }
 
 .quick-buttons{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:8px;
-
     margin-top:14px;
 }
 
@@ -418,7 +353,7 @@ body{
     background:
         rgba(255,255,255,.15);
 
-    color:white;
+    color:#fff;
 
     border:1px solid
         rgba(255,255,255,.18);
@@ -432,6 +367,14 @@ body{
     text-decoration:none;
 
     font-size:10px;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.quick-btn:active{
+    transform:scale(.95);
 }
 
 .quick-btn span{
@@ -440,27 +383,16 @@ body{
     margin-bottom:4px;
 }
 
-
-/* =========================================
-   FOOTER
-========================================= */
+/* FOOTER */
 
 .footer{
     text-align:center;
-
     color:#999;
-
     font-size:10px;
-
-    padding:
-        20px
-        5px;
+    padding:20px 5px;
 }
 
-
-/* =========================================
-   MOBILE
-========================================= */
+/* MOBILE */
 
 @media(max-width:390px){
 
@@ -494,9 +426,7 @@ body{
 <div class="app">
 
 
-<!-- ======================================
-     TOP BAR
-======================================= -->
+<!-- TOP BAR -->
 
 <div class="topbar">
 
@@ -519,9 +449,7 @@ body{
 </div>
 
 
-<!-- ======================================
-     SEARCH
-======================================= -->
+<!-- SEARCH -->
 
 <div class="search">
 
@@ -536,10 +464,6 @@ body{
 </div>
 
 
-<!-- ======================================
-     TITLE
-======================================= -->
-
 <div class="section-title">
     File Conversion
 </div>
@@ -547,17 +471,19 @@ body{
 
 <!-- ======================================
      FEATURES
-======================================= -->
+====================================== -->
 
-<div class="features"
-     id="features">
+<div
+    class="features"
+    id="features"
+>
 
 
 <!-- JPEG TO PDF -->
 
-<a
-    href="jpeg-to-pdf.html"
+<div
     class="feature"
+    onclick="openTool('jpeg-to-pdf.html')"
 >
 
     <div class="icon blue">
@@ -577,14 +503,14 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- PDF TO JPEG -->
 
-<a
-    href="pdf-to-jpeg.html"
+<div
     class="feature"
+    onclick="openTool('pdf-to-jpeg.html')"
 >
 
     <div class="icon red">
@@ -604,14 +530,14 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- JPG TO PNG -->
 
-<a
-    href="jpg-to-png.html"
+<div
     class="feature"
+    onclick="openTool('jpg-to-png.html')"
 >
 
     <div class="icon green">
@@ -624,21 +550,21 @@ body{
 
     <p>
         Convert JPG photos into
-        transparent PNG images.
+        PNG images.
     </p>
 
     <div class="arrow">
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- PNG TO JPG -->
 
-<a
-    href="png-to-jpg.html"
+<div
     class="feature"
+    onclick="openTool('png-to-jpg.html')"
 >
 
     <div class="icon orange">
@@ -658,14 +584,14 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- IMAGE TO PDF -->
 
-<a
-    href="image-to-pdf.html"
+<div
     class="feature"
+    onclick="openTool('image-to-pdf.html')"
 >
 
     <div class="icon purple">
@@ -685,14 +611,14 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- PHOTO COMPRESSOR -->
 
-<a
-    href="photo-compressor.html"
+<div
     class="feature"
+    onclick="openTool('photo-compressor.html')"
 >
 
     <div class="icon cyan">
@@ -712,14 +638,14 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 <!-- PHOTO RESIZER -->
 
-<a
-    href="photo-resizer.html"
+<div
     class="feature"
+    onclick="openTool('photo-resizer.html')"
 >
 
     <div class="icon pink">
@@ -739,17 +665,44 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
-<!-- FILE TOOL -->
+<!-- PHOTO TOOL -->
 
-<a
-    href="file-tools.html"
+<div
     class="feature"
+    onclick="openTool('photo_maker.html')"
 >
 
     <div class="icon dark">
+        📸
+    </div>
+
+    <h3>
+        Photo Tool
+    </h3>
+
+    <p>
+        Create passport photos
+        and photo sheets.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</div>
+
+
+<!-- MORE TOOLS -->
+
+<div
+    class="feature"
+    onclick="openTool('file-tools.html')"
+>
+
+    <div class="icon blue">
         🛠️
     </div>
 
@@ -766,15 +719,15 @@ body{
         →
     </div>
 
-</a>
+</div>
 
 
 </div>
 
 
 <!-- ======================================
-     QUICK ACTION
-======================================= -->
+     QUICK CONVERSION
+====================================== -->
 
 <div class="quick">
 
@@ -790,49 +743,49 @@ body{
 
     <div class="quick-buttons">
 
-        <a
-            href="jpeg-to-pdf.html"
+
+        <div
             class="quick-btn"
+            onclick="openTool('jpeg-to-pdf.html')"
         >
 
             <span>🖼️</span>
 
             JPEG PDF
 
-        </a>
+        </div>
 
 
-        <a
-            href="pdf-to-jpeg.html"
+        <div
             class="quick-btn"
+            onclick="openTool('pdf-to-jpeg.html')"
         >
 
             <span>📄</span>
 
             PDF JPG
 
-        </a>
+        </div>
 
 
-        <a
-            href="photo-compressor.html"
+        <div
             class="quick-btn"
+            onclick="openTool('photo-compressor.html')"
         >
 
             <span>📦</span>
 
             Compress
 
-        </a>
+        </div>
+
 
     </div>
 
 </div>
 
 
-<!-- ======================================
-     FOOTER
-======================================= -->
+<!-- FOOTER -->
 
 <div class="footer">
 
@@ -849,7 +802,18 @@ body{
 <script>
 
 /* =========================================
-   SEARCH TOOLS
+   OPEN TOOL FUNCTION
+========================================= */
+
+function openTool(file){
+
+    window.location.href = file;
+
+}
+
+
+/* =========================================
+   SEARCH
 ========================================= */
 
 const search =
