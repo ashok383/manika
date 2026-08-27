@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0">
+
+<title>MANIK-A-RNIKA | File Conversion</title>
+
+<style>
+
+/* =========================================
+   RESET
+========================================= */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:
+        Arial,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
+
+body{
+    min-height:100vh;
+    background:#f1f3f6;
+    color:#202124;
+    padding:12px;
+}
+
+
+/* =========================================
+   APP
+========================================= */
+
+.app{
+    width:100%;
+    max-width:650px;
+    margin:auto;
+}
+
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.topbar{
+    background:#ffffff;
+    border-radius:22px;
+
+    padding:16px;
+
+    display:flex;
+    align-items:center;
+    gap:13px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,.08);
+
+    margin-bottom:14px;
+}
+
+.logo{
+    width:48px;
+    height:48px;
+
+    border-radius:15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1769e0,
+            #42a5f5
+        );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:white;
+    font-size:25px;
+
+    box-shadow:
+        0 5px 15px rgba(23,105,224,.25);
+}
+
+.title{
+    flex:1;
+}
+
+.title h1{
+    font-size:20px;
+    color:#1769e0;
+}
+
+.title p{
+    margin-top:3px;
+    font-size:11px;
+    color:#777;
+}
+
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.search{
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:12px 15px;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.06);
+
+    margin-bottom:15px;
+}
+
+.search span{
+    font-size:18px;
+}
+
+.search input{
+    width:100%;
+
+    border:0;
+    outline:0;
+
+    font-size:14px;
+
+    background:transparent;
+}
+
+
+/* =========================================
+   SECTION
+========================================= */
+
+.section-title{
+    font-size:16px;
+    font-weight:bold;
+
+    margin:
+        5px
+        5px
+        10px;
+}
+
+
+/* =========================================
+   FEATURE GRID
+========================================= */
+
+.features{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:12px;
+}
+
+
+/* =========================================
+   FEATURE CARD
+========================================= */
+
+.feature{
+    position:relative;
+
+    background:#fff;
+
+    border-radius:21px;
+
+    padding:17px;
+
+    min-height:155px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,.07);
+
+    text-decoration:none;
+
+    color:#202124;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease;
+
+    overflow:hidden;
+}
+
+.feature:active{
+    transform:scale(.97);
+}
+
+
+/* Shine */
+
+.feature::after{
+    content:"";
+
+    position:absolute;
+
+    width:80px;
+    height:80px;
+
+    right:-30px;
+    top:-30px;
+
+    border-radius:50%;
+
+    background:
+        rgba(23,105,224,.08);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.icon{
+    width:52px;
+    height:52px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:27px;
+
+    margin-bottom:13px;
+
+    color:white;
+}
+
+
+/* =========================================
+   COLORS
+========================================= */
+
+.blue{
+    background:
+        linear-gradient(
+            135deg,
+            #1976d2,
+            #42a5f5
+        );
+}
+
+.red{
+    background:
+        linear-gradient(
+            135deg,
+            #e53935,
+            #ff7043
+        );
+}
+
+.green{
+    background:
+        linear-gradient(
+            135deg,
+            #00a86b,
+            #26c281
+        );
+}
+
+.orange{
+    background:
+        linear-gradient(
+            135deg,
+            #f57c00,
+            #ffb300
+        );
+}
+
+.purple{
+    background:
+        linear-gradient(
+            135deg,
+            #7b1fa2,
+            #ab47bc
+        );
+}
+
+.cyan{
+    background:
+        linear-gradient(
+            135deg,
+            #00838f,
+            #26c6da
+        );
+}
+
+.pink{
+    background:
+        linear-gradient(
+            135deg,
+            #d81b60,
+            #ec407a
+        );
+}
+
+.dark{
+    background:
+        linear-gradient(
+            135deg,
+            #263238,
+            #546e7a
+        );
+}
+
+
+/* =========================================
+   CARD TEXT
+========================================= */
+
+.feature h3{
+    font-size:15px;
+    margin-bottom:5px;
+}
+
+.feature p{
+    font-size:11px;
+    color:#777;
+
+    line-height:1.5;
+}
+
+
+/* =========================================
+   ARROW
+========================================= */
+
+.arrow{
+    position:absolute;
+
+    right:14px;
+    bottom:14px;
+
+    width:27px;
+    height:27px;
+
+    border-radius:50%;
+
+    background:#f1f3f6;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#1769e0;
+
+    font-size:15px;
+}
+
+
+/* =========================================
+   QUICK ACTION
+========================================= */
+
+.quick{
+    margin-top:18px;
+
+    background:#1769e0;
+
+    color:white;
+
+    border-radius:22px;
+
+    padding:18px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(23,105,224,.25);
+}
+
+.quick h2{
+    font-size:17px;
+}
+
+.quick p{
+    font-size:11px;
+
+    opacity:.85;
+
+    margin-top:5px;
+}
+
+.quick-buttons{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:8px;
+
+    margin-top:14px;
+}
+
+.quick-btn{
+    background:
+        rgba(255,255,255,.15);
+
+    color:white;
+
+    border:1px solid
+        rgba(255,255,255,.18);
+
+    border-radius:14px;
+
+    padding:10px 5px;
+
+    text-align:center;
+
+    text-decoration:none;
+
+    font-size:10px;
+}
+
+.quick-btn span{
+    display:block;
+    font-size:20px;
+    margin-bottom:4px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer{
+    text-align:center;
+
+    color:#999;
+
+    font-size:10px;
+
+    padding:
+        20px
+        5px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:390px){
+
+    .features{
+        gap:9px;
+    }
+
+    .feature{
+        padding:14px;
+        min-height:145px;
+    }
+
+    .icon{
+        width:47px;
+        height:47px;
+        font-size:24px;
+    }
+
+    .feature h3{
+        font-size:14px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+<!-- ======================================
+     TOP BAR
+======================================= -->
+
+<div class="topbar">
+
+    <div class="logo">
+        ⚡
+    </div>
+
+    <div class="title">
+
+        <h1>
+            MANIK-A-RNIKA
+        </h1>
+
+        <p>
+            Fast File Conversion Tools
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     SEARCH
+======================================= -->
+
+<div class="search">
+
+    <span>🔍</span>
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search conversion tools..."
+    >
+
+</div>
+
+
+<!-- ======================================
+     TITLE
+======================================= -->
+
+<div class="section-title">
+    File Conversion
+</div>
+
+
+<!-- ======================================
+     FEATURES
+======================================= -->
+
+<div class="features"
+     id="features">
+
+
+<!-- JPEG TO PDF -->
+
+<a
+    href="jpeg-to-pdf.html"
+    class="feature"
+>
+
+    <div class="icon blue">
+        🖼️
+    </div>
+
+    <h3>
+        JPEG → PDF
+    </h3>
+
+    <p>
+        Convert one or multiple
+        JPEG images into PDF.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- PDF TO JPEG -->
+
+<a
+    href="pdf-to-jpeg.html"
+    class="feature"
+>
+
+    <div class="icon red">
+        📄
+    </div>
+
+    <h3>
+        PDF → JPEG
+    </h3>
+
+    <p>
+        Convert PDF pages into
+        high-quality JPG images.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- JPG TO PNG -->
+
+<a
+    href="jpg-to-png.html"
+    class="feature"
+>
+
+    <div class="icon green">
+        🖼️
+    </div>
+
+    <h3>
+        JPG → PNG
+    </h3>
+
+    <p>
+        Convert JPG photos into
+        transparent PNG images.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- PNG TO JPG -->
+
+<a
+    href="png-to-jpg.html"
+    class="feature"
+>
+
+    <div class="icon orange">
+        🔄
+    </div>
+
+    <h3>
+        PNG → JPG
+    </h3>
+
+    <p>
+        Convert PNG images into
+        compressed JPG format.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- IMAGE TO PDF -->
+
+<a
+    href="image-to-pdf.html"
+    class="feature"
+>
+
+    <div class="icon purple">
+        📚
+    </div>
+
+    <h3>
+        Images → PDF
+    </h3>
+
+    <p>
+        Combine multiple images
+        into one PDF document.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- PHOTO COMPRESSOR -->
+
+<a
+    href="photo-compressor.html"
+    class="feature"
+>
+
+    <div class="icon cyan">
+        📦
+    </div>
+
+    <h3>
+        Photo Compressor
+    </h3>
+
+    <p>
+        Reduce image size while
+        maintaining good quality.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- PHOTO RESIZER -->
+
+<a
+    href="photo-resizer.html"
+    class="feature"
+>
+
+    <div class="icon pink">
+        📐
+    </div>
+
+    <h3>
+        Photo Resizer
+    </h3>
+
+    <p>
+        Resize photos to your
+        required dimensions.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+<!-- FILE TOOL -->
+
+<a
+    href="file-tools.html"
+    class="feature"
+>
+
+    <div class="icon dark">
+        🛠️
+    </div>
+
+    <h3>
+        More Tools
+    </h3>
+
+    <p>
+        Open additional document
+        and file utilities.
+    </p>
+
+    <div class="arrow">
+        →
+    </div>
+
+</a>
+
+
+</div>
+
+
+<!-- ======================================
+     QUICK ACTION
+======================================= -->
+
+<div class="quick">
+
+    <h2>
+        ⚡ Quick Conversion
+    </h2>
+
+    <p>
+        Choose a frequently used tool
+        and start immediately.
+    </p>
+
+
+    <div class="quick-buttons">
+
+        <a
+            href="jpeg-to-pdf.html"
+            class="quick-btn"
+        >
+
+            <span>🖼️</span>
+
+            JPEG PDF
+
+        </a>
+
+
+        <a
+            href="pdf-to-jpeg.html"
+            class="quick-btn"
+        >
+
+            <span>📄</span>
+
+            PDF JPG
+
+        </a>
+
+
+        <a
+            href="photo-compressor.html"
+            class="quick-btn"
+        >
+
+            <span>📦</span>
+
+            Compress
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     FOOTER
+======================================= -->
+
+<div class="footer">
+
+    © 2026 MANIK-A-RNIKA
+    <br>
+    Fast • Simple • Private
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =========================================
+   SEARCH TOOLS
+========================================= */
+
+const search =
+document.getElementById("search");
+
+const features =
+document.querySelectorAll(".feature");
+
+
+search.addEventListener(
+    "input",
+    function(){
+
+        const text =
+            this.value
+            .toLowerCase()
+            .trim();
+
+
+        features.forEach(
+            card => {
+
+                const content =
+                    card.innerText
+                    .toLowerCase();
+
+
+                if(
+                    content.includes(text)
+                ){
+
+                    card.style.display =
+                        "";
+
+                }
+                else{
+
+                    card.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+</body>
+</html>
