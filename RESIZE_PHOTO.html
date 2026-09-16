@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo KB Converter & Decorator</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #111827, #312e81, #0f766e);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 950px;
+        background: rgba(255,255,255,0.96);
+        border-radius: 22px;
+        padding: 25px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.35);
+    }
+
+    h1 {
+        text-align: center;
+        margin: 0 0 5px;
+        font-size: 30px;
+        color: #111827;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 22px;
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .control-box {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid #ddd;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    input[type="file"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #bbb;
+        border-radius: 8px;
+        background: white;
+    }
+
+    input[type="range"] {
+        width: 100%;
+    }
+
+    .range-value {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .preview-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 430px;
+        padding: 25px;
+        border-radius: 18px;
+        background:
+            radial-gradient(circle at center, #ffffff, #e5e7eb);
+        overflow: hidden;
+    }
+
+    .photo-frame {
+        position: relative;
+        display: inline-block;
+        padding: 12px;
+        background: linear-gradient(
+            135deg,
+            #fff7ad,
+            #ffd700,
+            #fff,
+            #d4af37,
+            #fff7ad
+        );
+        border-radius: 14px;
+        box-shadow:
+            0 0 8px #fff,
+            0 0 18px rgba(255,215,0,.8),
+            0 0 35px rgba(255,215,0,.55);
+    }
+
+    .photo-frame::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border: 2px solid rgba(255,255,255,.9);
+        border-radius: 10px;
+        pointer-events: none;
+    }
+
+    .photo-frame img {
+        display: block;
+        max-width: min(80vw, 650px);
+        max-height: 390px;
+        object-fit: contain;
+        border-radius: 5px;
+        background: white;
+    }
+
+    .shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.7),
+            transparent
+        );
+        transform: skewX(-20deg);
+        animation: shine 3s infinite;
+        pointer-events: none;
+    }
+
+    @keyframes shine {
+        0% {
+            left: -100%;
+        }
+        45%, 100% {
+            left: 150%;
+        }
+    }
+
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 10px;
+        padding: 13px 22px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+    }
+
+    .convert {
+        background: #2563eb;
+        color: white;
+    }
+
+    .download {
+        background: #059669;
+        color: white;
+    }
+
+    .download:disabled,
+    .convert:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+    }
+
+    .status {
+        text-align: center;
+        margin-top: 18px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        font-weight: bold;
+    }
+
+    .size-good {
+        color: #047857;
+    }
+
+    .size-bad {
+        color: #dc2626;
+    }
+
+    .info {
+        margin-top: 15px;
+        padding: 13px;
+        background: #eff6ff;
+        border-left: 5px solid #2563eb;
+        border-radius: 8px;
+        color: #1e3a8a;
+        font-size: 14px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media(max-width:600px) {
+        h1 {
+            font-size: 23px;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .preview-area {
+            min-height: 300px;
+        }
+
+        .photo-frame img {
+            max-height: 270px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📸 Photo KB Converter</h1>
+    <div class="subtitle">
+        JPEG • 10 KB – 150 KB • Decorative Shining Look
+    </div>
+
+    <div class="controls">
+
+        <div class="control-box">
+            <label>📁 Select Photo</label>
+            <input type="file" id="photoInput" accept="image/*">
+        </div>
+
+        <div class="control-box">
+            <label>🎯 Maximum File Size</label>
+            <input
+                type="number"
+                id="targetKB"
+                min="10"
+                max="150"
+                value="100"
+            >
+            <small>Allowed: 10 KB to 150 KB</small>
+        </div>
+
+        <div class="control-box">
+            <label>✨ Decoration</label>
+            <select id="decoration">
+                <option value="gold">Golden Shining</option>
+                <option value="silver">Silver Shining</option>
+                <option value="blue">Blue Shining</option>
+                <option value="pink">Pink Shining</option>
+                <option value="none">No Decoration</option>
+            </select>
+        </div>
+
+        <div class="control-box">
+            <label>🖼️ Border Width</label>
+            <input
+                type="range"
+                id="borderWidth"
+                min="0"
+                max="30"
+                value="12"
+            >
+            <div class="range-value">
+                <span id="borderValue">12</span> px
+            </div>
+        </div>
+
+    </div>
+
+    <div class="preview-area">
+
+        <div id="frame" class="photo-frame hidden">
+
+            <img id="previewImage" alt="Preview">
+
+            <div class="shine"></div>
+
+        </div>
+
+        <div id="emptyMessage">
+            Select a photo to see the preview
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button
+            class="convert"
+            id="convertBtn"
+            disabled
+        >
+            🔄 Convert to JPEG
+        </button>
+
+        <button
+            class="download"
+            id="downloadBtn"
+            disabled
+        >
+            ⬇️ Download JPEG
+        </button>
+
+    </div>
+
+    <div id="status" class="status">
+        No photo selected
+    </div>
+
+    <div class="info">
+        <b>How it works:</b>
+        Select your photo → choose the required maximum KB →
+        click Convert → check the actual JPEG size → Download.
+        The converter automatically reduces JPEG quality to stay within your selected limit.
+    </div>
+
+</div>
+
+<script>
+
+const photoInput = document.getElementById("photoInput");
+const previewImage = document.getElementById("previewImage");
+const frame = document.getElementById("frame");
+const emptyMessage = document.getElementById("emptyMessage");
+
+const targetKB = document.getElementById("targetKB");
+const decoration = document.getElementById("decoration");
+
+const borderWidth = document.getElementById("borderWidth");
+const borderValue = document.getElementById("borderValue");
+
+const convertBtn = document.getElementById("convertBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+const status = document.getElementById("status");
+
+let originalImage = null;
+let finalBlob = null;
+
+
+/* -----------------------------
+   FILE SELECTION
+------------------------------ */
+
+photoInput.addEventListener("change", function() {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please select an image file.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        originalImage = new Image();
+
+        originalImage.onload = function() {
+
+            previewImage.src = e.target.result;
+
+            frame.classList.remove("hidden");
+            emptyMessage.classList.add("hidden");
+
+            convertBtn.disabled = false;
+            downloadBtn.disabled = true;
+
+            finalBlob = null;
+
+            status.textContent =
+                "Photo selected: " +
+                originalImage.width +
+                " × " +
+                originalImage.height +
+                " pixels";
+
+        };
+
+        originalImage.src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+
+/* -----------------------------
+   BORDER WIDTH
+------------------------------ */
+
+borderWidth.addEventListener("input", function() {
+
+    borderValue.textContent = this.value;
+
+    frame.style.padding = this.value + "px";
+
+});
+
+
+/* -----------------------------
+   DECORATION
+------------------------------ */
+
+decoration.addEventListener("change", function() {
+
+    const value = this.value;
+
+    if (value === "none") {
+
+        frame.style.background = "#ffffff";
+        frame.style.boxShadow = "0 5px 20px rgba(0,0,0,.2)";
+
+    }
+
+    else if (value === "silver") {
+
+        frame.style.background =
+            "linear-gradient(135deg,#eee,#999,#fff,#aaa,#eee)";
+
+        frame.style.boxShadow =
+            "0 0 10px #fff, 0 0 25px #aaa";
+
+    }
+
+    else if (value === "blue") {
+
+        frame.style.background =
+            "linear-gradient(135deg,#8be9ff,#168cff,#fff,#5ec8ff)";
+
+        frame.style.boxShadow =
+            "0 0 10px #fff, 0 0 30px #168cff";
+
+    }
+
+    else if (value === "pink") {
+
+        frame.style.background =
+            "linear-gradient(135deg,#ffb6d9,#ff4fa3,#fff,#ff8ac5)";
+
+        frame.style.boxShadow =
+            "0 0 10px #fff, 0 0 30px #ff4fa3";
+
+    }
+
+    else {
+
+        frame.style.background =
+            "linear-gradient(135deg,#fff7ad,#ffd700,#fff,#d4af37,#fff7ad)";
+
+        frame.style.boxShadow =
+            "0 0 8px #fff, 0 0 18px rgba(255,215,0,.8), 0 0 35px rgba(255,215,0,.55)";
+    }
+
+});
+
+
+/* -----------------------------
+   CANVAS CREATION
+------------------------------ */
+
+function createCanvas(image, border) {
+
+    const canvas = document.createElement("canvas");
+
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = image.width + border * 2;
+    canvas.height = image.height + border * 2;
+
+    /*
+       White base
+    */
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+       Decorative border
+    */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    const style = decoration.value;
+
+    if (style === "silver") {
+
+        gradient.addColorStop(0, "#eeeeee");
+        gradient.addColorStop(.25, "#777777");
+        gradient.addColorStop(.5, "#ffffff");
+        gradient.addColorStop(.75, "#aaaaaa");
+        gradient.addColorStop(1, "#eeeeee");
+
+    }
+
+    else if (style === "blue") {
+
+        gradient.addColorStop(0, "#8be9ff");
+        gradient.addColorStop(.25, "#168cff");
+        gradient.addColorStop(.5, "#ffffff");
+        gradient.addColorStop(.75, "#168cff");
+        gradient.addColorStop(1, "#8be9ff");
+
+    }
+
+    else if (style === "pink") {
+
+        gradient.addColorStop(0, "#ffb6d9");
+        gradient.addColorStop(.25, "#ff4fa3");
+        gradient.addColorStop(.5, "#ffffff");
+        gradient.addColorStop(.75, "#ff4fa3");
+        gradient.addColorStop(1, "#ffb6d9");
+
+    }
+
+    else if (style === "none") {
+
+        gradient.addColorStop(0, "#ffffff");
+        gradient.addColorStop(1, "#ffffff");
+
+    }
+
+    else {
+
+        gradient.addColorStop(0, "#fff7ad");
+        gradient.addColorStop(.2, "#ffd700");
+        gradient.addColorStop(.4, "#ffffff");
+        gradient.addColorStop(.6, "#d4af37");
+        gradient.addColorStop(.8, "#fff7ad");
+        gradient.addColorStop(1, "#ffd700");
+
+    }
+
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+       Photo
+    */
+
+    ctx.drawImage(
+        image,
+        border,
+        border,
+        image.width,
+        image.height
+    );
+
+
+    /*
+       Inner decorative line
+    */
+
+    if (style !== "none") {
+
+        ctx.strokeStyle = "rgba(255,255,255,.9)";
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            border / 2,
+            border / 2,
+            canvas.width - border,
+            canvas.height - border
+        );
+
+    }
+
+    return canvas;
+}
+
+
+/* -----------------------------
+   BLOB CONVERSION
+------------------------------ */
+
+function canvasToBlob(canvas, quality) {
+
+    return new Promise(resolve => {
+
+        canvas.toBlob(
+            blob => resolve(blob),
+            "image/jpeg",
+            quality
+        );
+
+    });
+
+}
+
+
+/* -----------------------------
+   SMART JPEG COMPRESSION
+------------------------------ */
+
+async function findBestJPEG(canvas, maxBytes) {
+
+    let low = 0.05;
+    let high = 1.0;
+
+    let bestBlob = null;
+
+    /*
+       First check quality values using
+       binary search.
+    */
+
+    for (let i = 0; i < 12; i++) {
+
+        const quality = (low + high) / 2;
+
+        const blob =
+            await canvasToBlob(canvas, quality);
+
+        if (blob.size <= maxBytes) {
+
+            bestBlob = blob;
+
+            low = quality;
+
+        } else {
+
+            high = quality;
+
+        }
+
+    }
+
+    /*
+       If even very low quality is too large,
+       progressively resize the image.
+    */
+
+    if (!bestBlob) {
+
+        let scale = 0.90;
+
+        while (scale >= 0.20) {
+
+            const resized =
+                document.createElement("canvas");
+
+            resized.width =
+                Math.max(1, Math.floor(canvas.width * scale));
+
+            resized.height =
+                Math.max(1, Math.floor(canvas.height * scale));
+
+            const rctx =
+                resized.getContext("2d");
+
+            rctx.drawImage(
+                canvas,
+                0,
+                0,
+                resized.width,
+                resized.height
+            );
+
+            bestBlob =
+                await canvasToBlob(
+                    resized,
+                    0.50
+                );
+
+            if (bestBlob.size <= maxBytes) {
+
+                return bestBlob;
+
+            }
+
+            scale -= 0.10;
+        }
+
+        /*
+           Last possible result
+        */
+
+        return bestBlob;
+    }
+
+    return bestBlob;
+}
+
+
+/* -----------------------------
+   CONVERT BUTTON
+------------------------------ */
+
+convertBtn.addEventListener("click", async function() {
+
+    if (!originalImage) return;
+
+    let kb =
+        parseInt(targetKB.value);
+
+    /*
+       Enforce 10–150 KB
+    */
+
+    if (isNaN(kb)) kb = 100;
+
+    kb =
+        Math.max(
+            10,
+            Math.min(
+                150,
+                kb
+            )
+        );
+
+    targetKB.value = kb;
+
+    const maxBytes =
+        kb * 1024;
+
+    convertBtn.disabled = true;
+    downloadBtn.disabled = true;
+
+    status.textContent =
+        "⏳ Converting photo... Please wait.";
+
+    /*
+       Border
+    */
+
+    const border =
+        parseInt(borderWidth.value);
+
+    /*
+       Create canvas
+    */
+
+    const canvas =
+        createCanvas(
+            originalImage,
+            border
+        );
+
+    /*
+       Compress
+    */
+
+    finalBlob =
+        await findBestJPEG(
+            canvas,
+            maxBytes
+        );
+
+    if (!finalBlob) {
+
+        status.textContent =
+            "❌ Could not create JPEG.";
+
+        convertBtn.disabled = false;
+
+        return;
+    }
+
+    const actualKB =
+        finalBlob.size / 1024;
+
+    /*
+       Show result
+    */
+
+    if (actualKB <= kb) {
+
+        status.innerHTML =
+            "✅ JPEG Ready — " +
+            actualKB.toFixed(2) +
+            " KB / " +
+            kb +
+            " KB maximum";
+
+        status.className =
+            "status size-good";
+
+        downloadBtn.disabled = false;
+
+    } else {
+
+        status.innerHTML =
+            "⚠️ Result: " +
+            actualKB.toFixed(2) +
+            " KB. Try a larger target or smaller border.";
+
+        status.className =
+            "status size-bad";
+
+        downloadBtn.disabled = false;
+    }
+
+    convertBtn.disabled = false;
+
+});
+
+
+/* -----------------------------
+   DOWNLOAD
+------------------------------ */
+
+downloadBtn.addEventListener("click", function() {
+
+    if (!finalBlob) return;
+
+    const url =
+        URL.createObjectURL(finalBlob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "photo_" +
+        Math.round(finalBlob.size / 1024) +
+        "KB.jpeg";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    setTimeout(
+        () => URL.revokeObjectURL(url),
+        1000
+    );
+
+});
+
+</script>
+
+</body>
+</html>
