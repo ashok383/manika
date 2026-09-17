@@ -1,660 +1,2177 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo + Signature + Border</title>
+
+<title>Photo & Signature Merger</title>
 
 <style>
-* { box-sizing: border-box; }
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f4f7;
+    min-height: 100vh;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(0, 212, 255, .30),
+            transparent 28%
+        ),
+
+        radial-gradient(
+            circle at 90% 15%,
+            rgba(168, 85, 247, .35),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(20, 184, 166, .25),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            135deg,
+            #020617,
+            #111827,
+            #172554
+        );
+
+    color: white;
+
+    padding: 25px;
 }
 
-.container {
-    max-width: 1100px;
-    margin: 25px auto;
-    padding: 20px;
+
+/* =========================================================
+   MAIN APP
+========================================================= */
+
+.app {
+
+    max-width: 1200px;
+
+    margin: auto;
+
+    background:
+        rgba(255,255,255,.10);
+
+    border:
+        1px solid rgba(255,255,255,.25);
+
+    border-radius: 28px;
+
+    backdrop-filter:
+        blur(20px);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.5),
+        inset 0 1px 0
+        rgba(255,255,255,.25);
+
+    overflow: hidden;
 }
 
-h1 {
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+
+    position: relative;
+
     text-align: center;
+
+    padding: 28px;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(37,99,235,.35),
+            rgba(124,58,237,.35),
+            rgba(6,182,212,.30)
+        );
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.2);
 }
 
-.panel {
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,.12);
+.header h1 {
+
+    margin: 0;
+
+    font-size: 34px;
+
+    letter-spacing: .5px;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.8),
+        0 0 25px rgba(96,165,250,.8),
+        0 0 40px rgba(168,85,247,.6);
 }
+
+.header p {
+
+    margin:
+        8px 0 0;
+
+    color:
+        #dbeafe;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   SHINING LINE
+========================================================= */
+
+.shine-line {
+
+    height: 4px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #38bdf8,
+            white,
+            #a78bfa,
+            #38bdf8,
+            transparent
+        );
+
+    background-size: 200% 100%;
+
+    animation:
+        movingShine 3s linear infinite;
+}
+
+@keyframes movingShine {
+
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+
+    padding: 25px;
+}
+
+
+/* =========================================================
+   UPLOAD GRID
+========================================================= */
+
+.upload-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(280px,1fr)
+        );
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   UPLOAD CARD
+========================================================= */
+
+.upload-card {
+
+    position: relative;
+
+    padding: 25px;
+
+    text-align: center;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,.20);
+
+    overflow: hidden;
+
+    transition: .3s;
+}
+
+.upload-card:hover {
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        0 10px 35px
+        rgba(0,0,0,.3),
+
+        0 0 25px
+        rgba(96,165,250,.25);
+}
+
+
+.upload-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 150px;
+    height: 150px;
+
+    top: -80px;
+    right: -80px;
+
+    background:
+        rgba(255,255,255,.15);
+
+    border-radius: 50%;
+
+    filter:
+        blur(5px);
+}
+
+
+.upload-icon {
+
+    font-size: 55px;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255,255,255,.8)
+        )
+
+        drop-shadow(
+            0 0 20px
+            rgba(59,130,246,.7)
+        );
+}
+
+
+.upload-card h2 {
+
+    margin:
+        8px 0;
+
+    font-size: 20px;
+}
+
+
+.upload-card p {
+
+    color:
+        #cbd5e1;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FILE INPUT
+========================================================= */
+
+input[type="file"] {
+
+    display: none;
+}
+
+
+.select-btn {
+
+    display: inline-block;
+
+    padding:
+        12px 22px;
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    box-shadow:
+        0 0 15px
+        rgba(96,165,250,.45);
+
+    transition: .25s;
+}
+
+
+.select-btn:hover {
+
+    transform:
+        translateY(-2px)
+        scale(1.03);
+
+    box-shadow:
+        0 0 28px
+        rgba(96,165,250,.8);
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
 
 .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
+
+    margin-top: 22px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px,1fr)
+        );
+
+    gap: 15px;
 }
 
-input, select, button {
-    padding: 9px;
+
+.control {
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
 }
 
-button {
-    border: 0;
-    border-radius: 6px;
-    background: #1976d2;
-    color: white;
+
+.control label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
     font-weight: bold;
-    cursor: pointer;
+
+    color:
+        #e0f2fe;
 }
 
-.download {
-    background: #16833b;
+
+.control input[type="number"],
+.control select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    border:
+        1px solid
+        #64748b;
+
+    background:
+        #0f172a;
+
+    color:
+        white;
+
+    outline: none;
 }
 
-.reset {
-    background: #777;
+
+.control input[type="range"] {
+
+    width: 100%;
 }
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-title {
+
+    margin-top: 28px;
+
+    font-size: 21px;
+
+    font-weight: bold;
+}
+
+
+.preview-area {
+
+    margin-top: 15px;
+
+    min-height: 520px;
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    padding: 35px;
+
+    border-radius: 22px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #ffffff,
+            #dbeafe 45%,
+            #cbd5e1
+        );
+
+    overflow: auto;
+}
+
+
+/* =========================================================
+   DOCUMENT / MERGED CANVAS
+========================================================= */
 
 .canvas-wrapper {
-    overflow: auto;
-    text-align: center;
-    background: #eee;
-    padding: 15px;
+
+    position: relative;
+
+    padding: 12px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fef08a,
+            #f59e0b,
+            white,
+            #facc15,
+            #f59e0b
+        );
+
+    box-shadow:
+
+        0 0 8px white,
+
+        0 0 20px
+        rgba(250,204,21,.85),
+
+        0 0 45px
+        rgba(245,158,11,.55);
 }
 
-canvas {
-    max-width: 100%;
-    height: auto;
-    cursor: crosshair;
+
+.canvas-wrapper::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 4px;
+
+    border:
+        2px solid
+        rgba(255,255,255,.9);
+
+    border-radius: 14px;
+
+    pointer-events: none;
 }
+
+
+#outputCanvas {
+
+    display: block;
+
+    background: white;
+
+    max-width: 100%;
+
+    height: auto;
+
+    border-radius: 5px;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.actions {
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap: 15px;
+
+    margin-top: 25px;
+}
+
+
+button {
+
+    border: none;
+
+    color: white;
+
+    padding:
+        14px 26px;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+
+button:hover {
+
+    transform:
+        translateY(-3px);
+}
+
+
+.preview-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #0891b2
+        );
+
+    box-shadow:
+        0 0 18px
+        rgba(14,165,233,.45);
+}
+
+
+.download-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #059669,
+            #0d9488
+        );
+
+    box-shadow:
+        0 0 20px
+        rgba(20,184,166,.5);
+}
+
+
+.download-btn:hover {
+
+    box-shadow:
+        0 0 32px
+        rgba(45,212,191,.85);
+}
+
+
+.reset-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #be123c
+        );
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+
+    margin-top: 20px;
+
+    padding: 13px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    background:
+        rgba(0,0,0,.25);
+
+    color:
+        #bfdbfe;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+
+    text-align: center;
+
+    padding: 18px;
+
+    color:
+        #94a3b8;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+    .preview-area {
+        min-height: 350px;
+        padding: 15px;
+    }
+
+}
+
 </style>
 </head>
 
+
 <body>
 
-<div class="container">
 
-<h1>📷 Photo + Signature Merger</h1>
+<div class="app">
 
-<div class="panel">
 
-    <div class="controls">
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-        <label>
-            Photo:
-            <input type="file" id="photoInput" accept="image/*">
+<div class="header">
+
+    <h1>
+        ✨ PHOTO + SIGNATURE MERGER ✨
+    </h1>
+
+    <p>
+        Create a professional photo & signature image
+        with a premium shining design
+    </p>
+
+</div>
+
+
+<div class="shine-line"></div>
+
+
+<div class="content">
+
+
+<!-- =====================================================
+     UPLOAD SECTION
+===================================================== -->
+
+<div class="upload-grid">
+
+
+    <!-- PHOTO -->
+
+    <div class="upload-card">
+
+        <div class="upload-icon">
+            📷
+        </div>
+
+        <h2>
+            Photo
+        </h2>
+
+        <p>
+            Select your photograph
+        </p>
+
+        <label
+            for="photoInput"
+            class="select-btn"
+        >
+            📂 Select Photo
         </label>
 
-        <label>
-            Signature:
-            <input type="file" id="signatureInput" accept="image/*">
-        </label>
+        <input
+            type="file"
+            id="photoInput"
+            accept="image/*"
+        >
 
     </div>
 
-    <br>
 
-    <div class="controls">
+    <!-- SIGNATURE -->
 
-        <label>
-            Signature Size:
-            <input type="range" id="signatureSize"
-                   min="5" max="100" value="30">
-            <span id="sizeValue">30%</span>
+    <div class="upload-card">
+
+        <div class="upload-icon">
+            ✍️
+        </div>
+
+        <h2>
+            Signature
+        </h2>
+
+        <p>
+            Select your signature image
+        </p>
+
+        <label
+            for="signatureInput"
+            class="select-btn"
+        >
+            📂 Select Signature
         </label>
 
-        <label>
-            Border:
-            <input type="range" id="borderSize"
-                   min="0" max="50" value="5">
-            <span id="borderValue">5 px</span>
-        </label>
-
-        <label>
-            Border Color:
-            <input type="color" id="borderColor" value="#000000">
-        </label>
-
-        <label>
-            Border Style:
-            <select id="borderStyle">
-                <option value="solid">Solid</option>
-                <option value="double">Double</option>
-                <option value="dashed">Dashed</option>
-                <option value="dotted">Dotted</option>
-            </select>
-        </label>
-
-        <button class="reset" onclick="resetSignature()">
-            Reset Signature
-        </button>
-
-        <button class="download" onclick="downloadImage()">
-            ⬇ Download Image
-        </button>
+        <input
+            type="file"
+            id="signatureInput"
+            accept="image/*"
+        >
 
     </div>
 
 </div>
 
-<div class="panel">
 
-    <div class="canvas-wrapper">
-        <canvas id="canvas"></canvas>
+<!-- =====================================================
+     CONTROLS
+===================================================== -->
+
+<div class="controls">
+
+
+    <div class="control">
+
+        <label>
+            📐 Output Width (px)
+        </label>
+
+        <input
+            type="number"
+            id="outputWidth"
+            value="800"
+            min="100"
+            max="5000"
+        >
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            📏 Output Height (px)
+        </label>
+
+        <input
+            type="number"
+            id="outputHeight"
+            value="600"
+            min="100"
+            max="5000"
+        >
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            🎨 Background
+        </label>
+
+        <select id="background">
+
+            <option value="white">
+                White
+            </option>
+
+            <option value="transparent">
+                Transparent
+            </option>
+
+            <option value="lightblue">
+                Light Blue
+            </option>
+
+            <option value="gradient">
+                Premium Gradient
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            ✨ Border
+        </label>
+
+        <select id="borderStyle">
+
+            <option value="gold">
+                Golden Shine
+            </option>
+
+            <option value="blue">
+                Blue Shine
+            </option>
+
+            <option value="silver">
+                Silver Shine
+            </option>
+
+            <option value="purple">
+                Purple Shine
+            </option>
+
+            <option value="none">
+                No Border
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            📷 Photo Size
+        </label>
+
+        <input
+            type="range"
+            id="photoSize"
+            min="20"
+            max="100"
+            value="55"
+        >
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            ✍️ Signature Size
+        </label>
+
+        <input
+            type="range"
+            id="signatureSize"
+            min="10"
+            max="80"
+            value="30"
+        >
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            ↔️ Signature Position
+        </label>
+
+        <select id="signaturePosition">
+
+            <option value="bottom-right">
+                Bottom Right
+            </option>
+
+            <option value="bottom-left">
+                Bottom Left
+            </option>
+
+            <option value="bottom-center">
+                Bottom Center
+            </option>
+
+            <option value="right">
+                Right Side
+            </option>
+
+            <option value="left">
+                Left Side
+            </option>
+
+            <option value="center">
+                Center
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="control">
+
+        <label>
+            🔄 Signature Rotation
+        </label>
+
+        <input
+            type="number"
+            id="signatureRotation"
+            value="0"
+            min="-180"
+            max="180"
+        >
+
     </div>
 
 </div>
+
+
+<!-- =====================================================
+     PREVIEW
+===================================================== -->
+
+<div class="preview-title">
+
+    🖼️ Live Merged Preview
+
+</div>
+
+
+<div class="preview-area">
+
+    <div
+        class="canvas-wrapper"
+        id="canvasWrapper"
+    >
+
+        <canvas
+            id="outputCanvas"
+            width="800"
+            height="600"
+        ></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ACTION BUTTONS
+===================================================== -->
+
+<div class="actions">
+
+    <button
+        class="preview-btn"
+        onclick="mergeImages()"
+    >
+        ✨ Create Preview
+    </button>
+
+
+    <button
+        class="download-btn"
+        onclick="downloadJPEG()"
+    >
+        ⬇️ Download JPEG
+    </button>
+
+
+    <button
+        class="reset-btn"
+        onclick="resetAll()"
+    >
+        🔄 Reset
+    </button>
+
+</div>
+
+
+<div
+    class="status"
+    id="status"
+>
+    Select a photo and signature to begin.
+</div>
+
+
+</div>
+
+
+<div class="footer">
+
+    ✨ Premium Photo + Signature Merger
+    • Browser based • No upload required
+
+</div>
+
 
 </div>
 
 
 <script>
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let photoImage = null;
+
+let signatureImage = null;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
 const photoInput =
-    document.getElementById("photoInput");
+    document.getElementById(
+        "photoInput"
+    );
 
 const signatureInput =
-    document.getElementById("signatureInput");
-
-const signatureSize =
-    document.getElementById("signatureSize");
-
-const borderSize =
-    document.getElementById("borderSize");
-
-const borderColor =
-    document.getElementById("borderColor");
-
-const borderStyle =
-    document.getElementById("borderStyle");
-
-const sizeValue =
-    document.getElementById("sizeValue");
-
-const borderValue =
-    document.getElementById("borderValue");
-
-let photo = new Image();
-let signature = new Image();
-
-let photoLoaded = false;
-let signatureLoaded = false;
-
-let sigX = 0;
-let sigY = 0;
-let sigWidth = 200;
-let sigHeight = 100;
-
-let dragging = false;
-let offsetX = 0;
-let offsetY = 0;
-
-
-// =============================
-// LOAD PHOTO
-// =============================
-
-photoInput.addEventListener("change", function(e) {
-
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-
-        photo.onload = function() {
-
-            canvas.width = photo.naturalWidth;
-            canvas.height = photo.naturalHeight;
-
-            photoLoaded = true;
-
-            drawCanvas();
-
-        };
-
-        photo.src = event.target.result;
-    };
-
-    reader.readAsDataURL(file);
-});
-
-
-// =============================
-// LOAD SIGNATURE
-// =============================
-
-signatureInput.addEventListener("change", function(e) {
-
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-
-        signature.onload = function() {
-
-            signatureLoaded = true;
-
-            const ratio =
-                signature.naturalHeight /
-                signature.naturalWidth;
-
-            sigWidth = canvas.width * 0.30;
-
-            sigHeight = sigWidth * ratio;
-
-            sigX =
-                (canvas.width - sigWidth) / 2;
-
-            sigY =
-                canvas.height -
-                sigHeight -
-                50;
-
-            drawCanvas();
-        };
-
-        signature.src = event.target.result;
-    };
-
-    reader.readAsDataURL(file);
-});
-
-
-// =============================
-// DRAW EVERYTHING
-// =============================
-
-function drawCanvas() {
-
-    if (!photoLoaded) return;
-
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    document.getElementById(
+        "signatureInput"
     );
 
-    // PHOTO
-    ctx.drawImage(
-        photo,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+const canvas =
+    document.getElementById(
+        "outputCanvas"
     );
 
-    // SIGNATURE
-    if (signatureLoaded) {
+const ctx =
+    canvas.getContext("2d");
 
-        ctx.drawImage(
-            signature,
-            sigX,
-            sigY,
-            sigWidth,
-            sigHeight
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+/* =========================================================
+   LOAD PHOTO
+========================================================= */
+
+photoInput.addEventListener(
+    "change",
+    function() {
+
+        const file =
+            this.files[0];
+
+        if (!file) return;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(e) {
+
+                photoImage =
+                    new Image();
+
+
+                photoImage.onload =
+                    function() {
+
+                        status.textContent =
+                            "✅ Photo loaded successfully.";
+
+                        mergeImages();
+
+                    };
+
+
+                photoImage.src =
+                    e.target.result;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================================
+   LOAD SIGNATURE
+========================================================= */
+
+signatureInput.addEventListener(
+    "change",
+    function() {
+
+        const file =
+            this.files[0];
+
+        if (!file) return;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(e) {
+
+                signatureImage =
+                    new Image();
+
+
+                signatureImage.onload =
+                    function() {
+
+                        status.textContent =
+                            "✅ Signature loaded successfully.";
+
+                        mergeImages();
+
+                    };
+
+
+                signatureImage.src =
+                    e.target.result;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================================
+   DRAW BACKGROUND
+========================================================= */
+
+function drawBackground() {
+
+    const background =
+        document.getElementById(
+            "background"
+        ).value;
+
+
+    if (
+        background ===
+        "transparent"
+    ) {
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
         );
+
+        return;
+
     }
 
-    // BORDER
-    drawBorder();
+
+    if (
+        background ===
+        "lightblue"
+    ) {
+
+        ctx.fillStyle =
+            "#eff6ff";
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        return;
+
+    }
+
+
+    if (
+        background ===
+        "gradient"
+    ) {
+
+        const gradient =
+            ctx.createLinearGradient(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "#eff6ff"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#e0e7ff"
+        );
+
+
+        ctx.fillStyle =
+            gradient;
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        return;
+
+    }
+
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
 }
 
 
-// =============================
-// BORDER
-// =============================
+/* =========================================================
+   DRAW PHOTO
+========================================================= */
 
-function drawBorder() {
+function drawPhoto() {
+
+    if (!photoImage)
+        return;
+
+
+    const size =
+        Number(
+            document.getElementById(
+                "photoSize"
+            ).value
+        ) / 100;
+
+
+    const maxWidth =
+        canvas.width * size;
+
+
+    const maxHeight =
+        canvas.height * .85;
+
+
+    const ratio =
+        Math.min(
+            maxWidth /
+                photoImage.naturalWidth,
+
+            maxHeight /
+                photoImage.naturalHeight
+        );
+
 
     const width =
-        Number(borderSize.value);
+        photoImage.naturalWidth *
+        ratio;
 
-    if (width <= 0) return;
+
+    const height =
+        photoImage.naturalHeight *
+        ratio;
+
+
+    /*
+       Center photo
+    */
+
+    const x =
+        (canvas.width -
+         width) / 2;
+
+
+    const y =
+        (canvas.height -
+         height) / 2;
+
+
+    /*
+       Soft photo shadow
+    */
 
     ctx.save();
 
-    ctx.strokeStyle =
-        borderColor.value;
+    ctx.shadowColor =
+        "rgba(0,0,0,.30)";
 
-    ctx.lineWidth = width;
+    ctx.shadowBlur =
+        15;
 
-    const inset = width / 2;
+    ctx.shadowOffsetY =
+        5;
 
-    if (borderStyle.value === "solid") {
 
-        ctx.setLineDash([]);
+    ctx.drawImage(
+        photoImage,
+        x,
+        y,
+        width,
+        height
+    );
 
-        ctx.strokeRect(
-            inset,
-            inset,
-            canvas.width - width,
-            canvas.height - width
-        );
-
-    }
-
-    else if (borderStyle.value === "dashed") {
-
-        ctx.setLineDash([20, 12]);
-
-        ctx.strokeRect(
-            inset,
-            inset,
-            canvas.width - width,
-            canvas.height - width
-        );
-
-    }
-
-    else if (borderStyle.value === "dotted") {
-
-        ctx.setLineDash([3, 8]);
-
-        ctx.strokeRect(
-            inset,
-            inset,
-            canvas.width - width,
-            canvas.height - width
-        );
-
-    }
-
-    else if (borderStyle.value === "double") {
-
-        ctx.setLineDash([]);
-
-        ctx.strokeRect(
-            inset,
-            inset,
-            canvas.width - width,
-            canvas.height - width
-        );
-
-        const second = width * 2;
-
-        ctx.strokeRect(
-            second,
-            second,
-            canvas.width - second * 2,
-            canvas.height - second * 2
-        );
-    }
 
     ctx.restore();
+
 }
 
 
-// =============================
-// SIGNATURE SIZE
-// =============================
+/* =========================================================
+   DRAW SIGNATURE
+========================================================= */
 
-signatureSize.addEventListener("input", function() {
+function drawSignature() {
 
-    const percentage =
-        Number(this.value);
+    if (!signatureImage)
+        return;
 
-    sizeValue.textContent =
-        percentage + "%";
 
-    if (!signatureLoaded) return;
+    const size =
+        Number(
+            document.getElementById(
+                "signatureSize"
+            ).value
+        ) / 100;
+
+
+    const position =
+        document.getElementById(
+            "signaturePosition"
+        ).value;
+
+
+    const rotation =
+        Number(
+            document.getElementById(
+                "signatureRotation"
+            ).value
+        );
+
+
+    const maxWidth =
+        canvas.width *
+        size;
+
+
+    const maxHeight =
+        canvas.height *
+        .25;
+
 
     const ratio =
-        signature.naturalHeight /
-        signature.naturalWidth;
+        Math.min(
+            maxWidth /
+                signatureImage.naturalWidth,
 
-    sigWidth =
-        canvas.width * percentage / 100;
-
-    sigHeight =
-        sigWidth * ratio;
-
-    drawCanvas();
-});
+            maxHeight /
+                signatureImage.naturalHeight
+        );
 
 
-// =============================
-// BORDER CONTROLS
-// =============================
-
-borderSize.addEventListener("input", function() {
-
-    borderValue.textContent =
-        this.value + " px";
-
-    drawCanvas();
-});
-
-borderColor.addEventListener("input", drawCanvas);
-
-borderStyle.addEventListener("change", drawCanvas);
+    const width =
+        signatureImage.naturalWidth *
+        ratio;
 
 
-// =============================
-// MOUSE DRAG SIGNATURE
-// =============================
+    const height =
+        signatureImage.naturalHeight *
+        ratio;
 
-canvas.addEventListener("mousedown", function(e) {
 
-    if (!signatureLoaded) return;
+    let x = 0;
 
-    const rect =
-        canvas.getBoundingClientRect();
+    let y = 0;
 
-    const scaleX =
-        canvas.width / rect.width;
 
-    const scaleY =
-        canvas.height / rect.height;
+    const margin = 20;
 
-    const x =
-        (e.clientX - rect.left) * scaleX;
 
-    const y =
-        (e.clientY - rect.top) * scaleY;
+    /* POSITION */
+
 
     if (
-        x >= sigX &&
-        x <= sigX + sigWidth &&
-        y >= sigY &&
-        y <= sigY + sigHeight
+        position ===
+        "bottom-right"
     ) {
 
-        dragging = true;
+        x =
+            canvas.width -
+            width -
+            margin;
 
-        offsetX = x - sigX;
-        offsetY = y - sigY;
+        y =
+            canvas.height -
+            height -
+            margin;
+
     }
-});
 
 
-canvas.addEventListener("mousemove", function(e) {
-
-    if (!dragging) return;
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-    const scaleX =
-        canvas.width / rect.width;
-
-    const scaleY =
-        canvas.height / rect.height;
-
-    const x =
-        (e.clientX - rect.left) * scaleX;
-
-    const y =
-        (e.clientY - rect.top) * scaleY;
-
-    sigX = x - offsetX;
-    sigY = y - offsetY;
-
-    drawCanvas();
-});
-
-
-canvas.addEventListener("mouseup", function() {
-
-    dragging = false;
-
-});
-
-canvas.addEventListener("mouseleave", function() {
-
-    dragging = false;
-
-});
-
-
-// =============================
-// TOUCH SUPPORT
-// =============================
-
-canvas.addEventListener("touchstart", function(e) {
-
-    if (!signatureLoaded) return;
-
-    const touch = e.touches[0];
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-    const scaleX =
-        canvas.width / rect.width;
-
-    const scaleY =
-        canvas.height / rect.height;
-
-    const x =
-        (touch.clientX - rect.left) * scaleX;
-
-    const y =
-        (touch.clientY - rect.top) * scaleY;
-
-    if (
-        x >= sigX &&
-        x <= sigX + sigWidth &&
-        y >= sigY &&
-        y <= sigY + sigHeight
+    else if (
+        position ===
+        "bottom-left"
     ) {
 
-        dragging = true;
+        x =
+            margin;
 
-        offsetX = x - sigX;
-        offsetY = y - sigY;
+        y =
+            canvas.height -
+            height -
+            margin;
+
     }
 
-}, {passive:false});
+
+    else if (
+        position ===
+        "bottom-center"
+    ) {
+
+        x =
+            (canvas.width -
+             width) / 2;
+
+        y =
+            canvas.height -
+            height -
+            margin;
+
+    }
 
 
-canvas.addEventListener("touchmove", function(e) {
+    else if (
+        position ===
+        "right"
+    ) {
 
-    if (!dragging) return;
+        x =
+            canvas.width -
+            width -
+            margin;
 
-    e.preventDefault();
+        y =
+            (canvas.height -
+             height) / 2;
 
-    const touch = e.touches[0];
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-    const scaleX =
-        canvas.width / rect.width;
-
-    const scaleY =
-        canvas.height / rect.height;
-
-    const x =
-        (touch.clientX - rect.left) * scaleX;
-
-    const y =
-        (touch.clientY - rect.top) * scaleY;
-
-    sigX = x - offsetX;
-    sigY = y - offsetY;
-
-    drawCanvas();
-
-}, {passive:false});
+    }
 
 
-canvas.addEventListener("touchend", function() {
+    else if (
+        position ===
+        "left"
+    ) {
 
-    dragging = false;
+        x =
+            margin;
 
-});
+        y =
+            (canvas.height -
+             height) / 2;
+
+    }
 
 
-// =============================
-// RESET SIGNATURE
-// =============================
+    else {
 
-function resetSignature() {
+        x =
+            (canvas.width -
+             width) / 2;
 
-    if (!signatureLoaded) return;
+        y =
+            (canvas.height -
+             height) / 2;
 
-    sigX =
-        (canvas.width - sigWidth) / 2;
+    }
 
-    sigY =
-        canvas.height -
-        sigHeight -
-        50;
 
-    drawCanvas();
+    /*
+       Rotate around center
+    */
+
+    ctx.save();
+
+
+    ctx.translate(
+        x + width / 2,
+        y + height / 2
+    );
+
+
+    ctx.rotate(
+        rotation *
+        Math.PI /
+        180
+    );
+
+
+    /*
+       Signature glow
+    */
+
+    ctx.shadowColor =
+        "rgba(37,99,235,.35)";
+
+    ctx.shadowBlur =
+        8;
+
+
+    ctx.drawImage(
+        signatureImage,
+        -width / 2,
+        -height / 2,
+        width,
+        height
+    );
+
+
+    ctx.restore();
+
 }
 
 
-// =============================
-// DOWNLOAD
-// =============================
+/* =========================================================
+   DRAW DECORATIVE BORDER
+========================================================= */
 
-function downloadImage() {
+function drawBorder() {
 
-    if (!photoLoaded) {
+    const style =
+        document.getElementById(
+            "borderStyle"
+        ).value;
 
-        alert("Please select a photo.");
 
+    if (
+        style ===
+        "none"
+    )
         return;
+
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+    if (
+        style ===
+        "blue"
+    ) {
+
+        gradient.addColorStop(
+            0,
+            "#38bdf8"
+        );
+
+        gradient.addColorStop(
+            .3,
+            "#2563eb"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .7,
+            "#7c3aed"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#38bdf8"
+        );
+
     }
 
-    if (!signatureLoaded) {
 
-        alert("Please select a signature.");
+    else if (
+        style ===
+        "silver"
+    ) {
+
+        gradient.addColorStop(
+            0,
+            "#64748b"
+        );
+
+        gradient.addColorStop(
+            .3,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#cbd5e1"
+        );
+
+        gradient.addColorStop(
+            .7,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#64748b"
+        );
+
+    }
+
+
+    else if (
+        style ===
+        "purple"
+    ) {
+
+        gradient.addColorStop(
+            0,
+            "#a855f7"
+        );
+
+        gradient.addColorStop(
+            .3,
+            "#7c3aed"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .7,
+            "#c084fc"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#7c3aed"
+        );
+
+    }
+
+
+    else {
+
+        gradient.addColorStop(
+            0,
+            "#fef08a"
+        );
+
+        gradient.addColorStop(
+            .25,
+            "#f59e0b"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .75,
+            "#facc15"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#f59e0b"
+        );
+
+    }
+
+
+    ctx.save();
+
+
+    ctx.strokeStyle =
+        gradient;
+
+    ctx.lineWidth =
+        14;
+
+
+    ctx.shadowColor =
+        "rgba(255,215,0,.55)";
+
+    ctx.shadowBlur =
+        15;
+
+
+    ctx.strokeRect(
+        7,
+        7,
+        canvas.width - 14,
+        canvas.height - 14
+    );
+
+
+    /*
+       Inner white line
+    */
+
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.9)";
+
+    ctx.lineWidth = 2;
+
+
+    ctx.strokeRect(
+        16,
+        16,
+        canvas.width - 32,
+        canvas.height - 32
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   MAIN MERGE
+========================================================= */
+
+function mergeImages() {
+
+    const width =
+        Number(
+            document.getElementById(
+                "outputWidth"
+            ).value
+        );
+
+
+    const height =
+        Number(
+            document.getElementById(
+                "outputHeight"
+            ).value
+        );
+
+
+    if (
+        width < 100 ||
+        height < 100
+    ) {
+
+        alert(
+            "Please enter valid output dimensions."
+        );
 
         return;
+
     }
+
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    /*
+       Background
+    */
+
+    drawBackground();
+
+
+    /*
+       Photo
+    */
+
+    drawPhoto();
+
+
+    /*
+       Signature
+    */
+
+    drawSignature();
+
+
+    /*
+       Border
+    */
+
+    drawBorder();
+
+
+    status.textContent =
+        "✨ Photo & signature merged successfully.";
+
+}
+
+
+/* =========================================================
+   DOWNLOAD JPEG
+========================================================= */
+
+function downloadJPEG() {
+
+    if (
+        !photoImage &&
+        !signatureImage
+    ) {
+
+        alert(
+            "Please select a photo and signature first."
+        );
+
+        return;
+
+    }
+
+
+    mergeImages();
+
+
+    /*
+       JPEG cannot store transparency.
+       White background is used.
+    */
+
+    const jpegCanvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    jpegCanvas.width =
+        canvas.width;
+
+    jpegCanvas.height =
+        canvas.height;
+
+
+    const jpegCtx =
+        jpegCanvas.getContext(
+            "2d"
+        );
+
+
+    /*
+       White background
+    */
+
+    jpegCtx.fillStyle =
+        "#ffffff";
+
+    jpegCtx.fillRect(
+        0,
+        0,
+        jpegCanvas.width,
+        jpegCanvas.height
+    );
+
+
+    jpegCtx.drawImage(
+        canvas,
+        0,
+        0
+    );
+
+
+    /*
+       JPEG QUALITY
+    */
+
+    const quality = 0.95;
+
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
+
 
     link.download =
-        "photo_signature_merged.png";
+        "Photo_Signature_Merged.jpeg";
+
 
     link.href =
-        canvas.toDataURL("image/png");
+        jpegCanvas.toDataURL(
+            "image/jpeg",
+            quality
+        );
+
+
+    document.body.appendChild(
+        link
+    );
+
 
     link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    status.textContent =
+        "⬇️ Merged JPEG downloaded successfully.";
+
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetAll() {
+
+    photoImage = null;
+
+    signatureImage = null;
+
+
+    photoInput.value = "";
+
+    signatureInput.value = "";
+
+
+    document.getElementById(
+        "outputWidth"
+    ).value = 800;
+
+
+    document.getElementById(
+        "outputHeight"
+    ).value = 600;
+
+
+    document.getElementById(
+        "photoSize"
+    ).value = 55;
+
+
+    document.getElementById(
+        "signatureSize"
+    ).value = 30;
+
+
+    document.getElementById(
+        "signatureRotation"
+    ).value = 0;
+
+
+    document.getElementById(
+        "signaturePosition"
+    ).value =
+        "bottom-right";
+
+
+    document.getElementById(
+        "background"
+    ).value =
+        "white";
+
+
+    document.getElementById(
+        "borderStyle"
+    ).value =
+        "gold";
+
+
+    canvas.width = 800;
+
+    canvas.height = 600;
+
+
+    drawBackground();
+
+
+    ctx.fillStyle =
+        "#64748b";
+
+    ctx.font =
+        "bold 24px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.fillText(
+        "Select Photo + Signature",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+
+
+    status.textContent =
+        "Select a photo and signature to begin.";
+
+}
+
+
+/* =========================================================
+   LIVE PREVIEW
+========================================================= */
+
+document
+    .querySelectorAll(
+        "select, input[type=range], input[type=number]"
+    )
+    .forEach(
+        element => {
+
+            element.addEventListener(
+                "input",
+                () => {
+
+                    if (
+                        photoImage ||
+                        signatureImage
+                    ) {
+
+                        mergeImages();
+
+                    }
+
+                }
+            );
+
+            element.addEventListener(
+                "change",
+                () => {
+
+                    if (
+                        photoImage ||
+                        signatureImage
+                    ) {
+
+                        mergeImages();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   INITIAL SCREEN
+========================================================= */
+
+resetAll();
 
 </script>
 
 </body>
 </html>
-```
