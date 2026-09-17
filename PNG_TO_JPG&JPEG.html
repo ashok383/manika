@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PNG to JPG JPEG Converter</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 25px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+
+    background:
+        radial-gradient(circle at 10% 10%,
+            rgba(0,212,255,.30),
+            transparent 28%),
+        radial-gradient(circle at 90% 10%,
+            rgba(168,85,247,.35),
+            transparent 30%),
+        radial-gradient(circle at 50% 100%,
+            rgba(20,184,166,.25),
+            transparent 35%),
+        linear-gradient(
+            135deg,
+            #020617,
+            #0f172a,
+            #172554,
+            #111827
+        );
+}
+
+.app {
+    max-width: 1250px;
+    margin: auto;
+
+    border-radius: 30px;
+    overflow: hidden;
+
+    background: rgba(255,255,255,.09);
+
+    border: 1px solid rgba(255,255,255,.25);
+
+    backdrop-filter: blur(22px);
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* HEADER */
+
+.header {
+    text-align: center;
+    padding: 30px 20px;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(37,99,235,.38),
+            rgba(124,58,237,.38),
+            rgba(6,182,212,.30)
+        );
+}
+
+.header h1 {
+    margin: 0;
+
+    font-size: 36px;
+
+    text-shadow:
+        0 0 8px white,
+        0 0 20px #38bdf8,
+        0 0 35px #8b5cf6;
+}
+
+.header p {
+    margin: 10px 0 0;
+
+    color: #dbeafe;
+}
+
+/* SHINING LINE */
+
+.shine {
+    height: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #22d3ee,
+            white,
+            #a78bfa,
+            white,
+            #22d3ee,
+            transparent
+        );
+
+    background-size: 250% 100%;
+
+    animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* CONTENT */
+
+.content {
+    padding: 25px;
+}
+
+/* UPLOAD */
+
+.upload-area {
+    padding: 45px 20px;
+
+    text-align: center;
+
+    border-radius: 23px;
+
+    border: 2px dashed rgba(255,255,255,.45);
+
+    background: rgba(255,255,255,.07);
+
+    transition: .3s;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: #38bdf8;
+
+    background: rgba(56,189,248,.08);
+
+    box-shadow:
+        0 0 35px rgba(56,189,248,.35);
+}
+
+.upload-icon {
+    font-size: 72px;
+
+    filter:
+        drop-shadow(0 0 8px white)
+        drop-shadow(0 0 20px #38bdf8)
+        drop-shadow(0 0 35px #8b5cf6);
+}
+
+.upload-area h2 {
+    margin: 8px 0;
+}
+
+.upload-area p {
+    color: #cbd5e1;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.select-btn {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 14px 28px;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 20px rgba(59,130,246,.55);
+
+    transition: .25s;
+}
+
+.select-btn:hover {
+    transform:
+        translateY(-3px)
+        scale(1.04);
+
+    box-shadow:
+        0 0 32px rgba(96,165,250,.85);
+}
+
+/* SETTINGS */
+
+.settings {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(190px,1fr)
+        );
+
+    gap: 15px;
+
+    margin-top: 22px;
+}
+
+.setting {
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background: rgba(255,255,255,.08);
+
+    border:
+        1px solid rgba(255,255,255,.16);
+}
+
+.setting label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #e0f2fe;
+
+    font-weight: bold;
+
+    font-size: 13px;
+}
+
+.setting select,
+.setting input[type="number"] {
+    width: 100%;
+
+    padding: 11px;
+
+    border-radius: 9px;
+
+    background: #0f172a;
+
+    color: white;
+
+    border: 1px solid #64748b;
+
+    outline: none;
+}
+
+.setting input[type="range"] {
+    width: 100%;
+}
+
+/* IMAGE GRID */
+
+.section-title {
+    margin-top: 28px;
+
+    font-size: 21px;
+
+    font-weight: bold;
+}
+
+.image-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(210px,1fr)
+        );
+
+    gap: 18px;
+
+    margin-top: 15px;
+}
+
+/* IMAGE CARD */
+
+.image-card {
+    padding: 10px;
+
+    border-radius: 18px;
+
+    background: rgba(255,255,255,.09);
+
+    border:
+        1px solid rgba(255,255,255,.18);
+
+    transition: .3s;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        0 0 22px rgba(56,189,248,.25);
+}
+
+.image-card img {
+    width: 100%;
+    height: 170px;
+
+    object-fit: contain;
+
+    border-radius: 11px;
+
+    background:
+        repeating-conic-gradient(
+            #f1f5f9 0% 25%,
+            #cbd5e1 0% 50%
+        )
+        50% / 20px 20px;
+}
+
+.file-name {
+    margin-top: 8px;
+
+    font-size: 12px;
+
+    color: #cbd5e1;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-buttons {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 10px;
+}
+
+.card-buttons button {
+    flex: 1;
+
+    padding: 9px 5px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    font-size: 12px;
+}
+
+.download-one {
+    background:
+        linear-gradient(
+            135deg,
+            #059669,
+            #0d9488
+        );
+}
+
+.remove-one {
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #be123c
+        );
+}
+
+/* ACTIONS */
+
+.actions {
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    margin-top: 28px;
+}
+
+.action-btn {
+    border: none;
+
+    padding: 15px 28px;
+
+    border-radius: 13px;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.convert-btn {
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed,
+            #0891b2
+        );
+
+    box-shadow:
+        0 0 20px rgba(59,130,246,.5);
+}
+
+.download-all {
+    background:
+        linear-gradient(
+            135deg,
+            #059669,
+            #0f766e
+        );
+
+    box-shadow:
+        0 0 20px rgba(20,184,166,.5);
+}
+
+.clear-btn {
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #be123c
+        );
+}
+
+.action-btn:hover {
+    transform:
+        translateY(-3px)
+        scale(1.02);
+}
+
+/* PROGRESS */
+
+.progress-box {
+    display: none;
+
+    margin-top: 22px;
+}
+
+.progress-bg {
+    width: 100%;
+
+    height: 12px;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    background: rgba(255,255,255,.12);
+}
+
+.progress-bar {
+    width: 0%;
+
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #22d3ee,
+            #3b82f6,
+            #a855f7
+        );
+
+    box-shadow:
+        0 0 15px #38bdf8;
+
+    transition: width .3s;
+}
+
+.progress-text {
+    margin-top: 7px;
+
+    text-align: center;
+
+    color: #bfdbfe;
+
+    font-size: 13px;
+}
+
+/* STATUS */
+
+.status {
+    margin-top: 20px;
+
+    padding: 13px;
+
+    border-radius: 12px;
+
+    background: rgba(0,0,0,.25);
+
+    text-align: center;
+
+    color: #bfdbfe;
+}
+
+/* FOOTER */
+
+.footer {
+    padding: 18px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 26px;
+    }
+
+    .image-grid {
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .image-card img {
+        height: 130px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="header">
+
+        <h1>
+            ✨ PNG → JPG / JPEG ✨
+        </h1>
+
+        <p>
+            Premium Image Converter • Fast • Private • Professional
+        </p>
+
+    </div>
+
+    <div class="shine"></div>
+
+    <div class="content">
+
+        <!-- UPLOAD -->
+
+        <div
+            class="upload-area"
+            id="dropArea"
+        >
+
+            <div class="upload-icon">
+                🖼️
+            </div>
+
+            <h2>
+                Convert PNG Images
+            </h2>
+
+            <p>
+                Select PNG images or drag & drop them here
+            </p>
+
+            <label
+                class="select-btn"
+                for="fileInput"
+            >
+                📂 Select PNG Images
+            </label>
+
+            <input
+                type="file"
+                id="fileInput"
+                accept=".png,image/png"
+                multiple
+            >
+
+        </div>
+
+
+        <!-- SETTINGS -->
+
+        <div class="settings">
+
+            <div class="setting">
+
+                <label>
+                    🔄 Output Format
+                </label>
+
+                <select id="format">
+
+                    <option value="image/jpeg">
+                        JPG
+                    </option>
+
+                    <option value="image/jpeg">
+                        JPEG
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    🎨 Transparent Background
+                </label>
+
+                <select id="background">
+
+                    <option value="white">
+                        White
+                    </option>
+
+                    <option value="black">
+                        Black
+                    </option>
+
+                    <option value="lightblue">
+                        Light Blue
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    📐 Output Width
+                </label>
+
+                <input
+                    type="number"
+                    id="outputWidth"
+                    placeholder="Original"
+                    min="1"
+                >
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    📏 Output Height
+                </label>
+
+                <input
+                    type="number"
+                    id="outputHeight"
+                    placeholder="Original"
+                    min="1"
+                >
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    ✨ JPG Quality
+                    <span id="qualityValue">
+                        95%
+                    </span>
+                </label>
+
+                <input
+                    type="range"
+                    id="quality"
+                    min="10"
+                    max="100"
+                    value="95"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- IMAGE LIST -->
+
+        <div class="section-title">
+            🖼️ Selected PNG Images
+        </div>
+
+        <div
+            id="imageGrid"
+            class="image-grid"
+        ></div>
+
+
+        <!-- PROGRESS -->
+
+        <div
+            class="progress-box"
+            id="progressBox"
+        >
+
+            <div class="progress-bg">
+
+                <div
+                    class="progress-bar"
+                    id="progressBar"
+                ></div>
+
+            </div>
+
+            <div
+                class="progress-text"
+                id="progressText"
+            >
+                Converting...
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="actions">
+
+            <button
+                class="action-btn convert-btn"
+                onclick="convertAll()"
+            >
+                ✨ Convert to JPG
+            </button>
+
+            <button
+                class="action-btn download-all"
+                onclick="downloadAll()"
+            >
+                📦 Download All
+            </button>
+
+            <button
+                class="action-btn clear-btn"
+                onclick="clearAll()"
+            >
+                🗑️ Clear All
+            </button>
+
+        </div>
+
+
+        <div
+            class="status"
+            id="status"
+        >
+            No PNG images selected
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        ✨ PNG to JPG/JPEG Converter
+        • Browser based • No server upload
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let files = [];
+
+let convertedImages = [];
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
+
+const dropArea =
+    document.getElementById(
+        "dropArea"
+    );
+
+const imageGrid =
+    document.getElementById(
+        "imageGrid"
+    );
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+const progressBox =
+    document.getElementById(
+        "progressBox"
+    );
+
+const progressBar =
+    document.getElementById(
+        "progressBar"
+    );
+
+const progressText =
+    document.getElementById(
+        "progressText"
+    );
+
+const quality =
+    document.getElementById(
+        "quality"
+    );
+
+const qualityValue =
+    document.getElementById(
+        "qualityValue"
+    );
+
+
+/* =========================================================
+   QUALITY DISPLAY
+========================================================= */
+
+quality.addEventListener(
+    "input",
+    function() {
+
+        qualityValue.textContent =
+            this.value + "%";
+
+    }
+);
+
+
+/* =========================================================
+   FILE SELECT
+========================================================= */
+
+fileInput.addEventListener(
+    "change",
+    function() {
+
+        addFiles(
+            this.files
+        );
+
+        this.value = "";
+
+    }
+);
+
+
+/* =========================================================
+   ADD FILES
+========================================================= */
+
+function addFiles(
+    selectedFiles
+) {
+
+    for (
+        const file of selectedFiles
+    ) {
+
+        if (
+            file.type ===
+            "image/png"
+        ) {
+
+            files.push(file);
+
+        }
+
+    }
+
+    renderFiles();
+
+}
+
+
+/* =========================================================
+   DRAG & DROP
+========================================================= */
+
+dropArea.addEventListener(
+    "dragover",
+    function(e) {
+
+        e.preventDefault();
+
+        dropArea.classList.add(
+            "dragover"
+        );
+
+    }
+);
+
+
+dropArea.addEventListener(
+    "dragleave",
+    function() {
+
+        dropArea.classList.remove(
+            "dragover"
+        );
+
+    }
+);
+
+
+dropArea.addEventListener(
+    "drop",
+    function(e) {
+
+        e.preventDefault();
+
+        dropArea.classList.remove(
+            "dragover"
+        );
+
+        addFiles(
+            e.dataTransfer.files
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RENDER FILES
+========================================================= */
+
+function renderFiles() {
+
+    imageGrid.innerHTML = "";
+
+    files.forEach(
+        (file,index) => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "image-card";
+
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+            img.src =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "file-name";
+
+            name.textContent =
+                file.name;
+
+
+            const buttons =
+                document.createElement(
+                    "div"
+                );
+
+            buttons.className =
+                "card-buttons";
+
+
+            const download =
+                document.createElement(
+                    "button"
+                );
+
+            download.className =
+                "download-one";
+
+            download.textContent =
+                "⬇️ JPG";
+
+
+            download.onclick =
+                async function() {
+
+                    const result =
+                        await convertFile(
+                            file
+                        );
+
+                    downloadJPG(
+                        result.blob,
+                        result.name
+                    );
+
+                };
+
+
+            const remove =
+                document.createElement(
+                    "button"
+                );
+
+            remove.className =
+                "remove-one";
+
+            remove.textContent =
+                "✕ Remove";
+
+
+            remove.onclick =
+                function() {
+
+                    files.splice(
+                        index,
+                        1
+                    );
+
+                    renderFiles();
+
+                };
+
+
+            buttons.appendChild(
+                download
+            );
+
+            buttons.appendChild(
+                remove
+            );
+
+
+            card.appendChild(
+                img
+            );
+
+            card.appendChild(
+                name
+            );
+
+            card.appendChild(
+                buttons
+            );
+
+
+            imageGrid.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    status.textContent =
+        files.length +
+        " PNG image(s) selected";
+
+}
+
+
+/* =========================================================
+   LOAD IMAGE
+========================================================= */
+
+function loadImage(file) {
+
+    return new Promise(
+        (resolve,reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(e) {
+
+                    const img =
+                        new Image();
+
+
+                    img.onload =
+                        function() {
+
+                            resolve(img);
+
+                        };
+
+
+                    img.onerror =
+                        reject;
+
+
+                    img.src =
+                        e.target.result;
+
+                };
+
+
+            reader.onerror =
+                reject;
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CONVERT FILE
+========================================================= */
+
+async function convertFile(
+    file
+) {
+
+    const img =
+        await loadImage(
+            file
+        );
+
+
+    const widthInput =
+        document.getElementById(
+            "outputWidth"
+        ).value;
+
+
+    const heightInput =
+        document.getElementById(
+            "outputHeight"
+        ).value;
+
+
+    let width =
+        img.naturalWidth;
+
+    let height =
+        img.naturalHeight;
+
+
+    if (
+        widthInput &&
+        Number(widthInput) > 0
+    ) {
+
+        width =
+            Number(widthInput);
+
+    }
+
+
+    if (
+        heightInput &&
+        Number(heightInput) > 0
+    ) {
+
+        height =
+            Number(heightInput);
+
+    }
+
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    /* BACKGROUND */
+
+    const background =
+        document.getElementById(
+            "background"
+        ).value;
+
+
+    if (
+        background ===
+        "black"
+    ) {
+
+        ctx.fillStyle =
+            "#000000";
+
+        ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+    }
+
+    else if (
+        background ===
+        "lightblue"
+    ) {
+
+        ctx.fillStyle =
+            "#e0f2fe";
+
+        ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+    }
+
+    else {
+
+        /*
+           White is required because
+           JPEG does not support transparency.
+        */
+
+        ctx.fillStyle =
+            "#ffffff";
+
+        ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+    }
+
+
+    /* IMAGE */
+
+    const scale =
+        Math.min(
+            width /
+                img.naturalWidth,
+
+            height /
+                img.naturalHeight
+        );
+
+
+    const drawWidth =
+        img.naturalWidth *
+        scale;
+
+
+    const drawHeight =
+        img.naturalHeight *
+        scale;
+
+
+    const x =
+        (width -
+         drawWidth) / 2;
+
+
+    const y =
+        (height -
+         drawHeight) / 2;
+
+
+    ctx.drawImage(
+        img,
+        x,
+        y,
+        drawWidth,
+        drawHeight
+    );
+
+
+    /* JPEG QUALITY */
+
+    const qualityValue =
+        Number(
+            document.getElementById(
+                "quality"
+            ).value
+        ) / 100;
+
+
+    const blob =
+        await new Promise(
+            resolve => {
+
+                canvas.toBlob(
+                    resolve,
+                    "image/jpeg",
+                    qualityValue
+                );
+
+            }
+        );
+
+
+    const selectedFormat =
+        document.getElementById(
+            "format"
+        ).value;
+
+
+    /*
+       Browser JPEG encoder produces
+       the same JPEG format for both
+       .jpg and .jpeg extensions.
+    */
+
+    const extension =
+        document.getElementById(
+            "format"
+        ).selectedIndex === 0
+            ? ".jpg"
+            : ".jpeg";
+
+
+    const baseName =
+        file.name.replace(
+            /\.png$/i,
+            ""
+        );
+
+
+    return {
+
+        blob: blob,
+
+        name:
+            baseName +
+            extension
+
+    };
+
+}
+
+
+/* =========================================================
+   CONVERT ALL
+========================================================= */
+
+async function convertAll() {
+
+    if (
+        files.length === 0
+    ) {
+
+        alert(
+            "Please select PNG images first."
+        );
+
+        return;
+
+    }
+
+
+    convertedImages = [];
+
+
+    progressBox.style.display =
+        "block";
+
+
+    progressBar.style.width =
+        "0%";
+
+
+    for (
+        let i = 0;
+        i < files.length;
+        i++
+    ) {
+
+        progressText.textContent =
+            "Converting " +
+            (i + 1) +
+            " of " +
+            files.length +
+            "...";
+
+
+        const result =
+            await convertFile(
+                files[i]
+            );
+
+
+        convertedImages.push(
+            result
+        );
+
+
+        progressBar.style.width =
+            ((i + 1) /
+             files.length * 100) +
+            "%";
+
+    }
+
+
+    progressText.textContent =
+        "✅ Conversion completed";
+
+
+    status.textContent =
+        "✨ " +
+        convertedImages.length +
+        " JPG/JPEG image(s) ready.";
+
+}
+
+
+/* =========================================================
+   DOWNLOAD ONE
+========================================================= */
+
+function downloadJPG(
+    blob,
+    name
+) {
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+    link.download =
+        name;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    setTimeout(
+        function() {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+
+}
+
+
+/* =========================================================
+   DOWNLOAD ALL
+========================================================= */
+
+async function downloadAll() {
+
+    if (
+        convertedImages.length === 0
+    ) {
+
+        await convertAll();
+
+    }
+
+
+    if (
+        convertedImages.length === 0
+    )
+        return;
+
+
+    for (
+        const item
+        of convertedImages
+    ) {
+
+        downloadJPG(
+            item.blob,
+            item.name
+        );
+
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    300
+                )
+        );
+
+    }
+
+
+    status.textContent =
+        "⬇️ All JPG/JPEG images downloaded.";
+
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearAll() {
+
+    files = [];
+
+    convertedImages = [];
+
+
+    imageGrid.innerHTML =
+        "";
+
+
+    progressBox.style.display =
+        "none";
+
+
+    progressBar.style.width =
+        "0%";
+
+
+    status.textContent =
+        "No PNG images selected";
+
+}
+
+</script>
+
+</body>
+</html>
