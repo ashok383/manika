@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>✨ PDF to Word Converter</title>
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:white;
+    padding:25px;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(0,255,255,.20),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(255,0,255,.18),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(0,110,255,.20),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #050914,
+            #0c1730,
+            #070b19
+        );
+}
+
+/* MAIN CONTAINER */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:30px;
+
+    border-radius:30px;
+
+    background:
+        rgba(255,255,255,.065);
+
+    border:
+        1px solid rgba(255,255,255,.18);
+
+    backdrop-filter:
+        blur(22px);
+
+    box-shadow:
+        0 0 35px rgba(0,255,255,.12),
+        0 0 90px rgba(140,0,255,.12),
+        inset 0 0 30px rgba(255,255,255,.035);
+
+    position:relative;
+    overflow:hidden;
+}
+
+/* MOVING SHINE */
+
+.container::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-100%;
+    left:-50%;
+
+    width:30%;
+    height:300%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.10),
+            transparent
+        );
+
+    transform:rotate(25deg);
+
+    animation:
+        shine 7s infinite;
+
+    pointer-events:none;
+}
+
+@keyframes shine{
+
+    0%{
+        left:-50%;
+    }
+
+    45%,100%{
+        left:140%;
+    }
+
+}
+
+/* HEADER */
+
+.header{
+    text-align:center;
+    position:relative;
+    z-index:2;
+
+    margin-bottom:30px;
+}
+
+.header h1{
+
+    font-size:40px;
+
+    font-weight:900;
+
+    letter-spacing:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00ffff,
+            #ffffff,
+            #ff66ff,
+            #ffffff,
+            #00ffff
+        );
+
+    background-size:400%;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    color:transparent;
+
+    animation:
+        textShine 5s linear infinite;
+
+    text-shadow:
+        0 0 20px rgba(0,255,255,.25);
+}
+
+@keyframes textShine{
+
+    0%{
+        background-position:0%;
+    }
+
+    100%{
+        background-position:400%;
+    }
+
+}
+
+.header p{
+
+    margin-top:10px;
+
+    color:#b9c8dc;
+
+    font-size:15px;
+}
+
+.badges{
+    margin-top:13px;
+}
+
+.badge{
+
+    display:inline-block;
+
+    padding:7px 13px;
+
+    margin:4px;
+
+    border-radius:30px;
+
+    background:
+        rgba(0,255,255,.07);
+
+    border:
+        1px solid rgba(0,255,255,.20);
+
+    color:#8ffaff;
+
+    font-size:12px;
+
+    box-shadow:
+        0 0 15px rgba(0,255,255,.08);
+}
+
+/* UPLOAD */
+
+.upload{
+
+    position:relative;
+    z-index:2;
+
+    display:block;
+
+    border:
+        2px dashed rgba(0,255,255,.55);
+
+    border-radius:24px;
+
+    padding:45px 20px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,255,255,.055),
+            rgba(255,0,255,.055)
+        );
+
+    transition:.3s;
+
+    box-shadow:
+        0 0 25px rgba(0,255,255,.08),
+        inset 0 0 25px rgba(255,255,255,.025);
+}
+
+.upload:hover,
+.upload.drag{
+
+    transform:
+        translateY(-3px);
+
+    border-color:#00ffff;
+
+    box-shadow:
+        0 0 35px rgba(0,255,255,.25),
+        inset 0 0 30px rgba(0,255,255,.05);
+}
+
+.upload-icon{
+
+    font-size:65px;
+
+    margin-bottom:12px;
+
+    filter:
+        drop-shadow(0 0 10px #00ffff)
+        drop-shadow(0 0 25px #0077ff);
+}
+
+.upload h2{
+
+    font-size:23px;
+
+    margin-bottom:8px;
+}
+
+.upload p{
+
+    color:#aabbd0;
+
+    font-size:14px;
+}
+
+.upload small{
+
+    display:block;
+
+    margin-top:10px;
+
+    color:#6e829d;
+}
+
+#pdfInput{
+    display:none;
+}
+
+/* BUTTONS */
+
+.buttons{
+
+    position:relative;
+    z-index:2;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    margin-top:22px;
+}
+
+button{
+
+    border:0;
+
+    padding:13px 21px;
+
+    border-radius:13px;
+
+    color:white;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+button:hover{
+
+    transform:
+        translateY(-2px);
+}
+
+button:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+
+    transform:none;
+}
+
+.primary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #00c6ff,
+            #0072ff
+        );
+
+    box-shadow:
+        0 0 22px rgba(0,170,255,.35);
+}
+
+.primary:hover{
+
+    box-shadow:
+        0 0 35px rgba(0,200,255,.55);
+}
+
+.success{
+
+    background:
+        linear-gradient(
+            135deg,
+            #00d084,
+            #009f6b
+        );
+
+    box-shadow:
+        0 0 20px rgba(0,255,170,.25);
+}
+
+.secondary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
+}
+
+.danger{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff416c,
+            #d90035
+        );
+}
+
+/* PROGRESS */
+
+.progress-area{
+
+    position:relative;
+    z-index:2;
+
+    display:none;
+
+    margin-top:24px;
+}
+
+.progress-info{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:8px;
+
+    font-size:13px;
+
+    color:#c5d3e4;
+}
+
+.progress{
+
+    height:12px;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    overflow:hidden;
+}
+
+.progress-bar{
+
+    width:0%;
+
+    height:100%;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00ffff,
+            #0072ff,
+            #ff00cc
+        );
+
+    box-shadow:
+        0 0 18px rgba(0,255,255,.6);
+
+    transition:.3s;
+}
+
+/* RESULTS */
+
+.results{
+
+    position:relative;
+    z-index:2;
+
+    margin-top:30px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(290px,1fr)
+        );
+
+    gap:20px;
+}
+
+.empty{
+
+    grid-column:1/-1;
+
+    text-align:center;
+
+    padding:45px 20px;
+
+    border-radius:20px;
+
+    border:
+        1px dashed rgba(255,255,255,.14);
+
+    color:#8092aa;
+}
+
+/* CARD */
+
+.card{
+
+    overflow:hidden;
+
+    border-radius:21px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        0 0 25px rgba(0,0,0,.18),
+        inset 0 0 25px rgba(255,255,255,.02);
+
+    transition:.3s;
+}
+
+.card:hover{
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(0,255,255,.35);
+
+    box-shadow:
+        0 0 30px rgba(0,255,255,.14);
+}
+
+.card-head{
+
+    padding:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.08);
+}
+
+.pdf-icon{
+
+    width:55px;
+    height:55px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:15px;
+
+    font-size:29px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff416c,
+            #ff1744
+        );
+
+    box-shadow:
+        0 0 20px rgba(255,40,80,.30);
+}
+
+.filename{
+
+    flex:1;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+.card-body{
+
+    padding:18px;
+}
+
+.row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:6px 0;
+
+    font-size:13px;
+
+    color:#aebed2;
+}
+
+.status{
+
+    color:#50ffca;
+}
+
+.card button{
+
+    width:100%;
+
+    margin-top:12px;
+}
+
+/* FOOTER */
+
+.footer{
+
+    position:relative;
+
+    z-index:2;
+
+    text-align:center;
+
+    margin-top:28px;
+
+    color:#71849e;
+
+    font-size:12px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+    }
+
+    .container{
+        padding:18px;
+        border-radius:22px;
+    }
+
+    .header h1{
+        font-size:29px;
+    }
+
+    .upload{
+        padding:32px 15px;
+    }
+
+    .buttons button{
+        width:100%;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            ✨ PDF → WORD
+        </h1>
+
+        <p>
+            Convert PDF documents into editable Word files
+        </p>
+
+        <div class="badges">
+
+            <span class="badge">
+                ⚡ Fast
+            </span>
+
+            <span class="badge">
+                🔒 Private
+            </span>
+
+            <span class="badge">
+                📄 DOCX
+            </span>
+
+            <span class="badge">
+                ✨ Premium UI
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- UPLOAD -->
+
+    <label
+        class="upload"
+        id="upload"
+        for="pdfInput"
+    >
+
+        <div class="upload-icon">
+            📄
+        </div>
+
+        <h2>
+            Select PDF Files
+        </h2>
+
+        <p>
+            Click here or drag & drop PDF documents
+        </p>
+
+        <small>
+            Multiple PDF files supported
+        </small>
+
+    </label>
+
+
+    <input
+        type="file"
+        id="pdfInput"
+        accept="application/pdf,.pdf"
+        multiple
+    >
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+        <button
+            class="primary"
+            id="convertBtn"
+            disabled
+        >
+            ⚡ CONVERT TO WORD
+        </button>
+
+
+        <button
+            class="success"
+            id="downloadAllBtn"
+            disabled
+        >
+            📥 DOWNLOAD ALL
+        </button>
+
+
+        <button
+            class="secondary"
+            id="selectBtn"
+        >
+            📂 SELECT AGAIN
+        </button>
+
+
+        <button
+            class="danger"
+            id="clearBtn"
+        >
+            🗑️ CLEAR
+        </button>
+
+    </div>
+
+
+    <!-- PROGRESS -->
+
+    <div
+        class="progress-area"
+        id="progressArea"
+    >
+
+        <div class="progress-info">
+
+            <span id="progressText">
+                Preparing...
+            </span>
+
+            <span id="progressPercent">
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progressBar"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div
+        class="results"
+        id="results"
+    >
+
+        <div class="empty">
+
+            📂 Select PDF files to begin
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
+        🔒 Processing happens in your browser.
+        Your PDF is not uploaded to this page.
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/*
+    PDF.js worker
+*/
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+let selectedFiles = [];
+
+let convertedFiles = [];
+
+
+/* ELEMENTS */
+
+const pdfInput =
+    document.getElementById("pdfInput");
+
+const upload =
+    document.getElementById("upload");
+
+const convertBtn =
+    document.getElementById("convertBtn");
+
+const downloadAllBtn =
+    document.getElementById("downloadAllBtn");
+
+const selectBtn =
+    document.getElementById("selectBtn");
+
+const clearBtn =
+    document.getElementById("clearBtn");
+
+const results =
+    document.getElementById("results");
+
+const progressArea =
+    document.getElementById("progressArea");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+const progressText =
+    document.getElementById("progressText");
+
+const progressPercent =
+    document.getElementById("progressPercent");
+
+
+/* SELECT */
+
+pdfInput.addEventListener(
+    "change",
+    function(){
+
+        selectedFiles =
+            Array.from(this.files);
+
+        convertedFiles = [];
+
+        convertBtn.disabled =
+            selectedFiles.length === 0;
+
+        downloadAllBtn.disabled = true;
+
+        showFiles();
+
+    }
+);
+
+
+/* SELECT AGAIN */
+
+selectBtn.addEventListener(
+    "click",
+    function(){
+
+        pdfInput.click();
+
+    }
+);
+
+
+/* DRAG OVER */
+
+upload.addEventListener(
+    "dragover",
+    function(e){
+
+        e.preventDefault();
+
+        upload.classList.add("drag");
+
+    }
+);
+
+
+/* DRAG LEAVE */
+
+upload.addEventListener(
+    "dragleave",
+    function(){
+
+        upload.classList.remove("drag");
+
+    }
+);
+
+
+/* DROP */
+
+upload.addEventListener(
+    "drop",
+    function(e){
+
+        e.preventDefault();
+
+        upload.classList.remove("drag");
+
+        selectedFiles =
+            Array.from(e.dataTransfer.files)
+            .filter(
+                file =>
+                file.type === "application/pdf" ||
+                file.name.toLowerCase().endsWith(".pdf")
+            );
+
+        convertedFiles = [];
+
+        convertBtn.disabled =
+            selectedFiles.length === 0;
+
+        downloadAllBtn.disabled = true;
+
+        showFiles();
+
+    }
+);
+
+
+/* SHOW FILES */
+
+function showFiles(){
+
+    results.innerHTML = "";
+
+    if(selectedFiles.length === 0){
+
+        results.innerHTML =
+        `<div class="empty">
+            📂 Select PDF files to begin
+        </div>`;
+
+        return;
+
+    }
+
+
+    selectedFiles.forEach(
+        (file,index)=>{
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "card";
+
+
+            card.innerHTML = `
+
+                <div class="card-head">
+
+                    <div class="pdf-icon">
+                        📄
+                    </div>
+
+                    <div class="filename">
+                        ${safe(file.name)}
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+                        <span>File Size</span>
+
+                        <span>
+                            ${formatBytes(file.size)}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span>Type</span>
+
+                        <span>
+                            PDF
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span>Status</span>
+
+                        <span>
+                            ⏳ Ready
+                        </span>
+                    </div>
+
+                </div>
+            `;
+
+
+            results.appendChild(card);
+
+        }
+    );
+
+}
+
+
+/* CONVERT */
+
+convertBtn.addEventListener(
+    "click",
+    convertAll
+);
+
+
+async function convertAll(){
+
+    if(!selectedFiles.length)
+        return;
+
+
+    convertedFiles = [];
+
+    results.innerHTML = "";
+
+    progressArea.style.display =
+        "block";
+
+
+    for(
+        let i=0;
+        i<selectedFiles.length;
+        i++
+    ){
+
+        const file =
+            selectedFiles[i];
+
+
+        progressText.innerText =
+            `Converting ${i+1} of ${selectedFiles.length}`;
+
+
+        const percent =
+            Math.round(
+                (i /
+                selectedFiles.length) *
+                100
+            );
+
+
+        progressBar.style.width =
+            percent + "%";
+
+
+        progressPercent.innerText =
+            percent + "%";
+
+
+        try{
+
+            const result =
+                await pdfToDocx(file);
+
+
+            convertedFiles.push(result);
+
+
+            addResult(
+                result,
+                convertedFiles.length - 1
+            );
+
+        }
+        catch(error){
+
+            console.error(error);
+
+            addError(file,error);
+
+        }
+
+
+        await wait(100);
+
+    }
+
+
+    progressBar.style.width =
+        "100%";
+
+    progressPercent.innerText =
+        "100%";
+
+    progressText.innerText =
+        "✅ Conversion Complete";
+
+
+    downloadAllBtn.disabled =
+        convertedFiles.length === 0;
+
+}
+
+
+/*
+    PDF → DOCX
+
+    This creates a simple valid DOCX
+    using extracted PDF text.
+*/
+
+async function pdfToDocx(file){
+
+    const buffer =
+        await file.arrayBuffer();
+
+
+    const pdf =
+        await pdfjsLib.getDocument({
+            data:buffer
+        }).promise;
+
+
+    let pages = [];
+
+
+    for(
+        let pageNumber=1;
+        pageNumber<=pdf.numPages;
+        pageNumber++
+    ){
+
+        const page =
+            await pdf.getPage(pageNumber);
+
+
+        const content =
+            await page.getTextContent();
+
+
+        const lines =
+            extractLines(content);
+
+
+        pages.push(lines);
+
+    }
+
+
+    const docx =
+        createDocx(pages);
+
+
+    const baseName =
+        file.name
+        .replace(
+            /\.pdf$/i,
+            ""
+        );
+
+
+    return {
+
+        blob:docx,
+
+        name:
+            baseName +
+            ".docx",
+
+        original:file.name,
+
+        pages:pdf.numPages
+
+    };
+
+}
+
+
+/*
+    Extract lines
+*/
+
+function extractLines(content){
+
+    const items =
+        content.items || [];
+
+
+    const lines = [];
+
+
+    let current = [];
+
+    let currentY = null;
+
+
+    items.forEach(item=>{
+
+        const text =
+            item.str || "";
+
+
+        if(!text.trim())
+            return;
+
+
+        const y =
+            item.transform
+            ? item.transform[5]
+            : 0;
+
+
+        if(
+            currentY !== null &&
+            Math.abs(y-currentY) > 5
+        ){
+
+            lines.push(
+                current.join(" ")
+            );
+
+            current = [];
+
+        }
+
+
+        current.push(text);
+
+        currentY = y;
+
+    });
+
+
+    if(current.length){
+
+        lines.push(
+            current.join(" ")
+        );
+
+    }
+
+
+    return lines;
+
+}
+
+
+/*
+    Create DOCX
+
+    DOCX is a ZIP containing
+    XML files.
+*/
+
+function createDocx(pages){
+
+    const zip =
+        new JSZip();
+
+
+    const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+
+<Default Extension="rels"
+ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+
+<Default Extension="xml"
+ContentType="application/xml"/>
+
+<Override PartName="/word/document.xml"
+ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+
+</Types>`;
+
+
+    const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+
+<Relationship
+Id="rId1"
+Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
+Target="word/document.xml"/>
+
+</Relationships>`;
+
+
+    const documentRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>`;
+
+
+    let body = "";
+
+
+    pages.forEach(
+        (page,pageIndex)=>{
+
+            page.forEach(
+                line=>{
+
+                    body +=
+                    `<w:p>
+                        <w:r>
+                            <w:t xml:space="preserve">
+                                ${xmlEscape(line)}
+                            </w:t>
+                        </w:r>
+                    </w:p>`;
+
+                }
+            );
+
+
+            /*
+                Page break between PDF pages
+            */
+
+            if(
+                pageIndex <
+                pages.length - 1
+            ){
+
+                body +=
+                `<w:p>
+                    <w:r>
+                        <w:br w:type="page"/>
+                    </w:r>
+                </w:p>`;
+
+            }
+
+        }
+    );
+
+
+    const documentXML =
+`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<w:document
+xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+
+<w:body>
+
+${body}
+
+<w:sectPr>
+
+<w:pgSz
+w:w="11906"
+w:h="16838"/>
+
+<w:pgMar
+w:top="1440"
+w:right="1440"
+w:bottom="1440"
+w:left="1440"/>
+
+</w:sectPr>
+
+</w:body>
+
+</w:document>`;
+
+
+    zip.file(
+        "[Content_Types].xml",
+        contentTypes
+    );
+
+
+    zip.folder("_rels")
+       .file(
+           ".rels",
+           rels
+       );
+
+
+    zip.folder("word")
+       .file(
+           "document.xml",
+           documentXML
+       );
+
+
+    zip.folder("word")
+       .folder("_rels")
+       .file(
+           "document.xml.rels",
+           documentRels
+       );
+
+
+    return zip.generateAsync({
+        type:"blob",
+        mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    });
+
+}
+
+
+/* RESULT */
+
+function addResult(
+    item,
+    index
+){
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "card";
+
+
+    card.innerHTML = `
+
+        <div class="card-head">
+
+            <div class="pdf-icon">
+                📝
+            </div>
+
+            <div class="filename">
+                ${safe(item.name)}
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <span>Source</span>
+
+                <span>
+                    ${safe(item.original)}
+                </span>
+            </div>
+
+            <div class="row">
+                <span>PDF Pages</span>
+
+                <span>
+                    ${item.pages}
+                </span>
+            </div>
+
+            <div class="row">
+                <span>Output</span>
+
+                <span>
+                    DOCX
+                </span>
+            </div>
+
+            <div class="row">
+                <span>Status</span>
+
+                <span class="status">
+                    ✅ Converted
+                </span>
+            </div>
+
+            <button
+                class="success"
+                onclick="downloadOne(${index})"
+            >
+                📥 DOWNLOAD WORD
+            </button>
+
+        </div>
+    `;
+
+
+    results.appendChild(card);
+
+}
+
+
+/* ERROR */
+
+function addError(file,error){
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "card";
+
+
+    card.innerHTML = `
+
+        <div class="card-head">
+
+            <div class="pdf-icon">
+                ⚠️
+            </div>
+
+            <div class="filename">
+                ${safe(file.name)}
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <span>Status</span>
+
+                <span style="color:#ff7b8c">
+                    ❌ Conversion failed
+                </span>
+            </div>
+
+            <div class="row">
+                <span>Message</span>
+
+                <span>
+                    Check PDF
+                </span>
+            </div>
+
+        </div>
+    `;
+
+
+    results.appendChild(card);
+
+}
+
+
+/* DOWNLOAD ONE */
+
+function downloadOne(index){
+
+    const item =
+        convertedFiles[index];
+
+    if(!item)
+        return;
+
+
+    const url =
+        URL.createObjectURL(
+            item.blob
+        );
+
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        item.name;
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    setTimeout(
+        ()=>{
+            URL.revokeObjectURL(url);
+        },
+        1000
+    );
+
+}
+
+
+/* DOWNLOAD ALL */
+
+downloadAllBtn.addEventListener(
+    "click",
+    function(){
+
+        convertedFiles.forEach(
+            (item,index)=>{
+
+                setTimeout(
+                    ()=>{
+                        downloadOne(index);
+                    },
+                    index * 500
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* CLEAR */
+
+clearBtn.addEventListener(
+    "click",
+    function(){
+
+        selectedFiles = [];
+
+        convertedFiles = [];
+
+        pdfInput.value = "";
+
+        convertBtn.disabled = true;
+
+        downloadAllBtn.disabled = true;
+
+        progressArea.style.display =
+            "none";
+
+        progressBar.style.width =
+            "0%";
+
+        progressPercent.innerText =
+            "0%";
+
+        results.innerHTML =
+        `<div class="empty">
+            📂 Select PDF files to begin
+        </div>`;
+
+    }
+);
+
+
+/* HELPERS */
+
+function wait(ms){
+
+    return new Promise(
+        resolve =>
+        setTimeout(resolve,ms)
+    );
+
+}
+
+
+function safe(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function xmlEscape(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&apos;");
+
+}
+
+
+function formatBytes(bytes){
+
+    if(bytes < 1024)
+        return bytes + " B";
+
+    if(bytes < 1024*1024)
+        return (
+            bytes/1024
+        ).toFixed(2)+" KB";
+
+    return (
+        bytes/(1024*1024)
+    ).toFixed(2)+" MB";
+
+}
+
+</script>
+
+</body>
+</html>
