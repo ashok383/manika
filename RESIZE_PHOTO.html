@@ -2,892 +2,323 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo KB Converter & Decorator</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Photo KB Converter — Width Height DPI</title>
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #111827, #312e81, #0f766e);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .container {
-        width: 100%;
-        max-width: 950px;
-        background: rgba(255,255,255,0.96);
-        border-radius: 22px;
-        padding: 25px;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.35);
-    }
-
-    h1 {
-        text-align: center;
-        margin: 0 0 5px;
-        font-size: 30px;
-        color: #111827;
-    }
-
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 22px;
-    }
-
-    .controls {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .control-box {
-        background: #f3f4f6;
-        padding: 15px;
-        border-radius: 14px;
-        border: 1px solid #ddd;
-    }
-
-    label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 8px;
-        color: #333;
-    }
-
-    input[type="file"],
-    input[type="number"],
-    select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #bbb;
-        border-radius: 8px;
-        background: white;
-    }
-
-    input[type="range"] {
-        width: 100%;
-    }
-
-    .range-value {
-        text-align: center;
-        font-weight: bold;
-        margin-top: 5px;
-    }
-
-    .preview-area {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 430px;
-        padding: 25px;
-        border-radius: 18px;
-        background:
-            radial-gradient(circle at center, #ffffff, #e5e7eb);
-        overflow: hidden;
-    }
-
-    .photo-frame {
-        position: relative;
-        display: inline-block;
-        padding: 12px;
-        background: linear-gradient(
-            135deg,
-            #fff7ad,
-            #ffd700,
-            #fff,
-            #d4af37,
-            #fff7ad
-        );
-        border-radius: 14px;
-        box-shadow:
-            0 0 8px #fff,
-            0 0 18px rgba(255,215,0,.8),
-            0 0 35px rgba(255,215,0,.55);
-    }
-
-    .photo-frame::before {
-        content: "";
-        position: absolute;
-        inset: 4px;
-        border: 2px solid rgba(255,255,255,.9);
-        border-radius: 10px;
-        pointer-events: none;
-    }
-
-    .photo-frame img {
-        display: block;
-        max-width: min(80vw, 650px);
-        max-height: 390px;
-        object-fit: contain;
-        border-radius: 5px;
-        background: white;
-    }
-
-    .shine {
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 60%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.7),
-            transparent
-        );
-        transform: skewX(-20deg);
-        animation: shine 3s infinite;
-        pointer-events: none;
-    }
-
-    @keyframes shine {
-        0% {
-            left: -100%;
-        }
-        45%, 100% {
-            left: 150%;
-        }
-    }
-
-    .buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-
-    button {
-        border: none;
-        border-radius: 10px;
-        padding: 13px 22px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    button:hover {
-        transform: translateY(-2px);
-    }
-
-    .convert {
-        background: #2563eb;
-        color: white;
-    }
-
-    .download {
-        background: #059669;
-        color: white;
-    }
-
-    .download:disabled,
-    .convert:disabled {
-        opacity: .45;
-        cursor: not-allowed;
-    }
-
-    .status {
-        text-align: center;
-        margin-top: 18px;
-        padding: 12px;
-        border-radius: 10px;
-        background: #f3f4f6;
-        font-weight: bold;
-    }
-
-    .size-good {
-        color: #047857;
-    }
-
-    .size-bad {
-        color: #dc2626;
-    }
-
-    .info {
-        margin-top: 15px;
-        padding: 13px;
-        background: #eff6ff;
-        border-left: 5px solid #2563eb;
-        border-radius: 8px;
-        color: #1e3a8a;
-        font-size: 14px;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    @media(max-width:600px) {
-        h1 {
-            font-size: 23px;
-        }
-
-        .container {
-            padding: 15px;
-        }
-
-        .preview-area {
-            min-height: 300px;
-        }
-
-        .photo-frame img {
-            max-height: 270px;
-        }
-    }
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#07111f,#312e81,#075985,#064e3b);padding:22px;display:flex;justify-content:center;align-items:center}
+.container{width:100%;max-width:1050px;background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:25px;box-shadow:0 25px 80px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.container:before{content:"";position:absolute;top:-100px;left:-20%;width:40%;height:350px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:rotate(20deg);animation:shine 6s infinite;pointer-events:none}
+@keyframes shine{0%,55%{left:-45%;opacity:0}65%{opacity:1}90%,100%{left:130%;opacity:0}}
+h1{text-align:center;margin:0;font-size:31px;color:#111827}
+.subtitle{text-align:center;color:#64748b;margin:7px 0 22px;font-weight:600}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.control-box{background:linear-gradient(135deg,#f8fbff,#eef2ff);padding:15px;border-radius:16px;border:1px solid #dbe3f0;box-shadow:0 7px 20px rgba(15,23,42,.06);position:relative;overflow:hidden}
+.control-box:after{content:"";position:absolute;top:-120%;left:-35%;width:22%;height:330%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);transform:rotate(20deg);animation:boxshine 5s infinite;pointer-events:none}
+@keyframes boxshine{0%,60%{left:-45%;opacity:0}70%{opacity:1}90%,100%{left:130%;opacity:0}}
+label{display:block;font-weight:800;color:#1e293b;margin-bottom:8px}
+input[type=file],input[type=number],select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font-size:14px;outline:none}
+input:focus,select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+small{color:#64748b}
+.range-value{text-align:center;font-weight:800;margin-top:6px}
+.check{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:13px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:#2563eb}
+.print-label{margin-top:10px}
+.badge{margin-top:9px;padding:8px;border-radius:9px;background:linear-gradient(135deg,#dbeafe,#dcfce7);border:1px solid #bfdbfe;text-align:center;color:#1e3a8a;font-size:12px;font-weight:800}
+.preview-area{margin-top:18px;min-height:410px;padding:25px;border-radius:20px;background:radial-gradient(circle,#fff,#e2e8f0);display:flex;align-items:center;justify-content:center;overflow:auto}
+.photo-frame{position:relative;display:inline-block;padding:12px;background:linear-gradient(135deg,#fff7ad,#ffd700,#fff,#d4af37,#fff7ad);border-radius:15px;box-shadow:0 0 10px #fff,0 0 22px rgba(255,215,0,.75),0 0 42px rgba(255,215,0,.4);overflow:hidden}
+.photo-frame img{display:block;max-width:min(82vw,720px);max-height:390px;object-fit:contain;background:#fff;border-radius:5px}
+.photo-frame .shine{position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);transform:skewX(-20deg);animation:photoshine 3.5s infinite;pointer-events:none}
+@keyframes photoshine{0%{left:-100%}45%,100%{left:150%}}
+.hidden{display:none}
+.buttons{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:20px}
+button{border:0;border-radius:12px;padding:14px 23px;font-size:16px;font-weight:800;color:white;cursor:pointer;box-shadow:0 8px 20px rgba(15,23,42,.15);transition:.2s;position:relative;overflow:hidden}
+button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 26px rgba(15,23,42,.2)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.convert{background:linear-gradient(135deg,#2563eb,#7c3aed)}
+.download{background:linear-gradient(135deg,#059669,#0f766e)}
+.status{text-align:center;margin-top:16px;padding:13px;border-radius:12px;background:#f1f5f9;font-weight:800;line-height:1.6}
+.good{color:#047857}.bad{color:#dc2626}
+.info{margin-top:14px;padding:14px;background:#eff6ff;border-left:5px solid #2563eb;border-radius:9px;color:#1e3a8a;font-size:14px;line-height:1.5}
+@media(max-width:600px){body{padding:10px} .container{padding:15px;border-radius:20px}h1{font-size:24px}.preview-area{min-height:300px;padding:12px}.photo-frame img{max-height:270px}}
 </style>
 </head>
-
 <body>
-
 <div class="container">
+<h1>📸 Photo KB Converter</h1>
+<div class="subtitle">JPEG • 10–150 KB • Width × Height • DPI • Shining Design</div>
 
-    <h1>📸 Photo KB Converter</h1>
-    <div class="subtitle">
-        JPEG • 10 KB – 150 KB • Decorative Shining Look
-    </div>
+<div class="controls">
+<div class="control-box">
+<label>📁 Select Photo</label>
+<input type="file" id="photoInput" accept="image/*">
+</div>
 
-    <div class="controls">
+<div class="control-box">
+<label>🎯 Maximum File Size</label>
+<input type="number" id="targetKB" min="10" max="150" value="100">
+<small>Allowed: 10 KB to 150 KB</small>
+</div>
 
-        <div class="control-box">
-            <label>📁 Select Photo</label>
-            <input type="file" id="photoInput" accept="image/*">
-        </div>
+<div class="control-box">
+<label>✨ Decoration</label>
+<select id="decoration">
+<option value="gold">Golden Shining</option><option value="silver">Silver Shining</option>
+<option value="blue">Blue Shining</option><option value="pink">Pink Shining</option>
+<option value="none">No Decoration</option>
+</select>
+</div>
 
-        <div class="control-box">
-            <label>🎯 Maximum File Size</label>
-            <input
-                type="number"
-                id="targetKB"
-                min="10"
-                max="150"
-                value="100"
-            >
-            <small>Allowed: 10 KB to 150 KB</small>
-        </div>
+<div class="control-box">
+<label>🖼️ Border Width</label>
+<input type="range" id="borderWidth" min="0" max="30" value="12">
+<div class="range-value"><span id="borderValue">12</span> px</div>
+</div>
 
-        <div class="control-box">
-            <label>✨ Decoration</label>
-            <select id="decoration">
-                <option value="gold">Golden Shining</option>
-                <option value="silver">Silver Shining</option>
-                <option value="blue">Blue Shining</option>
-                <option value="pink">Pink Shining</option>
-                <option value="none">No Decoration</option>
-            </select>
-        </div>
+<div class="control-box">
+<label>📏 Size Unit</label>
+<select id="sizeUnit">
+<option value="cm" selected>Centimeter (cm)</option>
+<option value="px">Pixel (px)</option>
+</select>
+<small>CM is selected by default. Pixel mode uses DPI/PPI.</small>
+</div>
 
-        <div class="control-box">
-            <label>🖼️ Border Width</label>
-            <input
-                type="range"
-                id="borderWidth"
-                min="0"
-                max="30"
-                value="12"
-            >
-            <div class="range-value">
-                <span id="borderValue">12</span> px
-            </div>
-        </div>
+<div class="control-box">
+<label>↔️ Output Width (<span id="widthUnitLabel">cm</span>)</label>
+<input type="number" id="outputWidth" min="0.01" max="1000" step="0.01" placeholder="Original">
+<small id="widthHelp">Enter physical width in centimeters</small>
+</div>
 
-    </div>
+<div class="control-box">
+<label>↕️ Output Height (<span id="heightUnitLabel">cm</span>)</label>
+<input type="number" id="outputHeight" min="0.01" max="1000" step="0.01" placeholder="Original">
+<small id="heightHelp">Enter physical height in centimeters</small>
+</div>
 
-    <div class="preview-area">
+<div class="control-box">
+<label>🖨️ DPI / PPI</label>
+<input type="number" id="dpi" min="72" max="1200" value="300">
+<small>72–1200 DPI. Used to convert cm ↔ pixels.</small>
+</div>
 
-        <div id="frame" class="photo-frame hidden">
-
-            <img id="previewImage" alt="Preview">
-
-            <div class="shine"></div>
-
-        </div>
-
-        <div id="emptyMessage">
-            Select a photo to see the preview
-        </div>
-
-    </div>
-
-    <div class="buttons">
-
-        <button
-            class="convert"
-            id="convertBtn"
-            disabled
-        >
-            🔄 Convert to JPEG
-        </button>
-
-        <button
-            class="download"
-            id="downloadBtn"
-            disabled
-        >
-            ⬇️ Download JPEG
-        </button>
-
-    </div>
-
-    <div id="status" class="status">
-        No photo selected
-    </div>
-
-    <div class="info">
-        <b>How it works:</b>
-        Select your photo → choose the required maximum KB →
-        click Convert → check the actual JPEG size → Download.
-        The converter automatically reduces JPEG quality to stay within your selected limit.
-    </div>
+<div class="control-box">
+<label>🔗 Resize Mode</label>
+<select id="resizeMode">
+<option value="fit">Fit — preserve aspect ratio</option>
+<option value="stretch">Exact — stretch to W × H</option>
+<option value="crop">Fill — crop to W × H</option>
+</select>
 
 </div>
 
+<div class="control-box">
+<label>📐 Physical / Pixel Information</label>
+<div id="dpiInfo" class="badge">300 DPI → 1 cm = 118.11 px</div>
+<small id="conversionInfo">CM mode: dimensions are entered in centimeters and converted to pixels using DPI.</small>
+</div>
+</div>
+
+<div class="preview-area">
+<div id="frame" class="photo-frame hidden">
+<img id="previewImage" alt="Preview"><div class="shine"></div>
+</div>
+<div id="emptyMessage">Select a photo to see the preview</div>
+</div>
+
+<div class="buttons">
+<button class="convert" id="convertBtn" disabled>🔄 Convert to JPEG</button>
+<button class="download" id="downloadBtn" disabled>⬇️ Download JPEG</button>
+</div>
+
+<div id="status" class="status">No photo selected</div>
+<div class="info"><b>How it works:</b> Select a photo → choose maximum KB → select CM or Pixel → set width and height → set DPI → choose resize mode → Convert → Download. <b>Fit</b> preserves proportions, <b>Exact</b> uses the requested dimensions, and <b>Fill</b> crops to the requested dimensions. CM mode calculates pixels from centimeters × DPI; Pixel mode uses the entered pixel dimensions directly.</div>
+</div>
+
 <script>
+const photoInput=document.getElementById("photoInput");
+const previewImage=document.getElementById("previewImage");
+const frame=document.getElementById("frame");
+const emptyMessage=document.getElementById("emptyMessage");
+const targetKB=document.getElementById("targetKB");
+const decoration=document.getElementById("decoration");
+const borderWidth=document.getElementById("borderWidth");
+const borderValue=document.getElementById("borderValue");
+const outputWidth=document.getElementById("outputWidth");
+const outputHeight=document.getElementById("outputHeight");
+const dpi=document.getElementById("dpi");
+const resizeMode=document.getElementById("resizeMode");
+const dpiInfo=document.getElementById("dpiInfo");
+const sizeUnit=document.getElementById("sizeUnit");
+const widthUnitLabel=document.getElementById("widthUnitLabel");
+const heightUnitLabel=document.getElementById("heightUnitLabel");
+const widthHelp=document.getElementById("widthHelp");
+const heightHelp=document.getElementById("heightHelp");
+const conversionInfo=document.getElementById("conversionInfo");
+const convertBtn=document.getElementById("convertBtn");
+const downloadBtn=document.getElementById("downloadBtn");
+const status=document.getElementById("status");
 
-const photoInput = document.getElementById("photoInput");
-const previewImage = document.getElementById("previewImage");
-const frame = document.getElementById("frame");
-const emptyMessage = document.getElementById("emptyMessage");
+let originalImage=null,finalBlob=null;
 
-const targetKB = document.getElementById("targetKB");
-const decoration = document.getElementById("decoration");
-
-const borderWidth = document.getElementById("borderWidth");
-const borderValue = document.getElementById("borderValue");
-
-const convertBtn = document.getElementById("convertBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-
-const status = document.getElementById("status");
-
-let originalImage = null;
-let finalBlob = null;
-
-
-/* -----------------------------
-   FILE SELECTION
------------------------------- */
-
-photoInput.addEventListener("change", function() {
-
-    const file = this.files[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-        alert("Please select an image file.");
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-
-        originalImage = new Image();
-
-        originalImage.onload = function() {
-
-            previewImage.src = e.target.result;
-
-            frame.classList.remove("hidden");
-            emptyMessage.classList.add("hidden");
-
-            convertBtn.disabled = false;
-            downloadBtn.disabled = true;
-
-            finalBlob = null;
-
-            status.textContent =
-                "Photo selected: " +
-                originalImage.width +
-                " × " +
-                originalImage.height +
-                " pixels";
-
-        };
-
-        originalImage.src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
+photoInput.addEventListener("change",function(){
+ const file=this.files[0]; if(!file)return;
+ if(!file.type.startsWith("image/")){alert("Please select an image file.");return}
+ const reader=new FileReader();
+ reader.onload=e=>{
+  originalImage=new Image();
+  originalImage.onload=()=>{
+   previewImage.src=e.target.result; frame.classList.remove("hidden");emptyMessage.classList.add("hidden");
+   convertBtn.disabled=false;downloadBtn.disabled=true;finalBlob=null;
+   status.className="status";
+   status.textContent="Photo selected: "+originalImage.width+" × "+originalImage.height+" pixels";
+   if(!outputWidth.value)outputWidth.placeholder=originalImage.width;
+   if(!outputHeight.value)outputHeight.placeholder=originalImage.height;
+  };
+  originalImage.src=e.target.result;
+ };
+ reader.readAsDataURL(file);
 });
 
+borderWidth.addEventListener("input",()=>{borderValue.textContent=borderWidth.value;frame.style.padding=borderWidth.value+"px"});
 
-/* -----------------------------
-   BORDER WIDTH
------------------------------- */
-
-borderWidth.addEventListener("input", function() {
-
-    borderValue.textContent = this.value;
-
-    frame.style.padding = this.value + "px";
-
+decoration.addEventListener("change",()=>{
+ const v=decoration.value;
+ const styles={
+  none:["#fff","0 5px 20px rgba(0,0,0,.2)"],
+  silver:["linear-gradient(135deg,#eee,#999,#fff,#aaa,#eee)","0 0 10px #fff,0 0 25px #aaa"],
+  blue:["linear-gradient(135deg,#8be9ff,#168cff,#fff,#5ec8ff)","0 0 10px #fff,0 0 30px #168cff"],
+  pink:["linear-gradient(135deg,#ffb6d9,#ff4fa3,#fff,#ff8ac5)","0 0 10px #fff,0 0 30px #ff4fa3"],
+  gold:["linear-gradient(135deg,#fff7ad,#ffd700,#fff,#d4af37,#fff7ad)","0 0 8px #fff,0 0 18px rgba(255,215,0,.8),0 0 35px rgba(255,215,0,.55)"]
+ };
+ frame.style.background=styles[v][0];frame.style.boxShadow=styles[v][1];
 });
 
+function cmToPx(cm,dpiValue){return cm*dpiValue/2.54;}
+function pxToCm(px,dpiValue){return px*2.54/dpiValue;}
 
-/* -----------------------------
-   DECORATION
------------------------------- */
+function updateUnitUI(){
+ let unit=sizeUnit.value;
+ widthUnitLabel.textContent=unit;
+ heightUnitLabel.textContent=unit;
 
-decoration.addEventListener("change", function() {
-
-    const value = this.value;
-
-    if (value === "none") {
-
-        frame.style.background = "#ffffff";
-        frame.style.boxShadow = "0 5px 20px rgba(0,0,0,.2)";
-
-    }
-
-    else if (value === "silver") {
-
-        frame.style.background =
-            "linear-gradient(135deg,#eee,#999,#fff,#aaa,#eee)";
-
-        frame.style.boxShadow =
-            "0 0 10px #fff, 0 0 25px #aaa";
-
-    }
-
-    else if (value === "blue") {
-
-        frame.style.background =
-            "linear-gradient(135deg,#8be9ff,#168cff,#fff,#5ec8ff)";
-
-        frame.style.boxShadow =
-            "0 0 10px #fff, 0 0 30px #168cff";
-
-    }
-
-    else if (value === "pink") {
-
-        frame.style.background =
-            "linear-gradient(135deg,#ffb6d9,#ff4fa3,#fff,#ff8ac5)";
-
-        frame.style.boxShadow =
-            "0 0 10px #fff, 0 0 30px #ff4fa3";
-
-    }
-
-    else {
-
-        frame.style.background =
-            "linear-gradient(135deg,#fff7ad,#ffd700,#fff,#d4af37,#fff7ad)";
-
-        frame.style.boxShadow =
-            "0 0 8px #fff, 0 0 18px rgba(255,215,0,.8), 0 0 35px rgba(255,215,0,.55)";
-    }
-
-});
-
-
-/* -----------------------------
-   CANVAS CREATION
------------------------------- */
-
-function createCanvas(image, border) {
-
-    const canvas = document.createElement("canvas");
-
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = image.width + border * 2;
-    canvas.height = image.height + border * 2;
-
-    /*
-       White base
-    */
-    ctx.fillStyle = "#ffffff";
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    /*
-       Decorative border
-    */
-
-    const gradient =
-        ctx.createLinearGradient(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-    const style = decoration.value;
-
-    if (style === "silver") {
-
-        gradient.addColorStop(0, "#eeeeee");
-        gradient.addColorStop(.25, "#777777");
-        gradient.addColorStop(.5, "#ffffff");
-        gradient.addColorStop(.75, "#aaaaaa");
-        gradient.addColorStop(1, "#eeeeee");
-
-    }
-
-    else if (style === "blue") {
-
-        gradient.addColorStop(0, "#8be9ff");
-        gradient.addColorStop(.25, "#168cff");
-        gradient.addColorStop(.5, "#ffffff");
-        gradient.addColorStop(.75, "#168cff");
-        gradient.addColorStop(1, "#8be9ff");
-
-    }
-
-    else if (style === "pink") {
-
-        gradient.addColorStop(0, "#ffb6d9");
-        gradient.addColorStop(.25, "#ff4fa3");
-        gradient.addColorStop(.5, "#ffffff");
-        gradient.addColorStop(.75, "#ff4fa3");
-        gradient.addColorStop(1, "#ffb6d9");
-
-    }
-
-    else if (style === "none") {
-
-        gradient.addColorStop(0, "#ffffff");
-        gradient.addColorStop(1, "#ffffff");
-
-    }
-
-    else {
-
-        gradient.addColorStop(0, "#fff7ad");
-        gradient.addColorStop(.2, "#ffd700");
-        gradient.addColorStop(.4, "#ffffff");
-        gradient.addColorStop(.6, "#d4af37");
-        gradient.addColorStop(.8, "#fff7ad");
-        gradient.addColorStop(1, "#ffd700");
-
-    }
-
-
-    ctx.fillStyle = gradient;
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    /*
-       Photo
-    */
-
-    ctx.drawImage(
-        image,
-        border,
-        border,
-        image.width,
-        image.height
-    );
-
-
-    /*
-       Inner decorative line
-    */
-
-    if (style !== "none") {
-
-        ctx.strokeStyle = "rgba(255,255,255,.9)";
-        ctx.lineWidth = 3;
-
-        ctx.strokeRect(
-            border / 2,
-            border / 2,
-            canvas.width - border,
-            canvas.height - border
-        );
-
-    }
-
-    return canvas;
+ if(unit==="cm"){
+   outputWidth.min=".01"; outputWidth.max="1000"; outputWidth.step=".01";
+   outputHeight.min=".01"; outputHeight.max="1000"; outputHeight.step=".01";
+   widthHelp.textContent="Enter physical width in centimeters";
+   heightHelp.textContent="Enter physical height in centimeters";
+   conversionInfo.textContent="CM mode: dimensions are converted to pixels using DPI.";
+ }else{
+   outputWidth.min="1"; outputWidth.max="12000"; outputWidth.step="1";
+   outputHeight.min="1"; outputHeight.max="12000"; outputHeight.step="1";
+   widthHelp.textContent="Enter width directly in pixels";
+   heightHelp.textContent="Enter height directly in pixels";
+   conversionInfo.textContent="Pixel mode: entered dimensions are used directly. DPI is stored/displayed as the print resolution.";
+ }
+ updateDpiInfo();
 }
 
-
-/* -----------------------------
-   BLOB CONVERSION
------------------------------- */
-
-function canvasToBlob(canvas, quality) {
-
-    return new Promise(resolve => {
-
-        canvas.toBlob(
-            blob => resolve(blob),
-            "image/jpeg",
-            quality
-        );
-
-    });
-
+function updateDpiInfo(){
+ let d=Math.max(72,Math.min(1200,Math.round(Number(dpi.value)||300)));
+ dpi.value=d;
+ if(sizeUnit.value==="cm"){
+   const oneCm=Math.round(cmToPx(1,d)*100)/100;
+   dpiInfo.textContent=`${d} DPI → 1 cm = ${oneCm} px`;
+ }else{
+   dpiInfo.textContent=`${d} DPI → Pixel mode (1 inch = ${d} px)`;
+ }
 }
 
+function getDimensions(img){
+ let d=Math.max(72,Math.min(1200,Math.round(Number(dpi.value)||300)));
+ let rawW=Number(outputWidth.value), rawH=Number(outputHeight.value);
+ let w,h;
 
-/* -----------------------------
-   SMART JPEG COMPRESSION
------------------------------- */
+ if(sizeUnit.value==="cm"){
+   w=rawW>0?Math.round(cmToPx(rawW,d)):img.width;
+   h=rawH>0?Math.round(cmToPx(rawH,d)):img.height;
+ }else{
+   w=rawW>0?Math.round(rawW):img.width;
+   h=rawH>0?Math.round(rawH):img.height;
+ }
 
-async function findBestJPEG(canvas, maxBytes) {
+ if(resizeMode.value==="fit"){
+   if(rawW>0&&!rawH) h=Math.round(w*img.height/img.width);
+   if(!rawW&&rawH>0) w=Math.round(h*img.width/img.height);
+ }
 
-    let low = 0.05;
-    let high = 1.0;
-
-    let bestBlob = null;
-
-    /*
-       First check quality values using
-       binary search.
-    */
-
-    for (let i = 0; i < 12; i++) {
-
-        const quality = (low + high) / 2;
-
-        const blob =
-            await canvasToBlob(canvas, quality);
-
-        if (blob.size <= maxBytes) {
-
-            bestBlob = blob;
-
-            low = quality;
-
-        } else {
-
-            high = quality;
-
-        }
-
-    }
-
-    /*
-       If even very low quality is too large,
-       progressively resize the image.
-    */
-
-    if (!bestBlob) {
-
-        let scale = 0.90;
-
-        while (scale >= 0.20) {
-
-            const resized =
-                document.createElement("canvas");
-
-            resized.width =
-                Math.max(1, Math.floor(canvas.width * scale));
-
-            resized.height =
-                Math.max(1, Math.floor(canvas.height * scale));
-
-            const rctx =
-                resized.getContext("2d");
-
-            rctx.drawImage(
-                canvas,
-                0,
-                0,
-                resized.width,
-                resized.height
-            );
-
-            bestBlob =
-                await canvasToBlob(
-                    resized,
-                    0.50
-                );
-
-            if (bestBlob.size <= maxBytes) {
-
-                return bestBlob;
-
-            }
-
-            scale -= 0.10;
-        }
-
-        /*
-           Last possible result
-        */
-
-        return bestBlob;
-    }
-
-    return bestBlob;
+ return {
+   width:Math.max(50,Math.min(12000,w)),
+   height:Math.max(50,Math.min(12000,h)),
+   dpi:d
+ }
 }
 
+function drawSized(ctx,img,x,y,w,h,mode){
+ if(mode==="stretch"){ctx.drawImage(img,x,y,w,h);return}
+ const s=mode==="crop"?Math.max(w/img.width,h/img.height):Math.min(w/img.width,h/img.height);
+ const dw=img.width*s,dh=img.height*s,dx=x+(w-dw)/2,dy=y+(h-dh)/2;
+ if(mode==="crop"){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.drawImage(img,dx,dy,dw,dh);ctx.restore()}
+ else ctx.drawImage(img,dx,dy,dw,dh);
+}
 
-/* -----------------------------
-   CONVERT BUTTON
------------------------------- */
+function createCanvas(img,border,dim){
+ const c=document.createElement("canvas"),ctx=c.getContext("2d",{alpha:false});
+ c.width=dim.width+border*2;c.height=dim.height+border*2;
+ ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+ const g=ctx.createLinearGradient(0,0,c.width,c.height),s=decoration.value;
+ const sets={
+  silver:["#eee","#777","#fff","#aaa","#eee"],blue:["#8be9ff","#168cff","#fff","#168cff","#8be9ff"],
+  pink:["#ffb6d9","#ff4fa3","#fff","#ff4fa3","#ffb6d9"],gold:["#fff7ad","#ffd700","#fff","#d4af37","#ffd700"],none:["#fff","#fff"]
+ };
+ const a=sets[s];a.forEach((c,i)=>g.addColorStop(i/(a.length-1),c));
+ ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+ drawSized(ctx,img,border,border,dim.width,dim.height,resizeMode.value);
+ if(s!=="none"){ctx.strokeStyle="rgba(255,255,255,.92)";ctx.lineWidth=Math.max(2,Math.min(5,border/3));ctx.strokeRect(border/2,border/2,c.width-border,c.height-border)}
+ return c;
+}
 
-convertBtn.addEventListener("click", async function() {
+function canvasBlob(c,q){return new Promise(r=>c.toBlob(r,"image/jpeg",q))}
 
-    if (!originalImage) return;
+async function compressCanvas(canvas,maxBytes){
+ let low=.05,high=1,best=null;
+ for(let i=0;i<14;i++){
+  const q=(low+high)/2,b=await canvasBlob(canvas,q);
+  if(b.size<=maxBytes){best=b;low=q}else high=q;
+ }
+ if(best)return best;
+ let scale=.9;
+ while(scale>=.2){
+  const c=document.createElement("canvas");c.width=Math.max(1,Math.floor(canvas.width*scale));c.height=Math.max(1,Math.floor(canvas.height*scale));
+  c.getContext("2d").drawImage(canvas,0,0,c.width,c.height);
+  const b=await canvasBlob(c,.5);
+  if(b.size<=maxBytes)return b;scale-=.1;
+ }
+ return await canvasBlob(canvas,.05);
+}
 
-    let kb =
-        parseInt(targetKB.value);
-
-    /*
-       Enforce 10–150 KB
-    */
-
-    if (isNaN(kb)) kb = 100;
-
-    kb =
-        Math.max(
-            10,
-            Math.min(
-                150,
-                kb
-            )
-        );
-
-    targetKB.value = kb;
-
-    const maxBytes =
-        kb * 1024;
-
-    convertBtn.disabled = true;
-    downloadBtn.disabled = true;
-
-    status.textContent =
-        "⏳ Converting photo... Please wait.";
-
-    /*
-       Border
-    */
-
-    const border =
-        parseInt(borderWidth.value);
-
-    /*
-       Create canvas
-    */
-
-    const canvas =
-        createCanvas(
-            originalImage,
-            border
-        );
-
-    /*
-       Compress
-    */
-
-    finalBlob =
-        await findBestJPEG(
-            canvas,
-            maxBytes
-        );
-
-    if (!finalBlob) {
-
-        status.textContent =
-            "❌ Could not create JPEG.";
-
-        convertBtn.disabled = false;
-
-        return;
-    }
-
-    const actualKB =
-        finalBlob.size / 1024;
-
-    /*
-       Show result
-    */
-
-    if (actualKB <= kb) {
-
-        status.innerHTML =
-            "✅ JPEG Ready — " +
-            actualKB.toFixed(2) +
-            " KB / " +
-            kb +
-            " KB maximum";
-
-        status.className =
-            "status size-good";
-
-        downloadBtn.disabled = false;
-
-    } else {
-
-        status.innerHTML =
-            "⚠️ Result: " +
-            actualKB.toFixed(2) +
-            " KB. Try a larger target or smaller border.";
-
-        status.className =
-            "status size-bad";
-
-        downloadBtn.disabled = false;
-    }
-
-    convertBtn.disabled = false;
-
+convertBtn.addEventListener("click",async()=>{
+ if(!originalImage)return;
+ let kb=Math.max(10,Math.min(150,parseInt(targetKB.value)||100));targetKB.value=kb;
+ convertBtn.disabled=true;downloadBtn.disabled=true;status.className="status";status.textContent="⏳ Creating requested size and dimensions…";
+ try{
+  const dim=getDimensions(originalImage),border=parseInt(borderWidth.value)||0;
+  const canvas=createCanvas(originalImage,border,dim);
+  finalBlob=await compressCanvas(canvas,kb*1024);
+  const actual=finalBlob.size/1024;
+  status.innerHTML=(actual<=kb?"✅ JPEG Ready — ":"⚠️ Result — ")+actual.toFixed(2)+" KB / "+kb+" KB maximum<br>📐 "+dim.width+" × "+dim.height+" px • 🖨️ "+dim.dpi+" DPI";
+  status.className="status "+(actual<=kb?"good":"bad");downloadBtn.disabled=false;
+ }catch(e){status.textContent="❌ "+e.message;status.className="status bad"}
+ convertBtn.disabled=false;
 });
 
-
-/* -----------------------------
-   DOWNLOAD
------------------------------- */
-
-downloadBtn.addEventListener("click", function() {
-
-    if (!finalBlob) return;
-
-    const url =
-        URL.createObjectURL(finalBlob);
-
-    const link =
-        document.createElement("a");
-
-    link.href = url;
-
-    link.download =
-        "photo_" +
-        Math.round(finalBlob.size / 1024) +
-        "KB.jpeg";
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-    setTimeout(
-        () => URL.revokeObjectURL(url),
-        1000
-    );
-
+downloadBtn.addEventListener("click",()=>{
+ if(!finalBlob)return;
+ const url=URL.createObjectURL(finalBlob),a=document.createElement("a");
+ a.href=url;a.download="photo_"+Math.round(finalBlob.size/1024)+"KB_"+Date.now()+".jpeg";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-
+updateUnitUI();
 </script>
-
 </body>
 </html>
