@@ -12,8 +12,8 @@ async function payAndDownload() {
 
     // 2️⃣ Configure Razorpay payment
     const options = {
-        key: "pl_S6lafCKovpvLyH",
-        payment_link: "https://checkout.razorpay.com/v1/payment-button.js",
+        key: "rzp_live_Tn3hozihdEiMSy",
+        payment_link: "O7aaZwhH72oJfSHtaZrAm5an",
         handler: async function (response) {
             // 3️⃣ Payment successful
             alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
