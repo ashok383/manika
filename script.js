@@ -13,7 +13,7 @@ async function payAndDownload() {
     // 2️⃣ Configure Razorpay payment
     const options = {
         key: "rzp_live_Tn3hozihdEiMSy",
-        payment_link: "https://rzp.io/rzp/N2VNnQlV",
+        payment_link: "https://rzp.io/rzp/X7TLPOIH",
         handler: async function (response) {
             // 3️⃣ Payment successful
             alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
