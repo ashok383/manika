@@ -1,4 +1,4 @@
-//===============================================PAY&DOWNLOAD_FUNCTION======================================================
+//===============================================PAY&DOWNLOAD_FUNCTION==============================================
 async function payAndDownload() {
     // 1️⃣ Check which resume model is selected
     const selected = document.querySelector('input[name="resumeModel"]:checked');
@@ -12,13 +12,11 @@ async function payAndDownload() {
 
     // 2️⃣ Configure Razorpay payment
     const options = {
-    key: "rzp_live_Tn3hozihdEiMSy",
-    amount: 5000, // 50 Rupees
-    currency: "INR",
-    name: "Resume Builder",
-    handler: function (response) {
-        alert("Payment Successful ✅\nID: " + response.razorpay_payment_id);
-        generatePDF(); // Ikkada download start
+        key: "rzp_live_Tn3hozihdEiMSy",
+        payment_link: "https://rzp.io/rzp/X7TLPOIH",
+        handler: async function (response) {
+            // 3️⃣ Payment successful
+            alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
     }
 };
 const rzp = new Razorpay(options);
