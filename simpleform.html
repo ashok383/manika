@@ -150,10 +150,14 @@ button:hover {
   box-shadow: 0 7px 18px rgba(101, 88, 232, .22);
 }
 
+/* Add pulse glow */
 .download-btn {
-  color: #fff;
-  background: linear-gradient(135deg, #119b70, #087b58);
-  box-shadow: 0 7px 18px rgba(8, 123, 88, .2);
+  animation: shine 2.5s infinite, pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 7px 18px rgba(8, 123, 88, .2); }
+  100% { box-shadow: 0 7px 24px rgba(17, 155, 112, .45), 0 0 20px rgba(17, 155, 112, .2); }
 }
 
 #academicsContainer {
