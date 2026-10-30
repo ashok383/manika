@@ -412,96 +412,226 @@ function addAcademic(){
 function removeAcademic(btn){btn.parentElement.remove();}
 
 // ========== GET SELECTED RESUME MODEL ==========
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f4f6fc;--surface:#fff;--primary:#6558e8;--text:#182039;--muted:#69738a;--border:#e2e7f0}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;color:var(--text);background:radial-gradient(ellipse at top left,#e7e6ff,transparent 42%),var(--bg);font-family:'Inter',Arial,sans-serif;line-height:1.6}
+.container{max-width:960px;margin:22px auto;padding:clamp(20px,4vw,42px);background:var(--surface);border:1px solid rgba(226,231,240,.9);border-radius:24px;box-shadow:0 24px 70px rgba(28,37,75,.09)}
+.container h4{margin:0 0 28px;padding-bottom:22px;text-align:center;font-size:clamp(23px,4vw,34px);font-weight:800;color:var(--primary);border-bottom:1px solid var(--border)}
+label{display:block;margin:18px 0 7px;color:#303a55;font-size:13px;font-weight:700}
+input:not([type="radio"]):not([type="checkbox"]):not([type="file"]),textarea,select{display:block;width:100%;margin:0 0 12px;padding:12px 14px;color:var(--text);background:#fbfcff;border:1px solid #dce2ee;border-radius:10px;font:inherit;font-size:14px;outline:none;transition:.2s}
+input:focus,textarea:focus,select:focus{background:#fff;border-color:var(--primary);box-shadow:0 0 0 4px rgba(101,88,232,.12)}
+input[type="file"]{display:block;width:100%;padding:12px;margin-bottom:12px;background:#f8f8ff;border:1px dashed #aaa4ef;border-radius:12px}
+textarea{resize:vertical;min-height:85px}
+button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;margin:6px 5px 6px 0;border:1px solid transparent;border-radius:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+button:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(30,40,80,.12)}
+.add-btn{color:var(--primary);background:#efedff;border-color:#dedaff}
+.remove-btn{flex:0 0 auto;color:#c43248;background:#fff0f2}
+.preview-btn{color:white;background:linear-gradient(135deg,#7868f4,#5141d0);box-shadow:0 7px 18px rgba(101,88,232,.22)}
+/* CYAN SHINING DOWNLOAD BUTTON - FIXED */
+.download-btn{
+  color:#fff;
+  background: linear-gradient(135deg, #00d2ff, #0097a7);
+  box-shadow: 0 7px 18px rgba(0,151,167,.25);
+  position:relative;overflow:hidden;border:none;padding:14px 28px;border-radius:12px;font-weight:700;font-size:15px;
+}
+.download-btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.5),transparent);
+  animation: shine 2.5s infinite;
+}
+.download-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,210,255,.4)}
+@keyframes shine{0%{left:-100%}100%{left:100%}}
+#academicsContainer{display:grid;gap:10px}
+.academicRow{align-items:center;flex-wrap:wrap;padding:12px;background:#f8f9fd;border:1px solid var(--border);border-radius:12px}
+.academicRow input{flex:1 1 130px}
+.container > div[style*="dashed"]{background:#f8f8ff !important;border:1px solid #dedaff !important;border-radius:16px !important;padding:20px !important}
+.container > div[style*="dashed"] label{padding:12px;margin:7px 0;background:#fff;border:1px solid var(--border);border-radius:10px}
+.container > div[style*="dashed"] input[type="radio"]{accent-color:var(--primary)}
+@media (max-width:600px){body{padding:8px}.container{margin:8px auto;padding:18px 14px;border-radius:16px}button{max-width:100%}.preview-btn,.download-btn{width:100%;margin:6px 0}.academicRow{display:flex !important}.academicRow input{flex-basis:100%}}
+</style>
+</head>
+<body>
+<div class="container">
+<h4>🌸(RESUME_BUILDER)🌸</h4>
+<label>Upload Photo</label><input type="file" id="photo" accept="image/*">
+<label>Full Name</label><input id="fullName" value="Your Fullname">
+<label>Father Name</label><input id="fatherName" value="FATHER_NAME">
+<label>Mother Name</label><input id="motherName" value="MOTHER_NAME">
+<label>Date of Birth</label><input id="dob" type="date">
+<label>Email</label><input id="email" value="yourname@email.com">
+<label>Phone</label><input id="phone" value="+91 9XXXXXXXXX">
+<label>Address</label><textarea id="address">Hyderabad, Telangana, India</textarea>
+<label>Career Objective</label><textarea id="objective" rows="6">A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.</textarea>
+<label>Professional Summary</label><textarea id="summary">Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.</textarea>
+<label>Academic Details</label>
+<div id="academicsContainer">
+    <div class="academicRow" style="display:flex;gap:5px;">
+        <input value="B,Tech or B,Sc"><input value="University"><input value="2026 - 2027"><input value="8.5 CGPA">
+        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
+    </div>
+</div>
+<button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
+<label>Education</label><textarea id="education">Bachelor of Technology in Computer</textarea>
+<label>Experience</label><textarea id="experience">Fresher / Internship experience</textarea>
+<label>Technical Skills</label><input id="skill" value="Your skills, Java, Python">
+<label>Projects</label><textarea id="projects">Resume Builder, E-commerce Website</textarea>
+<label>Habits / Strengths</label><textarea id="habits">Quick learner, disciplined, team player</textarea>
+<label>Languages Known</label><input id="Languages" value="Hindi, English,Telugu,">
+<label>Declaration</label><textarea id="declaration">I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.</textarea>
+<label>Place</label><input id="place" value="Hyderabad">
+<label>Date</label><input id="date" type="date">
+<label>Signature</label><input id="signature" value="(manikhanta)">
+<label>🌍 Select Resume Model / Template</label>
+<div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
+  <label><input type="radio" name="resumeModel" value="ats" checked><b>1. ATS-Friendly (Modern Professional)</b><br><small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="reverse"><b>2. Reverse-Chronological Resume</b><br><small>✔ Latest job first • Recruiter favorite</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="hybrid"><b>3. Hybrid / Combination Resume</b><br><small>✔ Skills + Experience • Mid–Senior roles</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="onepage"><b>4. One-Page Resume</b><br><small>✔ Concise • Students • Freshers • &lt;10 yrs</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="targeted"><b>5. Targeted Resume</b><br><small>✔ Job-specific • Keyword optimized • FAANG</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="functional"><b>6. Functional (Skills-Based) Resume</b><br><small>✔ Career change • Employment gaps</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="executive"><b>7. Executive Resume</b><br><small>✔ Leadership • Metrics • CEOs / Managers</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="academic"><b>8. Academic CV</b><br><small>✔ Research • Publications • PhD / Professors</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="creative"><b>9. Creative / Visual Resume</b><br><small>✔ Designers • UI/UX • Media (Not ATS)</small></label><br><br>
+  <label><input type="radio" name="resumeModel" value="europass"><b>10. Europass CV (EU Standard)</b><br><small>✔ Europe • Structured • Multi-language</small></label>
+</div>
+<div style="margin-top:15px;">
+    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
+    <button class="download-btn" onclick="payAndDownload()">💳 PAY & DOWNLOAD PDF</button>
+</div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+function addAcademic(){
+    const d=document.createElement("div");
+    d.className="academicRow";d.style.display="flex";d.style.gap="5px";
+    d.innerHTML=`<input placeholder="Course"><input placeholder="Institute"><input placeholder="Year"><input placeholder="GPA"><button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
+    document.getElementById("academicsContainer").appendChild(d);
+}
+function removeAcademic(btn){btn.parentElement.remove();}
 function getSelectedResumeModel(){
-    return document.querySelector('input[name="resumeModel"]:checked').value;
+    const el=document.querySelector('input[name="resumeModel"]:checked');
+    return el ? el.value : 'ats';
 }
 
-// ========== PREVIEW CV ==========
+// ===== COLOURED DECORATED PREVIEW - NO LOGIC CHANGE =====
 function previewCV(){
-    const f = photo.files[0];
-    if(f){
-        const r = new FileReader();
-        r.onload = e => openPreview(e.target.result);
-        r.readAsDataURL(f);
-    } else openPreview("");
+    const photoInput=document.getElementById("photo");
+    const f=photoInput.files[0];
+    if(f){const r=new FileReader();r.onload=e=>openPreview(e.target.result);r.readAsDataURL(f);}
+    else openPreview("");
 }
-function openPreview(photo){
-    const w = window.open("", "_blank", "width=900,height=1200");
-    const selectedModel = getSelectedResumeModel();
+function openPreview(photoSrc){
+    const gv=id=>document.getElementById(id)?.value||'';
+    const fullName=gv("fullName"), fatherName=gv("fatherName"), motherName=gv("motherName"), dob=gv("dob"), email=gv("email"), phone=gv("phone"), address=gv("address"), objective=gv("objective"), summary=gv("summary"), education=gv("education"), experience=gv("experience"), skillVal=gv("skill"), projects=gv("projects"), habits=gv("habits"), Languages=gv("Languages"), declaration=gv("declaration"), place=gv("place"), date=gv("date"), signature=gv("signature"), selectedModel=getSelectedResumeModel();
+    const academicsHTML=[...document.querySelectorAll(".academicRow")].map(r=>{let i=r.querySelectorAll("input");if(i.length<4)return'';return`<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;}).join("");
+    const skillsHTML=skillVal?skillVal.split(",").map(s=>`<span class="skill-chip">${s.trim()}</span>`).join(""):'';
+    
+    const w=window.open("","_blank","width=1000,height=1200");
     w.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
 <title>Preview - ${selectedModel}</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Poppins;background:#eee;}
-.page{min-height:100vh;background:#fff;margin:20px;padding:30px;border:6px solid; border-image:linear-gradient(45deg,#ff4081,#7c4dff,#00e5ff,#4caf50) 1;}
-.header{display:flex;gap:20px;align-items:center;}
-img{width:120px;height:120px;border-radius:50%;}
-.header h1{margin:0;color:#4caf50;}
-h2{color:#4caf50;margin-bottom:5px;margin-top:25px;}
-p{margin:4px 0;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border:1px solid #aaa;padding:8px;text-align:center;}
-span{display:inline-block;background:#ff4081;color:#fff;padding:6px 14px;border-radius:30px;margin:4px;}
-.close-bar{position:fixed;bottom:0;left:0;width:100%;background:#222;text-align:center;padding:12px;}
-.close-bar button{background:#f44336;color:#fff;border:none;border-radius:30px;padding:10px 28px;font-weight:600;cursor:pointer;}
+*{box-sizing:border-box}body{margin:0;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#f5f7ff,#eef2ff);padding:20px}
+.page{max-width:850px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.12);border:1px solid #e8eaf6}
+.top-banner{background:linear-gradient(135deg,#6558e8 0%,#00d2ff 100%);padding:35px 35px 25px;color:#fff;position:relative}
+.top-banner::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:#fff;border-radius:50% 50% 0 0}
+.header{display:flex;gap:22px;align-items:center;position:relative;z-index:2}
+.header img{width:110px;height:110px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,0.8);box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.header h1{margin:0;font-family:'Poppins';font-size:32px;font-weight:700;letter-spacing:-0.5px}
+.header p{margin:3px 0;font-size:13px;opacity:0.92}
+.contact-bar{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:10px 14px;border-radius:12px}
+.content{padding:30px 35px 20px}
+.section{margin-bottom:22px}
+.section-title{font-family:'Poppins';font-size:13px;font-weight:700;letter-spacing:1px;color:#6558e8;text-transform:uppercase;border-left:4px solid #6558e8;padding-left:12px;margin:0 0 10px 0}
+.section-box{background:#f8f9ff;border:1px solid #eef0ff;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.7;color:#2d3748}
+table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:10px}
+th{background:linear-gradient(135deg,#6558e8,#7868f4);color:#fff;padding:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:10px;border-bottom:1px solid #eef0ff;font-size:13px}
+tr:last-child td{border-bottom:none}tr:nth-child(even) td{background:#f8f9ff}
+.skill-chip{display:inline-block;background:linear-gradient(135deg,#6558e8,#00d2ff);color:#fff;padding:6px 14px;border-radius:20px;margin:4px;font-size:12px;font-weight:600;box-shadow:0 3px 10px rgba(101,88,232,0.25)}
+.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.badge{display:inline-block;background:#e0e7ff;color:#4338ca;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:10px}
+.declaration-box{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px dashed #f59e0b;border-radius:12px}
+.signature{font-family:'Poppins';font-size:18px;font-weight:700;color:#182039}
+.model-badge{text-align:center;margin-top:20px;padding:10px;background:linear-gradient(135deg,#f3f0ff,#e0f7ff);border-radius:10px;font-size:12px;color:#6558e8;font-weight:600}
+.close-bar{position:fixed;bottom:0;left:0;width:100%;background:rgba(24,32,57,0.9);backdrop-filter:blur(12px);text-align:center;padding:12px;z-index:99}
+.close-bar button{background:#fff;color:#182039;border:none;border-radius:30px;padding:10px 28px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
 </style>
 </head>
 <body>
-
 <div class="page">
-<div class="header">
-${photo?`<img src="${photo}">`:""}
-<div>
-<h1>${fullName.value}</h1>
-<p><b>Father:</b> ${fatherName.value} | <b>Mother:</b> ${motherName.value}</p>
-<p><b>DOB:</b> ${dob.value}</p>
-<p>${email.value} | ${phone.value}</p>
-<p>${address.value}</p>
+  <div class="top-banner">
+    <div class="header">
+      ${photoSrc?`<img src="${photoSrc}">`:`<div style="width:110px;height:110px;background:rgba(255,255,255,0.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>`}
+      <div style="flex:1">
+        <h1>${fullName}</h1>
+        <div style="margin-top:6px;font-size:13px;"><span>👨 ${fatherName}</span> &nbsp;|&nbsp; <span>👩 ${motherName}</span> &nbsp;|&nbsp; <span>🎂 ${dob}</span></div>
+        <div class="contact-bar"><span>📧 ${email}</span><span>📱 ${phone}</span><span>📍 ${address}</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section"><div class="section-title">🎯 Career Objective</div><div class="section-box">${objective}</div></div>
+    <div class="section"><div class="section-title">💼 Professional Summary</div><div class="section-box">${summary}</div></div>
+    <div class="section"><div class="section-title">🎓 Academic Details</div><div class="section-box" style="padding:0;overflow:hidden"><table><tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA</th></tr>${academicsHTML}</table></div></div>
+    <div class="footer-grid">
+      <div class="section"><div class="section-title">📚 Education</div><div class="section-box">${education}</div></div>
+      <div class="section"><div class="section-title">💻 Experience</div><div class="section-box">${experience}</div></div>
+    </div>
+    <div class="section"><div class="section-title">⚡ Technical Skills</div><div class="section-box">${skillsHTML}</div></div>
+    <div class="footer-grid">
+      <div class="section"><div class="section-title">🚀 Projects</div><div class="section-box">${projects}</div></div>
+      <div class="section"><div class="section-title">💪 Strengths</div><div class="section-box">${habits}</div></div>
+    </div>
+    <div class="section"><div class="section-title">🗣️ Languages</div><div class="section-box">${Languages}</div></div>
+    <div class="section"><div class="section-title">📝 Declaration</div><div class="section-box declaration-box">${declaration}</div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:20px;padding:16px;background:#f8f9fd;border-radius:12px;font-size:13px">
+      <span><b>📍 Place:</b> ${place}</span><span><b>📅 Date:</b> ${date}</span><span><b>✍️ Signature:</b> <span class="signature">${signature}</span></span>
+    </div>
+    <div class="model-badge">✨ Resume Model: ${selectedModel.toUpperCase()} <span class="badge">MANIKARNIKA</span></div>
+  </div>
 </div>
-</div>
-
-<h2>Career Objective</h2><p>${objective.value}</p>
-<h2>Professional Summary</h2><p>${summary.value}</p>
-
-<h2>Academics</h2>
-<table>
-<tr><th>Course</th><th>Institute</th><th>Year</th><th>GPA</th></tr>
-${[...document.querySelectorAll(".academicRow")].map(r=>{
-    let i = r.querySelectorAll("input");
-    return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
-}).join("")}
-</table>
-
-<h2>Education</h2><p>${education.value}</p>
-<h2>Experience</h2><p>${experience.value}</p>
-
-<h2>Technical Skills</h2>
-${skills.value.split(",").map(s=>`<span>${s.trim()}</span>`).join("")}
-
-<h2>Projects</h2><p>${projects.value}</p>
-<h2>Habits / Strengths</h2><p>${habits.value}</p>
-<h2>Languages Known</h2><p>${Languages.value}</p>
-
-<h2>Declaration</h2><p>${declaration.value}</p>
-
-<p><b>Place:</b> ${place.value}</p>
-<p><b>Date:</b> ${date.value}</p>
-<p><b>Signature:</b> ${signature.value}</p>
-<p><b>Selected Model:</b> ${selectedModel}</p>
-</div>
-
 <div class="close-bar">
-<button onclick="window.close()">❌ Close Preview</button>
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#00d2ff,#0097a7);color:#fff;margin-right:10px">🖨️ Print</button>
+  <button onclick="window.close()">❌ Close</button>
 </div>
-
 </body>
 </html>
 `);
+    w.document.close();
 }
 
+function payAndDownload(){
+    const selected=document.querySelector('input[name="resumeModel"]:checked');
+    if(!selected){alert("Select Model!");return;}
+    const options={
+        key:"rzp_live_Tn3hozihdEiMSy",
+        amount:5000, currency:"INR", name:"MANIKARNIKA", description:selected.value,
+        handler:function(res){alert("Payment Success ✅ "+res.razorpay_payment_id); previewCV();},
+        theme:{color:"#00d2ff"}
+    };
+    const rzp=new Razorpay(options);
+    rzp.open();
+}
+</script>
+</body>
+</html>
 
 //====================================================================================
 
