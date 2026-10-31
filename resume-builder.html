@@ -195,39 +195,49 @@ button:hover {
   accent-color: var(--primary);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   body {
-    padding: 8px;
+    padding: 12px;
+    background: var(--bg);
   }
-
   .container {
-    margin: 8px auto;
-    padding: 18px 14px;
-    border-radius: 16px;
+    margin: 0 auto;
+    padding: 20px 16px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(28,37,75,.08);
   }
-
   .container h4 {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    font-size: 24px;
   }
-
+  label {
+    margin: 14px 0 6px;
+  }
   button {
     max-width: 100%;
+    width: 100%;
+    margin: 8px 0;
+    padding: 14px;
+    font-size: 14px;
   }
-
   .preview-btn,
   .download-btn {
     width: 100%;
-    margin: 6px 0;
   }
-
   .academicRow {
-    display: flex !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
-
   .academicRow input {
     flex-basis: 100%;
   }
-}
+  .academicRow input:nth-child(1),
+  .academicRow input:nth-child(2) {
+    grid-column: span 2;
+  }
+} 
 </style>
 
 </head>
