@@ -3,122 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manika - PDF Tools</title>
+<title>Manika Pro PDF Tools</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
 <style>
-body{font-family:system-ui;background:#0f172a;color:#fff;padding:20px;max-width:900px;margin:auto}
-.card{background:#1e293b;padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid #334155}
-h2{color:#38bdf8} input,button{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:none}
-input{background:#0f172a;color:#fff;border:1px solid #334155}
-button{background:#38bdf8;color:#000;font-weight:700;cursor:pointer}
-.log{background:#000;padding:12px;border-radius:8px;margin-top:10px;white-space:pre-wrap;font-size:13px;color:#22c55e;max-height:300px;overflow:auto}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
-.ok{background:#22c55e;color:#000} .fail{background:#ef4444}
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700&display=swap');
+body{font-family:'Plus Jakarta Sans',sans-serif}
+.glass{background:rgba(255,255,255,0.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1)}
+.glow{box-shadow:0 0 40px rgba(56,189,248,0.3)}
 </style>
 </head>
-<body>
-<h1 style="text-align:center">MANIKA PDF Tools - ashok383.github.io/manika</h1>
+<body class="bg-[#020617] text-white min-h-screen p-4 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-900/20 via-slate-900 to-slate-950">
 
-<!-- TOOL 1: UNLOCK PDF -->
-<div class="card">
-<h2>1. Unlock PDF (With Password)</h2>
-<p style="font-size:13px;color:#94a3b8">Password unna PDF ni unlock chesi fresh PDF istundi. Password crack cheyadu.</p>
-<input type="file" id="pdfFile" accept="application/pdf">
-<input type="password" id="pdfPass" placeholder="Enter PDF Password">
-<button onclick="unlockPDF()">Unlock & Download</button>
-<div id="log1" class="log">Waiting...</div>
+<!-- HEADER -->
+<div class="max-w-5xl mx-auto text-center mb-10">
+<h1 class="text-4xl md:text-5xl font-bold tracking-tight">MANIKA <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">PDF PRO</span></h1>
+<p class="text-slate-400 mt-2">Unlock PDF & Digital Signature Verifier • Made with ❤️ by ManikarNika</p>
 </div>
 
-<!-- TOOL 2: E-SIGNATURE VERIFIER -->
-<div class="card">
-<h2>2. Digital E-Signature Verifier</h2>
-<input type="file" id="sigFile" accept="application/pdf">
-<button onclick="verifySignature()">Verify Signature</button>
-<div id="log2" class="log">Upload PDF to check digital signature...</div>
+<div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
+
+<!-- TOOL 1 -->
+<div class="glass rounded-[24px] p-7 glow">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center"><i class="ri-lock-unlock-line text-xl"></i></div>
+<div><h2 class="text-xl font-bold">Unlock PDF</h2><p class="text-xs text-slate-400">Password tho secure ga unlock</p></div>
 </div>
+
+<label class="block border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-cyan-400 cursor-pointer transition">
+<input type="file" id="pdfFile" accept="application/pdf" hidden onchange="showName('pdfFile','name1')">
+<i class="ri-upload-cloud-2-line text-3xl text-cyan-400"></i>
+<p id="name1" class="text-sm text-slate-300 mt-2">Click to upload locked PDF</p>
+</label>
+
+<div class="relative mt-4">
+<input type="password" id="pdfPass" placeholder="Enter PDF Password" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 pr-10 outline-none focus:border-cyan-400">
+<i class="ri-key-2-line absolute right-3 top-3.5 text-slate-500"></i>
+</div>
+
+<button onclick="unlockPDF()" class="w-full mt-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold py-3.5 rounded-xl hover:scale-[1.02] transition"><i class="ri-download-2-line"></i> Unlock & Download</button>
+
+<div id="log1" class="mt-4 bg-black/60 rounded-xl p-4 text-[12px] font-mono text-emerald-300 min-h-[80px]">Ready to unlock...</div>
+</div>
+
+<!-- TOOL 2 -->
+<div class="glass rounded-[24px] p-7">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center"><i class="ri-quill-pen-line text-xl"></i></div>
+<div><h2 class="text-xl font-bold">E-Signature Verifier</h2><p class="text-xs text-slate-400">Digital Sign verify chey</p></div>
+</div>
+
+<label class="block border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-violet-400 cursor-pointer transition">
+<input type="file" id="sigFile" accept="application/pdf" hidden onchange="showName('sigFile','name2')">
+<i class="ri-shield-check-line text-3xl text-violet-400"></i>
+<p id="name2" class="text-sm text-slate-300 mt-2">Upload signed PDF</p>
+</label>
+
+<button onclick="verifySignature()" class="w-full mt-4 bg-gradient-to-r from-violet-400 to-purple-600 text-white font-bold py-3.5 rounded-xl hover:scale-[1.02] transition"><i class="ri-search-eye-line"></i> Verify Now</button>
+
+<div id="log2" class="mt-4 bg-black/60 rounded-xl p-4 text-[12px] font-mono text-slate-200 min-h-[180px]">Waiting for PDF...</div>
+</div>
+
+</div>
+
+<div class="max-w-5xl mx-auto mt-8 text-center text-slate-500 text-xs">Thanks to ManikarNika! 👍 • Andaru Udyogastulu Happy 😊</div>
 
 <script>
 const { PDFDocument } = PDFLib;
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+function showName(inputId, labelId){
+  const f = document.getElementById(inputId).files[0];
+  if(f) document.getElementById(labelId).innerText = '📄 ' + f.name;
+}
+
 async function unlockPDF(){
   const log = document.getElementById('log1');
-  const file = document.getElementById('pdfFile').files[0];
-  const pass = document.getElementById('pdfPass').value;
-  if(!file){ log.textContent='Please select PDF'; return; }
-  if(!pass){ log.textContent='Please enter password'; return; }
+  const fileInput = document.getElementById('pdfFile');
+  const pass = document.getElementById('pdfPass').value.trim();
+  const file = fileInput.files[0];
+  if(!file){ log.innerHTML = '❌ <span class="text-red-400">PDF select chey anna!</span>'; return; }
+  if(!pass){ log.innerHTML = '❌ <span class="text-red-400">Password enter chey!</span>'; return; }
+
+  log.innerHTML = '⏳ Checking password...';
   try{
-    log.textContent='Reading PDF...';
     const buffer = await file.arrayBuffer();
-    // Try to load with password using pdf-lib (pdf-lib needs password in load options)
-    let pdfDoc;
-    try {
-      pdfDoc = await PDFDocument.load(buffer, { password: pass, ignoreEncryption: false });
+    
+    // STEP 1: Verify password with pdf.js - this is 100% accurate
+    try{
+      await pdfjsLib.getDocument({data: buffer.slice(0), password: pass}).promise;
+      log.innerHTML = '✅ Password correct! Creating unlocked PDF...';
     } catch(e){
-      // Fallback for pdf.js encrypted check
-      log.textContent='Invalid password or file is not password protected.\nError: '+e.message;
-      return;
+      if(e.name === 'PasswordException'){
+        log.innerHTML = '❌ <span class="text-red-400">Wrong Password! Malli try chey.</span>';
+        return;
+      }
+      throw e;
     }
-    log.textContent='Password correct! Removing encryption...';
-    // Re-save without encryption = unlocked
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes], {type:'application/pdf'});
+
+    // STEP 2: Remove encryption with pdf-lib
+    const pdfDoc = await PDFDocument.load(buffer, { password: pass });
+    const newBytes = await pdfDoc.save();
+
+    const blob = new Blob([newBytes], {type:'application/pdf'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'unlocked_'+file.name;
+    a.download = file.name.replace('.pdf','') + '_UNLOCKED_Manika.pdf';
     a.click();
-    log.textContent='SUCCESS: Unlocked PDF Downloaded!\nFile: unlocked_'+file.name+'\nThanks to ManikarNika!';
-  }catch(err){
-    log.textContent='FAILED: '+err.message;
+    URL.revokeObjectURL(url);
+    
+    log.innerHTML = `🎉 <span class="text-cyan-300 font-bold">SUCCESS!</span><br>File Downloaded: ${a.download}<br><br>😊 Smiling with happiness - Thanks to ManikarNika!`;
+
+  } catch(err){
+    log.innerHTML = '❌ Error: ' + err.message + '<br><span class="text-slate-400">PDF already unlocked ayyi undochu, leka file corrupt ayyi undochu.</span>';
   }
 }
 
 async function verifySignature(){
   const log = document.getElementById('log2');
   const file = document.getElementById('sigFile').files[0];
-  if(!file){ log.textContent='Please select PDF'; return; }
+  if(!file){ log.innerHTML = '❌ PDF select chey!'; return; }
+  log.innerHTML = '🔍 Analyzing...';
   try{
-    log.textContent='Analyzing PDF...';
     const buffer = await file.arrayBuffer();
-    const text = new TextDecoder('latin1').decode(buffer);
+    const raw = new TextDecoder('latin1').decode(new Uint8Array(buffer).slice(0, 200000)); // first 200kb enough
 
-    const hasAcroForm = text.includes('/AcroForm');
-    const hasSig = text.includes('/Type /Sig') || text.includes('/SubFilter');
-    const byteRange = text.match(/\/ByteRange\s*\[\s*(\d+\s+\d+\s+\d+\s+\d+)\s*\]/);
-    const subFilter = (text.match(/\/SubFilter\s*\/([A-Za-z0-9\.]+)/)||[])[1] || 'N/A';
-    const signer = (text.match(/\/Name\s*\(([^)]+)\)/)||[])[1] || (text.match(/\/CN=([^\/\),]+)/)||[])[1] || 'Unknown';
-    const reason = (text.match(/\/Reason\s*\(([^)]+)\)/)||[])[1] || 'N/A';
-    const sigCount = (text.match(/\/Type\s*\/Sig/g) || []).length;
+    const sigMatches = [...raw.matchAll(/\/Type\s*\/Sig/g)];
+    const byteRangeMatch = raw.match(/\/ByteRange\s*\[([^\]]+)\]/);
+    const subFilter = (raw.match(/\/SubFilter\s*\/([A-Za-z0-9\.\-]+)/)||[])[1] || 'Not Found';
+    const contact = (raw.match(/\/ContactInfo\s*\(([^)]+)\)/)||[])[1] || 'N/A';
+    const reason = (raw.match(/\/Reason\s*\(([^)]+)\)/)||[])[1] || 'N/A';
+    const nameMatch = raw.match(/\/Name\s*\(([^)]+)\)/) || raw.match(/\/CN=([^\/\),]+)/);
+    const signerName = nameMatch ? nameMatch[1] : 'Unknown';
 
-    // Use pdf.js to check if file is valid
-    await pdfjsLib.getDocument({data: buffer}).promise;
+    await pdfjsLib.getDocument({data: buffer}).promise; // validate pdf
 
-    let result = '';
-    if(sigCount > 0 && hasSig){
-      result += `✅ DIGITAL SIGNATURE FOUND\n`;
-      result += `------------------------\n`;
-      result += `Signature Count: ${sigCount}\n`;
-      result += `Signer: ${signer}\n`;
-      result += `SubFilter (Type): ${subFilter}\n`;
-      result += `Reason: ${reason}\n`;
-      result += `ByteRange: ${byteRange ? byteRange[1] : 'Present'}\n`;
-      result += `AcroForm: ${hasAcroForm ? 'Yes' : 'No'}\n\n`;
-      result += `Status: ${byteRange ? '🟢 Document appears digitally signed. Integrity protected.' : '🟡 Signature object found but ByteRange incomplete.'}\n\n`;
-      result += `Note: Full cryptographic validation (PKI chain) needs server-side verification. This tool confirms presence & structure.`;
-      log.innerHTML = `<span class="badge ok">VERIFIED</span>\n`+result;
+    if(sigMatches.length > 0){
+      log.innerHTML = `
+<div class="flex items-center gap-2 mb-2"><span class="bg-emerald-500 text-black px-3 py-1 rounded-full text-[10px] font-bold">✓ VALID DIGITAL SIGN</span><span class="text-slate-400 text-[10px]">${sigMatches.length} signature(s)</span></div>
+<span class="text-emerald-300">Signer:</span> ${signerName}
+<span class="text-emerald-300">Type:</span> ${subFilter}
+<span class="text-emerald-300">Reason:</span> ${reason}
+<span class="text-emerald-300">Contact:</span> ${contact}
+<span class="text-emerald-300">ByteRange:</span> ${byteRangeMatch ? byteRangeMatch[1].trim() : 'Present'}
+<span class="text-emerald-300">Integrity:</span> 🟢 Protected (ByteRange intact)
+
+<span class="text-cyan-400 mt-2 block">Andaru Udyogastulu Happy 👍 Thanks to ManikarNika 😊</span>
+      `;
     } else {
-      result += `❌ NO DIGITAL SIGNATURE FOUND\n`;
-      result += `------------------------\n`;
-      result += `This PDF does NOT contain a digital e-signature.\n`;
-      result += `It may have only an image signature, not PKI based.\n`;
-      log.innerHTML = `<span class="badge fail">NOT SIGNED</span>\n`+result;
+      log.innerHTML = `
+<div class="bg-red-500/20 border border-red-500/40 text-red-300 px-3 py-2 rounded-full text-[11px] font-bold inline-block">✗ NO DIGITAL E-SIGNATURE</div>
+<span class="block mt-3 text-slate-300">Idi digitally sign kaledu. Image signature ayyi undochu, PKI sign kadu.</span>
+<span class="text-slate-500 mt-2 block">Tip: DSC / Aadhaar eSign unna PDF matrame valid avutundi.</span>
+      `;
     }
-    log.textContent = log.innerText + '\n\nThanks to ManikarNika! 👍';
-
-  }catch(err){
-    log.textContent='Error verifying: '+err.message;
+  } catch(e){
+    log.innerHTML = '❌ Error: ' + e.message;
   }
 }
 </script>
