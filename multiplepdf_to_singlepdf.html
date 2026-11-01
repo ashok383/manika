@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manikarnika - Merge PDF | 2 Sec Magic ✨</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{
+    min-height:100vh;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;overflow:hidden;position:relative;
+}
+/* Shining Stars Background */
+body::before{
+    content:"";position:absolute;width:200%;height:200%;
+    background: radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+                radial-gradient(2px 2px at 40% 70%, #fff, transparent),
+                radial-gradient(1px 1px at 90% 40%, #fff, transparent);
+    animation: stars 60s linear infinite;
+}
+@keyframes stars{0%{transform:translateY(0)}100%{transform:translateY(-500px)}}
+
+.card{
+    position:relative;z-index:2;
+    width:100%;max-width:480px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius:24px;
+    padding:28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
+}
+.shine{
+    position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    transform: rotate(25deg);
+    animation: shineMove 3s infinite;
+}
+@keyframes shineMove{0%{transform:translateX(-100%) rotate(25deg)}100%{transform:translateX(100%) rotate(25deg)}}
+
+h1{
+    text-align:center;font-size:22px;font-weight:700;
+    background: linear-gradient(90deg, #fde047, #fb923c, #f472b6);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:6px;
+}
+.sub{color:#cbd5e1;text-align:center;font-size:13px;margin-bottom:20px}
+
+.drop-zone{
+    border:2px dashed rgba(255,255,255,0.3);
+    border-radius:16px;padding:30px 20px;text-align:center;
+    cursor:pointer;transition:0.3s;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+}
+.drop-zone:hover{border-color:#fde047;box-shadow:0 0 25px rgba(253,224,71,0.3);transform:translateY(-2px)}
+.drop-zone .icon{font-size:42px;animation: float 2s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.drop-zone p{color:#fff;margin-top:10px;font-weight:600}
+
+#fileList{margin:15px 0;max-height:160px;overflow-y:auto}
+.file-item{
+    display:flex;justify-content:space-between;align-items:center;
+    background: rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);
+    padding:10px 12px;border-radius:10px;margin-bottom:8px;color:#e2e8f0;font-size:13px;
+    animation: slideIn 0.3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.file-item button{background:#ff3b3b;border:none;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer}
+
+.merge-btn{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    font-size:16px;font-weight:700;cursor:pointer;
+    background: linear-gradient(135deg, #facc15, #fb923c, #ec4899);
+    color:#000;box-shadow:0 8px 25px rgba(250,204,21,0.4);
+    transition:0.3s;position:relative;overflow:hidden;
+}
+.merge-btn:hover{transform:scale(1.03);box-shadow:0 12px 35px rgba(250,204,21,0.6)}
+.merge-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+.success{
+    display:none;text-align:center;margin-top:15px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color:#fff;padding:12px;border-radius:12px;font-weight:600;
+    animation: pop 0.5s ease;
+}
+@keyframes pop{0%{transform:scale(0.8)}100%{transform:scale(1)}}
+
+.footer{margin-top:18px;text-align:center;color:#64748b;font-size:11px}
+.footer a{color:#fde047;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+<div class="shine"></div>
+<h1>✨ Manikarnika PDF Merger ✨</h1>
+<p class="sub">Multiple PDF → Single PDF in 2 Seconds | ₹0 Free</p>
+
+<div class="drop-zone" id="dropZone" onclick="document.getElementById('pdfInput').click()">
+<div class="icon">📁💫</div>
+<p>Tap to Add PDFs or Drag & Drop</p>
+<p style="font-size:11px;color:#94a3b8;font-weight:400;margin-top:4px">Support: Resume + Certificates + All</p>
+<input type="file" id="pdfInput" accept=".pdf" multiple hidden>
+</div>
+
+<div id="fileList"></div>
+
+<button class="merge-btn" id="mergeBtn" disabled>🔗 Merge Now - Shining PDF Ready!</button>
+
+<div class="success" id="successMsg">✅ Merged! Downloading... 🎉</div>
+
+<div class="footer">Made for <a href="https://ashok383.github.io/manika/" target="_blank">Manikarnika Resume Builder</a> | 10 Best Models | ₹50 Only</div>
+</div>
+
+<script>
+const { PDFDocument } = PDFLib;
+let filesArr = [];
+
+const fileInput = document.getElementById('pdfInput');
+const fileList = document.getElementById('fileList');
+const mergeBtn = document.getElementById('mergeBtn');
+const dropZone = document.getElementById('dropZone');
+
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor='#fde047'; });
+dropZone.addEventListener('dragleave', ()=> dropZone.style.borderColor='rgba(255,255,255,0.3)');
+dropZone.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files){
+    for(let f of files){
+        if(f.type==='application/pdf') filesArr.push(f);
+    }
+    renderList();
+}
+function renderList(){
+    fileList.innerHTML='';
+    filesArr.forEach((f,i)=>{
+        fileList.innerHTML+=`<div class="file-item"><span>📄 ${f.name} (${(f.size/1024).toFixed(0)}KB)</span><button onclick="removeFile(${i})">✕</button></div>`;
+    });
+    mergeBtn.disabled = filesArr.length < 2;
+    if(filesArr.length>=2) mergeBtn.innerHTML=`🔗 Merge ${filesArr.length} PDFs - Ready! ✨`;
+}
+function removeFile(i){ filesArr.splice(i,1); renderList(); }
+
+mergeBtn.addEventListener('click', async ()=>{
+    mergeBtn.disabled=true; mergeBtn.innerHTML='⏳ Merging Magic... ✨';
+    const mergedPdf = await PDFDocument.create();
+    for(let file of filesArr){
+        const buf = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(buf);
+        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        pages.forEach(p=>mergedPdf.addPage(p));
+    }
+    const mergedBytes = await mergedPdf.save();
+    const blob = new Blob([mergedBytes], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=`Manikarnika_Merged_${Date.now()}.pdf`; a.click();
+    document.getElementById('successMsg').style.display='block';
+    setTimeout(()=>{document.getElementById('successMsg').style.display='none'; mergeBtn.innerHTML='🔗 Merge Now - Shining PDF Ready!'; mergeBtn.disabled=false;},3000);
+});
+</script>
+</body>
+</html>
