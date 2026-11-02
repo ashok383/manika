@@ -1,1 +1,227 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA PDF Unlocker</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;min-height:100vh;
+ display:flex;align-items:center;justify-content:center;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#10152b,#263d69);
+}
+.container{
+ width:100%;max-width:460px;background:white;
+ padding:30px;border-radius:20px;text-align:center;
+ box-shadow:0 15px 50px #0005;
+}
+.logo{font-size:27px;font-weight:bold;color:#4338ca}
+h2{color:#222}
+.subtitle{color:#777;margin-bottom:25px}
+.upload{
+ display:block;padding:30px 15px;
+ border:2px dashed #6366f1;border-radius:14px;
+ background:#f5f5ff;cursor:pointer;
+}
+.upload span{font-size:40px}
+input[type=file]{display:none}
+input[type=password]{
+ width:100%;padding:14px;margin-top:18px;
+ border:1px solid #ddd;border-radius:10px;font-size:16px;
+}
+button{
+ width:100%;padding:14px;margin-top:14px;
+ border:0;border-radius:10px;
+ background:linear-gradient(90deg,#4338ca,#7c3aed);
+ color:white;font-size:16px;font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.5}
+#status{margin-top:18px;font-size:14px;line-height:1.5}
+.success{color:green}
+.error{color:red}
+.footer{margin-top:25px;color:#999;font-size:12px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="logo">MANIKARNIKA</div>
+<h2>🔓 PDF Unlocker</h2>
+<div class="subtitle">Unlock your PDF documents easily</div>
+
+<label class="upload" for="pdfFile">
+ <span>📄</span>
+ <p><b>Choose PDF File</b></p>
+ <small>Select your password-protected PDF</small>
+</label>
+
+<input type="file" id="pdfFile" accept=".pdf,application/pdf">
+
+<p id="fileName">No PDF selected</p>
+
+<input type="password" id="password" placeholder="Enter PDF password">
+
+<button id="unlockBtn" onclick="unlockPDF()">🔓 Unlock PDF</button>
+
+<button id="downloadBtn" style="display:none" onclick="downloadPDF()">
+⬇ Download Unlocked PDF
+</button>
+
+<div id="status"></div>
+
+<div class="footer">
+MANIKARNIKA Software & Embedded Systems<br>
+Your files are processed locally in your browser.
+</div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+let selectedFile=null;
+let unlockedBytes=null;
+
+const fileInput=document.getElementById("pdfFile");
+const statusBox=document.getElementById("status");
+const unlockBtn=document.getElementById("unlockBtn");
+const downloadBtn=document.getElementById("downloadBtn");
+
+fileInput.addEventListener("change",()=>{
+ selectedFile=fileInput.files[0];
+ unlockedBytes=null;
+ downloadBtn.style.display="none";
+
+ if(selectedFile){
+  if(selectedFile.type!=="application/pdf"){
+   statusBox.innerHTML='<span class="error">Select a valid PDF file.</span>';
+   selectedFile=null;
+   return;
+  }
+  document.getElementById("fileName").textContent=selectedFile.name;
+  statusBox.textContent="PDF selected successfully.";
+ }
+});
+
+async function unlockPDF(){
+
+ if(!selectedFile){
+  alert("Please select a PDF file.");
+  return;
+ }
+
+ const password=document.getElementById("password").value;
+ if(!password){
+  alert("Enter the PDF password.");
+  return;
+ }
+
+ unlockBtn.disabled=true;
+ downloadBtn.style.display="none";
+ statusBox.textContent="Verifying PDF password...";
+
+ try{
+  const buffer=await selectedFile.arrayBuffer();
+
+  const loadingTask=pdfjsLib.getDocument({
+   data:new Uint8Array(buffer.slice(0)),
+   password:password
+  });
+
+  const pdf=await loadingTask.promise;
+
+  const {PDFDocument}=PDFLib;
+  const output=await PDFDocument.create();
+
+  for(let i=1;i<=pdf.numPages;i++){
+
+   statusBox.textContent=
+   "Processing page "+i+" of "+pdf.numPages+"...";
+
+   const page=await pdf.getPage(i);
+   const viewport=page.getViewport({scale:2});
+
+   const canvas=document.createElement("canvas");
+   canvas.width=Math.ceil(viewport.width);
+   canvas.height=Math.ceil(viewport.height);
+
+   const ctx=canvas.getContext("2d");
+
+   await page.render({
+    canvasContext:ctx,
+    viewport:viewport
+   }).promise;
+
+   const imageData=canvas.toDataURL("image/png");
+   const image=await output.embedPng(imageData);
+
+   const newPage=output.addPage([
+    viewport.width/2,
+    viewport.height/2
+   ]);
+
+   newPage.drawImage(image,{
+    x:0,y:0,
+    width:viewport.width/2,
+    height:viewport.height/2
+   });
+
+   canvas.width=1;
+   canvas.height=1;
+  }
+
+  unlockedBytes=await output.save();
+
+  statusBox.innerHTML=
+  '<span class="success">✓ PDF unlocked successfully!<br>Ready to download.</span>';
+
+  downloadBtn.style.display="block";
+
+ }catch(error){
+
+  console.error(error);
+
+  if(error.name==="PasswordException"){
+   statusBox.innerHTML=
+   '<span class="error">Incorrect password. Please try again.</span>';
+  }else{
+   statusBox.innerHTML=
+   '<span class="error">Unable to unlock this PDF. It may be damaged or unsupported.</span>';
+  }
+
+ }finally{
+  unlockBtn.disabled=false;
+ }
+}
+
+function downloadPDF(){
+
+ if(!unlockedBytes)return;
+
+ const blob=new Blob([unlockedBytes],{
+  type:"application/pdf"
+ });
+
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+
+ a.href=url;
+ a.download=selectedFile.name.replace(/\.pdf$/i,"")+"_unlocked.pdf";
+
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+</script>
+</body>
+</html>
