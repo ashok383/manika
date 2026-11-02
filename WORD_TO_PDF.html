@@ -4,228 +4,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>MANIKARNIKA WORD TO PDF</title>
 
-<!-- Mammoth DOCX Reader -->
+<!-- Word DOCX Reader -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.9.0/mammoth.browser.min.js"></script>
 
-<!-- HTML to PDF -->
+<!-- PDF Generator -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
 
 body{
-background:linear-gradient(135deg,#f2ffff,#fff3ed,#f7f0ff);
-padding:20px;
-min-height:100vh;
-color:#123;
+    background:linear-gradient(135deg,#f2ffff,#fff3ed,#f7f0ff);
+    padding:20px;
+    min-height:100vh;
+    color:#123;
 }
 
 .container{
-max-width:1100px;
-margin:auto;
-background:white;
-border:2px solid #00cddd;
-border-radius:22px;
-overflow:hidden;
-box-shadow:0 10px 35px #00cddd55;
+    max-width:1100px;
+    margin:auto;
+    background:white;
+    border:2px solid #00cddd;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 10px 35px #00cddd55;
 }
 
 header{
-background:linear-gradient(100deg,#00c9d9,#0085c9,#8c42dc);
-color:white;
-text-align:center;
-padding:28px 15px;
+    background:linear-gradient(100deg,#00c9d9,#0085c9,#8c42dc);
+    color:white;
+    text-align:center;
+    padding:30px 15px;
 }
 
 header h1{
-font-size:30px;
-letter-spacing:2px;
-text-shadow:0 0 12px white;
+    font-size:30px;
+    letter-spacing:2px;
+    text-shadow:0 0 12px white;
 }
 
-header p{margin-top:10px;font-size:14px}
+header p{
+    margin-top:10px;
+    font-size:14px;
+}
 
-.content{padding:25px}
+.content{
+    padding:25px;
+}
 
 .heading{
-font-size:19px;
-font-weight:bold;
-color:#008c9d;
-margin-bottom:15px;
+    font-size:19px;
+    font-weight:bold;
+    color:#008c9d;
+    margin-bottom:15px;
 }
 
 .upload{
-border:3px dashed #00bfd0;
-background:linear-gradient(135deg,#edffff,#f4faff);
-border-radius:18px;
-text-align:center;
-padding:40px 15px;
-cursor:pointer;
-transition:.3s;
+    border:3px dashed #00bfd0;
+    background:linear-gradient(135deg,#edffff,#f4faff);
+    border-radius:18px;
+    text-align:center;
+    padding:45px 15px;
+    cursor:pointer;
+    transition:.3s;
 }
 
 .upload:hover{
-background:#dfffff;
-box-shadow:0 0 20px #00c9d977;
+    background:#dfffff;
+    box-shadow:0 0 20px #00c9d977;
+    transform:translateY(-2px);
 }
 
-.upload .icon{font-size:55px}
-.upload h3{color:#007f91;margin:12px}
-.upload p{color:#667;font-size:13px}
+.upload .icon{
+    font-size:55px;
+}
 
-input[type=file]{display:none}
+.upload h3{
+    color:#007f91;
+    margin:12px;
+}
+
+.upload p{
+    color:#667;
+    font-size:13px;
+    margin:5px;
+}
+
+input[type=file]{
+    display:none;
+}
 
 .file-info{
-display:none;
-background:#eaffff;
-padding:15px;
-border:1px solid #00c9d9;
-border-radius:12px;
-margin-top:18px;
-line-height:1.8;
-overflow-wrap:anywhere;
+    display:none;
+    background:#eaffff;
+    padding:15px;
+    border:1px solid #00c9d9;
+    border-radius:12px;
+    margin-top:18px;
+    line-height:1.8;
+    overflow-wrap:anywhere;
 }
 
 .settings{
-margin-top:25px;
-padding:20px;
-border-radius:15px;
-background:#f4fcff;
-border:1px solid #9beaf0;
+    margin-top:25px;
+    padding:20px;
+    border-radius:15px;
+    background:#f4fcff;
+    border:1px solid #9beaf0;
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:15px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
 }
 
 .field label{
-display:block;
-font-weight:bold;
-color:#007f91;
-margin-bottom:8px;
-font-size:13px;
+    display:block;
+    font-weight:bold;
+    color:#007f91;
+    margin-bottom:8px;
+    font-size:13px;
 }
 
-select,input[type=number]{
-width:100%;
-padding:12px;
-border:1px solid #00bccc;
-border-radius:9px;
-background:white;
-outline:none;
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #00bccc;
+    border-radius:9px;
+    background:white;
+    outline:none;
 }
-
-.buttons{
-display:flex;
-flex-wrap:wrap;
-gap:12px;
-margin-top:22px;
-}
-
-button{
-border:0;
-padding:14px 20px;
-border-radius:10px;
-font-weight:bold;
-font-size:14px;
-color:white;
-cursor:pointer;
-transition:.25s;
-}
-
-button:hover{
-transform:translateY(-3px);
-filter:brightness(1.12);
-box-shadow:0 5px 18px #0003;
-}
-
-.convert{
-background:linear-gradient(100deg,#00c9a7,#00a6d9);
-flex:1;
-}
-
-.download{
-background:linear-gradient(100deg,#ff8a00,#ff3d78);
-flex:1;
-}
-
-.clear{
-background:linear-gradient(100deg,#697386,#303d56);
-}
-
-button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
 .progress{
-display:none;
-margin-top:20px;
+    display:none;
+    margin-top:25px;
 }
 
 .progress-top{
-display:flex;
-justify-content:space-between;
-font-size:13px;
-font-weight:bold;
-color:#008a9b;
-margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    font-weight:bold;
+    color:#008a9b;
+    margin-bottom:8px;
 }
 
 .track{
-height:13px;
-background:#e6eeee;
-border-radius:20px;
-overflow:hidden;
+    height:15px;
+    background:#e6eeee;
+    border-radius:20px;
+    overflow:hidden;
 }
 
 .fill{
-width:0%;
-height:100%;
-background:linear-gradient(90deg,#00d9bd,#008cff,#a34aff);
-transition:.3s;
-}
-
-.preview{
-display:none;
-margin-top:25px;
-}
-
-.preview iframe{
-width:100%;
-height:600px;
-border:2px solid #00c9d9;
-border-radius:12px;
-background:white;
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#00d9bd,#008cff,#a34aff);
+    transition:width .3s;
 }
 
 .status{
-display:none;
-padding:15px;
-margin-top:18px;
-border-radius:10px;
-font-size:14px;
-line-height:1.6;
-overflow-wrap:anywhere;
+    display:none;
+    padding:15px;
+    margin-top:18px;
+    border-radius:10px;
+    font-size:14px;
+    line-height:1.6;
+    overflow-wrap:anywhere;
 }
 
-.success{display:block;background:#e7fff3;color:#087a4b;border:1px solid #00b978}
-.error{display:block;background:#fff0f0;color:#bd2222;border:1px solid #ff6060}
+.success{
+    display:block;
+    background:#e7fff3;
+    color:#087a4b;
+    border:1px solid #00b978;
+}
+
+.error{
+    display:block;
+    background:#fff0f0;
+    color:#bd2222;
+    border:1px solid #ff6060;
+}
+
+.preview{
+    display:none;
+    margin-top:25px;
+}
+
+.preview iframe{
+    width:100%;
+    height:600px;
+    border:2px solid #00c9d9;
+    border-radius:12px;
+    background:white;
+}
+
+.new-upload{
+    display:none;
+    width:100%;
+    margin-top:18px;
+    padding:14px;
+    border:0;
+    border-radius:10px;
+    color:white;
+    font-weight:bold;
+    background:linear-gradient(100deg,#ff8a00,#ff3d78);
+    cursor:pointer;
+    font-size:14px;
+}
+
+.new-upload:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px #ff408855;
+}
 
 .footer{
-text-align:center;
-padding:18px;
-font-size:12px;
-color:#789;
-border-top:1px solid #ddd;
+    text-align:center;
+    padding:18px;
+    font-size:12px;
+    color:#789;
+    border-top:1px solid #ddd;
 }
 
 @media(max-width:600px){
-header h1{font-size:22px}
-.content{padding:15px}
-.buttons{flex-direction:column}
-button{width:100%}
+    header h1{font-size:23px}
+    .content{padding:15px}
+    .preview iframe{height:400px}
 }
 </style>
 </head>
@@ -235,9 +249,9 @@ button{width:100%}
 <div class="container">
 
 <header>
-<h1>MANIKARNIKA</h1>
-<p>ADVANCED WORD TO PDF CONVERTER</p>
-<p>EDITABLE WORD DOCUMENT → PDF DOCUMENT</p>
+    <h1>MANIKARNIKA</h1>
+    <p>ADVANCED WORD TO PDF CONVERTER</p>
+    <p>WORD DOCUMENT → PDF DOCUMENT</p>
 </header>
 
 <div class="content">
@@ -245,378 +259,540 @@ button{width:100%}
 <div class="heading">📄 SELECT WORD DOCUMENT</div>
 
 <div class="upload" id="uploadArea">
-<div class="icon">📝</div>
-<h3>UPLOAD WORD FILE</h3>
-<p>Click here or drag and drop your DOCX document</p>
-<p>Supported format: .DOCX</p>
+
+    <div class="icon">📝</div>
+
+    <h3>UPLOAD WORD FILE</h3>
+
+    <p>Click here or drag and drop your Word document</p>
+
+    <p>Supported format: .DOCX</p>
+
+    <p style="color:#00a6b5;font-weight:bold;margin-top:12px">
+        AUTOMATIC CONVERSION AND DOWNLOAD
+    </p>
+
 </div>
 
 <input type="file" id="fileInput" accept=".docx">
 
 <div class="file-info" id="fileInfo">
-<b>File:</b> <span id="fileName"></span><br>
-<b>Size:</b> <span id="fileSize"></span>
+
+    <b>Selected File:</b>
+    <span id="fileName"></span><br>
+
+    <b>File Size:</b>
+    <span id="fileSize"></span>
+
 </div>
 
 <div class="settings">
 
-<div class="heading">⚙️ PDF PAGE SETTINGS</div>
+    <div class="heading">⚙️ PDF PAGE SETTINGS</div>
 
-<div class="grid">
+    <div class="grid">
 
-<div class="field">
-<label>Paper Size</label>
-<select id="paper">
-<option value="a4">A4</option>
-<option value="letter">Letter</option>
-<option value="legal">Legal</option>
-</select>
-</div>
+        <div class="field">
+            <label>Paper Size</label>
 
-<div class="field">
-<label>Orientation</label>
-<select id="orientation">
-<option value="portrait">Portrait</option>
-<option value="landscape">Landscape</option>
-</select>
-</div>
+            <select id="paper">
+                <option value="a4">A4</option>
+                <option value="letter">Letter</option>
+                <option value="legal">Legal</option>
+            </select>
+        </div>
 
-<div class="field">
-<label>Margins (mm)</label>
-<select id="margin">
-<option value="10">10 mm</option>
-<option value="15" selected>15 mm</option>
-<option value="20">20 mm</option>
-<option value="25">25 mm</option>
-</select>
-</div>
+        <div class="field">
+            <label>Orientation</label>
 
-<div class="field">
-<label>PDF Image Quality</label>
-<select id="quality">
-<option value="1">Standard</option>
-<option value="1.5" selected>High</option>
-<option value="2">Very High</option>
-</select>
-</div>
+            <select id="orientation">
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+            </select>
+        </div>
 
-</div>
-</div>
+        <div class="field">
+            <label>Margins</label>
 
-<div class="buttons">
-<button class="convert" id="convertBtn" disabled>
-⚡ CONVERT TO PDF
-</button>
+            <select id="margin">
+                <option value="10">10 mm</option>
+                <option value="15" selected>15 mm</option>
+                <option value="20">20 mm</option>
+                <option value="25">25 mm</option>
+            </select>
+        </div>
 
-<button class="download" id="downloadBtn" disabled>
-⬇ DOWNLOAD PDF
-</button>
+        <div class="field">
+            <label>PDF Quality</label>
 
-<button class="clear" id="clearBtn">✖ CLEAR</button>
+            <select id="quality">
+                <option value="1">Standard</option>
+                <option value="1.5" selected>High</option>
+                <option value="2">Very High</option>
+            </select>
+        </div>
+
+    </div>
+
 </div>
 
 <div class="progress" id="progress">
-<div class="progress-top">
-<span id="progressLabel">Preparing document...</span>
-<span id="percent">0%</span>
-</div>
-<div class="track">
-<div class="fill" id="fill"></div>
-</div>
+
+    <div class="progress-top">
+
+        <span id="progressLabel">Preparing document...</span>
+
+        <span id="percent">0%</span>
+
+    </div>
+
+    <div class="track">
+
+        <div class="fill" id="fill"></div>
+
+    </div>
+
 </div>
 
 <div class="status" id="status"></div>
 
 <div class="preview" id="preview">
-<div class="heading">📑 CONVERTED PDF PREVIEW</div>
-<iframe id="pdfViewer"></iframe>
+
+    <div class="heading">📑 CONVERTED PDF PREVIEW</div>
+
+    <iframe id="pdfViewer"></iframe>
+
 </div>
+
+<button class="new-upload" id="newUpload">
+    + UPLOAD ANOTHER WORD DOCUMENT
+</button>
 
 </div>
 
 <div class="footer">
-MANIKARNIKA WORD TO PDF | PROFESSIONAL DOCUMENT TOOL
+    MANIKARNIKA WORD TO PDF | AUTOMATIC DOCUMENT CONVERTER
 </div>
 
 </div>
 
 <script>
-const fileInput=document.getElementById("fileInput");
-const uploadArea=document.getElementById("uploadArea");
-const convertBtn=document.getElementById("convertBtn");
-const downloadBtn=document.getElementById("downloadBtn");
-const statusBox=document.getElementById("status");
 
-let selectedFile=null;
-let pdfBlob=null;
-let pdfURL=null;
-let busy=false;
+const fileInput = document.getElementById("fileInput");
+const uploadArea = document.getElementById("uploadArea");
+const statusBox = document.getElementById("status");
+const newUpload = document.getElementById("newUpload");
 
-uploadArea.addEventListener("click",()=>fileInput.click());
+let selectedFile = null;
+let pdfBlob = null;
+let pdfURL = null;
+let busy = false;
 
-uploadArea.addEventListener("dragover",e=>{
-e.preventDefault();
-uploadArea.style.background="#dfffff";
-});
+function showStatus(message,type){
 
-uploadArea.addEventListener("dragleave",()=>{
-uploadArea.style.background="";
-});
+    statusBox.className = "status " + type;
 
-uploadArea.addEventListener("drop",e=>{
-e.preventDefault();
-uploadArea.style.background="";
-if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0]);
-});
+    statusBox.textContent = message;
 
-fileInput.addEventListener("change",e=>{
-if(e.target.files.length)handleFile(e.target.files[0]);
-});
-
-function showStatus(msg,type){
-statusBox.className="status "+type;
-statusBox.textContent=msg;
 }
 
 function setProgress(value,label){
-document.getElementById("progress").style.display="block";
-document.getElementById("fill").style.width=value+"%";
-document.getElementById("percent").textContent=value+"%";
-document.getElementById("progressLabel").textContent=label;
+
+    document.getElementById("progress").style.display = "block";
+
+    document.getElementById("fill").style.width = value + "%";
+
+    document.getElementById("percent").textContent = value + "%";
+
+    document.getElementById("progressLabel").textContent = label;
+
 }
 
-function reset(clearInput=true){
-selectedFile=null;
-pdfBlob=null;
-busy=false;
+function reset(){
 
-if(pdfURL){
-URL.revokeObjectURL(pdfURL);
-pdfURL=null;
-}
+    selectedFile = null;
+    pdfBlob = null;
+    busy = false;
 
-document.getElementById("fileInfo").style.display="none";
-document.getElementById("preview").style.display="none";
-document.getElementById("pdfViewer").src="";
-document.getElementById("progress").style.display="none";
+    if(pdfURL){
+        URL.revokeObjectURL(pdfURL);
+        pdfURL = null;
+    }
 
-convertBtn.disabled=true;
-downloadBtn.disabled=true;
-convertBtn.textContent="⚡ CONVERT TO PDF";
+    document.getElementById("fileInfo").style.display = "none";
 
-statusBox.style.display="none";
-statusBox.className="status";
+    document.getElementById("preview").style.display = "none";
 
-if(clearInput)fileInput.value="";
+    document.getElementById("pdfViewer").src = "";
+
+    document.getElementById("progress").style.display = "none";
+
+    document.getElementById("fill").style.width = "0%";
+
+    statusBox.style.display = "none";
+
+    newUpload.style.display = "none";
+
+    fileInput.value = "";
+
 }
 
 function handleFile(file){
 
-reset(false);
+    if(busy) return;
 
-if(!file.name.toLowerCase().endsWith(".docx")){
-showStatus("Please upload a valid DOCX Word document.","error");
-return;
-}
+    reset();
 
-if(file.size>30*1024*1024){
-showStatus("File is too large. Maximum supported size is 30 MB.","error");
-return;
-}
+    if(!file.name.toLowerCase().endsWith(".docx")){
 
-selectedFile=file;
+        showStatus(
+            "Please upload a valid DOCX Word document.",
+            "error"
+        );
 
-document.getElementById("fileName").textContent=file.name;
-document.getElementById("fileSize").textContent=
-(file.size/1024).toFixed(2)+" KB";
+        return;
 
-document.getElementById("fileInfo").style.display="block";
+    }
 
-convertBtn.disabled=false;
+    if(file.size > 30 * 1024 * 1024){
 
-showStatus("Word document successfully selected. Ready to convert.","success");
+        showStatus(
+            "Maximum supported file size is 30 MB.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if(file.size === 0){
+
+        showStatus("The selected file is empty.","error");
+
+        return;
+
+    }
+
+    selectedFile = file;
+
+    document.getElementById("fileName").textContent = file.name;
+
+    document.getElementById("fileSize").textContent =
+        (file.size / 1024).toFixed(2) + " KB";
+
+    document.getElementById("fileInfo").style.display = "block";
+
+    showStatus(
+        "Word document uploaded! Automatic conversion starting...",
+        "success"
+    );
+
+    // AUTOMATIC CONVERSION
+    convert();
+
 }
 
 async function convert(){
 
-if(!selectedFile||busy)return;
+    if(!selectedFile || busy) return;
 
-busy=true;
-convertBtn.disabled=true;
-downloadBtn.disabled=true;
+    busy = true;
 
-try{
+    try{
 
-setProgress(10,"Reading Word document...");
+        setProgress(5,"Reading Word document...");
 
-const arrayBuffer=await selectedFile.arrayBuffer();
+        const arrayBuffer = await selectedFile.arrayBuffer();
 
-const result=await mammoth.convertToHtml(
-{arrayBuffer:arrayBuffer},
-{
-styleMap:[
-"p[style-name='Title'] => h1:fresh",
-"p[style-name='Heading 1'] => h1:fresh",
-"p[style-name='Heading 2'] => h2:fresh",
-"b => strong"
-]
+        setProgress(15,"Extracting document content...");
+
+        const result = await mammoth.convertToHtml(
+            {arrayBuffer:arrayBuffer},
+            {
+                styleMap:[
+                    "p[style-name='Title'] => h1:fresh",
+                    "p[style-name='Heading 1'] => h1:fresh",
+                    "p[style-name='Heading 2'] => h2:fresh",
+                    "p[style-name='Heading 3'] => h3:fresh"
+                ]
+            }
+        );
+
+        if(!result.value || !result.value.trim()){
+
+            throw new Error("No readable Word content found.");
+
+        }
+
+        setProgress(35,"Preparing PDF layout...");
+
+        const paper = document.getElementById("paper").value;
+
+        const orientation = document.getElementById("orientation").value;
+
+        const margin = Number(document.getElementById("margin").value);
+
+        const quality = Number(document.getElementById("quality").value);
+
+        const wrapper = document.createElement("div");
+
+        wrapper.style.cssText = `
+            position:fixed;
+            left:-100000px;
+            top:0;
+            width:1000px;
+            background:white;
+            color:#111;
+        `;
+
+        const style = document.createElement("style");
+
+        style.textContent = `
+
+            #pdfContent{
+                width:100%;
+                background:white;
+                color:#111;
+                font-family:Arial,sans-serif;
+                font-size:11pt;
+                line-height:1.5;
+                overflow-wrap:anywhere;
+            }
+
+            #pdfContent h1{
+                font-size:22pt;
+                margin:12px 0;
+            }
+
+            #pdfContent h2{
+                font-size:17pt;
+                margin:10px 0;
+            }
+
+            #pdfContent h3{
+                font-size:14pt;
+                margin:8px 0;
+            }
+
+            #pdfContent p{
+                margin:0 0 9px;
+            }
+
+            #pdfContent table{
+                width:100%;
+                border-collapse:collapse;
+                margin:10px 0;
+            }
+
+            #pdfContent td,
+            #pdfContent th{
+                border:1px solid #777;
+                padding:6px;
+                vertical-align:top;
+            }
+
+            #pdfContent img{
+                max-width:100%;
+                height:auto;
+            }
+
+            #pdfContent ul,
+            #pdfContent ol{
+                padding-left:25px;
+                margin:8px 0;
+            }
+
+            #pdfContent strong{
+                font-weight:bold;
+            }
+
+            #pdfContent em{
+                font-style:italic;
+            }
+
+        `;
+
+        const content = document.createElement("div");
+
+        content.id = "pdfContent";
+
+        content.innerHTML = result.value;
+
+        wrapper.appendChild(style);
+
+        wrapper.appendChild(content);
+
+        document.body.appendChild(wrapper);
+
+        setProgress(50,"Generating PDF document...");
+
+        const options = {
+
+            margin:margin,
+
+            filename:selectedFile.name.replace(/\.docx$/i,"")+".pdf",
+
+            image:{
+                type:"jpeg",
+                quality:0.95
+            },
+
+            html2canvas:{
+                scale:quality,
+                useCORS:true,
+                backgroundColor:"#ffffff",
+                logging:false,
+                windowWidth:1000
+            },
+
+            jsPDF:{
+                unit:"mm",
+                format:paper,
+                orientation:orientation
+            },
+
+            pagebreak:{
+                mode:["css","legacy"],
+                avoid:["tr","img"]
+            }
+
+        };
+
+        const worker = html2pdf()
+            .set(options)
+            .from(wrapper)
+            .toPdf();
+
+        setProgress(65,"Creating PDF pages...");
+
+        await worker.get("pdf").then(pdf=>{
+
+            pdfBlob = pdf.output("blob");
+
+        });
+
+        wrapper.remove();
+
+        if(!pdfBlob || pdfBlob.size === 0){
+
+            throw new Error("PDF generation failed.");
+
+        }
+
+        setProgress(85,"Preparing automatic download...");
+
+        if(pdfURL){
+
+            URL.revokeObjectURL(pdfURL);
+
+        }
+
+        pdfURL = URL.createObjectURL(pdfBlob);
+
+        document.getElementById("pdfViewer").src = pdfURL;
+
+        document.getElementById("preview").style.display = "block";
+
+        setProgress(100,"Conversion completed!");
+
+        // AUTOMATIC DOWNLOAD
+        const baseName = selectedFile.name.replace(/\.docx$/i,"");
+
+        const link = document.createElement("a");
+
+        link.href = pdfURL;
+
+        link.download = baseName + ".pdf";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        showStatus(
+            "SUCCESS! Your Word document has been converted and PDF download has started automatically.",
+            "success"
+        );
+
+        newUpload.style.display = "block";
+
+    }catch(error){
+
+        console.error(error);
+
+        showStatus(
+            "CONVERSION FAILED: " + error.message,
+            "error"
+        );
+
+        newUpload.style.display = "block";
+
+    }finally{
+
+        busy = false;
+
+    }
+
 }
-);
 
-setProgress(35,"Preparing document layout...");
+// FILE UPLOAD
 
-if(!result.value.trim()){
-throw new Error("No readable content found in the Word document.");
-}
+uploadArea.addEventListener("click",()=>{
 
-const paper=document.getElementById("paper").value;
-const orientation=document.getElementById("orientation").value;
-const margin=Number(document.getElementById("margin").value);
-const quality=Number(document.getElementById("quality").value);
+    if(!busy) fileInput.click();
 
-const content=document.createElement("div");
-
-content.innerHTML=result.value;
-
-content.style.cssText=`
-width:100%;
-color:#111;
-font-family:Arial,sans-serif;
-font-size:11pt;
-line-height:1.45;
-overflow-wrap:anywhere;
-`;
-
-const style=document.createElement("style");
-
-style.textContent=`
-#pdfContent h1{font-size:22pt;margin:12px 0}
-#pdfContent h2{font-size:17pt;margin:10px 0}
-#pdfContent h3{font-size:14pt;margin:8px 0}
-#pdfContent p{margin:0 0 9px}
-#pdfContent table{
-width:100%;
-border-collapse:collapse;
-margin:10px 0;
-}
-#pdfContent td,#pdfContent th{
-border:1px solid #777;
-padding:5px;
-vertical-align:top;
-}
-#pdfContent img{
-max-width:100%;
-height:auto;
-}
-#pdfContent ul,#pdfContent ol{
-padding-left:25px;
-margin:8px 0;
-}
-`;
-
-content.id="pdfContent";
-
-const wrapper=document.createElement("div");
-wrapper.appendChild(style);
-wrapper.appendChild(content);
-
-document.body.appendChild(wrapper);
-
-setProgress(55,"Generating PDF pages...");
-
-const options={
-margin:margin,
-filename:"converted.pdf",
-image:{
-type:"jpeg",
-quality:0.95
-},
-html2canvas:{
-scale:quality,
-useCORS:true,
-backgroundColor:"#ffffff",
-logging:false,
-windowWidth:1000
-},
-jsPDF:{
-unit:"mm",
-format:paper,
-orientation:orientation
-},
-pagebreak:{
-mode:["css","legacy"],
-avoid:["tr","img"]
-}
-};
-
-const worker=html2pdf()
-.set(options)
-.from(wrapper)
-.toPdf();
-
-await worker.get("pdf").then(pdf=>{
-setProgress(90,"Finalizing PDF document...");
-pdfBlob=pdf.output("blob");
 });
 
-wrapper.remove();
+fileInput.addEventListener("change",e=>{
 
-if(!pdfBlob||pdfBlob.size===0){
-throw new Error("PDF generation failed.");
-}
+    if(e.target.files.length){
 
-if(pdfURL)URL.revokeObjectURL(pdfURL);
+        handleFile(e.target.files[0]);
 
-pdfURL=URL.createObjectURL(pdfBlob);
-
-document.getElementById("pdfViewer").src=pdfURL;
-document.getElementById("preview").style.display="block";
-
-setProgress(100,"PDF conversion completed!");
-
-downloadBtn.disabled=false;
-
-showStatus(
-"SUCCESS! Your Word document has been converted to PDF. Click DOWNLOAD PDF.",
-"success"
-);
-
-}catch(error){
-
-console.error(error);
-
-showStatus("Conversion failed: "+error.message,"error");
-
-}finally{
-
-busy=false;
-convertBtn.disabled=false;
-
-}
-
-}
-
-convertBtn.addEventListener("click",convert);
-
-downloadBtn.addEventListener("click",()=>{
-
-if(!pdfBlob)return;
-
-const baseName=selectedFile.name.replace(/\.docx$/i,"");
-
-const link=document.createElement("a");
-link.href=pdfURL;
-link.download=baseName+".pdf";
-
-document.body.appendChild(link);
-link.click();
-link.remove();
-
-showStatus("PDF downloaded successfully!","success");
+    }
 
 });
 
-clearBtn.addEventListener("click",()=>reset());
+// DRAG AND DROP
+
+uploadArea.addEventListener("dragover",e=>{
+
+    e.preventDefault();
+
+    uploadArea.style.background = "#dfffff";
+
+});
+
+uploadArea.addEventListener("dragleave",()=>{
+
+    uploadArea.style.background = "";
+
+});
+
+uploadArea.addEventListener("drop",e=>{
+
+    e.preventDefault();
+
+    uploadArea.style.background = "";
+
+    if(e.dataTransfer.files.length){
+
+        handleFile(e.dataTransfer.files[0]);
+
+    }
+
+});
+
+// UPLOAD ANOTHER DOCUMENT
+
+newUpload.addEventListener("click",()=>{
+
+    reset();
+
+    fileInput.click();
+
+});
 
 </script>
 
