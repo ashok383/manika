@@ -628,16 +628,7 @@ tr:last-child td{border-bottom:none}tr:nth-child(even) td{background:#f8f9ff}
 }
 
 function mah_A_dev(){
-    const selected=document.querySelector('input[name="resumeModel"]:checked');
-    if(!selected){alert("Select Model!");return;}
-    const options={
-        key:"rzp_live_Tn3hozihdEiMSy",
-        amount:5000, currency:"INR", name:"MANIKARNIKA", description:selected.value,
-        handler:function(res){alert("Payment Success ✅ "+res.razorpay_payment_id); previewCV();},
-        theme:{color:"#00d2ff"}
-    };
-    const rzp=new Razorpay(options);
-    rzp.open();
+  payAndDownload();  
 }
 </script>
 </body>
