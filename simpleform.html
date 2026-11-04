@@ -302,7 +302,7 @@ button:hover {
 
   <div style="margin-top:15px;">
       <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-      <button class="download-btn" onclick="payAndDownload()">💳 PAY & DOWNLOAD PDF</button>
+      <button class="download-btn" onclick="mahadev()">💳 PAY & DOWNLOAD PDF</button>
   </div>
 </div>
 
@@ -439,26 +439,8 @@ tr:last-child td{border-bottom:none}tr:nth-child(even) td{background:#f8f9ff}
     w.document.close();
 }
 
-function payAndDownload() {
-    const selected = document.querySelector('input[name="resumeModel"]:checked');
-    if (!selected) {
-        alert("Please select a Resume Model/Template!");
-        return;
-    }
-    const options = {
-        key: "rzp_live_Tn3hozihdEiMSy",
-        amount: 5000, 
-        currency: "INR", 
-        name: "MANIKARNIKA", 
-        description: `Resume Template: ${selected.value.toUpperCase()}`,
-        handler: function(res) {
-            alert("Payment Success ✅ Transaction ID: " + res.razorpay_payment_id);
-            previewCV();
-        },
-        theme: { color: "#00d2ff" }
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
+function mahadev() {
+         payAndDownload();
 }
 </script>
 
