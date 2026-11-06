@@ -2,7 +2,6 @@
 async function payAndDownload() {
     // 1️⃣ Check which resume model is selected
     const selected = document.querySelector('input[name="resumeModel"]:checked');
-
     if (!selected) {
         alert("No option selected!");
         return;
@@ -12,15 +11,14 @@ async function payAndDownload() {
 
     // 2️⃣ Configure Razorpay payment
     const options = {
-        key: "rzp_live_Twk0HEUJf6Y43e",
-        payment_link: "https://rzp.io/rzp/X7TLPOIH",
+        key: "rzp_live_Tn3hozihdEiMSy", // Use your Live Key ID from Dashboard
+        amount: 100, // 1 Rs = 100 paise
+        currency: "INR",
+        name: "MANIKARNIKA",
+        description: selected.value + " Resume Download",
         handler: async function (response) {
             // 3️⃣ Payment successful
             alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
-    }
-};
-const rzp = new Razorpay(options);
-rzp.open();
 
             // 4️⃣ Generate PDF according to selected resume model
             switch (selected.value) {
@@ -58,7 +56,11 @@ rzp.open();
                     alert("Invalid selection!");
             }
         },
-        prefill: { name: fullName.value, email: email.value, contact: phone.value },
+        prefill: { 
+            name: typeof fullName !== 'undefined' ? fullName.value : "", 
+            email: typeof email !== 'undefined' ? email.value : "", 
+            contact: typeof phone !== 'undefined' ? phone.value : "" 
+        },
         theme: { color: "#2196f3" }
     };
 
@@ -66,6 +68,9 @@ rzp.open();
     const rzp = new Razorpay(options);
     rzp.open();
 }
+
+// Make global so HTML button can call
+window.payAndDownload = payAndDownload;
 
 //===================================ATS_RESUME_1==========================================================================
 async function generateATSResume() {
