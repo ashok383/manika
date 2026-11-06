@@ -30,7 +30,7 @@ function getAcademicData() {
     });
 }
 
-//=============================================== PAY & DOWNLOAD FUNCTION ==============================================
+//=============================================== PAY & DOWNLOAD FUNCTION ==============================================\\
 async function payAndDownload() {
     const selected = document.querySelector('input[name="resumeModel"]:checked');
     if (!selected) {
