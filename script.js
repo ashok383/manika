@@ -40,13 +40,15 @@ async function payAndDownload() {
 
     console.log("Selected Model:", selected.value);
 
+    // Direct frontend options (Auto-capture is handled automatically by your Razorpay Dashboard settings)
     const options = {
         key: "rzp_live_Twk0HEUJf6Y43e",
-        amount: 100, // 1 INR in paise
+        amount: 100, // 100 paise = 1 INR
         currency: "INR",
         name: "MANIKARNIKA",
         description: selected.value.toUpperCase() + " Resume Download",
         handler: async function (response) {
+            // Payment was successful and auto-captured (no auto-refund)
             alert("Payment Successful ✅\nPayment ID: " + response.razorpay_payment_id);
 
             switch (selected.value.toLowerCase()) {
