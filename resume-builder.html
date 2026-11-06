@@ -3,14 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Builder</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+<title>Resume Builder - MANIKARNIKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
   --bg: #f4f6fc;
   --surface: #ffffff;
@@ -75,7 +71,6 @@ textarea,
 select {
   display: block;
   width: 100%;
-  min-width: 0;
   margin: 0 0 12px;
   padding: 12px 14px;
   color: var(--text);
@@ -150,7 +145,34 @@ button:hover {
   box-shadow: 0 7px 18px rgba(101, 88, 232, .22);
 }
 
-.download-btn{background:#00c853;color:#fff}
+/* CYAN SHINING DOWNLOAD BUTTON */
+.download-btn {
+  color: #fff;
+  background: linear-gradient(135deg, #00d2ff, #0097a7);
+  box-shadow: 0 7px 18px rgba(0,151,167,.25);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.download-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shine 2.5s infinite;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,210,255,.4);
 }
 
 @keyframes shine {
@@ -176,385 +198,179 @@ button:hover {
   flex: 1 1 130px;
 }
 
-.container > div[style*="dashed"] {
-  background: #f8f8ff !important;
-  border: 1px solid #dedaff !important;
-  border-radius: 16px !important;
-  padding: 20px !important;
+@media (max-width: 600px) {
+  body { padding: 8px; }
+  .container { margin: 8px auto; padding: 18px 14px; border-radius: 16px; }
+  button { max-width: 100%; }
+  .preview-btn, .download-btn { width: 100%; margin: 6px 0; }
+  .academicRow { display: flex !important; }
+  .academicRow input { flex-basis: 100%; }
 }
-
-.container > div[style*="dashed"] label {
-  padding: 12px;
-  margin: 7px 0;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-}
-
-.container > div[style*="dashed"] input[type="radio"] {
-  accent-color: var(--primary);
-}
-
-@media (max-width: 768px) {
-  body {
-    padding: 12px;
-    background: var(--bg);
-  }
-  .container {
-    margin: 0 auto;
-    padding: 20px 16px;
-    border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(28,37,75,.08);
-  }
-  .container h4 {
-    margin-bottom: 18px;
-    padding-bottom: 16px;
-    font-size: 24px;
-  }
-  label {
-    margin: 14px 0 6px;
-  }
-  button {
-    max-width: 100%;
-    width: 100%;
-    margin: 8px 0;
-    padding: 14px;
-    font-size: 14px;
-  }
-  .preview-btn,
-  .download-btn {
-    width: 100%;
-  }
-  .academicRow {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .academicRow input {
-    flex-basis: 100%;
-  }
-  .academicRow input:nth-child(1),
-  .academicRow input:nth-child(2) {
-    grid-column: span 2;
-  }
-} 
 </style>
-
 </head>
 
 <body>
-
 <div class="container">
-<h4>🌸🌿(RESUME_BUILDER)🌿🌸</h4>
+  <h4>🌸(RESUME_BUILDER)🌸</h4>
+  
+  <label>Upload Photo</label>
+  <input type="file" id="photo" accept="image/*">
 
-<label>Upload Photo</label>
-<input type="file" id="photo" accept="image/*">
+  <label>Full Name</label>
+  <input id="fullName" value="Your Fullname">
 
-<label>Full Name</label>
-<input id="fullName" value="Your Fullname">
+  <label>Father Name</label>
+  <input id="fatherName" value="FATHER_NAME">
 
-<label>Father Name</label>
-<input id="fatherName" value="FATHER_NAME">
+  <label>Mother Name</label>
+  <input id="motherName" value="MOTHER_NAME">
 
-<label>Mother Name</label>
-<input id="motherName" value="MOTHER_NAME">
+  <label>Date of Birth</label>
+  <input id="dob" type="date">
 
-<label>Date of Birth</label>
-<input id="dob" type="date">
+  <label>Email</label>
+  <input id="email" value="yourname@email.com">
 
-<label>Email</label>
-<input id="email" value="yourname@email.com">
+  <label>Phone</label>
+  <input id="phone" value="+91 9XXXXXXXXX">
 
-<label>Phone</label>
-<input id="phone" value="+91 9XXXXXXXXX">
+  <label>Address</label>
+  <textarea id="address">Hyderabad, Telangana, India</textarea>
 
-<label>Address</label>
-<textarea id="address">Hyderabad, Telangana, India</textarea>
+  <label>Career Objective</label>
+  <textarea id="objective" rows="6">A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.</textarea>
 
-<label>Career Objective</label>
-<textarea id="objective" rows="6">
-A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.
-</textarea>
+  <label>Professional Summary</label>
+  <textarea id="summary">Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.</textarea>
 
-<label>Professional Summary</label>
-<textarea id="summary">
-Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.
-</textarea>
+  <label>Academic Details</label>
+  <div id="academicsContainer">
+      <div class="academicRow" style="display:flex;gap:5px;">
+          <input value="B,Tech or B,Sc">
+          <input value="University">
+          <input value="2026 - 2027">
+          <input value="8.5 CGPA">
+          <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
+      </div>
+  </div>
+  <button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
 
-<label>Academic Details</label>
-<div id="academicsContainer">
-    <div class="academicRow" style="display:flex;gap:5px;">
-        <input value="B,Tech or B,Sc">
-        <input value="University">
-        <input value="2026 - 2027">
-        <input value="8.5 CGPA">
-        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-    </div>
-</div>
-<button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
+  <label>Education</label>
+  <textarea id="education">Bachelor of Technology in Computer</textarea>
 
-<label>Education</label>
-<textarea id="education">Bachelor of Technology in Computer</textarea>
+  <label>Experience</label>
+  <textarea id="experience">Fresher / Internship experience</textarea>
 
-<label>Experience</label>
-<textarea id="experience">Fresher / Internship experience</textarea>
+  <label>Technical Skills</label>
+  <input id="skill" value="Your skills, Java, Python">
 
-<label>Technical Skills</label>
-<input id="skill" value="Your skills">
+  <label>Projects</label>
+  <textarea id="projects">Resume Builder, E-commerce Website</textarea>
 
-<label>Projects</label>
-<textarea id="projects">Resume Builder, E-commerce Website</textarea>
+  <label>Habits / Strengths</label>
+  <textarea id="habits">Quick learner, disciplined, team player</textarea>
 
-<label>Habits / Strengths</label>
-<textarea id="habits">Quick learner, disciplined, team player</textarea>
+  <label>Languages Known</label>
+  <input id="Languages" value="Hindi, English, Telugu">
 
-<label>Languages Known</label>
-<input id="Languages" value="Hindi, English,Telugu,">
+  <label>Declaration</label>
+  <textarea id="declaration">I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.</textarea>
 
-<label>Declaration</label>
-<textarea id="declaration">
-I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.
-</textarea>
+  <label>Place</label>
+  <input id="place" value="Hyderabad">
 
-<label>Place</label>
-<input id="place" value="Hyderabad">
+  <label>Date</label>
+  <input id="date" type="date">
 
-<label>Date</label>
-<input id="date" type="date">
+  <label>Signature</label>
+  <input id="signature" value="(manikhanta)">
 
-<label>Signature</label>
-<input id="signature" value="(manikhanta)">
+  <!-- MODEL / TEMPLATE SELECTION -->
+  <label>🌍 Select Resume Model / Template</label>
+  <div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
+    <label><input type="radio" name="resumeModel" value="ats" checked><b>1. ATS-Friendly (Modern Professional)</b><br><small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="reverse"><b>2. Reverse-Chronological Resume</b><br><small>✔ Latest job first • Recruiter favorite</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="hybrid"><b>3. Hybrid / Combination Resume</b><br><small>✔ Skills + Experience • Mid–Senior roles</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="onepage"><b>4. One-Page Resume</b><br><small>✔ Concise • Students • Freshers • &lt;10 yrs</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="targeted"><b>5. Targeted Resume</b><br><small>✔ Job-specific • Keyword optimized • FAANG</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="functional"><b>6. Functional (Skills-Based) Resume</b><br><small>✔ Career change • Employment gaps</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="executive"><b>7. Executive Resume</b><br><small>✔ Leadership • Metrics • CEOs / Managers</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="academic"><b>8. Academic CV</b><br><small>✔ Research • Publications • PhD / Professors</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="creative"><b>9. Creative / Visual Resume</b><br><small>✔ Designers • UI/UX • Media (Not ATS)</small></label><br><br>
+    <label><input type="radio" name="resumeModel" value="europass"><b>10. Europass CV (EU Standard)</b><br><small>✔ Europe • Structured • Multi-language</small></label>
+  </div>
 
-<!-- ===== MODEL / TEMPLATE SELECTION ===== -->
-<label>🌍 Select Resume Model / Template</label>
-<div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
-
-  <label>
-    <input type="radio" name="resumeModel" value="ats" checked>
-    <b>1. ATS-Friendly (Modern Professional)</b><br>
-    <small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="reverse">
-    <b>2. Reverse-Chronological Resume</b><br>
-    <small>✔ Latest job first • Recruiter favorite</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="hybrid">
-    <b>3. Hybrid / Combination Resume</b><br>
-    <small>✔ Skills + Experience • Mid–Senior roles</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="onepage">
-    <b>4. One-Page Resume (Global Gold Standard)</b><br>
-    <small>✔ Concise • Students • Freshers • &lt;10 yrs</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="targeted">
-    <b>5. Targeted Resume</b><br>
-    <small>✔ Job-specific • Keyword optimized • FAANG</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="functional">
-    <b>6. Functional (Skills-Based) Resume</b><br>
-    <small>✔ Career change • Employment gaps</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="executive">
-    <b>7. Executive Resume</b><br>
-    <small>✔ Leadership • Metrics • CEOs / Managers</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="academic">
-    <b>8. Academic CV (International)</b><br>
-    <small>✔ Research • Publications • PhD / Professors</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="creative">
-    <b>9. Creative / Visual Resume</b><br>
-    <small>✔ Designers • UI/UX • Media (Not ATS)</small>
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="resumeModel" value="europass">
-    <b>10. Europass CV (EU Standard)</b><br>
-    <small>✔ Europe • Structured • Multi-language</small>
-  </label>
-
+  <div style="margin-top:15px;">
+      <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
+      <button class="download-btn" onclick="mahadev()">💳 PAY & DOWNLOAD PDF</button>
+  </div>
 </div>
 
-<div style="margin-top:15px;">
-    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-    <button class="download-btn" onclick="payAndDownload()">💳 PAY_&_DOWNLOAD_YOUR_RESUME_PDF</button>
-</div>
-</div>
-
-<!-- Razorpay script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<!-- jsPDF script -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- jsPDF AutoTable plugin -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<script>
-// ========== ACADEMIC HANDLING ==========
-function addAcademic(){
-    const d=document.createElement("div");
-    d.className="academicRow";
-    d.style.display="flex";
-    d.style.gap="5px";
-    d.innerHTML=`
-    <input placeholder="Course">
-    <input placeholder="Institute">
-    <input placeholder="Year">
-    <input placeholder="GPA">
-    <button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
-    academicsContainer.appendChild(d);
-}
-function removeAcademic(btn){btn.parentElement.remove();}
-
-// ========== GET SELECTED RESUME MODEL ==========
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-:root{--bg:#f4f6fc;--surface:#fff;--primary:#6558e8;--text:#182039;--muted:#69738a;--border:#e2e7f0}
-*{box-sizing:border-box}
-body{margin:0;padding:20px;color:var(--text);background:radial-gradient(ellipse at top left,#e7e6ff,transparent 42%),var(--bg);font-family:'Inter',Arial,sans-serif;line-height:1.6}
-.container{max-width:960px;margin:22px auto;padding:clamp(20px,4vw,42px);background:var(--surface);border:1px solid rgba(226,231,240,.9);border-radius:24px;box-shadow:0 24px 70px rgba(28,37,75,.09)}
-.container h4{margin:0 0 28px;padding-bottom:22px;text-align:center;font-size:clamp(23px,4vw,34px);font-weight:800;color:var(--primary);border-bottom:1px solid var(--border)}
-label{display:block;margin:18px 0 7px;color:#303a55;font-size:13px;font-weight:700}
-input:not([type="radio"]):not([type="checkbox"]):not([type="file"]),textarea,select{display:block;width:100%;margin:0 0 12px;padding:12px 14px;color:var(--text);background:#fbfcff;border:1px solid #dce2ee;border-radius:10px;font:inherit;font-size:14px;outline:none;transition:.2s}
-input:focus,textarea:focus,select:focus{background:#fff;border-color:var(--primary);box-shadow:0 0 0 4px rgba(101,88,232,.12)}
-input[type="file"]{display:block;width:100%;padding:12px;margin-bottom:12px;background:#f8f8ff;border:1px dashed #aaa4ef;border-radius:12px}
-textarea{resize:vertical;min-height:85px}
-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;margin:6px 5px 6px 0;border:1px solid transparent;border-radius:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-button:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(30,40,80,.12)}
-.add-btn{color:var(--primary);background:#efedff;border-color:#dedaff}
-.remove-btn{flex:0 0 auto;color:#c43248;background:#fff0f2}
-.preview-btn{color:white;background:linear-gradient(135deg,#7868f4,#5141d0);box-shadow:0 7px 18px rgba(101,88,232,.22)}
-/* CYAN SHINING DOWNLOAD BUTTON - FIXED */
-.download-btn{
-  color:#fff;
-  background: linear-gradient(135deg, #00d2ff, #0097a7);
-  box-shadow: 0 7px 18px rgba(0,151,167,.25);
-  position:relative;overflow:hidden;border:none;padding:14px 28px;border-radius:12px;font-weight:700;font-size:15px;
-}
-.download-btn::before{
-  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.5),transparent);
-  animation: shine 2.5s infinite;
-}
-.download-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,210,255,.4)}
-@keyframes shine{0%{left:-100%}100%{left:100%}}
-#academicsContainer{display:grid;gap:10px}
-.academicRow{align-items:center;flex-wrap:wrap;padding:12px;background:#f8f9fd;border:1px solid var(--border);border-radius:12px}
-.academicRow input{flex:1 1 130px}
-.container > div[style*="dashed"]{background:#f8f8ff !important;border:1px solid #dedaff !important;border-radius:16px !important;padding:20px !important}
-.container > div[style*="dashed"] label{padding:12px;margin:7px 0;background:#fff;border:1px solid var(--border);border-radius:10px}
-.container > div[style*="dashed"] input[type="radio"]{accent-color:var(--primary)}
-@media (max-width:600px){body{padding:8px}.container{margin:8px auto;padding:18px 14px;border-radius:16px}button{max-width:100%}.preview-btn,.download-btn{width:100%;margin:6px 0}.academicRow{display:flex !important}.academicRow input{flex-basis:100%}}
-</style>
-</head>
-<body>
-<div class="container">
-<h4>🌸(RESUME_BUILDER)🌸</h4>
-<label>Upload Photo</label><input type="file" id="photo" accept="image/*">
-<label>Full Name</label><input id="fullName" value="Your Fullname">
-<label>Father Name</label><input id="fatherName" value="FATHER_NAME">
-<label>Mother Name</label><input id="motherName" value="MOTHER_NAME">
-<label>Date of Birth</label><input id="dob" type="date">
-<label>Email</label><input id="email" value="yourname@email.com">
-<label>Phone</label><input id="phone" value="+91 9XXXXXXXXX">
-<label>Address</label><textarea id="address">Hyderabad, Telangana, India</textarea>
-<label>Career Objective</label><textarea id="objective" rows="6">A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.</textarea>
-<label>Professional Summary</label><textarea id="summary">Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.</textarea>
-<label>Academic Details</label>
-<div id="academicsContainer">
-    <div class="academicRow" style="display:flex;gap:5px;">
-        <input value="B,Tech or B,Sc"><input value="University"><input value="2026 - 2027"><input value="8.5 CGPA">
-        <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
-    </div>
-</div>
-<button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
-<label>Education</label><textarea id="education">Bachelor of Technology in Computer</textarea>
-<label>Experience</label><textarea id="experience">Fresher / Internship experience</textarea>
-<label>Technical Skills</label><input id="skill" value="Your skills, Java, Python">
-<label>Projects</label><textarea id="projects">Resume Builder, E-commerce Website</textarea>
-<label>Habits / Strengths</label><textarea id="habits">Quick learner, disciplined, team player</textarea>
-<label>Languages Known</label><input id="Languages" value="Hindi, English,Telugu,">
-<label>Declaration</label><textarea id="declaration">I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.</textarea>
-<label>Place</label><input id="place" value="Hyderabad">
-<label>Date</label><input id="date" type="date">
-<label>Signature</label><input id="signature" value="(manikhanta)">
-<label>🌍 Select Resume Model / Template</label>
-<div style="margin-bottom:15px; padding:15px; border:2px dashed #7c4dff; border-radius:12px; background:#f9f9ff">
-  <label><input type="radio" name="resumeModel" value="ats" checked><b>1. ATS-Friendly (Modern Professional)</b><br><small>✔ Clean • No graphics • Used by Google, Amazon, Microsoft</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="reverse"><b>2. Reverse-Chronological Resume</b><br><small>✔ Latest job first • Recruiter favorite</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="hybrid"><b>3. Hybrid / Combination Resume</b><br><small>✔ Skills + Experience • Mid–Senior roles</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="onepage"><b>4. One-Page Resume</b><br><small>✔ Concise • Students • Freshers • &lt;10 yrs</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="targeted"><b>5. Targeted Resume</b><br><small>✔ Job-specific • Keyword optimized • FAANG</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="functional"><b>6. Functional (Skills-Based) Resume</b><br><small>✔ Career change • Employment gaps</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="executive"><b>7. Executive Resume</b><br><small>✔ Leadership • Metrics • CEOs / Managers</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="academic"><b>8. Academic CV</b><br><small>✔ Research • Publications • PhD / Professors</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="creative"><b>9. Creative / Visual Resume</b><br><small>✔ Designers • UI/UX • Media (Not ATS)</small></label><br><br>
-  <label><input type="radio" name="resumeModel" value="europass"><b>10. Europass CV (EU Standard)</b><br><small>✔ Europe • Structured • Multi-language</small></label>
-</div>
-<div style="margin-top:15px;">
-    <button class="preview-btn" onclick="previewCV()">👁 Preview</button>
-    <button class="download-btn" onclick="payAndDownload()">💳 PAY & DOWNLOAD PDF</button>
-</div>
-</div>
-
+<!-- External Scripts -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
+<!-- FIXED: Corrected filename from scriptt.js to script.js -->
+<script src="script.js"></script>
+
+<!-- Integrated Main Script -->
 <script>
 function addAcademic(){
-    const d=document.createElement("div");
-    d.className="academicRow";d.style.display="flex";d.style.gap="5px";
-    d.innerHTML=`<input placeholder="Course"><input placeholder="Institute"><input placeholder="Year"><input placeholder="GPA"><button class="remove-btn" onclick="removeAcademic(this)">✖</button>`;
-    document.getElementById("academicsContainer").appendChild(d);
+    const container = document.getElementById("academicsContainer");
+    const d = document.createElement("div");
+    d.className = "academicRow";
+    d.style.display = "flex";
+    d.style.gap = "5px";
+    d.innerHTML = `
+      <input placeholder="Course">
+      <input placeholder="Institute">
+      <input placeholder="Year">
+      <input placeholder="GPA">
+      <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
+    `;
+    container.appendChild(d);
 }
-function removeAcademic(btn){btn.parentElement.remove();}
-function getSelectedResumeModel(){
-    const el=document.querySelector('input[name="resumeModel"]:checked');
+
+function removeAcademic(btn) {
+    btn.parentElement.remove();
+}
+
+function getSelectedResumeModel() {
+    const el = document.querySelector('input[name="resumeModel"]:checked');
     return el ? el.value : 'ats';
 }
 
-// ===== COLOURED DECORATED PREVIEW - NO LOGIC CHANGE =====
-function previewCV(){
-    const photoInput=document.getElementById("photo");
-    const f=photoInput.files[0];
-    if(f){const r=new FileReader();r.onload=e=>openPreview(e.target.result);r.readAsDataURL(f);}
-    else openPreview("");
+function previewCV() {
+    const photoInput = document.getElementById("photo");
+    const f = photoInput.files[0];
+    if (f) {
+        const r = new FileReader();
+        r.onload = e => openPreview(e.target.result);
+        r.readAsDataURL(f);
+    } else {
+        openPreview("");
+    }
 }
-function openPreview(photoSrc){
-    const gv=id=>document.getElementById(id)?.value||'';
-    const fullName=gv("fullName"), fatherName=gv("fatherName"), motherName=gv("motherName"), dob=gv("dob"), email=gv("email"), phone=gv("phone"), address=gv("address"), objective=gv("objective"), summary=gv("summary"), education=gv("education"), experience=gv("experience"), skillVal=gv("skill"), projects=gv("projects"), habits=gv("habits"), Languages=gv("Languages"), declaration=gv("declaration"), place=gv("place"), date=gv("date"), signature=gv("signature"), selectedModel=getSelectedResumeModel();
-    const academicsHTML=[...document.querySelectorAll(".academicRow")].map(r=>{let i=r.querySelectorAll("input");if(i.length<4)return'';return`<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;}).join("");
-    const skillsHTML=skillVal?skillVal.split(",").map(s=>`<span class="skill-chip">${s.trim()}</span>`).join(""):'';
+
+function openPreview(photoSrc) {
+    const gv = id => document.getElementById(id)?.value || '';
+    const fullName = gv("fullName"), fatherName = gv("fatherName"), motherName = gv("motherName"), dob = gv("dob"), email = gv("email"), phone = gv("phone"), address = gv("address"), objective = gv("objective"), summary = gv("summary"), education = gv("education"), experience = gv("experience"), skillVal = gv("skill"), projects = gv("projects"), habits = gv("habits"), Languages = gv("Languages"), declaration = gv("declaration"), place = gv("place"), date = gv("date"), signature = gv("signature"), selectedModel = getSelectedResumeModel();
     
-    const w=window.open("","_blank","width=1000,height=1200");
+    const academicsHTML = [...document.querySelectorAll(".academicRow")].map(r => {
+        let i = r.querySelectorAll("input");
+        if (i.length < 4) return '';
+        return `<tr><td>${i[0].value}</td><td>${i[1].value}</td><td>${i[2].value}</td><td>${i[3].value}</td></tr>`;
+    }).join("");
+
+    const skillsHTML = skillVal ? skillVal.split(",").map(s => `<span class="skill-chip">${s.trim()}</span>`).join("") : '';
+    
+    const w = window.open("", "_blank", "width=1000,height=1200");
     w.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
-<title>Preview - ${selectedModel}</title>
+<title>Preview - ${selectedModel.toUpperCase()}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#f5f7ff,#eef2ff);padding:20px}
@@ -564,7 +380,6 @@ function openPreview(photoSrc){
 .header{display:flex;gap:22px;align-items:center;position:relative;z-index:2}
 .header img{width:110px;height:110px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,0.8);box-shadow:0 8px 20px rgba(0,0,0,0.2)}
 .header h1{margin:0;font-family:'Poppins';font-size:32px;font-weight:700;letter-spacing:-0.5px}
-.header p{margin:3px 0;font-size:13px;opacity:0.92}
 .contact-bar{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:10px 14px;border-radius:12px}
 .content{padding:30px 35px 20px}
 .section{margin-bottom:22px}
@@ -588,7 +403,7 @@ tr:last-child td{border-bottom:none}tr:nth-child(even) td{background:#f8f9ff}
 <div class="page">
   <div class="top-banner">
     <div class="header">
-      ${photoSrc?`<img src="${photoSrc}">`:`<div style="width:110px;height:110px;background:rgba(255,255,255,0.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>`}
+      ${photoSrc ? `<img src="${photoSrc}">` : `<div style="width:110px;height:110px;background:rgba(255,255,255,0.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>`}
       <div style="flex:1">
         <h1>${fullName}</h1>
         <div style="margin-top:6px;font-size:13px;"><span>👨 ${fatherName}</span> &nbsp;|&nbsp; <span>👩 ${motherName}</span> &nbsp;|&nbsp; <span>🎂 ${dob}</span></div>
@@ -627,26 +442,14 @@ tr:last-child td{border-bottom:none}tr:nth-child(even) td{background:#f8f9ff}
     w.document.close();
 }
 
-function payAndDownload(){
-    const selected=document.querySelector('input[name="resumeModel"]:checked');
-    if(!selected){alert("Select Model!");return;}
-    const options={
-        key:"rzp_live_Tn3hozihdEiMSy",
-        amount:5000, currency:"INR", name:"MANIKARNIKA", description:selected.value,
-        handler:function(res){alert("Payment Success ✅ "+res.razorpay_payment_id); previewCV();},
-        theme:{color:"#00d2ff"}
-    };
-    const rzp=new Razorpay(options);
-    rzp.open();
+function mahadev() {
+    if (typeof payAndDownload === 'function') {
+        payAndDownload();
+    } else {
+        alert("Error: payAndDownload function is not defined inside script.js!");
+    }
 }
 </script>
-</body>
-</html>
-
-
-
-</script>
-<script src="script.js"></script>
 
 </body>
 </html>
