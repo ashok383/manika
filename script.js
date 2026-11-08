@@ -1,34 +1,4 @@
-// Helper to safely get value from input elements or fallback to default
-function val(id, fallback = "") {
-    const el = document.getElementById(id);
-    return el && el.value !== undefined ? el.value.trim() : fallback;
-}
 
-// Helper to convert uploaded photo file into base64 DataURL
-async function getPhotoDataUrl() {
-    const photoInput = document.getElementById("photo");
-    if (!photoInput || !photoInput.files || !photoInput.files[0]) return null;
-
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(photoInput.files[0]);
-    });
-}
-
-// Helper to split long text into rows cleanly for auto-table
-function getAcademicData() {
-    return [...document.querySelectorAll(".academicRow")].map(row => {
-        const inputs = row.querySelectorAll("input");
-        return [
-            inputs[0] ? inputs[0].value : "",
-            inputs[1] ? inputs[1].value : "",
-            inputs[2] ? inputs[2].value : "",
-            inputs[3] ? inputs[3].value : ""
-        ];
-    });
-}
 
 //=============================================== PAY & DOWNLOAD FUNCTION ==============================================\\
 async function payAndDownload() {
@@ -43,7 +13,7 @@ async function payAndDownload() {
     // Direct frontend options (Auto-capture is handled automatically by your Razorpay Dashboard settings)
     const options = {
         key: "rzp_live_Twk0HEUJf6Y43e",
-        amount: 5000, // 100 paise = 1 INR
+        amount: 100, // 100 paise = 1 INR
         currency: "INR",
         name: "MANIK_A_RNIKA",
         description: selected.value.toUpperCase() + " Resume Download",
@@ -107,6 +77,38 @@ window.payAndDownload = payAndDownload;
    9 Creative    | dark sidebar, numbered sections      | magenta + cyan     | Helvetica
    10 Europass   | label column | content column        | EU blue            | Helvetica
    ========================================================================== */
+
+// Helper to safely get value from input elements or fallback to default
+function val(id, fallback = "") {
+    const el = document.getElementById(id);
+    return el && el.value !== undefined ? el.value.trim() : fallback;
+}
+
+// Helper to convert uploaded photo file into base64 DataURL
+async function getPhotoDataUrl() {
+    const photoInput = document.getElementById("photo");
+    if (!photoInput || !photoInput.files || !photoInput.files[0]) return null;
+
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(photoInput.files[0]);
+    });
+}
+
+// Helper to split long text into rows cleanly for auto-table
+function getAcademicData() {
+    return [...document.querySelectorAll(".academicRow")].map(row => {
+        const inputs = row.querySelectorAll("input");
+        return [
+            inputs[0] ? inputs[0].value : "",
+            inputs[1] ? inputs[1].value : "",
+            inputs[2] ? inputs[2].value : "",
+            inputs[3] ? inputs[3].value : ""
+        ];
+    });
+}
 
 //=============================================== SHARED TOOLKIT ===============================================
 const RS = (() => {
