@@ -216,34 +216,34 @@ button:hover {
   <label> 🤳 UPLOAD_PHOTO 📸 </label>
   <input type="file" id="photo" accept="image/*">
 
-  <label>👩‍🎓  FULL_NAME: </label>
+  <label>👩‍🎓 FULL_NAME 👩‍🎓: </label>
   <input id="fullName" value="Your name with surname">
 
-  <label>👨‍💼 FATHER_NAME: </label>
+  <label>👨‍💼 FATHER_NAME 👨‍💼: </label>
   <input id="fatherName" value="father name">
 
-  <label>👩‍🏫 MOTHER_NAME: </label>
+  <label>👩‍🏫 MOTHER_NAME 👩‍🏫: </label>
   <input id="motherName" value="mother name">
 
-  <label>🎂 DATE_OF_BIRTH</label>
+  <label>🎂 DATE_OF_BIRTH 🎂:</label>
   <input id="dob" type="date">
 
-  <label>📩  E_MAIL:</label>
+  <label>📩 E_MAIL 📩:</label>
   <input id="email" value="yourname@email.com">
 
-  <label>📞 PHONE: </label>
+  <label>📞 PHONE 📞: </label>
   <input id="phone" value="+91 9XXXXXXXXX">
 
-  <label>📍 ADDRESS: </label>
+  <label>📍 ADDRESS 📍: </label>
   <textarea id="address">DOOR NO : 0-0 , PANCHAYATH, MANDAL, PIN CODE : 500000, DISTRICT, STATE, INDIA. </textarea>
 
-  <label>🎯 CARRER OBJECTIVE: </label>
+  <label>🎯 CARRER OBJECTIVE 🎯: </label>
   <textarea id="objective" rows="6">A highly motivated, disciplined, and detail-oriented individual seeking a challenging position in a growth-oriented organization where I can effectively apply my technical knowledge, problem-solving abilities, and creative thinking skills.</textarea>
 
-  <label>💼 PROFESSIONAL SUMMARY: </label>
+  <label>💼 PROFESSIONAL SUMMARY 💼: </label>
   <textarea id="summary">Enthusiastic and dedicated professional with a strong foundation in modern technologies and effective communication skills.</textarea>
 
-  <label>📈 ACADEMIC DETAILS: </label>
+  <label>📈 ACADEMIC DETAILS 📈: </label>
   <div id="academicsContainer">
       <div class="academicRow" style="display:flex;gap:5px;">
           <input value="B,Tech / B,Sc (🎓) DIPLOMA / ITI  ">
@@ -255,34 +255,34 @@ button:hover {
   </div>
   <button class="add-btn" onclick="addAcademic()">➕ Add Academic</button>
 
-  <label>📖 EDUCATION: </label>
+  <label>📖 EDUCATION 📖: </label>
   <textarea id="education">Bachelor of Technology in Computer</textarea>
 
-  <label>⭐ EXPERIENCE: </label>
+  <label>⭐ EXPERIENCE ⭐: </label>
   <textarea id="experience">Fresher / Internship experience / Training experience .</textarea>
 
   <label>🛠️ TECHNICAL SKILLS 🩺: </label>
   <input id="skill" value="Your skills....">
 
-  <label>🚀 PROJECT'S: </label>
+  <label>🚀 PROJECT'S 🚀:</label>
   <textarea id="projects"> Any project work you have done in college time or somewhere in company .</textarea>
 
   <label>🔄 HABITS / STRENGTHS 💪: </label>
   <textarea id="habits">Quick learner, disciplined, team player.</textarea>
 
-  <label>🗣️ LANGUAGES KNOWN: </label>
+  <label>🗣️ LANGUAGES KNOWN 🗣️: </label>
   <input id="Languages" value="Hindi, English, Telugu.">
 
-  <label>📝 DECLARATION: </label>
+  <label>📝 DECLARATION 📝: </label>
   <textarea id="declaration">I hereby declare that the information furnished above is, to the best of my knowledge, true and correct.</textarea>
 
-  <label>🏠 PLACE: </label>
+  <label>🏠 PLACE 🏠: </label>
   <input id="place" value="Currently Residing Place">
 
-  <label>📅 DATE</label>
+  <label>📅 DATE 📅:</label>
   <input id="date" type="date">
 
-  <label>✍🏻 SIGNATURE</label>
+  <label>✍🏻 SIGNATURE ✍🏻</label>
   <input id="signature" value="(Your Name/Signature)">
 
   <!-- MODEL / TEMPLATE SELECTION -->
@@ -323,10 +323,10 @@ function addAcademic(){
     d.style.display = "flex";
     d.style.gap = "5px";
     d.innerHTML = `
-      <input placeholder="Course">
-      <input placeholder="Institute">
-      <input placeholder="Year">
-      <input placeholder="GPA">
+      <input placeholder="🎓COURSE🎓">
+      <input placeholder="🏛️INSTITUTE🏛️">
+      <input placeholder="📈YEAR📈">
+      <input placeholder="💯% / GPA💯">
       <button class="remove-btn" onclick="removeAcademic(this)">✖</button>
     `;
     container.appendChild(d);
