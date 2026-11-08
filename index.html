@@ -15,6 +15,10 @@
 
 <title>MANIK_A_RNIKA</title>
 
+<!-- Include external JavaScript files -->
+<script src="userlog.js" defer></script>
+<script src="adminlog.js" defer></script>
+
 <style>
 
 /* ==================================================
@@ -77,72 +81,47 @@ button{
 
 .header{
     position:sticky;
-
     top:0;
-
     z-index:100;
-
     height:64px;
-
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
-    padding:
-        0 18px;
-
+    padding:0 18px;
     background:#ffffff;
-
-    border-bottom:
-        1px solid var(--border);
+    border-bottom:1px solid var(--border);
 }
 
 .brand{
     display:flex;
-
     align-items:center;
-
     gap:10px;
 }
 
 .brand img{
     width:40px;
     height:40px;
-
     object-fit:cover;
-
     border-radius:12px;
 }
 
 .brand-name{
     font-size:17px;
-
     font-weight:800;
-
     letter-spacing:-.4px;
 }
 
 .menu{
     width:40px;
     height:40px;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
     border:0;
-
     border-radius:12px;
-
     background:var(--blue-light);
-
     color:var(--blue);
-
     font-size:20px;
-
     cursor:pointer;
 }
 
@@ -153,41 +132,37 @@ button{
 
 .mobile-nav{
     display:none;
-
     position:absolute;
-
     top:64px;
-
     left:0;
     right:0;
-
     padding:10px;
-
     background:#fff;
-
-    border-bottom:
-        1px solid var(--border);
+    border-bottom:1px solid var(--border);
 }
 
 .mobile-nav.show{
     display:block;
 }
 
-.mobile-nav a{
+.mobile-nav a,
+.mobile-nav button{
     display:block;
-
+    width:100%;
+    text-align:left;
     padding:14px;
-
     border-radius:12px;
-
     font-size:14px;
-
     font-weight:600;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    color:inherit;
 }
 
-.mobile-nav a:hover{
+.mobile-nav a:hover,
+.mobile-nav button:hover{
     background:var(--blue-light);
-
     color:var(--blue);
 }
 
@@ -198,13 +173,9 @@ button{
 
 main{
     width:100%;
-
     max-width:1050px;
-
     margin:auto;
-
-    padding:
-        25px 18px 90px;
+    padding:25px 18px 90px;
 }
 
 
@@ -219,82 +190,54 @@ main{
             #2563eb,
             #4f46e5
         );
-
     color:#fff;
-
     border-radius:24px;
-
     padding:30px 25px;
-
     margin-bottom:22px;
-
     position:relative;
-
     overflow:hidden;
 }
 
 .hero::after{
     content:"";
-
     position:absolute;
-
     width:180px;
     height:180px;
-
     right:-70px;
     top:-70px;
-
-    background:
-        rgba(255,255,255,.12);
-
+    background:rgba(255,255,255,.12);
     border-radius:50%;
 }
 
 .hero small{
     font-size:12px;
-
     opacity:.8;
-
     font-weight:600;
 }
 
 .hero h1{
     margin-top:8px;
-
     font-size:34px;
-
     line-height:1.15;
-
     letter-spacing:-1.3px;
 }
 
 .hero p{
     margin-top:12px;
-
     max-width:600px;
-
     font-size:14px;
-
     line-height:1.7;
-
     opacity:.9;
 }
 
 .hero-button{
     display:inline-flex;
-
     margin-top:20px;
-
     padding:12px 18px;
-
     background:#fff;
-
     color:var(--blue);
-
     border-radius:12px;
-
     font-size:13px;
-
     font-weight:700;
 }
 
@@ -305,27 +248,19 @@ main{
 
 .section-title{
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
-    margin:
-        25px 2px
-        12px;
+    margin:25px 2px 12px;
 }
 
 .section-title h2{
     font-size:19px;
-
     letter-spacing:-.3px;
 }
 
 .section-title span{
     color:var(--blue);
-
     font-size:12px;
-
     font-weight:700;
 }
 
@@ -336,25 +271,16 @@ main{
 
 .tools{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:14px;
 }
 
 .tool{
     background:var(--card);
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:var(--radius);
-
     padding:20px;
-
     cursor:pointer;
-
     transition:
         transform .15s ease,
         box-shadow .15s ease;
@@ -362,10 +288,7 @@ main{
 
 .tool:hover{
     transform:translateY(-3px);
-
-    box-shadow:
-        0 8px 25px
-        rgba(17,24,39,.08);
+    box-shadow:0 8px 25px rgba(17,24,39,.08);
 }
 
 .tool:active{
@@ -375,20 +298,13 @@ main{
 .icon{
     width:48px;
     height:48px;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
     border-radius:14px;
-
     margin-bottom:15px;
-
     background:var(--blue-light);
-
     color:var(--blue);
-
     font-size:22px;
 }
 
@@ -404,27 +320,20 @@ main{
 
 .tool h3{
     font-size:16px;
-
     margin-bottom:7px;
 }
 
 .tool p{
     color:var(--muted);
-
     font-size:12px;
-
     line-height:1.6;
 }
 
 .open{
     display:inline-block;
-
     margin-top:15px;
-
     color:var(--blue);
-
     font-size:12px;
-
     font-weight:700;
 }
 
@@ -435,53 +344,37 @@ main{
 
 .quick-grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
+    grid-template-columns:repeat(4,1fr);
     gap:12px;
 }
 
 .quick{
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     justify-content:center;
-
     min-height:105px;
-
     padding:15px;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:16px;
-
     text-align:center;
-
     transition:.15s;
+    cursor:pointer;
 }
 
 .quick:hover{
     background:var(--blue-light);
-
     color:var(--blue);
 }
 
 .quick-icon{
     font-size:22px;
-
     margin-bottom:8px;
 }
 
 .quick span{
     font-size:12px;
-
     font-weight:700;
 }
 
@@ -492,28 +385,20 @@ main{
 
 .info{
     margin-top:25px;
-
     padding:22px;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:18px;
 }
 
 .info h2{
     font-size:18px;
-
     margin-bottom:8px;
 }
 
 .info p{
     color:var(--muted);
-
     font-size:13px;
-
     line-height:1.7;
 }
 
@@ -524,41 +409,28 @@ main{
 
 .stats{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:12px;
-
     margin-top:14px;
 }
 
 .stat{
     padding:18px;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:16px;
 }
 
 .stat strong{
     display:block;
-
     color:var(--blue);
-
     font-size:22px;
 }
 
 .stat span{
     display:block;
-
     margin-top:4px;
-
     color:var(--muted);
-
     font-size:11px;
 }
 
@@ -569,43 +441,26 @@ main{
 
 .bottom-nav{
     position:fixed;
-
     bottom:0;
-
     left:0;
     right:0;
-
     height:64px;
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     gap:60px;
-
     background:#fff;
-
-    border-top:
-        1px solid var(--border);
-
+    border-top:1px solid var(--border);
     z-index:100;
 }
 
 .bottom-nav a{
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     gap:4px;
-
     color:#6b7280;
-
     font-size:10px;
-
     font-weight:600;
 }
 
@@ -624,13 +479,8 @@ main{
 
 footer{
     text-align:center;
-
-    padding:
-        25px 15px
-        90px;
-
+    padding:25px 15px 90px;
     color:#9ca3af;
-
     font-size:11px;
 }
 
@@ -640,17 +490,12 @@ footer{
 ================================================== */
 
 @media(max-width:800px){
-
     .tools{
-        grid-template-columns:
-            repeat(2,1fr);
+        grid-template-columns:repeat(2,1fr);
     }
-
     .quick-grid{
-        grid-template-columns:
-            repeat(4,1fr);
+        grid-template-columns:repeat(4,1fr);
     }
-
 }
 
 
@@ -659,89 +504,59 @@ footer{
 ================================================== */
 
 @media(max-width:550px){
-
     main{
-        padding:
-            18px 12px 80px;
+        padding:18px 12px 80px;
     }
-
     .header{
-        padding:
-            0 14px;
+        padding:0 14px;
     }
-
     .hero{
         padding:25px 20px;
-
         border-radius:20px;
     }
-
     .hero h1{
         font-size:28px;
     }
-
     .hero p{
         font-size:13px;
     }
-
     .tools{
         grid-template-columns:1fr;
-
         gap:11px;
     }
-
     .tool{
         display:grid;
-
-        grid-template-columns:
-            50px 1fr;
-
+        grid-template-columns:50px 1fr;
         column-gap:14px;
-
         padding:16px;
     }
-
     .tool .icon{
-        grid-row:
-            span 3;
-
+        grid-row:span 3;
         margin:0;
     }
-
     .tool h3{
         margin-top:2px;
     }
-
     .open{
         margin-top:8px;
     }
-
     .quick-grid{
-        grid-template-columns:
-            repeat(2,1fr);
-
+        grid-template-columns:repeat(2,1fr);
         gap:10px;
     }
-
     .stats{
-        grid-template-columns:
-            repeat(3,1fr);
+        grid-template-columns:repeat(3,1fr);
     }
-
     .stat{
         padding:14px 10px;
-
         text-align:center;
     }
-
     .stat strong{
         font-size:18px;
     }
-
     .bottom-nav{
         gap:45px;
     }
-
 }
 
 
@@ -750,19 +565,15 @@ footer{
 ================================================== */
 
 @media(max-width:360px){
-
     .brand-name{
         font-size:14px;
     }
-
     .hero h1{
         font-size:25px;
     }
-
     .bottom-nav{
         gap:28px;
     }
-
 }
 
 </style>
@@ -771,27 +582,18 @@ footer{
 
 <body>
 
-
-<!-- ==================================================
-     HEADER
-================================================== -->
-
+<!-- HEADER -->
 <header class="header">
-
     <a href="#" class="brand">
-
-<img 
-  src="manika.jpeg" 
-  alt="MANIK_A_RNIKA" 
-  style="width:100%; max-width:40px; height:auto; display:block;"
->
-
+        <img 
+          src="manika.jpeg" 
+          alt="MANIK_A_RNIKA" 
+          style="width:100%; max-width:40px; height:auto; display:block;"
+        >
         <span class="brand-name">
             MANIK_A_RNIKA
         </span>
-
     </a>
-
 
     <button
         class="menu"
@@ -801,407 +603,183 @@ footer{
         ☰
     </button>
 
-
     <nav class="mobile-nav" id="mobileNav">
-
-        <a href="#home">
-            Home
-        </a>
-
-        <a href="#tools">
-            Tools
-        </a>
-
-        <a href="#services">
-            Services
-        </a>
-
-        <a href="#about">
-            About
-        </a>
-
+        <a href="#home">Home</a>
+        <a href="#tools">Tools</a>
+        <a href="#services">Services</a>
+        <button onclick="userlog()">User_Log</button>
+        <button onclick="adminlog()">Admin_Log</button>
+        <a href="#about">About</a>
     </nav>
-
 </header>
 
 
-
-<!-- ==================================================
-     MAIN
-================================================== -->
-
+<!-- MAIN CONTENT -->
 <main id="home">
 
-
     <!-- HERO -->
-
     <section class="hero">
-
-        <small>
-            ✦ DIGITAL TOOLS
-        </small>
-
-          <h1>
+        <small>✦ DIGITAL TOOLS</small>
+        <h1>
             💁‍♂️CUSTOMER_SUPPORT🕒
-               <br>
-             📞   9951912096
+            <br>
+            📞 9951912096
         </h1>
-
         <h1>
             Simple tools.
             <br>
             Powerful results.
         </h1>
-
         <p>
             Fast, simple and useful digital tools
             designed for everyday work.
         </p>
-
-        <a
-            href="#tools"
-            class="hero-button"
-        >
+        <a href="#tools" class="hero-button">
             Explore Tools →
         </a>
-
     </section>
-
-
 
     <!-- TOOLS -->
-
-    <div
-        class="section-title"
-        id="tools"
-    >
-
-        <h2>
-            My Tools
-        </h2>
-
-        <span>
-            VIEW ALL
-        </span>
-
+    <div class="section-title" id="tools">
+        <h2>My Tools</h2>
+        <span>VIEW ALL</span>
     </div>
 
-
     <section class="tools">
-
-
         <!-- RESUME -->
-
-        <article
-            class="tool"
-            onclick="location.href='resume-builder.html'"
-        >
-
-            <div class="icon">
-                📄
-            </div>
-
+        <article class="tool" onclick="location.href='resume-builder.html'">
+            <div class="icon">📄</div>
             <div>
-                <h3>
-                    Resume Maker
-                </h3>
-
-                <p>
-                    Create a clean professional resume quickly.
-                </p>
-
-                <span class="open">
-                    Open →
-                </span>
+                <h3>Resume Maker</h3>
+                <p>Create a clean professional resume quickly.</p>
+                <span class="open">Open →</span>
             </div>
-
         </article>
-
 
         <!-- PDF -->
-
-        <article
-            class="tool"
-            onclick="location.href='fileconversion.html'"
-        >
-
-            <div class="icon">
-                🖥️
-            </div>
-
+        <article class="tool" onclick="location.href='fileconversion.html'">
+            <div class="icon">🖥️</div>
             <div>
-                <h3>
-                    OFFICE_TOOLS
-                </h3>
-
-                <p>
-                    Easy PDF conversion and file utilities.
-                </p>
-
-                <span class="open">
-                    Open →
-                </span>
+                <h3>OFFICE_TOOLS</h3>
+                <p>Easy PDF conversion and file utilities.</p>
+                <span class="open">Open →</span>
             </div>
-
         </article>
-
 
         <!-- PHOTO -->
-
-        <article
-            class="tool"
-            onclick="location.href='photo_maker.html'"
-        >
-
-            <div class="icon">
-                🖼️
-            </div>
-
+        <article class="tool" onclick="location.href='photo_maker.html'">
+            <div class="icon">🖼️</div>
             <div>
-                <h3>
-                    Photo Studio
-                </h3>
-
-                <p>
-                    Simple photo editing and enhancement tools.
-                </p>
-
-                <span class="open">
-                    Open →
-                </span>
+                <h3>Photo Studio</h3>
+                <p>Simple photo editing and enhancement tools.</p>
+                <span class="open">Open →</span>
             </div>
-
         </article>
-
-
     </section>
-
 
 
     <!-- QUICK ACTIONS -->
-
-    <div
-        class="section-title"
-        id="services"
-    >
-
-        <h2>
-            Quick Actions
-        </h2>
-
+    <div class="section-title" id="services">
+        <h2>Quick Actions</h2>
     </div>
 
-
     <section class="quick-grid">
+        <div onclick="userlog()" class="quick">
+            <div class="quick-icon">🙋</div>
+            <span>User Log</span>
+        </div>
 
-        <a href="simpleform.html" class="quick">
-
-            <div class="quick-icon">
-                📝
-            </div>
-
-            <span>
-                Resume
-            </span>
-
-        </a>
-
+        <div onclick="adminlog()" class="quick">
+            <div class="quick-icon">🔐</div>
+            <span>Admin Log</span>
+        </div>
 
         <a href="photo_maker.html" class="quick">
-
-            <div class="quick-icon">
-                📂
-            </div>
-
-            <span>
-                PDF
-            </span>
-
+            <div class="quick-icon">📷</div>
+            <span>Photos</span>
         </a>
-
-
-        <a href="photo_maker.html" class="quick">
-
-            <div class="quick-icon">
-                📷
-            </div>
-
-            <span>
-                Photos
-            </span>
-
-        </a>
-
 
         <a href="#about" class="quick">
-
-            <div class="quick-icon">
-                ℹ️
-            </div>
-
-            <span>
-                About
-            </span>
-
+            <div class="quick-icon">ℹ️</div>
+            <span>About</span>
         </a>
-
     </section>
 
 
-
     <!-- STATS -->
-
     <div class="section-title">
-
-        <h2>
-            Platform
-        </h2>
-
+        <h2>Platform</h2>
     </div>
 
-
     <section class="stats">
-
         <div class="stat">
             <strong>10K+</strong>
             <span>Users</span>
         </div>
-
         <div class="stat">
             <strong>99%</strong>
             <span>Performance</span>
         </div>
-
         <div class="stat">
             <strong>24/7</strong>
             <span>Available</span>
         </div>
-
     </section>
 
 
-
     <!-- ABOUT -->
-
-    <section
-        class="info"
-        id="about"
-    >
-
-        <h2>
-            About MANIK_A_RNIKA
-        </h2>
-
+    <section class="info" id="about">
+        <h2>About MANIK_A_RNIKA</h2>
         <p>
             A simple collection of useful digital tools
             built with speed, clean design and ease of use
             in mind. Open a tool and get your work done
             without unnecessary steps.
         </p>
-
     </section>
-
 
 </main>
 
 
-
-<!-- ==================================================
-     FOOTER
-================================================== -->
-
+<!-- FOOTER -->
 <footer>
-
     © 2026 MANIK_A_RNIKA
-
 </footer>
 
 
-
-<!-- ==================================================
-     ANDROID BOTTOM NAV
-================================================== -->
-
+<!-- ANDROID BOTTOM NAV -->
 <nav class="bottom-nav">
-
     <a href="#home">
-
-        <span class="bottom-icon">
-            ⌂
-        </span>
-
+        <span class="bottom-icon">⌂</span>
         Home
-
     </a>
-
-
     <a href="#tools">
-
-        <span class="bottom-icon">
-            ▦
-        </span>
-
+        <span class="bottom-icon">▦</span>
         Tools
-
     </a>
-
-
     <a href="#about">
-
-        <span class="bottom-icon">
-            ●
-        </span>
-
+        <span class="bottom-icon">●</span>
         About
-
     </a>
-
 </nav>
 
 
-
-<!-- ==================================================
-     MINIMAL JAVASCRIPT
-================================================== -->
-
+<!-- MINIMAL JAVASCRIPT -->
 <script>
+const menuButton = document.getElementById("menuButton");
+const mobileNav = document.getElementById("mobileNav");
 
-const menuButton =
-    document.getElementById("menuButton");
+menuButton.addEventListener("click", function(){
+    mobileNav.classList.toggle("show");
+});
 
-const mobileNav =
-    document.getElementById("mobileNav");
-
-
-menuButton.addEventListener(
-    "click",
-    function(){
-
-        mobileNav.classList.toggle("show");
-
-    }
-);
-
-
-/* Close menu after selecting a link */
-
-mobileNav.querySelectorAll("a").forEach(
-    function(link){
-
-        link.addEventListener(
-            "click",
-            function(){
-
-                mobileNav.classList.remove("show");
-
-            }
-        );
-
-    }
-);
-
+/* Close menu after selecting a link or button */
+mobileNav.querySelectorAll("a, button").forEach(function(element){
+    element.addEventListener("click", function(){
+        mobileNav.classList.remove("show");
+    });
+});
 </script>
-
 
 </body>
 </html>
