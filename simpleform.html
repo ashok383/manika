@@ -1,36 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WhatsApp Message Button</title>
-    <style>
-        body { font-family: Arial; text-align: center; margin-top: 100px; background: #f0f0f0; }
-        button { background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; }
-        button:hover { background: #128C7E; }
-        input { padding: 10px; width: 250px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA Image Text Editor</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:15px;
+ background:#101827;color:white;
+ font-family:Arial,sans-serif;
+}
+.container{
+ max-width:950px;margin:auto;
+ background:#1d293b;padding:20px;
+ border-radius:15px;
+}
+h2{text-align:center;color:#38bdf8}
+input,select,button{
+ width:100%;padding:12px;margin:6px 0;
+ border-radius:7px;border:1px solid #475569;
+ font-size:15px;
+}
+input,select{background:#fff;color:#111}
+button{
+ background:#0284c7;color:white;
+ border:none;font-weight:bold;cursor:pointer;
+}
+button:hover{background:#0369a1}
+.delete{background:#dc2626}
+.download{background:#16a34a}
+#canvas{
+ width:100%;height:auto;
+ background:white;display:block;
+ margin-top:15px;border-radius:5px;
+ touch-action:none;
+}
+.controls{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:8px;
+}
+@media(max-width:550px){
+ .controls{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
 
-    <h2>Send WhatsApp Message</h2>
-    
-    <input type="text" id="phone" placeholder="Enter WhatsApp Number with country code" value="9951912096">
-    <br>
-    <input type="text" id="msg" placeholder="Enter Your Message" value="Hello, I need help!">
-    <br><br>
-    
-    <button onclick="sendWhatsApp()">💬 Send on WhatsApp</button>
+<div class="container">
+<h2>MANIKARNIKA JPEG TEXT EDITOR</h2>
 
-    <script>
-        function sendWhatsApp() {
-            const number = document.getElementById("phone").value;
-            const message = document.getElementById("msg").value;
+<label>Upload Image</label>
+<input type="file" id="upload" accept="image/jpeg,image/png,image/webp">
 
-            if (!number) { alert("Enter number!"); return; }
+<h3>Enter Text</h3>
+<input type="text" id="textInput" placeholder="Enter your text">
 
-            const link = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-            window.open(link, "_blank");
-        }
-    </script>
+<div class="controls">
+<div>
+<label>Font Size</label>
+<input type="number" id="fontSize" value="35" min="5" max="500">
+</div>
+<div>
+<label>Text Colour</label>
+<input type="color" id="fontColor" value="#ff0000">
+</div>
+<div>
+<label>Font Style</label>
+<select id="fontStyle">
+<option value="Arial">Arial</option>
+<option value="Times New Roman">Times New Roman</option>
+<option value="Courier New">Courier New</option>
+<option value="Georgia">Georgia</option>
+<option value="Verdana">Verdana</option>
+</select>
+</div>
+<div>
+<label>Font Weight</label>
+<select id="fontWeight">
+<option value="normal">Normal</option>
+<option value="bold">Bold</option>
+</select>
+</div>
+</div>
+
+<button onclick="addText()">ADD TEXT TO IMAGE</button>
+<button class="delete" onclick="deleteText()">DELETE SELECTED TEXT</button>
+
+<h3>Image Preview</h3>
+<p style="color:#cbd5e1;font-size:13px">
+Tap or drag text to position it anywhere on the image.
+</p>
+
+<canvas id="canvas"></canvas>
+
+<button class="download" onclick="downloadImage()">
+DOWNLOAD HD JPEG IMAGE
+</button>
+</div>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+let image=new Image();
+let imageLoaded=false;
+let texts=[];
+let selected=-1;
+let dragging=false;
+
+document.getElementById("upload").addEventListener("change",function(e){
+ const file=e.target.files[0];
+ if(!file)return;
+
+ const url=URL.createObjectURL(file);
+ image.onload=function(){
+  canvas.width=image.naturalWidth;
+  canvas.height=image.naturalHeight;
+  imageLoaded=true;
+  texts=[];
+  selected=-1;
+  draw();
+  URL.revokeObjectURL(url);
+ };
+ image.src=url;
+});
+
+function addText(){
+ if(!imageLoaded){
+  alert("Please upload an image first");
+  return;
+ }
+
+ const value=document.getElementById("textInput").value;
+ if(!value.trim()){
+  alert("Enter text first");
+  return;
+ }
+
+ texts.push({
+  text:value,
+  x:canvas.width/2,
+  y:canvas.height/2,
+  size:Number(document.getElementById("fontSize").value)||35,
+  color:document.getElementById("fontColor").value,
+  font:document.getElementById("fontStyle").value,
+  weight:document.getElementById("fontWeight").value
+ });
+
+ selected=texts.length-1;
+ draw();
+}
+
+function draw(){
+ if(!imageLoaded)return;
+
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.drawImage(image,0,0,canvas.width,canvas.height);
+
+ texts.forEach((t,i)=>{
+  ctx.font=`${t.weight} ${t.size}px "${t.font}"`;
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillStyle=t.color;
+  ctx.fillText(t.text,t.x,t.y);
+
+  if(i===selected){
+   const width=ctx.measureText(t.text).width;
+   ctx.strokeStyle="#00aaff";
+   ctx.lineWidth=Math.max(2,canvas.width/1000);
+   ctx.strokeRect(
+    t.x-width/2-5,
+    t.y-t.size/2-5,
+    width+10,
+    t.size+10
+   );
+  }
+ });
+}
+
+function getPosition(e){
+ const rect=canvas.getBoundingClientRect();
+ return {
+  x:(e.clientX-rect.left)*canvas.width/rect.width,
+  y:(e.clientY-rect.top)*canvas.height/rect.height
+ };
+}
+
+canvas.addEventListener("pointerdown",function(e){
+ if(!imageLoaded)return;
+ const p=getPosition(e);
+ selected=-1;
+
+ for(let i=texts.length-1;i>=0;i--){
+  const t=texts[i];
+  ctx.font=`${t.weight} ${t.size}px "${t.font}"`;
+  const w=ctx.measureText(t.text).width;
+  if(p.x>=t.x-w/2-10 && p.x<=t.x+w/2+10 &&
+     p.y>=t.y-t.size/2-10 && p.y<=t.y+t.size/2+10){
+   selected=i;
+   dragging=true;
+   canvas.setPointerCapture(e.pointerId);
+   break;
+  }
+ }
+ draw();
+});
+
+canvas.addEventListener("pointermove",function(e){
+ if(!dragging||selected<0)return;
+ const p=getPosition(e);
+ texts[selected].x=p.x;
+ texts[selected].y=p.y;
+ draw();
+});
+
+canvas.addEventListener("pointerup",function(){
+ dragging=false;
+});
+
+canvas.addEventListener("pointercancel",function(){
+ dragging=false;
+});
+
+function deleteText(){
+ if(selected<0){
+  alert("Select text first");
+  return;
+ }
+ texts.splice(selected,1);
+ selected=-1;
+ draw();
+}
+
+function downloadImage(){
+ if(!imageLoaded){
+  alert("Upload an image first");
+  return;
+ }
+
+ const old=selected;
+ selected=-1;
+ draw();
+
+ const link=document.createElement("a");
+ link.download="MANIKARNIKA-Edited-Image.jpg";
+ link.href=canvas.toDataURL("image/jpeg",1.0);
+ link.click();
+
+ selected=old;
+ draw();
+}
+</script>
 
 </body>
 </html>
+
