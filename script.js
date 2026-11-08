@@ -13,7 +13,7 @@ async function payAndDownload() {
     // Direct frontend options (Auto-capture is handled automatically by your Razorpay Dashboard settings)
     const options = {
         key: "rzp_live_Twk0HEUJf6Y43e",
-        amount: 100, // 100 paise = 1 INR
+        amount: 5000, // 100 paise = 1 INR
         currency: "INR",
         name: "MANIK_A_RNIKA",
         description: selected.value.toUpperCase() + " Resume Download",
