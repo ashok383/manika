@@ -1,258 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANIKARNIKA Image Text Editor</title>
-<style>
-*{box-sizing:border-box}
-body{
- margin:0;padding:15px;
- background:#101827;color:white;
- font-family:Arial,sans-serif;
-}
-.container{
- max-width:950px;margin:auto;
- background:#1d293b;padding:20px;
- border-radius:15px;
-}
-h2{text-align:center;color:#38bdf8}
-input,select,button{
- width:100%;padding:12px;margin:6px 0;
- border-radius:7px;border:1px solid #475569;
- font-size:15px;
-}
-input,select{background:#fff;color:#111}
-button{
- background:#0284c7;color:white;
- border:none;font-weight:bold;cursor:pointer;
-}
-button:hover{background:#0369a1}
-.delete{background:#dc2626}
-.download{background:#16a34a}
-#canvas{
- width:100%;height:auto;
- background:white;display:block;
- margin-top:15px;border-radius:5px;
- touch-action:none;
-}
-.controls{
- display:grid;grid-template-columns:1fr 1fr;
- gap:8px;
-}
-@media(max-width:550px){
- .controls{grid-template-columns:1fr}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANIK_A_RNIKA - Universal Drag & Drop e-PAN & PVC Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        canvas { cursor: grab; }
+        canvas:active { cursor: grabbing; }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-<div class="container">
-<h2>MANIKARNIKA JPEG TEXT EDITOR</h2>
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+                <i class="fa-solid fa-arrows-up-down-left-right"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-tight">Universal Drag & Drop Studio (e-PAN + PVC)</h1>
+                <p class="text-xs text-slate-400">Click & drag ANY item (Main/PVC Photo, Signatures, Text) on canvas</p>
+            </div>
+        </div>
 
-<label>Upload Image</label>
-<input type="file" id="upload" accept="image/jpeg,image/png,image/webp">
+        <div class="flex items-center gap-2">
+            <button onclick="copyPositionsCode()" class="px-3 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition">
+                <i class="fa-solid fa-code"></i> Copy All POS JSON
+            </button>
+            <button onclick="downloadDocument()" class="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-md transition">
+                <i class="fa-solid fa-download"></i> Download Image
+            </button>
+        </div>
+    </header>
 
-<h3>Enter Text</h3>
-<input type="text" id="textInput" placeholder="Enter your text">
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-hidden">
+        <!-- Sidebar Controls -->
+        <aside class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[88vh] space-y-4">
+            <div class="space-y-2">
+                <h2 class="font-bold text-xs uppercase tracking-wider text-blue-400">Card Data Entries</h2>
+                <input type="text" id="panNum" value="JKWPP5614J" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-xs uppercase font-mono" placeholder="PAN">
+                <input type="text" id="fullName" value="KELOTH PADMA" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-xs uppercase" placeholder="Full Name">
+                <input type="text" id="fatherName" value="KELOTH CHANDRU" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-xs uppercase" placeholder="Father Name">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="dob" value="12/06/2004" class="bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-xs" placeholder="DOB">
+                    <select id="gender" class="bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-xs">
+                        <option value="FEMALE" selected>FEMALE</option>
+                        <option value="MALE">MALE</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-1.5 rounded text-[11px] font-semibold">
+                        📷 Upload Photo
+                        <input type="file" id="photoUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'photo')">
+                    </label>
+                    <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-1.5 rounded text-[11px] font-semibold">
+                        ✍️ Upload Signature
+                        <input type="file" id="sigUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'signature')">
+                    </label>
+                </div>
+            </div>
 
-<div class="controls">
-<div>
-<label>Font Size</label>
-<input type="number" id="fontSize" value="35" min="5" max="500">
-</div>
-<div>
-<label>Text Colour</label>
-<input type="color" id="fontColor" value="#ff0000">
-</div>
-<div>
-<label>Font Style</label>
-<select id="fontStyle">
-<option value="Arial">Arial</option>
-<option value="Times New Roman">Times New Roman</option>
-<option value="Courier New">Courier New</option>
-<option value="Georgia">Georgia</option>
-<option value="Verdana">Verdana</option>
-</select>
-</div>
-<div>
-<label>Font Weight</label>
-<select id="fontWeight">
-<option value="normal">Normal</option>
-<option value="bold">Bold</option>
-</select>
-</div>
-</div>
+            <hr class="border-slate-800">
 
-<button onclick="addText()">ADD TEXT TO IMAGE</button>
-<button class="delete" onclick="deleteText()">DELETE SELECTED TEXT</button>
+            <div class="space-y-2">
+                <h2 class="font-bold text-xs uppercase tracking-wider text-emerald-400">Selected Item Controls</h2>
+                <select id="activeElement" onchange="changeActiveElement()" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-2 text-xs font-bold text-emerald-400">
+                    <option value="name">1. Name (Main)</option>
+                    <option value="father">2. Father's Name (Main)</option>
+                    <option value="dob">3. DOB (Main)</option>
+                    <option value="gender">4. Gender (Main)</option>
+                    <option value="pan">5. PAN Number (Main)</option>
+                    <option value="photo">6. Passport Photo (Main)</option>
+                    <option value="signature">7. Signature (Main)</option>
+                    <option value="qr">8. QR Code (Main)</option>
+                    <option value="pvc_photo">9. PVC Card Photo</option>
+                    <option value="pvc_sign">10. PVC Card Signature</option>
+                    <option value="pvc_pan">11. PVC Card PAN</option>
+                    <option value="pvc_name">12. PVC Card Name</option>
+                    <option value="pvc_father">13. PVC Card Father</option>
+                    <option value="pvc_dob">14. PVC Card DOB</option>
+                    <option value="pvc_qr">15. PVC Card QR</option>
+                </select>
+                <p class="text-[11px] text-slate-400">💡 <b>How to use:</b> Click any item on the canvas preview to select it, then drag it freely!</p>
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div>
+                        <span class="text-[10px] text-slate-500">X:</span>
+                        <input type="number" id="coordX" class="w-full bg-slate-800 border border-slate-700 rounded text-center py-1 text-xs" oninput="manualCoordUpdate()">
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-500">Y:</span>
+                        <input type="number" id="coordY" class="w-full bg-slate-800 border border-slate-700 rounded text-center py-1 text-xs" oninput="manualCoordUpdate()">
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-500">Width/Size:</span>
+                        <input type="number" id="coordSize" class="w-full bg-slate-800 border border-slate-700 rounded text-center py-1 text-xs" oninput="manualCoordUpdate()">
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-<h3>Image Preview</h3>
-<p style="color:#cbd5e1;font-size:13px">
-Tap or drag text to position it anywhere on the image.
-</p>
+        <!-- Canvas Workspace -->
+        <main class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-auto min-h-[600px] relative">
+            <canvas id="epanCanvas" class="shadow-2xl rounded border border-slate-700 bg-white" width="864" height="1224"></canvas>
+        </main>
+    </div>
 
-<canvas id="canvas"></canvas>
+    <div id="qrcode" class="hidden"></div>
 
-<button class="download" onclick="downloadImage()">
-DOWNLOAD HD JPEG IMAGE
-</button>
-</div>
+    <script>
+        const canvas = document.getElementById('epanCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let bgImage = new Image();
+        let userPhoto = new Image();
+        let userSignature = new Image();
+        let qrImage = new Image();
 
-<script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+        bgImage.src = 'WhatsApp Image 2026-11-08 at 2.43.01 PM.jpeg';
 
-let image=new Image();
-let imageLoaded=false;
-let texts=[];
-let selected=-1;
-let dragging=false;
+        let POS = {
+            pan:       { x: 300, y: 310, size: 24, w: 200, h: 30 },
+            name:      { x: 50,  y: 500, size: 18, w: 300, h: 30 },
+            father:    { x: 50,  y: 575, size: 18, w: 300, h: 30 },
+            dob:       { x: 50,  y: 645, size: 16, w: 150, h: 25 },
+            gender:    { x: 340, y: 645, size: 16, w: 150, h: 25 },
+            photo:     { x: 45,  y: 220, size: 120, h: 150 }, // made smaller
+            signature: { x: 350, y: 560, size: 190, h: 60 },
+            qr:        { x: 585, y: 220, size: 175, h: 175 },
+            // PVC Card elements (Movable)
+            pvc_photo: { x: 65,  y: 910, size: 55, h: 68 },
+            pvc_sign:  { x: 235, y: 1045, size: 95, h: 30 },
+            pvc_pan:   { x: 130, y: 925, size: 13, w: 120, h: 20 },
+            pvc_name:  { x: 65,  y: 995, size: 9, w: 150, h: 20 },
+            pvc_father:{ x: 65,  y: 1025, size: 9, w: 150, h: 20 },
+            pvc_dob:   { x: 65,  y: 1055, size: 9, w: 120, h: 20 },
+            pvc_qr:    { x: 330, y: 910, size: 115, h: 115 }
+        };
 
-document.getElementById("upload").addEventListener("change",function(e){
- const file=e.target.files[0];
- if(!file)return;
+        const SAMPLE_PHOTO = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240" viewBox="0 0 200 240"><rect width="200" height="240" fill="%23cbd5e1"/><circle cx="100" cy="85" r="40" fill="%23334155"/><path d="M 25 210 Q 100 130 175 210" stroke="%231e293b" stroke-width="30" fill="none"/></svg>`;
+        const SAMPLE_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><path d="M 10 40 Q 50 10 80 35 T 150 25 Q 180 50 190 20" stroke="%231e3a8a" stroke-width="3" fill="none"/></svg>`;
 
- const url=URL.createObjectURL(file);
- image.onload=function(){
-  canvas.width=image.naturalWidth;
-  canvas.height=image.naturalHeight;
-  imageLoaded=true;
-  texts=[];
-  selected=-1;
-  draw();
-  URL.revokeObjectURL(url);
- };
- image.src=url;
-});
+        let isDragging = false;
+        let activeKey = 'name';
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
 
-function addText(){
- if(!imageLoaded){
-  alert("Please upload an image first");
-  return;
- }
+        window.onload = function() {
+            ['panNum', 'fullName', 'fatherName', 'dob', 'gender'].forEach(id => {
+                document.getElementById(id).addEventListener('input', renderCanvas);
+            });
 
- const value=document.getElementById("textInput").value;
- if(!value.trim()){
-  alert("Enter text first");
-  return;
- }
+            userPhoto.src = SAMPLE_PHOTO;
+            userSignature.src = SAMPLE_SIGNATURE;
 
- texts.push({
-  text:value,
-  x:canvas.width/2,
-  y:canvas.height/2,
-  size:Number(document.getElementById("fontSize").value)||35,
-  color:document.getElementById("fontColor").value,
-  font:document.getElementById("fontStyle").value,
-  weight:document.getElementById("fontWeight").value
- });
+            bgImage.onload = () => {
+                canvas.width = bgImage.naturalWidth;
+                canvas.height = bgImage.naturalHeight;
+                updateSidebarControls();
+                renderCanvas();
+            };
 
- selected=texts.length-1;
- draw();
-}
+            userPhoto.onload = () => renderCanvas();
+            userSignature.onload = () => renderCanvas();
+            generateQRCode("JKWPP5614J");
 
-function draw(){
- if(!imageLoaded)return;
+            canvas.addEventListener('mousedown', (e) => {
+                const coords = getCanvasMouseCoords(e);
+                for (let key in POS) {
+                    let item = POS[key];
+                    let width = item.w || item.size || 100;
+                    let height = item.h || item.size || 30;
+                    
+                    let hit = false;
+                    if (['photo', 'signature', 'qr', 'pvc_photo', 'pvc_sign', 'pvc_qr'].includes(key)) {
+                        hit = (coords.x >= item.x && coords.x <= item.x + width &&
+                               coords.y >= item.y && coords.y <= item.y + height);
+                    } else {
+                        hit = (coords.x >= item.x - 10 && coords.x <= item.x + width + 10 &&
+                               coords.y >= item.y - 25 && coords.y <= item.y + 10);
+                    }
 
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.drawImage(image,0,0,canvas.width,canvas.height);
+                    if (hit) {
+                        activeKey = key;
+                        document.getElementById('activeElement').value = key;
+                        updateSidebarControls();
+                        isDragging = true;
+                        dragOffsetX = coords.x - item.x;
+                        dragOffsetY = coords.y - item.y;
+                        renderCanvas();
+                        return;
+                    }
+                }
+            });
 
- texts.forEach((t,i)=>{
-  ctx.font=`${t.weight} ${t.size}px "${t.font}"`;
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
-  ctx.fillStyle=t.color;
-  ctx.fillText(t.text,t.x,t.y);
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const coords = getCanvasMouseCoords(e);
+                    POS[activeKey].x = Math.round(coords.x - dragOffsetX);
+                    POS[activeKey].y = Math.round(coords.y - dragOffsetY);
+                    updateSidebarControls();
+                    renderCanvas();
+                }
+            });
 
-  if(i===selected){
-   const width=ctx.measureText(t.text).width;
-   ctx.strokeStyle="#00aaff";
-   ctx.lineWidth=Math.max(2,canvas.width/1000);
-   ctx.strokeRect(
-    t.x-width/2-5,
-    t.y-t.size/2-5,
-    width+10,
-    t.size+10
-   );
-  }
- });
-}
+            window.addEventListener('mouseup', () => { isDragging = false; });
+        };
 
-function getPosition(e){
- const rect=canvas.getBoundingClientRect();
- return {
-  x:(e.clientX-rect.left)*canvas.width/rect.width,
-  y:(e.clientY-rect.top)*canvas.height/rect.height
- };
-}
+        function getCanvasMouseCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: Math.round((e.clientX - rect.left) * scaleX),
+                y: Math.round((e.clientY - rect.top) * scaleY)
+            };
+        }
 
-canvas.addEventListener("pointerdown",function(e){
- if(!imageLoaded)return;
- const p=getPosition(e);
- selected=-1;
+        function changeActiveElement() {
+            activeKey = document.getElementById('activeElement').value;
+            updateSidebarControls();
+            renderCanvas();
+        }
 
- for(let i=texts.length-1;i>=0;i--){
-  const t=texts[i];
-  ctx.font=`${t.weight} ${t.size}px "${t.font}"`;
-  const w=ctx.measureText(t.text).width;
-  if(p.x>=t.x-w/2-10 && p.x<=t.x+w/2+10 &&
-     p.y>=t.y-t.size/2-10 && p.y<=t.y+t.size/2+10){
-   selected=i;
-   dragging=true;
-   canvas.setPointerCapture(e.pointerId);
-   break;
-  }
- }
- draw();
-});
+        function updateSidebarControls() {
+            const item = POS[activeKey];
+            document.getElementById('coordX').value = item.x;
+            document.getElementById('coordY').value = item.y;
+            document.getElementById('coordSize').value = item.size || item.w;
+        }
 
-canvas.addEventListener("pointermove",function(e){
- if(!dragging||selected<0)return;
- const p=getPosition(e);
- texts[selected].x=p.x;
- texts[selected].y=p.y;
- draw();
-});
+        function manualCoordUpdate() {
+            POS[activeKey].x = parseInt(document.getElementById('coordX').value) || 0;
+            POS[activeKey].y = parseInt(document.getElementById('coordY').value) || 0;
+            let val = parseInt(document.getElementById('coordSize').value) || 10;
+            if (POS[activeKey].size !== undefined) POS[activeKey].size = val;
+            if (POS[activeKey].w !== undefined) POS[activeKey].w = val;
+            renderCanvas();
+        }
 
-canvas.addEventListener("pointerup",function(){
- dragging=false;
-});
+        function generateQRCode(text) {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: text || "EPAN_CARD_VERIFIED",
+                width: 200, height: 200,
+                colorDark: "#000000", colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            setTimeout(() => {
+                const imgTag = qrContainer.querySelector("img");
+                if (imgTag) {
+                    qrImage.src = imgTag.src;
+                    qrImage.onload = () => renderCanvas();
+                }
+            }, 100);
+        }
 
-canvas.addEventListener("pointercancel",function(){
- dragging=false;
-});
+        function handleImageUpload(e, type) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (type === 'photo') userPhoto = img;
+                        else if (type === 'signature') userSignature = img;
+                        renderCanvas();
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-function deleteText(){
- if(selected<0){
-  alert("Select text first");
-  return;
- }
- texts.splice(selected,1);
- selected=-1;
- draw();
-}
+        function renderCanvas() {
+            if (!bgImage.complete || bgImage.naturalWidth === 0) return;
 
-function downloadImage(){
- if(!imageLoaded){
-  alert("Upload an image first");
-  return;
- }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
- const old=selected;
- selected=-1;
- draw();
+            const pan = document.getElementById('panNum').value.toUpperCase();
+            const name = document.getElementById('fullName').value.toUpperCase();
+            const father = document.getElementById('fatherName').value.toUpperCase();
+            const dob = document.getElementById('dob').value;
+            const gender = document.getElementById('gender').value;
 
- const link=document.createElement("a");
- link.download="MANIKARNIKA-Edited-Image.jpg";
- link.href=canvas.toDataURL("image/jpeg",1.0);
- link.click();
+            // 1. MAIN e-PAN TEXT
+            ctx.fillStyle = '#0f172a';
+            ctx.font = `bold ${POS.pan.size}px Roboto, sans-serif`;
+            ctx.fillText(pan, POS.pan.x, POS.pan.y);
 
- selected=old;
- draw();
-}
-</script>
+            ctx.fillStyle = '#000000';
+            ctx.font = `bold ${POS.name.size}px Roboto, sans-serif`;
+            ctx.fillText(name, POS.name.x, POS.name.y);
 
+            ctx.font = `bold ${POS.father.size}px Roboto, sans-serif`;
+            ctx.fillText(father, POS.father.x, POS.father.y);
+
+            ctx.font = `${POS.dob.size}px Roboto, sans-serif`;
+            ctx.fillText(dob, POS.dob.x, POS.dob.y);
+
+            ctx.font = `${POS.gender.size}px Roboto, sans-serif`;
+            ctx.fillText(gender, POS.gender.x, POS.gender.y);
+
+            // MAIN e-PAN IMAGES (Barcode omitted)
+            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
+                ctx.drawImage(userPhoto, POS.photo.x, POS.photo.y, POS.photo.size, POS.photo.h);
+            }
+
+            if (userSignature.complete && userSignature.naturalWidth !== 0) {
+                ctx.drawImage(userSignature, POS.signature.x, POS.signature.y, POS.signature.size, POS.signature.h);
+            }
+
+            if (qrImage.complete && qrImage.naturalWidth !== 0) {
+                ctx.drawImage(qrImage, POS.qr.x, POS.qr.y, POS.qr.size, POS.qr.size);
+            }
+
+            // 2. PVC CARD SECTION (Fully Movable Photo, Sign, Text, QR)
+            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
+                ctx.drawImage(userPhoto, POS.pvc_photo.x, POS.pvc_photo.y, POS.pvc_photo.size, POS.pvc_photo.h);
+            }
+
+            if (userSignature.complete && userSignature.naturalWidth !== 0) {
+                ctx.drawImage(userSignature, POS.pvc_sign.x, POS.pvc_sign.y, POS.pvc_sign.size, POS.pvc_sign.h);
+            }
+
+            if (qrImage.complete && qrImage.naturalWidth !== 0) {
+                ctx.drawImage(qrImage, POS.pvc_qr.x, POS.pvc_qr.y, POS.pvc_qr.size, POS.pvc_qr.h);
+            }
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = `bold ${POS.pvc_pan.size}px Roboto, sans-serif`;
+            ctx.fillText(pan, POS.pvc_pan.x, POS.pvc_pan.y);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = `bold ${POS.pvc_name.size}px Roboto, sans-serif`;
+            ctx.fillText(name, POS.pvc_name.x, POS.pvc_name.y);
+
+            ctx.font = `bold ${POS.pvc_father.size}px Roboto, sans-serif`;
+            ctx.fillText(father, POS.pvc_father.x, POS.pvc_father.y);
+
+            ctx.font = `bold ${POS.pvc_dob.size}px Roboto, sans-serif`;
+            ctx.fillText(dob, POS.pvc_dob.x, POS.pvc_dob.y);
+
+            // Active selection highlight
+            const active = POS[activeKey];
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            let boxW = active.w || active.size || 100;
+            let boxH = active.h || active.size || 30;
+            let boxY = (['photo', 'signature', 'qr', 'pvc_photo', 'pvc_sign', 'pvc_qr'].includes(activeKey)) ? active.y : active.y - boxH + 5;
+            ctx.strokeRect(active.x - 5, boxY - 5, boxW + 10, boxH + 10);
+            ctx.setLineDash([]);
+        }
+
+        function copyPositionsCode() {
+            const codeStr = JSON.stringify(POS, null, 4);
+            navigator.clipboard.writeText(codeStr);
+            alert("Copied all coordinates JSON configuration to clipboard!");
+        }
+
+        function downloadDocument() {
+            const link = document.createElement('a');
+            link.download = `filled_epan_pvc.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
 </body>
 </html>
-
