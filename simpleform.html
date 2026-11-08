@@ -13,19 +13,19 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+    <header class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-3">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shrink-0">
                 <i class="fa-solid fa-id-card"></i>
             </div>
             <div>
-                <h1 class="font-bold text-base leading-tight">Fixed e-PAN & PVC Card Generator</h1>
-                <p class="text-xs text-slate-400">All coordinates locked to exact specifications</p>
+                <h1 class="font-bold text-sm sm:text-base leading-tight">Fixed e-PAN & PVC Card Generator</h1>
+                <p class="text-[11px] text-slate-400">All coordinates locked to exact specifications</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <button onclick="downloadDocument()" class="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-md transition flex items-center gap-1.5">
+        <div class="w-full sm:w-auto flex items-center">
+            <button onclick="downloadDocument()" class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-download"></i> Download Image
             </button>
         </div>
@@ -61,12 +61,29 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Upload Photo:</label>
+                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
+                            📁 Choose Photo
+                            <input type="file" id="photoUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'photo')">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Upload Signature:</label>
+                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
+                            📁 Choose Sign
+                            <input type="file" id="sigUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'signature')">
+                        </label>
+                    </div>
+                </div>
             </div>
         </aside>
 
         <!-- Canvas Workspace -->
         <main class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-auto min-h-[600px] relative">
-            <canvas id="epanCanvas" class="shadow-2xl rounded border border-slate-700 bg-white" width="864" height="1224"></canvas>
+            <canvas id="epanCanvas" class="shadow-2xl rounded border border-slate-700 bg-white max-w-full h-auto" width="864" height="1224"></canvas>
         </main>
     </div>
 
@@ -80,7 +97,7 @@
 
         bgImage.src = 'e_pan.jpeg';
 
-        // Locked Coordinates as requested (QR codes removed)
+        // Locked Coordinates as requested
         const POS = {
             main: {
                 pan:       { x: 312, y: 239, size: 24 },
@@ -122,6 +139,26 @@
             userSignature.onload = () => renderCanvas();
         };
 
+        function handleImageUpload(e, type) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (type === 'photo') {
+                            userPhoto = img;
+                        } else if (type === 'signature') {
+                            userSignature = img;
+                        }
+                        renderCanvas();
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function renderCanvas() {
             if (!bgImage.complete || bgImage.naturalWidth === 0) return;
 
@@ -134,7 +171,7 @@
             const dob = document.getElementById('dob').value;
             const gender = document.getElementById('gender').value;
 
-            // 1. MAIN TABLE / e-PAN SECTION (Locked Coordinates, No QR)
+            // 1. MAIN TABLE / e-PAN SECTION
             ctx.fillStyle = '#0f172a';
             ctx.font = `bold ${POS.main.pan.size}px Roboto, sans-serif`;
             ctx.fillText(pan, POS.main.pan.x, POS.main.pan.y);
@@ -160,7 +197,7 @@
                 ctx.drawImage(userSignature, POS.main.signature.x, POS.main.signature.y, POS.main.signature.size, POS.main.signature.h);
             }
 
-            // 2. PVC TABLE SECTION (Locked Coordinates, No QR)
+            // 2. PVC TABLE SECTION
             ctx.fillStyle = '#0f172a';
             ctx.font = `bold ${POS.pvc.pan.size}px Roboto, sans-serif`;
             ctx.fillText(pan, POS.pvc.pan.x, POS.pvc.pan.y);
@@ -185,10 +222,23 @@
         }
 
         function downloadDocument() {
-            const link = document.createElement('a');
-            link.download = `filled_epan_pvc_fixed.png`;
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
+            try {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = `filled_epan_pvc_${document.getElementById('panNum').value.trim() || 'card'}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                const dataURL = canvas.toDataURL('image/png');
+                const newWindow = window.open();
+                if (newWindow) {
+                    newWindow.document.write(`<img src="${dataURL}" alt="Generated PAN Card" style="max-width:100%;height:auto;"/><p>Long-press or right-click the image to save.</p>`);
+                } else {
+                    alert("Popup blocked! Please allow popups or check browser download settings.");
+                }
+            }
         }
     </script>
 </body>
