@@ -1,60 +1,38 @@
 /**
  * ==================================================
- * MANIK_A_RNIKA - Admin Log Module (adminlog.js)
+ * ADMIN LOG / SECURE ADMIN AUTHENTICATION & REDIRECT
  * ==================================================
  */
 
-/**
- * Main function triggered by the Admin Log button.
- * Validates administrative access and opens the admin logging interface.
- */
-function adminlog() {
-    console.log("Admin log triggered...");
+const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes admin session limit
 
-    // Example authentication or authorization check
-    if (!checkAdminSession()) {
-        const password = prompt("Enter Admin Passcode:");
-        if (!authenticateAdmin(password)) {
-            alert("Access Denied: Incorrect passcode.");
-            return;
+function adminlog() {
+    let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
+    let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
+
+    // Check if session is valid and hasn't expired
+    if (adminAuth === "true" && adminLoginTime && (Date.now() - adminLoginTime < ADMIN_TIMEOUT)) {
+        // Refresh session timestamp and open admin page directly
+        sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
+        window.location.href = "admin-dashboard.html";
+        return;
+    }
+
+    // Prompt for Admin Password/PIN if not authenticated
+    let pin = prompt("🔐 Enter Admin Password / PIN to access Admin Panel:");
+    
+    // Replace '7680' or 'admin123' with your secure admin passcode
+    if (pin === "7680" || pin === "admin123") {
+        sessionStorage.setItem("manikarnika_admin_authenticated", "true");
+        sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
+        
+        alert("🔒 Admin Authentication Successful! Opening Dashboard...");
+        
+        // Redirect to the protected admin HTML file
+        window.location.href = "admin-dashboard.html";
+    } else {
+        if (pin !== null) {
+            alert("❌ Incorrect Admin Password!");
         }
     }
-
-    // Proceed to open or fetch admin logs
-    loadAdminDashboard();
 }
-
-/**
- * Checks if a valid admin session exists in local storage or cookies.
- * @returns {boolean}
- */
-function checkAdminSession() {
-    return localStorage.getItem("manik_admin_authenticated") === "true";
-}
-
-/**
- * Simple authentication stub (Replace with secure backend verification).
- * @param {string} password 
- * @returns {boolean}
- */
-function authenticateAdmin(password) {
-    // Replace "admin123" with your secure credential handling or API call
-    const ADMIN_SECRET = "admin123"; 
-    
-    if (password === ADMIN_SECRET) {
-        localStorage.setItem("manik_admin_authenticated", "true");
-        return true;
-    }
-    return false;
-}
-
-/**
- * Loads and displays the admin logs (Can be redirected or rendered dynamically).
- */
-function loadAdminDashboard() {
-    // Option A: Redirect to a dedicated admin log page if it exists
-window.location.href = 'adminlog.html';
-}
-
-// Export or attach to global scope if using module bundlers
-window.adminlog = adminlog;
