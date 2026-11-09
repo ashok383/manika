@@ -23,7 +23,7 @@
 
             let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
             let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
-            const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+            const ADMIN_TIMEOUT = 1 * 60 * 1000; // Active timeout limit
 
             // If not authenticated or session expired, challenge for password
             if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
@@ -37,7 +37,7 @@
                     window.location.href = "index.html";
                     return;
                 } else {
-                    // Success: set credentials
+                    // Success: set credentials & login timestamp
                     sessionStorage.setItem("manikarnika_admin_authenticated", "true");
                     sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
                 }
@@ -349,7 +349,7 @@
         window.location.href = "index.html";
     }
 
-    // Live Session Countdown & Timeout Watcher (10 Minutes)
+    // Live Session Countdown & Timeout Watcher
     const ADMIN_TIMEOUT = 1 * 60 * 1000; 
     const loginTime = parseInt(sessionStorage.getItem("manikarnika_admin_login_time") || Date.now());
 
