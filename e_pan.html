@@ -1,6 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-PAN Generator - MANIK_A_RNIKA</title>
+    
+    <!-- Security Guard: Blocks direct URL access, forces password entry, & logs out on reload -->
+    <script>
+        (function() {
+            // Check if page was just reloaded using Navigation Timing API
+            const isReloaded = 
+                (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "reload") ||
+                (performance.navigation && performance.navigation.type === 1);
+
+            if (isReloaded) {
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+                alert("🔄 Page reloaded. You have been logged out securely.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
+            let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
+            const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+            // If not authenticated or session expired, challenge for password
+            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+
+                let pin = prompt("🔐 Enter Admin Password (admin123) to access e-PAN Tool:");
+                
+                if (pin === null || pin.trim() !== "admin123") {
+                    alert("❌ Authentication failed or cancelled. Redirecting to home.");
+                    window.location.href = "index.html";
+                    return;
+                } else {
+                    // Success: set active session credentials
+                    sessionStorage.setItem("manikarnika_admin_authenticated", "true");
+                    sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
+                }
+            }
+        })();
+    </script>
+
+    <!-- Your existing styles or links go here -->
+    <style>
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <!-- Your e-PAN tool contents here -->
+</body>
+</html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIK_A_RNIKA - Fixed e-PAN & PVC Card Generator</title>
