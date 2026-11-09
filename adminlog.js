@@ -1,10 +1,23 @@
 /**
  * ==================================================
  * ADMIN LOG / SECURE ADMIN AUTHENTICATION & REDIRECT
+ * (Forces Logout on Page Reload)
  * ==================================================
  */
 
 const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes admin session limit
+
+// Automatically log out / clear session if the page is reloaded
+(function() {
+    const isReloaded = 
+        (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "reload") ||
+        (performance.navigation && performance.navigation.type === 1);
+
+    if (isReloaded) {
+        sessionStorage.removeItem("manikarnika_admin_authenticated");
+        sessionStorage.removeItem("manikarnika_admin_login_time");
+    }
+})();
 
 function adminlog() {
     let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
@@ -16,7 +29,7 @@ function adminlog() {
         if (elapsedTime < ADMIN_TIMEOUT) {
             // Refresh session timestamp and open admin page directly
             sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
-            window.location.href = "index.html";
+            window.location.href = "adminlog.html";
             return;
         } else {
             // Session expired, clear old tokens
