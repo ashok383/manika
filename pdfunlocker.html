@@ -223,5 +223,36 @@ function downloadPDF(){
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 </script>
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>MANIKARNIKA</title>
+</head>
+
+<body>
+
+    <h1>Welcome to MANIKARNIKA</h1>
+
+    <!-- Your existing HTML content here -->
+
+
+    <!-- Disable Right Click and Inspect -->
+    <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+</body>
+</html>
 </body>
 </html>
