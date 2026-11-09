@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+      <meta charset="UTF-8">
+    <title>Admin Dashboard - MANIK_A_RNIKA</title>
+    
+    <!-- Security Guard: Blocks direct URL access -->
+    <script>
+        (function() {
+            const adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
+            const adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
+            const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - adminLoginTime > ADMIN_TIMEOUT)) {
+                // Clear expired or invalid session data
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+                
+                alert("🚫 Unauthorized access! Please log in with admin credentials first.");
+                // Immediately kick them back to home page
+                window.location.href = "index.html";
+            }
+        })();
+    </script>
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width,initial-scale=1.0">
