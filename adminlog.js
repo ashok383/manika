@@ -16,7 +16,7 @@ function adminlog() {
         if (elapsedTime < ADMIN_TIMEOUT) {
             // Refresh session timestamp and open admin page directly
             sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
-            window.location.href = "adminlog.html";
+            window.location.href = "index.html";
             return;
         } else {
             // Session expired, clear old tokens
