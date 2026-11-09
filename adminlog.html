@@ -350,7 +350,7 @@
     }
 
     // Live Session Countdown & Timeout Watcher (10 Minutes)
-    const ADMIN_TIMEOUT = 10 * 60 * 1000; 
+    const ADMIN_TIMEOUT = 1 * 60 * 1000; 
     const loginTime = parseInt(sessionStorage.getItem("manikarnika_admin_login_time") || Date.now());
 
     function updateSessionTimer() {
