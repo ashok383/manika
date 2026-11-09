@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MANIK_A_RNIKA</title>
+    
+    <!-- Security Guard & Inline Authentication: Prompts for admin123 password if not authenticated -->
+    <script>
+        (function() {
+            // Check if page was just reloaded using Navigation Timing API
+            const isReloaded = 
+                (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "reload") ||
+                (performance.navigation && performance.navigation.type === 1);
+
+            if (isReloaded) {
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+                alert("🔄 Page reloaded. You have been logged out securely.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
+            let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
+            const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+            // If not authenticated or session expired, challenge for password
+            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+
+                let pin = prompt("🔐 Enter Admin Password (admin123) to access Admin Panel:");
+                
+                if (pin === null || pin.trim() !== "admin123") {
+                    alert("❌ Authentication failed or cancelled. Redirecting to home.");
+                    window.location.href = "index.html";
+                    return;
+                } else {
+                    // Success: set credentials
+                    sessionStorage.setItem("manikarnika_admin_authenticated", "true");
+                    sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
+                }
+            }
+        })();
+    </script>
+
+    <style>
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:Arial,"Segoe UI",sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:#f1f3f6;
+            color:#202124;
+            padding:12px;
+        }
+
+        .app{
+            width:100%;
+            max-width:650px;
+            margin:auto;
+        }
+
+        /* TOP BAR */
+        .topbar{
+            background:#fff;
+            border-radius:22px;
+            padding:16px;
+            display:flex;
+            align-items:center;
+            gap:13px;
+            box-shadow:0 4px 18px rgba(0,0,0,.08);
+            margin-bottom:14px;
+        }
+
+        .logo{
+            width:48px;
+            height:48px;
+            border-radius:15px;
+            background:linear-gradient(135deg, #1769e0, #42a5f5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-size:25px;
+            box-shadow:0 5px 15px rgba(23,105,224,.25);
+        }
+
+        .title{
+            flex:1;
+        }
+
+        .title h1{
+            font-size:18px;
+            color:#1769e0;
+        }
+
+        .title p{
+            margin-top:2px;
+            font-size:11px;
+            color:#777;
+        }
+
+        .session-info {
+            font-size: 10px;
+            color: #d93025;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* LOGOUT BUTTON */
+        .logout-btn {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .logout-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* SEARCH */
+        .search{
+            background:#fff;
+            border-radius:18px;
+            padding:12px 15px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            box-shadow:0 3px 15px rgba(0,0,0,.06);
+            margin-bottom:15px;
+        }
+
+        .search span{
+            font-size:18px;
+        }
+
+        .search input{
+            width:100%;
+            border:0;
+            outline:0;
+            font-size:14px;
+            background:transparent;
+        }
+
+        .section-title{
+            font-size:16px;
+            font-weight:bold;
+            margin:5px 5px 10px;
+        }
+
+        /* FEATURES GRID */
+        .features{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:12px;
+        }
+
+        .feature{
+            position:relative;
+            background:#fff;
+            border-radius:21px;
+            padding:17px;
+            min-height:155px;
+            box-shadow:0 4px 18px rgba(0,0,0,.07);
+            text-decoration:none;
+            color:#202124;
+            cursor:pointer;
+            transition:transform .15s ease, box-shadow .15s ease;
+            overflow:hidden;
+            -webkit-tap-highlight-color:transparent;
+        }
+
+        .feature:hover{
+            box-shadow:0 7px 22px rgba(0,0,0,.11);
+        }
+
+        .feature:active{
+            transform:scale(.96);
+        }
+
+        .feature::after{
+            content:"";
+            position:absolute;
+            width:80px;
+            height:80px;
+            right:-30px;
+            top:-30px;
+            border-radius:50%;
+            background:rgba(23,105,224,.08);
+            pointer-events:none;
+        }
+
+        .icon{
+            width:52px;
+            height:52px;
+            border-radius:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:27px;
+            margin-bottom:13px;
+            color:#fff;
+        }
+
+        /* GRADIENT COLORS */
+        .blue{ background: linear-gradient(135deg, #1976d2, #42a5f5); }
+        .red{ background: linear-gradient(135deg, #e53935, #ff7043); }
+        .green{ background: linear-gradient(135deg, #00a86b, #26c281); }
+        .orange{ background: linear-gradient(135deg, #f57c00, #ffb300); }
+        .purple{ background: linear-gradient(135deg, #7b1fa2, #ab47bc); }
+        .cyan{ background: linear-gradient(135deg, #00838f, #26c6da); }
+        .pink{ background: linear-gradient(135deg, #d81b60, #ec407a); }
+        .dark{ background: linear-gradient(135deg, #263238, #546e7a); }
+        .teal{ background: linear-gradient(135deg, #00695c, #26a69a); }
+        .ocean{ background: linear-gradient(135deg, #006064, #00bcd4); }
+        .forest{ background: linear-gradient(135deg, #1a237e, #00c853); }
+        .fire{ background: linear-gradient(135deg, #b71c1c, #ffab00); }
+        .gold{ background: linear-gradient(135deg, #ff8f00, #ffd54f); }
+        .ice{ background: linear-gradient(135deg, #e0f7fa, #4fc3f7); }
+
+        .feature h3{
+            font-size:15px;
+            margin-bottom:5px;
+        }
+
+        .feature p{
+            font-size:11px;
+            color:#777;
+            line-height:1.5;
+        }
+
+        .arrow{
+            position:absolute;
+            right:14px;
+            bottom:14px;
+            width:27px;
+            height:27px;
+            border-radius:50%;
+            background:#f1f3f6;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#1769e0;
+            font-size:15px;
+        }
+
+        @media(max-width:390px){
+            .features{ gap:9px; }
+            .feature{ padding:14px; min-height:145px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="logo">⚡</div>
+        <div class="title">
+            <h1>MANIK_A_RNIKA</h1>
+            <p>Admin_Log Dashboard</p>
+            <div class="session-info" id="sessionTimer">Session Active: Calculating...</div>
+        </div>
+        <button class="logout-btn" onclick="adminLogout()">🔒 Logout</button>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search">
+        <span>🔍</span>
+        <input type="text" id="search" placeholder="Search conversion tools...">
+    </div>
+
+    <div class="section-title">File Conversion Tools</div>
+
+    <!-- FEATURES -->
+    <div class="features" id="features">
+
+        <div class="feature" onclick="openTool('resume_maker.html')">
+            <div class="icon purple">📚</div>
+            <h3>Images → PDF</h3>
+            <p>Create world best Resumes Here.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('photo_studio.html')">
+            <div class="icon green">📦</div>
+            <h3>Photo & Signature merger</h3>
+            <p>Print Portal.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('file_convert.html')">
+            <div class="icon cyan">📐📦</div>
+            <h3>File Converters</h3>
+            <p>Convert files into required formats.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('RESIZE_PHOTO.html')">
+            <div class="icon ice">📐</div>
+            <h3>Photo Resizer</h3>
+            <p>Resize photos to required dimensions.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('pdfunlocker.html')">
+            <div class="icon ocean">🔑</div>
+            <h3>PDF_UNLOCKER</h3>
+            <p>Unlock encrypted Aadhar and other PDFs.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('pdfvalidetor.html')">
+            <div class="icon forest">✅</div>
+            <h3>PDF_VALIDATOR</h3>
+            <p>PDF Electronic Signature Validator.</p>
+            <div class="arrow">→</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Tool redirect function
+    function openTool(file){
+        window.location.href = file;
+    }
+
+    // Explicit Admin Logout Function
+    function adminLogout() {
+        sessionStorage.removeItem("manikarnika_admin_authenticated");
+        sessionStorage.removeItem("manikarnika_admin_login_time");
+        alert("🔒 Successfully logged out of Admin Panel.");
+        window.location.href = "index.html";
+    }
+
+    // Live Session Countdown & Timeout Watcher (10 Minutes)
+    const ADMIN_TIMEOUT = 1 * 60 * 1000; 
+    const loginTime = parseInt(sessionStorage.getItem("manikarnika_admin_login_time") || Date.now());
+
+    function updateSessionTimer() {
+        const elapsed = Date.now() - loginTime;
+        const remaining = ADMIN_TIMEOUT - elapsed;
+
+        if (remaining <= 0) {
+            alert("⏰ Admin session timed out!");
+            adminLogout();
+        } else {
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            document.getElementById("sessionTimer").innerText = 
+                `Session Expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    }
+
+    // Run timer interval every second
+    setInterval(updateSessionTimer, 1000);
+    updateSessionTimer();
+
+    // Search functionality filter
+    const search = document.getElementById("search");
+    const features = document.querySelectorAll(".feature");
+
+    search.addEventListener("input", function(){
+        const text = this.value.toLowerCase().trim();
+        features.forEach(card => {
+            const content = card.innerText.toLowerCase();
+            if(content.includes(text)){
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
