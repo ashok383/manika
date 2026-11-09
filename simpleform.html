@@ -1,30 +1,383 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MANIKARNIKA Auto Close</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahadev CSV Manager - MANIK_A_RNIKA</title>
+    <style>
+        :root{
+            --blue:#2563eb;
+            --blue-light:#eff6ff;
+            --bg:#f6f7fb;
+            --card:#ffffff;
+            --text:#111827;
+            --muted:#6b7280;
+            --border:#e5e7eb;
+            --radius:16px;
+        }
+
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            padding:20px;
+        }
+
+        .container{
+            max-width:700px;
+            margin:auto;
+        }
+
+        .header{
+            background:var(--card);
+            padding:20px;
+            border-radius:var(--radius);
+            border:1px solid var(--border);
+            margin-bottom:20px;
+            box-shadow:0 4px 15px rgba(0,0,0,.04);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .header h1{
+            font-size:18px;
+            color:var(--blue);
+        }
+
+        .header p{
+            font-size:11px;
+            color:var(--muted);
+            margin-top:2px;
+        }
+
+        .card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:20px;
+            margin-bottom:20px;
+            box-shadow:0 4px 15px rgba(0,0,0,.04);
+        }
+
+        .card h2{
+            font-size:15px;
+            margin-bottom:12px;
+        }
+
+        .form-group{
+            margin-bottom:12px;
+        }
+
+        .form-group label{
+            display:block;
+            font-size:12px;
+            font-weight:600;
+            margin-bottom:5px;
+            color:var(--muted);
+        }
+
+        .form-group input{
+            width:100%;
+            padding:10px 14px;
+            border:1px solid var(--border);
+            border-radius:10px;
+            font-size:14px;
+            outline:none;
+            transition:.15s;
+        }
+
+        .form-group input:focus{
+            border-color:var(--blue);
+            box-shadow:0 0 0 3px var(--blue-light);
+        }
+
+        .btn-group{
+            display:flex;
+            gap:10px;
+            margin-top:15px;
+        }
+
+        button{
+            padding:10px 16px;
+            border:0;
+            border-radius:10px;
+            font-size:13px;
+            font-weight:700;
+            cursor:pointer;
+            transition:.15s;
+        }
+
+        .btn-primary{
+            background:var(--blue);
+            color:#fff;
+        }
+
+        .btn-primary:hover{
+            background:#1d4ed8;
+        }
+
+        .btn-secondary{
+            background:#f3f4f6;
+            color:#374151;
+            border:1px solid var(--border);
+        }
+
+        .btn-secondary:hover{
+            background:#e5e7eb;
+        }
+
+        /* TABLE */
+        .table-container{
+            overflow-x:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:10px;
+            font-size:13px;
+        }
+
+        th, td{
+            padding:10px 12px;
+            text-align:left;
+            border-bottom:1px solid var(--border);
+        }
+
+        th{
+            background:#f9fafb;
+            color:var(--muted);
+            font-weight:700;
+        }
+
+        .file-upload-wrapper{
+            display:inline-block;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .file-upload-wrapper input[type=file]{
+            position:absolute;
+            left:0;
+            top:0;
+            opacity:0;
+            cursor:pointer;
+            height:100%;
+            width:100%;
+        }
+    </style>
 </head>
-<body style="font-family:Arial;text-align:center;padding:40px">
+<body>
 
-    <h2>Automatic Tab Closing</h2>
-    <h1 id="timer" style="font-size:60px">10</h1>
-    <p>Closing automatically in 10 seconds...</p>
+<div class="container">
 
-    <script>
-        let seconds = 10;
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <h1>MANIK_A_RNIKA</h1>
+            <p>Mahadev CSV Reader & Writer Utility</p>
+        </div>
+        <button class="btn-secondary" onclick="clearData()">Clear All</button>
+    </div>
 
-        const timer = setInterval(() => {
-            seconds--;
-            document.getElementById("timer").textContent = seconds;
+    <!-- FORM CARD (WRITE DATA) -->
+    <div class="card">
+        <h2>Add Entry to mahadev.csv</h2>
+        <form id="csvForm" onsubmit="addRow(event)">
+            <div class="form-group">
+                <label>Name / Title</label>
+                <input type="text" id="colName" placeholder="e.g. Item 1" required>
+            </div>
+            <div class="form-group">
+                <label>Category / Type</label>
+                <input type="text" id="colCategory" placeholder="e.g. Utility" required>
+            </div>
+            <div class="form-group">
+                <label>Details / Value</label>
+                <input type="text" id="colValue" placeholder="e.g. Active" required>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">Add Row</button>
+                <button type="button" class="btn-secondary" onclick="downloadCSV()">Download mahadev.csv</button>
+                
+                <div class="file-upload-wrapper">
+                    <button type="button" class="btn-secondary">Upload & Read CSV</button>
+                    <input type="file" id="csvFileInput" accept=".csv" onchange="readCSV(event)">
+                </div>
+            </div>
+        </form>
+    </div>
 
-            if (seconds <= 0) {
-                clearInterval(timer);
-                window.close();
+    <!-- TABLE CARD (DISPLAY DATA) -->
+    <div class="card">
+        <h2>Mahadev Record Table</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                </th>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:var(--muted);">No records found. Add rows or upload mahadev.csv.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                document.body.innerHTML =
-                    "<h2>Browser blocked automatic closing.</h2>";
+</div>
+
+<script>
+    let records = [];
+
+    // Load saved data from localStorage on startup
+    window.onload = function() {
+        const saved = localStorage.getItem("mahadev_records");
+        if (saved) {
+            try {
+                records = JSON.parse(saved);
+                renderTable();
+            } catch(e) {
+                records = [];
             }
-        }, 1000);
-    </script>
+        }
+    };
+
+    function addRow(e) {
+        e.preventDefault();
+        const name = document.getElementById("colName").value.trim();
+        const category = document.getElementById("colCategory").value.trim();
+        const value = document.getElementById("colValue").value.trim();
+
+        records.push({ name, category, value });
+        saveAndRender();
+        
+        document.getElementById("csvForm").reset();
+    }
+
+    function deleteRow(index) {
+        records.splice(index, 1);
+        saveAndRender();
+    }
+
+    function clearData() {
+        if (confirm("Are you sure you want to clear all records?")) {
+            records = [];
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem("mahadev_records", JSON.stringify(records));
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById("tableBody");
+        if (records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No records found. Add rows or upload mahadev.csv.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = records.map((r, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${escapeHtml(r.name)}</td>
+                <td>${escapeHtml(r.category)}</td>
+                <td>${escapeHtml(r.value)}</td>
+                <td><button onclick="deleteRow(${i})" style="padding:4px 8px; font-size:11px; background:#fee2e2; color:#dc2626; border-radius:6px; border:none; cursor:pointer;">Delete</button></td>
+            </tr>
+        `).join("");
+    }
+
+    // WRITE & DOWNLOAD mahadev.csv
+    function downloadCSV() {
+        if (records.length === 0) {
+            alert("No data available to write into mahadev.csv!");
+            return;
+        }
+
+        let csvContent = "Name,Category,Value\n";
+        records.forEach(r => {
+            csvContent += `"${r.name}","${r.category}","${r.value}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "mahadev.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // READ & UPLOAD mahadev.csv
+    function readCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            parseCSVText(text);
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSVText(text) {
+        const lines = text.split("\n");
+        let newRecords = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (!line) continue;
+
+            // Simple CSV parsing handling quotes
+            let cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (cols.length >= 3) {
+                let name = cols[0].replace(/^["']|["']$/g, "").trim();
+                let category = cols[1].replace(/^["']|["']$/g, "").trim();
+                let value = cols[2].replace(/^["']|["']$/g, "").trim();
+
+                // Skip header row if matches Name
+                if (i === 0 && name.toLowerCase() === "name") continue;
+
+                newRecords.push({ name, category, value });
+            }
+        }
+
+        if (newRecords.length > 0) {
+            records = newRecords;
+            saveAndRender();
+            alert(`Successfully read ${records.length} records from CSV file!`);
+        } else {
+            alert("Could not parse valid records from the uploaded file.");
+        }
+        
+        // Reset file input
+        document.getElementById("csvFileInput").value = "";
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+</script>
 
 </body>
 </html>
