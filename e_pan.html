@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANIK_A_RNIKA - Fixed e-PAN & PVC Card Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-3">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shrink-0">
+                <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm sm:text-base leading-tight">Fixed e-PAN & PVC Card Generator</h1>
+                <p class="text-[11px] text-slate-400">All coordinates locked to exact specifications</p>
+            </div>
+        </div>
+
+        <div class="w-full sm:w-auto flex items-center">
+            <button onclick="downloadDocument()" class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-download"></i> Download Image
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-hidden">
+        <!-- Sidebar Controls -->
+        <aside class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[88vh] space-y-4">
+            <div class="space-y-3">
+                <h2 class="font-bold text-xs uppercase tracking-wider text-blue-400">Card Data Entries</h2>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">PAN Number:</label>
+                    <input type="text" id="panNum" value="JKWKF5414U" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase font-mono">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Full Name:</label>
+                    <input type="text" id="fullName" value="YOUR NAME" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Father's Name:</label>
+                    <input type="text" id="fatherName" value="FATHER NAME" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Date of Birth:</label>
+                        <input type="text" id="dob" value="11/03/2001" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Gender:</label>
+                        <select id="gender" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs">
+                            <option value="FEMALE" selected>FEMALE</option>
+                            <option value="MALE">MALE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Upload Photo:</label>
+                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
+                            👤Choose Photo
+                            <input type="file" id="photoUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'photo')">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Upload Signature:</label>
+                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
+                            ✍️  Choose Sign
+                            <input type="file" id="sigUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'signature')">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Workspace -->
+        <main class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-auto min-h-[600px] relative">
+            <canvas id="epanCanvas" class="shadow-2xl rounded border border-slate-700 bg-white max-w-full h-auto" width="864" height="1224"></canvas>
+        </main>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('epanCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let bgImage = new Image();
+        let userPhoto = new Image();
+        let userSignature = new Image();
+
+        bgImage.src = 'e_pan.jpeg';
+
+        // Locked Coordinates as requested
+        const POS = {
+            main: {
+                pan:       { x: 312, y: 239, size: 24 },
+                name:      { x: 260, y: 289, size: 18 },
+                father:    { x: 260, y: 340, size: 18 },
+                dob:       { x: 259, y: 387, size: 16 },
+                gender:    { x: 262, y: 433, size: 16 },
+                photo:     { x: 63,  y: 456, size: 120, h: 150 },
+                signature: { x: 270, y: 487, size: 190, h: 60 }
+            },
+            pvc: {
+                pan:       { x: 161, y: 1068, size: 13 },
+                name:      { x: 71,  y: 1105, size: 9 },
+                father:    { x: 73,  y: 1132, size: 9 },
+                dob:       { x: 71,  y: 1171, size: 9 },
+                photo:     { x: 70,  y: 1009, size: 55, h: 68 },
+                signature: { x: 170, y: 1127, size: 95, h: 30 }
+            }
+        };
+
+        const SAMPLE_PHOTO = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240" viewBox="0 0 200 240"><rect width="200" height="240" fill="%23cbd5e1"/><circle cx="100" cy="85" r="40" fill="%23334155"/><path d="M 25 210 Q 100 130 175 210" stroke="%231e293b" stroke-width="30" fill="none"/></svg>`;
+        const SAMPLE_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><path d="M 10 40 Q 50 10 80 35 T 150 25 Q 180 50 190 20" stroke="%231e3a8a" stroke-width="3" fill="none"/></svg>`;
+
+        window.onload = function() {
+            ['panNum', 'fullName', 'fatherName', 'dob', 'gender'].forEach(id => {
+                document.getElementById(id).addEventListener('input', renderCanvas);
+            });
+
+            userPhoto.src = SAMPLE_PHOTO;
+            userSignature.src = SAMPLE_SIGNATURE;
+
+            bgImage.onload = () => {
+                canvas.width = bgImage.naturalWidth;
+                canvas.height = bgImage.naturalHeight;
+                renderCanvas();
+            };
+
+            userPhoto.onload = () => renderCanvas();
+            userSignature.onload = () => renderCanvas();
+        };
+
+        function handleImageUpload(e, type) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (type === 'photo') {
+                            userPhoto = img;
+                        } else if (type === 'signature') {
+                            userSignature = img;
+                        }
+                        renderCanvas();
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderCanvas() {
+            if (!bgImage.complete || bgImage.naturalWidth === 0) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+            const pan = document.getElementById('panNum').value.toUpperCase();
+            const name = document.getElementById('fullName').value.toUpperCase();
+            const father = document.getElementById('fatherName').value.toUpperCase();
+            const dob = document.getElementById('dob').value;
+            const gender = document.getElementById('gender').value;
+
+            // 1. MAIN TABLE / e-PAN SECTION
+            ctx.fillStyle = '#0f172a';
+            ctx.font = `bold ${POS.main.pan.size}px Roboto, sans-serif`;
+            ctx.fillText(pan, POS.main.pan.x, POS.main.pan.y);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = `bold ${POS.main.name.size}px Roboto, sans-serif`;
+            ctx.fillText(name, POS.main.name.x, POS.main.name.y);
+
+            ctx.font = `bold ${POS.main.father.size}px Roboto, sans-serif`;
+            ctx.fillText(father, POS.main.father.x, POS.main.father.y);
+
+            ctx.font = `${POS.main.dob.size}px Roboto, sans-serif`;
+            ctx.fillText(dob, POS.main.dob.x, POS.main.dob.y);
+
+            ctx.font = `${POS.main.gender.size}px Roboto, sans-serif`;
+            ctx.fillText(gender, POS.main.gender.x, POS.main.gender.y);
+
+            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
+                ctx.drawImage(userPhoto, POS.main.photo.x, POS.main.photo.y, POS.main.photo.size, POS.main.photo.h);
+            }
+
+            if (userSignature.complete && userSignature.naturalWidth !== 0) {
+                ctx.drawImage(userSignature, POS.main.signature.x, POS.main.signature.y, POS.main.signature.size, POS.main.signature.h);
+            }
+
+            // 2. PVC TABLE SECTION
+            ctx.fillStyle = '#0f172a';
+            ctx.font = `bold ${POS.pvc.pan.size}px Roboto, sans-serif`;
+            ctx.fillText(pan, POS.pvc.pan.x, POS.pvc.pan.y);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = `bold ${POS.pvc.name.size}px Roboto, sans-serif`;
+            ctx.fillText(name, POS.pvc.name.x, POS.pvc.name.y);
+
+            ctx.font = `bold ${POS.pvc.father.size}px Roboto, sans-serif`;
+            ctx.fillText(father, POS.pvc.father.x, POS.pvc.father.y);
+
+            ctx.font = `${POS.pvc.dob.size}px Roboto, sans-serif`;
+            ctx.fillText(dob, POS.pvc.dob.x, POS.pvc.dob.y);
+
+            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
+                ctx.drawImage(userPhoto, POS.pvc.photo.x, POS.pvc.photo.y, POS.pvc.photo.size, POS.pvc.photo.h);
+            }
+
+            if (userSignature.complete && userSignature.naturalWidth !== 0) {
+                ctx.drawImage(userSignature, POS.pvc.signature.x, POS.pvc.signature.y, POS.pvc.signature.size, POS.pvc.signature.h);
+            }
+        }
+
+        function downloadDocument() {
+            try {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = `filled_epan_pvc_${document.getElementById('panNum').value.trim() || 'card'}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                const dataURL = canvas.toDataURL('image/png');
+                const newWindow = window.open();
+                if (newWindow) {
+                    newWindow.document.write(`<img src="${dataURL}" alt="Generated PAN Card" style="max-width:100%;height:auto;"/><p>Long-press or right-click the image to save.</p>`);
+                } else {
+                    alert("Popup blocked! Please allow popups or check browser download settings.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
