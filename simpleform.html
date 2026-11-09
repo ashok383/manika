@@ -2,47 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Send OTP Example</title>
+    <title>OTP Sender - MANIK_A_RNIKA</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f7fb; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 320px; }
+        h2 { font-size: 18px; color: #2563eb; margin-bottom: 15px; }
+        input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; }
+        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        #status { margin-top: 10px; font-size: 12px; color: #555; text-align: center; }
+    </style>
 </head>
 <body>
 
-    <div style="max-width: 300px; margin: 50px auto; font-family: Arial;">
-        <h2>Mobile Verification</h2>
-        <input type="text" id="mobile" placeholder="Enter Mobile Number (e.g., +91...)" style="width: 100%; padding: 8px; margin-bottom: 10px;">
-        <button onclick="sendOTP()" style="width: 100%; padding: 8px; background: #2563eb; color: white; border: none; cursor: pointer;">Send OTP</button>
-        <p id="status" style="margin-top: 10px; font-size: 13px; color: #555;"></p>
-    </div>
+<div class="box">
+    <h2>Mobile Verification</h2>
+    <input type="text" id="mobile" placeholder="Enter Mobile (e.g. +917680078196)">
+    <button onclick="sendOTP()">Send OTP</button>
+    <p id="status"></p>
+</div>
 
-    <script>
-        async function sendOTP() {
-            const mobile = document.getElementById('mobile').value;
-            const statusEl = document.getElementById('status');
+<script>
+    async function sendOTP() {
+        const mobile = document.getElementById('mobile').value.trim();
+        const statusEl = document.getElementById('status');
+        if (!mobile) { statusEl.innerText = "Please enter a mobile number."; return; }
 
-            if (!mobile) {
-                statusEl.innerText = "Please enter a valid mobile number.";
-                return;
+        statusEl.innerText = "Sending...";
+
+        try {
+            const response = await fetch('http://localhost:3000/api/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mobile })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                statusEl.style.color = "green";
+                statusEl.innerText = data.message;
+            } else {
+                statusEl.style.color = "red";
+                statusEl.innerText = "Error: " + data.message;
             }
-
-            statusEl.innerText = "Sending OTP...";
-
-            try {
-                // Call your backend server endpoint
-                const response = await fetch('https://your-backend-server.com/api/send-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mobile: mobile })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    statusEl.innerText = "OTP sent successfully!";
-                } else {
-                    statusEl.innerText = "Error: " + data.message;
-                }
-            } catch (error) {
-                statusEl.innerText = "Network error. Please try again.";
-            }
+        } catch (err) {
+            statusEl.style.color = "red";
+            statusEl.innerText = "Network Error: Make sure your Node.js backend is running!";
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
