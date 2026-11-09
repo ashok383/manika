@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MANIK_A_RNIKA</title>
     
-    <!-- Security Guard: Blocks direct URL access, auto-logs out on page reload, & handles 10-minute timeout -->
+    <!-- Security Guard & Inline Authentication: Prompts for admin123 password if not authenticated -->
     <script>
         (function() {
             // Check if page was just reloaded using Navigation Timing API
@@ -14,7 +14,6 @@
                 (performance.navigation && performance.navigation.type === 1);
 
             if (isReloaded) {
-                // Clear session credentials immediately on refresh
                 sessionStorage.removeItem("manikarnika_admin_authenticated");
                 sessionStorage.removeItem("manikarnika_admin_login_time");
                 alert("🔄 Page reloaded. You have been logged out securely.");
@@ -22,17 +21,26 @@
                 return;
             }
 
-            const adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
-            const adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
+            let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
+            let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
             const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
+            // If not authenticated or session expired, challenge for password
             if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
-                // Clear expired or invalid session data
                 sessionStorage.removeItem("manikarnika_admin_authenticated");
                 sessionStorage.removeItem("manikarnika_admin_login_time");
+
+                let pin = prompt("🔐 Enter Admin Password (admin123) to access Admin Panel:");
                 
-                alert("🚫 Unauthorized access or session expired! Please log in with admin credentials first.");
-                window.location.href = "index.html";
+                if (pin === null || pin.trim() !== "admin123") {
+                    alert("❌ Authentication failed or cancelled. Redirecting to home.");
+                    window.location.href = "index.html";
+                    return;
+                } else {
+                    // Success: set credentials
+                    sessionStorage.setItem("manikarnika_admin_authenticated", "true");
+                    sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
+                }
             }
         })();
     </script>
@@ -342,7 +350,7 @@
     }
 
     // Live Session Countdown & Timeout Watcher (10 Minutes)
-    const ADMIN_TIMEOUT = 1 * 60 * 1000; 
+    const ADMIN_TIMEOUT = 10 * 60 * 1000; 
     const loginTime = parseInt(sessionStorage.getItem("manikarnika_admin_login_time") || Date.now());
 
     function updateSessionTimer() {
