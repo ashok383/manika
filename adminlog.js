@@ -41,7 +41,7 @@ function adminlog() {
         alert("🔒 Admin Authentication Successful! Opening Dashboard...");
         
         // Redirect to the protected admin HTML file
-        window.location.href = "admin-dashboard.html";
+        window.location.href = "adminlog.html";
     } else {
         alert("❌ Incorrect Admin Password!");
     }
