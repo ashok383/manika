@@ -1,1229 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-      <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MANIK_A_RNIKA</title>
     
-    <!-- Security Guard: Blocks direct URL access -->
+    <!-- Security Guard: Blocks direct URL access, auto-logs out on page reload, & handles 10-minute timeout -->
     <script>
         (function() {
+            // Check if page was just reloaded using Navigation Timing API
+            const isReloaded = 
+                (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "reload") ||
+                (performance.navigation && performance.navigation.type === 1);
+
+            if (isReloaded) {
+                // Clear session credentials immediately on refresh
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+                alert("🔄 Page reloaded. You have been logged out securely.");
+                window.location.href = "index.html";
+                return;
+            }
+
             const adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
             const adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
             const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
-            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - adminLoginTime > ADMIN_TIMEOUT)) {
+            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
                 // Clear expired or invalid session data
                 sessionStorage.removeItem("manikarnika_admin_authenticated");
                 sessionStorage.removeItem("manikarnika_admin_login_time");
                 
-                alert("🚫 Unauthorized access! Please log in with admin credentials first.");
-                // Immediately kick them back to home page
+                alert("🚫 Unauthorized access or session expired! Please log in with admin credentials first.");
                 window.location.href = "index.html";
             }
         })();
     </script>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1.0">
-
-<title>MANIK-A-RNIKA | ADMIN_LOG</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,"Segoe UI",sans-serif;
-}
-
-body{
-    min-height:100vh;
-    background:#f1f3f6;
-    color:#202124;
-    padding:12px;
-}
-
-.app{
-    width:100%;
-    max-width:650px;
-    margin:auto;
-}
-
-/* TOP BAR */
-
-.topbar{
-    background:#fff;
-    border-radius:22px;
-    padding:16px;
-    display:flex;
-    align-items:center;
-    gap:13px;
-    box-shadow:0 4px 18px rgba(0,0,0,.08);
-    margin-bottom:14px;
-}
-
-.logo{
-    width:48px;
-    height:48px;
-    border-radius:15px;
-
-    background:linear-gradient(
-        135deg,
-        #1769e0,
-        #42a5f5
-    );
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    color:white;
-    font-size:25px;
-
-    box-shadow:
-        0 5px 15px
-        rgba(23,105,224,.25);
-}
-
-.title{
-    flex:1;
-}
-
-.title h1{
-    font-size:20px;
-    color:#1769e0;
-}
-
-.title p{
-    margin-top:3px;
-    font-size:11px;
-    color:#777;
-}
-
-/* SEARCH */
-
-.search{
-    background:#fff;
-    border-radius:18px;
-    padding:12px 15px;
-
-    display:flex;
-    align-items:center;
-    gap:10px;
-
-    box-shadow:
-        0 3px 15px
-        rgba(0,0,0,.06);
-
-    margin-bottom:15px;
-}
 
-.search span{
-    font-size:18px;
-}
-
-.search input{
-    width:100%;
-    border:0;
-    outline:0;
-    font-size:14px;
-    background:transparent;
-}
-
-/* SECTION */
-
-.section-title{
-    font-size:16px;
-    font-weight:bold;
-    margin:5px 5px 10px;
-}
-
-/* FEATURES */
-
-.features{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
-}
-
-/* CARD */
-
-.feature{
-    position:relative;
-    background:#fff;
-    border-radius:21px;
-    padding:17px;
-    min-height:155px;
-
-    box-shadow:
-        0 4px 18px
-        rgba(0,0,0,.07);
-
-    text-decoration:none;
-    color:#202124;
-
-    cursor:pointer;
-
-    transition:
-        transform .15s ease,
-        box-shadow .15s ease;
-
-    overflow:hidden;
-
-    -webkit-tap-highlight-color:
-        transparent;
-}
-
-.feature:hover{
-    box-shadow:
-        0 7px 22px
-        rgba(0,0,0,.11);
-}
-
-.feature:active{
-    transform:scale(.96);
-}
-
-/* Shine */
-
-.feature::after{
-    content:"";
-
-    position:absolute;
-
-    width:80px;
-    height:80px;
-
-    right:-30px;
-    top:-30px;
-
-    border-radius:50%;
-
-    background:
-        rgba(23,105,224,.08);
-
-    pointer-events:none;
-}
-
-/* ICON */
-
-.icon{
-    width:52px;
-    height:52px;
-
-    border-radius:16px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:27px;
-
-    margin-bottom:13px;
-
-    color:#fff;
-}
-
-/* COLORS */
-
-/* --- MANIKARNIKA - ALL GRADIENT COLORS COLLECTION --- */
-
-/* Original 8 - Enhanced */
-.blue{
-    background: linear-gradient(135deg, #1976d2, #42a5f5);
-}
-.red{
-    background: linear-gradient(135deg, #e53935, #ff7043);
-}
-.green{
-    background: linear-gradient(135deg, #00a86b, #26c281);
-}
-.orange{
-    background: linear-gradient(135deg, #f57c00, #ffb300);
-}
-.purple{
-    background: linear-gradient(135deg, #7b1fa2, #ab47bc);
-}
-.cyan{
-    background: linear-gradient(135deg, #00838f, #26c6da);
-}
-.pink{
-    background: linear-gradient(135deg, #d81b60, #ec407a);
-}
-.dark{
-    background: linear-gradient(135deg, #263238, #546e7a);
-}
-
-/* New - All Types Added */
-.yellow{
-    background: linear-gradient(135deg, #f9a825, #ffeb3b);
-}
-.teal{
-    background: linear-gradient(135deg, #00695c, #26a69a);
-}
-.lime{
-    background: linear-gradient(135deg, #558b2f, #8bc34a);
-}
-.indigo{
-    background: linear-gradient(135deg, #283593, #5c6bc0);
-}
-.brown{
-    background: linear-gradient(135deg, #4e342e, #8d6e63);
-}
-.grey{
-    background: linear-gradient(135deg, #616161, #bdbdbd);
-}
-.navy{
-    background: linear-gradient(135deg, #0d47a1, #42a5f5);
-}
-.coral{
-    background: linear-gradient(135deg, #ff5252, #ff8a65);
-}
-.mint{
-    background: linear-gradient(135deg, #1b5e20, #66bb6a);
-}
-.peach{
-    background: linear-gradient(135deg, #e65100, #ffab91);
-}
-.lavender{
-    background: linear-gradient(135deg, #4527a0, #7e57c2);
-}
-.sky{
-    background: linear-gradient(135deg, #01579b, #29b6f6);
-}
-.rose{
-    background: linear-gradient(135deg, #880e4f, #f06292);
-}
-.olive{
-    background: linear-gradient(135deg, #33691e, #9ccc65);
-}
-.gold{
-    background: linear-gradient(135deg, #ff8f00, #ffd54f);
-}
-.slate{
-    background: linear-gradient(135deg, #37474f, #90a4ae);
-}
-.sunset{
-    background: linear-gradient(135deg, #ff1744, #ff9100);
-}
-.ocean{
-    background: linear-gradient(135deg, #006064, #00bcd4);
-}
-.forest{
-    background: linear-gradient(135deg, #1a237e, #00c853);
-}
-.berry{
-    background: linear-gradient(135deg, #4a148c, #e040fb);
-}
-.fire{
-    background: linear-gradient(135deg, #b71c1c, #ffab00);
-}
-.ice{
-    background: linear-gradient(135deg, #e0f7fa, #4fc3f7);
-}
-.midnight{
-    background: linear-gradient(135deg, #000000, #434343);
-}
-.royal{
-    background: linear-gradient(135deg, #311b92, #e91e63);
-}
-
-/* TEXT */
-
-.feature h3{
-    font-size:15px;
-    margin-bottom:5px;
-}
-
-.feature p{
-    font-size:11px;
-    color:#777;
-    line-height:1.5;
-}
-
-/* ARROW */
-
-.arrow{
-    position:absolute;
-
-    right:14px;
-    bottom:14px;
-
-    width:27px;
-    height:27px;
-
-    border-radius:50%;
-
-    background:#f1f3f6;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    color:#1769e0;
-
-    font-size:15px;
-}
-
-/* QUICK */
-
-.quick{
-    margin-top:18px;
-
-    background:#1769e0;
-    color:#fff;
-
-    border-radius:22px;
-
-    padding:18px;
-
-    box-shadow:
-        0 8px 25px
-        rgba(23,105,224,.25);
-}
-
-.quick h2{
-    font-size:17px;
-}
-
-.quick p{
-    font-size:11px;
-    opacity:.85;
-    margin-top:5px;
-}
-
-.quick-buttons{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin-top:14px;
-}
-
-.quick-btn{
-    background:
-        rgba(255,255,255,.15);
-
-    color:#fff;
-
-    border:1px solid
-        rgba(255,255,255,.18);
-
-    border-radius:14px;
-
-    padding:10px 5px;
-
-    text-align:center;
-
-    text-decoration:none;
-
-    font-size:10px;
-
-    cursor:pointer;
-
-    transition:.15s;
-}
-
-.quick-btn:active{
-    transform:scale(.95);
-}
-
-.quick-btn span{
-    display:block;
-    font-size:20px;
-    margin-bottom:4px;
-}
-
-/* FOOTER */
-
-.footer{
-    text-align:center;
-    color:#999;
-    font-size:10px;
-    padding:20px 5px;
-}
-
-/* MOBILE */
-
-@media(max-width:390px){
-
-    .features{
-        gap:9px;
-    }
-
-    .feature{
-        padding:14px;
-        min-height:145px;
-    }
-
-    .icon{
-        width:47px;
-        height:47px;
-        font-size:24px;
-    }
-
-    .feature h3{
-        font-size:14px;
-    }
-
-}
-
-</style>
+    <style>
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:Arial,"Segoe UI",sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:#f1f3f6;
+            color:#202124;
+            padding:12px;
+        }
+
+        .app{
+            width:100%;
+            max-width:650px;
+            margin:auto;
+        }
+
+        /* TOP BAR */
+        .topbar{
+            background:#fff;
+            border-radius:22px;
+            padding:16px;
+            display:flex;
+            align-items:center;
+            gap:13px;
+            box-shadow:0 4px 18px rgba(0,0,0,.08);
+            margin-bottom:14px;
+        }
+
+        .logo{
+            width:48px;
+            height:48px;
+            border-radius:15px;
+            background:linear-gradient(135deg, #1769e0, #42a5f5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-size:25px;
+            box-shadow:0 5px 15px rgba(23,105,224,.25);
+        }
+
+        .title{
+            flex:1;
+        }
+
+        .title h1{
+            font-size:18px;
+            color:#1769e0;
+        }
+
+        .title p{
+            margin-top:2px;
+            font-size:11px;
+            color:#777;
+        }
+
+        .session-info {
+            font-size: 10px;
+            color: #d93025;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* LOGOUT BUTTON */
+        .logout-btn {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .logout-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* SEARCH */
+        .search{
+            background:#fff;
+            border-radius:18px;
+            padding:12px 15px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            box-shadow:0 3px 15px rgba(0,0,0,.06);
+            margin-bottom:15px;
+        }
+
+        .search span{
+            font-size:18px;
+        }
+
+        .search input{
+            width:100%;
+            border:0;
+            outline:0;
+            font-size:14px;
+            background:transparent;
+        }
+
+        .section-title{
+            font-size:16px;
+            font-weight:bold;
+            margin:5px 5px 10px;
+        }
+
+        /* FEATURES GRID */
+        .features{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:12px;
+        }
+
+        .feature{
+            position:relative;
+            background:#fff;
+            border-radius:21px;
+            padding:17px;
+            min-height:155px;
+            box-shadow:0 4px 18px rgba(0,0,0,.07);
+            text-decoration:none;
+            color:#202124;
+            cursor:pointer;
+            transition:transform .15s ease, box-shadow .15s ease;
+            overflow:hidden;
+            -webkit-tap-highlight-color:transparent;
+        }
+
+        .feature:hover{
+            box-shadow:0 7px 22px rgba(0,0,0,.11);
+        }
+
+        .feature:active{
+            transform:scale(.96);
+        }
+
+        .feature::after{
+            content:"";
+            position:absolute;
+            width:80px;
+            height:80px;
+            right:-30px;
+            top:-30px;
+            border-radius:50%;
+            background:rgba(23,105,224,.08);
+            pointer-events:none;
+        }
+
+        .icon{
+            width:52px;
+            height:52px;
+            border-radius:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:27px;
+            margin-bottom:13px;
+            color:#fff;
+        }
+
+        /* GRADIENT COLORS */
+        .blue{ background: linear-gradient(135deg, #1976d2, #42a5f5); }
+        .red{ background: linear-gradient(135deg, #e53935, #ff7043); }
+        .green{ background: linear-gradient(135deg, #00a86b, #26c281); }
+        .orange{ background: linear-gradient(135deg, #f57c00, #ffb300); }
+        .purple{ background: linear-gradient(135deg, #7b1fa2, #ab47bc); }
+        .cyan{ background: linear-gradient(135deg, #00838f, #26c6da); }
+        .pink{ background: linear-gradient(135deg, #d81b60, #ec407a); }
+        .dark{ background: linear-gradient(135deg, #263238, #546e7a); }
+        .teal{ background: linear-gradient(135deg, #00695c, #26a69a); }
+        .ocean{ background: linear-gradient(135deg, #006064, #00bcd4); }
+        .forest{ background: linear-gradient(135deg, #1a237e, #00c853); }
+        .fire{ background: linear-gradient(135deg, #b71c1c, #ffab00); }
+        .gold{ background: linear-gradient(135deg, #ff8f00, #ffd54f); }
+        .ice{ background: linear-gradient(135deg, #e0f7fa, #4fc3f7); }
+
+        .feature h3{
+            font-size:15px;
+            margin-bottom:5px;
+        }
+
+        .feature p{
+            font-size:11px;
+            color:#777;
+            line-height:1.5;
+        }
+
+        .arrow{
+            position:absolute;
+            right:14px;
+            bottom:14px;
+            width:27px;
+            height:27px;
+            border-radius:50%;
+            background:#f1f3f6;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#1769e0;
+            font-size:15px;
+        }
+
+        @media(max-width:390px){
+            .features{ gap:9px; }
+            .feature{ padding:14px; min-height:145px; }
+        }
+    </style>
 </head>
-
 
 <body>
 
 <div class="app">
 
-
-<!-- TOP BAR -->
-
-<div class="topbar">
-
-    <div class="logo">
-        ⚡
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="logo">⚡</div>
+        <div class="title">
+            <h1>MANIK_A_RNIKA</h1>
+            <p>Admin_Log Dashboard</p>
+            <div class="session-info" id="sessionTimer">Session Active: Calculating...</div>
+        </div>
+        <button class="logout-btn" onclick="adminLogout()">🔒 Logout</button>
     </div>
 
-    <div class="title">
-
-        <h1>
-            MANIK_A_RNIKA
-        </h1>
-
-
-        <p>
-            Admin_Log
-        </p>
-
+    <!-- SEARCH -->
+    <div class="search">
+        <span>🔍</span>
+        <input type="text" id="search" placeholder="Search conversion tools...">
     </div>
 
-</div>
-
-
-<!-- SEARCH -->
-
-<div class="search">
-
-    <span>🔍</span>
-
-    <input
-        type="text"
-        id="search"
-        placeholder="Search conversion tools..."
-    >
-
-</div>
-
-
-<div class="section-title">
-    File Conversion
-</div>
-
-
-<!-- ======================================
-     FEATURES
-====================================== -->
-
-<div
-    class="features"
-    id="features"
->
-<!-- IMAGE TO PDF -->
-
-<div
-    class="feature"
-    onclick="openTool('resume_maker.html')"
->
-
-    <div class="icon purple">
-        📚
-    </div>
-
-    <h3>
-        Images → PDF
-    </h3>
-
-    <p>
-        Create world best Resumes Here .
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-
-<div
-    class="feature"
-    onclick="openTool('photo_studio.html')"
->
-
-    <div class="icon green">
-        📦
-    </div>
-
-    <h3>
-        Photo & Signature merger
-    </h3>
-
-    <p>
-        Print Portal .
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-
-
-<!-- PDF COMPRESSOR -->
-
-<div
-    class="feature"
-    onclick="openTool('file_convert.html')"
->
-
-    <div class="icon cyan">
-        📐📦
-    </div>
-
-    <h3>
-        file converters
-    </h3>
-
-    <p>
-        Convert files in to required
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- PHOTO RESIZER -->
-
-<div
-    class="feature"
-    onclick="openTool('RESIZE_PHOTO.html')"
->
-
-    <div class="icon ice">
-        📐
-    </div>
-
-    <h3>
-        Photo Resizer
-    </h3>
-
-    <p>
-        Resize photos to your
-        required dimensions.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-<!-- JPEG TO PDF -->
-      <div
-    class="feature"
-    onclick="openTool('pdfunlocker.html')"
->
-          <div class="icon ocean">
-        🔑
-    </div>
-
-    <h3>
-        PDF_UNLOCKER
-    </h3>
-
-    <p>
-        PDF unlocker for Adhar and Other pdf enscrypted .
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-<div
-    class="feature"
-    onclick="openTool('pdfvalidetor.html')"
->
-    <div class="icon forest">
-        ✅
-    </div>
-
-    <h3>
-        PDF_VALIDETOR
-    </h3>
-
-    <p>
-       PDF Electroinc Signature Validetor.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-<div
-    class="feature"
-    onclick="openTool('singlepdf_to_multiplepdf.html')"
->
-    <div class="icon fire">
-        📚
-    </div>
-
-    <h3>
-        PDF=(PDF+PDF)
-    </h3>
-
-    <p>
-        single pdf to making Multiple file pdf.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-<!-- JPEG TO PDF -->
-
-<div
-    class="feature"
-    onclick="openTool('multiplepdf_to_singlepdf.html')"
->
-          <div class="icon teal">
-        📚
-    </div>
-
-    <h3>
-        (PDF+PDF)=PDF
-    </h3>
-
-    <p>
-        Multiple pdf to making single file pdf.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-<!-- JPEG TO PDF -->
-
-<div
-    class="feature"
-    onclick="openTool('JPEGS _TO_PDF.html')"
->
-
-    <div class="icon blue">
-        🖼️
-    </div>
-
-    <h3>
-        JPEG → PDF
-    </h3>
-
-    <p>
-        Convert one or multiple
-        JPEG images into PDF.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- PDF TO JPEG -->
-
-<div
-    class="feature"
-    onclick="openTool('PDF_TO_JPEGS.html')"
->
-
-    <div class="icon red">
-        📄
-    </div>
-
-    <h3>
-        PDF → JPEG
-    </h3>
-
-    <p>
-        Convert PDF pages into
-        high-quality JPG images.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-<!-- PDF TO WORD -->
-
-<div
-    class="feature"
-    onclick="openTool('PDF_TO_WORD.html')"
->
-
-    <div class="icon gold">
-        📘
-    </div>
-
-    <h3>
-        PDF → WORD
-    </h3>
-
-    <p>
-        Convert one or multiple
-        PDF  into WORD.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- WORD TO PDF -->
-
-<div
-    class="feature"
-    onclick="openTool('WORD_TO_PDF.html')"
->
-
-    <div class="icon cyan">
-        📕
-    </div>
-
-    <h3>
-        WORD → PDF
-    </h3>
-
-    <p>
-        Convert WORD file into
-        PDF file.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- JPG TO PNG -->
-
-<div
-    class="feature"
-    onclick="openTool('JPG&JPEG_TO_PNG.html')"
->
-
-    <div class="icon green">
-        🖼️
-    </div>
-
-    <h3>
-        JPG → PNG
-    </h3>
-
-    <p>
-        Convert JPG photos into
-        PNG images.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- PNG TO JPG -->
-
-<div
-    class="feature"
-    onclick="openTool('PNG_TO_JPG&JPEG.html')"
->
-
-    <div class="icon orange">
-        🔄
-    </div>
-
-    <h3>
-        PNG → JPG
-    </h3>
-
-    <p>
-        Convert PNG images into
-        compressed JPG format.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-
-
-</div>
-
-
-
-
-
-<!-- PHOTO TOOL -->
-
-<div
-    class="feature"
-    onclick="openTool('photo_maker.html')"
->
-
-    <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-</div>
-
-
-<!-- MORE TOOLS -->
-
-<div
-    class="feature"
-    onclick="openTool('file-tools.html')"
->
-       <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-
-</div>
-      
-<div
-    class="feature"
-    onclick="openTool('file-tools.html')"
->
-       <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-
-</div>
-      
-<div
-    class="feature"
-    onclick="openTool('file-tools.html')"
->
-       <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-
-</div>
-      
-<div
-    class="feature"
-    onclick="openTool('file-tools.html')"
->
-       <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
- </div>
-      
-      <div
-    class="feature"
-    onclick="openTool('file-tools.html')"
->
-       <div class="icon dark">
-        📸
-    </div>
-
-    <h3>
-        Photo Tool
-    </h3>
-
-    <p>
-        Create passport photos
-        and photo sheets.
-    </p>
-
-    <div class="arrow">
-        →
-    </div>
-
-
-</div>
-</div>
-
-<!-- ======================================
-     QUICK CONVERSION
-====================================== -->
-
-<div class="quick">
-
-    <h2>
-        ⚡ Quick Conversion
-    </h2>
-
-    <p>
-        Choose a frequently used tool
-        and start immediately.
-    </p>
-
-
-    <div class="quick-buttons">
-
-
-        <div
-            class="quick-btn"
-            onclick="openTool('jpeg-to-pdf.html')"
-        >
-
-            <span>🖼️</span>
-
-            JPEG PDF
-
+    <div class="section-title">File Conversion Tools</div>
+
+    <!-- FEATURES -->
+    <div class="features" id="features">
+
+        <div class="feature" onclick="openTool('resume_maker.html')">
+            <div class="icon purple">📚</div>
+            <h3>Images → PDF</h3>
+            <p>Create world best Resumes Here.</p>
+            <div class="arrow">→</div>
         </div>
 
-
-        <div
-            class="quick-btn"
-            onclick="openTool('simpleform.html')"
-        >
-
-            <span>📄</span>
-
-            PDF JPG
-
+        <div class="feature" onclick="openTool('photo_studio.html')">
+            <div class="icon green">📦</div>
+            <h3>Photo & Signature merger</h3>
+            <p>Print Portal.</p>
+            <div class="arrow">→</div>
         </div>
 
-
-        <div
-            class="quick-btn"
-            onclick="openTool('photo-compressor.html')"
-        >
-
-            <span>📦</span>
-
-            Compress
-
+        <div class="feature" onclick="openTool('file_convert.html')">
+            <div class="icon cyan">📐📦</div>
+            <h3>File Converters</h3>
+            <p>Convert files into required formats.</p>
+            <div class="arrow">→</div>
         </div>
 
+        <div class="feature" onclick="openTool('RESIZE_PHOTO.html')">
+            <div class="icon ice">📐</div>
+            <h3>Photo Resizer</h3>
+            <p>Resize photos to required dimensions.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('pdfunlocker.html')">
+            <div class="icon ocean">🔑</div>
+            <h3>PDF_UNLOCKER</h3>
+            <p>Unlock encrypted Aadhar and other PDFs.</p>
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="feature" onclick="openTool('pdfvalidetor.html')">
+            <div class="icon forest">✅</div>
+            <h3>PDF_VALIDATOR</h3>
+            <p>PDF Electronic Signature Validator.</p>
+            <div class="arrow">→</div>
+        </div>
 
     </div>
 
 </div>
-<!-- ======================================
-     QUICK CONVERSION
-====================================== -->
-
-<div class="quick">
-
-    <h2>
-        ⚡ Quick Conversion
-    </h2>
-
-    <p>
-        Choose a frequently used tool
-        and start immediately.
-    </p>
-
-
-    <div class="quick-buttons">
-
-
-        <div
-            class="quick-btn"
-            onclick="openTool('jpeg-to-pdf.html')"
-        >
-
-            <span>🖼️</span>
-
-            JPEG PDF
-
-        </div>
-
-
-        <div
-            class="quick-btn"
-            onclick="openTool('simpleform.html')"
-        >
-
-            <span>📄</span>
-
-            PDF JPG
-
-        </div>
-
-
-        <div
-            class="quick-btn"
-            onclick="openTool('photo-compressor.html')"
-        >
-
-            <span>📦</span>
-
-            Compress
-
-        </div>
-
-
-    </div>
-
-</div>
-
-
-<!-- FOOTER -->
-
-
-
-</div>
-
 
 <script>
-
-/* =========================================
-   OPEN TOOL FUNCTION
-========================================= */
-
-function openTool(file){
-
-    window.location.href = file;
-
-}
-
-
-/* =========================================
-   SEARCH
-========================================= */
-
-const search =
-document.getElementById("search");
-
-const features =
-document.querySelectorAll(".feature");
-
-
-search.addEventListener(
-    "input",
-    function(){
-
-        const text =
-            this.value
-            .toLowerCase()
-            .trim();
-
-
-        features.forEach(
-            card => {
-
-                const content =
-                    card.innerText
-                    .toLowerCase();
-
-
-                if(
-                    content.includes(text)
-                ){
-
-                    card.style.display =
-                        "";
-
-                }
-                else{
-
-                    card.style.display =
-                        "none";
-
-                }
-
-            }
-        );
-
+    // Tool redirect function
+    function openTool(file){
+        window.location.href = file;
     }
-);
 
+    // Explicit Admin Logout Function
+    function adminLogout() {
+        sessionStorage.removeItem("manikarnika_admin_authenticated");
+        sessionStorage.removeItem("manikarnika_admin_login_time");
+        alert("🔒 Successfully logged out of Admin Panel.");
+        window.location.href = "index.html";
+    }
+
+    // Live Session Countdown & Timeout Watcher (10 Minutes)
+    const ADMIN_TIMEOUT = 10 * 60 * 1000; 
+    const loginTime = parseInt(sessionStorage.getItem("manikarnika_admin_login_time") || Date.now());
+
+    function updateSessionTimer() {
+        const elapsed = Date.now() - loginTime;
+        const remaining = ADMIN_TIMEOUT - elapsed;
+
+        if (remaining <= 0) {
+            alert("⏰ Admin session timed out!");
+            adminLogout();
+        } else {
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            document.getElementById("sessionTimer").innerText = 
+                `Session Expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    }
+
+    // Run timer interval every second
+    setInterval(updateSessionTimer, 1000);
+    updateSessionTimer();
+
+    // Search functionality filter
+    const search = document.getElementById("search");
+    const features = document.querySelectorAll(".feature");
+
+    search.addEventListener("input", function(){
+        const text = this.value.toLowerCase().trim();
+        features.forEach(card => {
+            const content = card.innerText.toLowerCase();
+            if(content.includes(text)){
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    });
 </script>
 
 </body>
