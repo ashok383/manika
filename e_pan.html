@@ -26,7 +26,7 @@
 
             let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
             let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
-            const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+            const ADMIN_TIMEOUT = 1 * 60 * 1000; // 10 minutes
 
             // If not authenticated or session expired, challenge for password
             if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
