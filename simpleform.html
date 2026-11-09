@@ -2,22 +2,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Auto Close</title>
+    <title>Auto Tab Close</title>
 </head>
-<body style="text-align:center; font-family:Arial; padding:50px;">
+<body style="text-align:center;font-family:Arial">
 
-    <h2>Page will close automatically</h2>
+    <h2>Automatic Tab Closing</h2>
     <h1 id="timer">10</h1>
-    <p>Please wait...</p>
+    <p>This tab will close in 10 seconds.</p>
 
     <script>
-        let seconds = 10;
+        let time = 10;
 
-        let countdown = setInterval(function() {
-            seconds--;
-            document.getElementById("timer").innerText = seconds;
+        const countdown = setInterval(() => {
+            time--;
+            document.getElementById("timer").innerText = time;
 
-            if (seconds <= 0) {
+            if (time <= 0) {
                 clearInterval(countdown);
                 window.close();
             }
