@@ -53,10 +53,7 @@ function authenticateAdmin(password) {
  */
 function loadAdminDashboard() {
     // Option A: Redirect to a dedicated admin log page if it exists
-    // window.location.href = 'admin-dashboard.html';
-
-    // Option B: Fallback alert or custom modal initialization
-    alert("Admin authentication successful! Loading audit logs...");
+window.location.href = 'adminlog.html';
 }
 
 // Export or attach to global scope if using module bundlers
