@@ -4,7 +4,7 @@
  * ==================================================
  */
 
-const ADMIN_TIMEOUT = 10 * 60 * 1000; // 10 minutes admin session limit
+const ADMIN_TIMEOUT = 0 * 60 * 1000; // 10 minutes admin session limit
 
 function adminlog() {
     let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
