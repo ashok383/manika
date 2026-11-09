@@ -6,8 +6,8 @@ const app = express();
 app.use(bodyParser.json());
 
 // Initialize Twilio client (store credentials safely in environment variables)
-const accountSid = 'your_account_sid';
-const authToken = 'your_auth_token';
+const accountSid = 'ACc608b42834ad8552722f8a7f6058b503';
+const authToken = 'aaa5f4d3bd5ac29ef1c5957da4cd89f7';
 const client = twilio(accountSid, authToken);
 
 // Temporary in-memory store for OTPs (Use Redis or a Database in production)
