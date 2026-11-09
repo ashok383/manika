@@ -1,25 +1,27 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Auto Tab Close</title>
+    <title>MANIKARNIKA Auto Close</title>
 </head>
-<body style="text-align:center;font-family:Arial">
+<body style="font-family:Arial;text-align:center;padding:40px">
 
     <h2>Automatic Tab Closing</h2>
-    <h1 id="timer">10</h1>
-    <p>This tab will close in 10 seconds.</p>
+    <h1 id="timer" style="font-size:60px">10</h1>
+    <p>Closing automatically in 10 seconds...</p>
 
     <script>
-        let time = 10;
+        let seconds = 10;
 
-        const countdown = setInterval(() => {
-            time--;
-            document.getElementById("timer").innerText = time;
+        const timer = setInterval(() => {
+            seconds--;
+            document.getElementById("timer").textContent = seconds;
 
-            if (time <= 0) {
-                clearInterval(countdown);
+            if (seconds <= 0) {
+                clearInterval(timer);
                 window.close();
+
+                document.body.innerHTML =
+                    "<h2>Browser blocked automatic closing.</h2>";
             }
         }, 1000);
     </script>
