@@ -30,9 +30,9 @@
                 sessionStorage.removeItem("manikarnika_admin_authenticated");
                 sessionStorage.removeItem("manikarnika_admin_login_time");
 
-                let pin = prompt("🔐 Enter Admin Password (admin123) to access Admin Panel:");
+                let pin = prompt("🔐 Enter Admin Password  to access Admin Panel:");
                 
-                if (pin === null || pin.trim() !== "admin123") {
+                if (pin === null || pin.trim() !== "admin132") {
                     alert("❌ Authentication failed or cancelled. Redirecting to home.");
                     window.location.href = "index.html";
                     return;
