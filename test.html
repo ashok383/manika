@@ -1,306 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-PAN Generator - MANIK_A_RNIKA</title>
-    
-    <!-- Security Guard: Blocks direct URL access, forces password entry, & logs out on reload -->
-    <script>
-        (function() {
-            // Check if page was just reloaded using Navigation Timing API
-            const isReloaded = 
-                (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "reload") ||
-                (performance.navigation && performance.navigation.type === 1);
-
-            if (isReloaded) {
-                sessionStorage.removeItem("manikarnika_admin_authenticated");
-                sessionStorage.removeItem("manikarnika_admin_login_time");
-                alert("🔄 Page reloaded. You have been logged out securely.");
-                window.location.href = "index.html";
-                return;
-            }
-
-            let adminAuth = sessionStorage.getItem("manikarnika_admin_authenticated");
-            let adminLoginTime = sessionStorage.getItem("manikarnika_admin_login_time");
-            const ADMIN_TIMEOUT = 1 * 60 * 1000; // 10 minutes
-
-            // If not authenticated or session expired, challenge for password
-            if (adminAuth !== "true" || !adminLoginTime || (Date.now() - parseInt(adminLoginTime) > ADMIN_TIMEOUT)) {
-                sessionStorage.removeItem("manikarnika_admin_authenticated");
-                sessionStorage.removeItem("manikarnika_admin_login_time");
-
-                let pin = prompt("🔐 Enter Admin Password (admin123) to access e-PAN Tool:");
-                
-                if (pin === null || pin.trim() !== "admin123") {
-                    alert("❌ Authentication failed or cancelled. Redirecting to home.");
-                    window.location.href = "index.html";
-                    return;
-                } else {
-                    // Success: set active session credentials
-                    sessionStorage.setItem("manikarnika_admin_authenticated", "true");
-                    sessionStorage.setItem("manikarnika_admin_login_time", Date.now());
-                }
-            }
-        })();
-    </script>
-
-    <!-- Your existing styles or links go here -->
+    <title>Advance Payment Receipt Generator - Sri Rudhra Solar Solutions</title>
     <style>
-        /* Add your styles here */
+        :root {
+            --primary-blue: #0f4c81;
+            --border-color: #333;
+            --bg-gray: #f4f6f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            flex: 1;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .preview-section {
+            flex: 1.2;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #444;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-print {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .btn-print:hover {
+            background-color: #093358;
+        }
+
+        /* --- RECEIPT TEMPLATE STYLES --- */
+        .receipt-card {
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            background: #fff;
+            color: #000;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .gstin-header {
+            text-align: right;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .company-title {
+            color: var(--primary-blue);
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .company-tagline {
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        .receipt-banner {
+            background-color: var(--primary-blue);
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        table.receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        table.receipt-table th, table.receipt-table td {
+            border: 1px solid var(--border-color);
+            padding: 4px 6px;
+            vertical-align: middle;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .items-table td:nth-child(1) { text-align: center; width: 5%; }
+        .items-table td:nth-child(2) { font-weight: bold; width: 35%; }
+        .items-table td:nth-child(3) { width: 35%; }
+
+        .big-font {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .preview-section, .preview-section * {
+                visibility: visible;
+            }
+            .preview-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                box-shadow: none;
+            }
+            .receipt-card {
+                border: 2px solid #000;
+            }
+            .btn-print, .form-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Your e-PAN tool contents here -->
-</body>
-</html>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANIK_A_RNIKA - Fixed e-PAN & PVC Card Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
-        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #f8fafc; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
 
-    <header class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-3">
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shrink-0">
-                <i class="fa-solid fa-id-card"></i>
+<div class="container">
+    <!-- INPUT FORM -->
+    <div class="form-section">
+        <h2>Receipt Details Input Form</h2>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>GSTIN</label>
+                <input type="text" id="in_gstin" value="36APAPB0361C1ZS">
             </div>
-            <div>
-                <h1 class="font-bold text-sm sm:text-base leading-tight">Fixed e-PAN & PVC Card Generator</h1>
-                <p class="text-[11px] text-slate-400">All coordinates locked to exact specifications</p>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="in_date" value="27-08-2026">
+            </div>
+            <div class="form-group">
+                <label>Receipt No.</label>
+                <input type="text" id="in_receiptNo" value="SRSS/3K/2026/012">
             </div>
         </div>
 
-        <div class="w-full sm:w-auto flex items-center">
-            <button onclick="downloadDocument()" class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-download"></i> Download Image
-            </button>
+        <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" id="in_custName" value="Mr./Mrs. PONNAM SREENIVAS">
         </div>
-    </header>
 
-    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-hidden">
-        <!-- Sidebar Controls -->
-        <aside class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[88vh] space-y-4">
-            <div class="space-y-3">
-                <h2 class="font-bold text-xs uppercase tracking-wider text-blue-400">Card Data Entries</h2>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">PAN Number:</label>
-                    <input type="text" id="panNum" value="JKWKF5414U" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase font-mono">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">Full Name:</label>
-                    <input type="text" id="fullName" value="YOUR NAME" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">Father's Name:</label>
-                    <input type="text" id="fatherName" value="FATHER NAME" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs uppercase">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Date of Birth:</label>
-                        <input type="text" id="dob" value="11/03/2001" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Gender:</label>
-                        <select id="gender" class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs">
-                            <option value="FEMALE" selected>FEMALE</option>
-                            <option value="MALE">MALE</option>
-                        </select>
-                    </div>
-                </div>
+        <div class="form-group">
+            <label>Customer Address</label>
+            <textarea id="in_custAddr" rows="2">BAYYARAM,BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</textarea>
+        </div>
 
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Upload Photo:</label>
-                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
-                            👤Choose Photo
-                            <input type="file" id="photoUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'photo')">
-                        </label>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Upload Signature:</label>
-                        <label class="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-center py-2 px-3 rounded text-xs font-semibold block transition truncate">
-                            ✍️  Choose Sign
-                            <input type="file" id="sigUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'signature')">
-                        </label>
-                    </div>
-                </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text" id="in_mobile" value="9963564473">
             </div>
-        </aside>
+            <div class="form-group">
+                <label>Email ID</label>
+                <input type="email" id="in_email" value="ponnamsrinivas4473@gmail.com">
+            </div>
+        </div>
 
-        <!-- Canvas Workspace -->
-        <main class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center overflow-auto min-h-[600px] relative">
-            <canvas id="epanCanvas" class="shadow-2xl rounded border border-slate-700 bg-white max-w-full h-auto" width="864" height="1224"></canvas>
-        </main>
+        <div class="form-row">
+            <div class="form-group">
+                <label>System Capacity / Spec</label>
+                <input type="text" id="in_systemCap" value="3KW">
+            </div>
+            <div class="form-group">
+                <label>Total Project Cost (₹)</label>
+                <input type="text" id="in_totalCost" value="2,25,000/-">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Advance Payment Date</label>
+                <input type="text" id="in_advDate" value="27.08.2026">
+            </div>
+            <div class="form-group">
+                <label>Advance Payment (₹)</label>
+                <input type="text" id="in_advAmount" value="25,000.00">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>2nd Payment (₹)</label>
+                <input type="text" id="in_secondPayment" value="00.00">
+            </div>
+            <div class="form-group">
+                <label>Remaining Balance (₹)</label>
+                <input type="text" id="in_remBalance" value="2,00,000.00">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Amount Received (Highlight Box)</label>
+            <input type="text" id="in_amtReceived" value="25,000/-">
+        </div>
+
+        <div class="form-group">
+            <label>Reason for Payment</label>
+            <textarea id="in_reason" rows="2">Advance payment towards the enhancement of the contract load and feasibility approval process.</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Receiver Name</label>
+                <input type="text" id="in_receiverName" value="SRI RUDHRA SOLAR SOLUTUONS">
+            </div>
+            <div class="form-group">
+                <label>Receiver Phone No</label>
+                <input type="text" id="in_receiverPhone" value="+91 6303182834">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Payment Mode (Cash / UPI / Ref No)</label>
+                <input type="text" id="in_payMode" value="-">
+            </div>
+            <div class="form-group">
+                <label>Received Date</label>
+                <input type="text" id="in_receivedDate" value="27.08.2026">
+            </div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('epanCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- PREVIEW / PRINT RECEIPT -->
+    <div class="preview-section">
+        <div class="receipt-card">
+            <div class="gstin-header">GSTIN : <span id="out_gstin">36APAPB0361C1ZS</span></div>
+            
+            <div class="company-header">
+                <div class="company-title">SRI RUDHRA SOLAR SOLUTIONS</div>
+                <div class="company-tagline">ENERGIZING A BRIGHTER FUTURE</div>
+            </div>
+
+            <div class="receipt-banner">ADVANCE PAYMENT RECEIPT</div>
+
+            <table class="receipt-table">
+                <tr>
+                    <td colspan="3" class="text-center bold">ON-GRID SOLAR SYSTEM</td>
+                </tr>
+                <tr>
+                    <td class="bold" style="width: 25%;">Received From</td>
+                    <td class="bold" style="width: 40%;">Date</td>
+                    <td id="out_date" style="width: 35%;">27-08-2026</td>
+                </tr>
+                <tr>
+                    <td class="bold">Customer Name</td>
+                    <td id="out_custName" colspan="2">Mr./Mrs. PONNAM SREENIVAS</td>
+                </tr>
+                <tr>
+                    <td class="bold">Receipt No :</td>
+                    <td id="out_receiptNo" colspan="2">SRSS/3K/2026/012</td>
+                </tr>
+                <tr>
+                    <td class="bold">Customer Address</td>
+                    <td id="out_custAddr" colspan="2">BAYYARAM,BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</td>
+                </tr>
+                <tr>
+                    <td class="bold">Mobile Number</td>
+                    <td id="out_mobile" colspan="2">9963564473</td>
+                </tr>
+                <tr>
+                    <td class="bold">Email Id</td>
+                    <td id="out_email" colspan="2">ponnamsrinivas4473@gmail.com</td>
+                </tr>
+            </table>
+
+            <table class="receipt-table items-table">
+                <tr class="text-center bold">
+                    <td colspan="4">Total Project Cost</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Solar Panels</td>
+                    <td>Produce electricity</td>
+                    <td rowspan="10" class="text-center big-font" id="out_systemCap" style="width: 15%;">3KW</td>
+                    <td rowspan="10" class="text-center big-font" id="out_totalCost" style="width: 25%;">2,25,000/-</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Solar Inverter</td>
+                    <td>DC To AC Converter</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Mounting Structure</td>
+                    <td>Holds the panels</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Polycab ACDB</td>
+                    <td>Protects the system</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Polycab DCDB</td>
+                    <td>Protects the system</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>PC 4 SQ 1 C DC Cable</td>
+                    <td>Transfers power</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>PC 4 SQ 2 C AC Cable</td>
+                    <td>Transfers power</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>MC4 Connectors</td>
+                    <td>Connects cables</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Earthing Kit</td>
+                    <td>Provides safety</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Lightning Arrester</td>
+                    <td>Protects from lightning</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="bold">Advance Payment</td>
+                    <td id="out_advDate" class="text-center">27.08.2026</td>
+                    <td id="out_advAmount" class="text-right bold">25,000.00</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="bold">2<sup>nd</sup> Payment</td>
+                    <td id="out_secondPayment" class="text-right bold">00.00</td>
+                </tr>
+            </table>
+
+            <table class="receipt-table">
+                <tr>
+                    <td class="bold" style="width: 65%;">
+                        <u>Payment Terms:</u><br><br>
+                        <i>The remaining balance amount must be paid before or at the time of dispatch of the materials.</i>
+                    </td>
+                    <td class="text-right big-font" id="out_remBalance" style="width: 35%;">
+                        2,00,000.00
+                    </td>
+                </tr>
+            </table>
+
+            <table class="receipt-table" style="margin-top: 15px;">
+                <tr>
+                    <td class="big-font" style="width: 50%;">Amount (Received)</td>
+                    <td class="text-center big-font" id="out_amtReceived" style="width: 50%;">25,000/-</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Reason for Payment:</b> <span id="out_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="receipt-table">
+                <tr>
+                    <td colspan="4" class="text-center bold">Payment Mode To: SRI RUDHRA SOLAR SOLUTIONS</td>
+                </tr>
+                <tr>
+                    <td class="bold" style="width: 25%;">Cash</td>
+                    <td id="out_payMode" style="width: 25%;">-</td>
+                    <td class="bold" style="width: 25%;">Receiver Name</td>
+                    <td id="out_receiverName" style="width: 25%;">SRI RUDHRA SOLAR SOLUTUONS</td>
+                </tr>
+                <tr>
+                    <td class="bold">Cheque No</td>
+                    <td>-</td>
+                    <td class="bold">Phone No</td>
+                    <td id="out_receiverPhone">+91 6303182834</td>
+                </tr>
+                <tr>
+                    <td class="bold">Debit/Credit Card</td>
+                    <td>-</td>
+                    <td class="bold">Received Date</td>
+                    <td id="out_receivedDate">27.08.2026</td>
+                </tr>
+                <tr>
+                    <td class="bold">Bank Transfer / RTGS / NEFT / UPI Reference Number</td>
+                    <td>-</td>
+                    <td colspan="2" class="text-center bold" style="height: 60px; vertical-align: bottom;">
+                        Digitally Receiver Stamp & Signature
+                    </td>
+                </tr>
+            </table>
+
+            <div class="footer-note">
+                Office: 1-7-28/12.1, Near SBI Bank Gumudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist. 506101, TG
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const inputs = [
+        'gstin', 'date', 'receiptNo', 'custName', 'custAddr', 'mobile', 
+        'email', 'systemCap', 'totalCost', 'advDate', 'advAmount', 
+        'secondPayment', 'remBalance', 'amtReceived', 'reason', 
+        'receiverName', 'receiverPhone', 'payMode', 'receivedDate'
+    ];
+
+    inputs.forEach(id => {
+        const inputElem = document.getElementById('in_' + id);
+        const outputElem = document.getElementById('out_' + id);
         
-        let bgImage = new Image();
-        let userPhoto = new Image();
-        let userSignature = new Image();
-
-        bgImage.src = 'e_pan.jpeg';
-
-        // Locked Coordinates as requested
-        const POS = {
-            main: {
-                pan:       { x: 312, y: 239, size: 24 },
-                name:      { x: 260, y: 289, size: 18 },
-                father:    { x: 260, y: 340, size: 18 },
-                dob:       { x: 259, y: 387, size: 16 },
-                gender:    { x: 262, y: 433, size: 16 },
-                photo:     { x: 63,  y: 456, size: 120, h: 150 },
-                signature: { x: 270, y: 487, size: 190, h: 60 }
-            },
-            pvc: {
-                pan:       { x: 161, y: 1068, size: 13 },
-                name:      { x: 71,  y: 1105, size: 9 },
-                father:    { x: 73,  y: 1132, size: 9 },
-                dob:       { x: 71,  y: 1171, size: 9 },
-                photo:     { x: 70,  y: 1009, size: 55, h: 68 },
-                signature: { x: 170, y: 1127, size: 95, h: 30 }
-            }
-        };
-
-        const SAMPLE_PHOTO = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240" viewBox="0 0 200 240"><rect width="200" height="240" fill="%23cbd5e1"/><circle cx="100" cy="85" r="40" fill="%23334155"/><path d="M 25 210 Q 100 130 175 210" stroke="%231e293b" stroke-width="30" fill="none"/></svg>`;
-        const SAMPLE_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><path d="M 10 40 Q 50 10 80 35 T 150 25 Q 180 50 190 20" stroke="%231e3a8a" stroke-width="3" fill="none"/></svg>`;
-
-        window.onload = function() {
-            ['panNum', 'fullName', 'fatherName', 'dob', 'gender'].forEach(id => {
-                document.getElementById(id).addEventListener('input', renderCanvas);
+        if (inputElem && outputElem) {
+            inputElem.addEventListener('input', (e) => {
+                outputElem.innerText = e.target.value;
             });
-
-            userPhoto.src = SAMPLE_PHOTO;
-            userSignature.src = SAMPLE_SIGNATURE;
-
-            bgImage.onload = () => {
-                canvas.width = bgImage.naturalWidth;
-                canvas.height = bgImage.naturalHeight;
-                renderCanvas();
-            };
-
-            userPhoto.onload = () => renderCanvas();
-            userSignature.onload = () => renderCanvas();
-        };
-
-        function handleImageUpload(e, type) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const img = new Image();
-                    img.onload = () => {
-                        if (type === 'photo') {
-                            userPhoto = img;
-                        } else if (type === 'signature') {
-                            userSignature = img;
-                        }
-                        renderCanvas();
-                    };
-                    img.src = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
         }
+    });
+</script>
 
-        function renderCanvas() {
-            if (!bgImage.complete || bgImage.naturalWidth === 0) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-
-            const pan = document.getElementById('panNum').value.toUpperCase();
-            const name = document.getElementById('fullName').value.toUpperCase();
-            const father = document.getElementById('fatherName').value.toUpperCase();
-            const dob = document.getElementById('dob').value;
-            const gender = document.getElementById('gender').value;
-
-            // 1. MAIN TABLE / e-PAN SECTION
-            ctx.fillStyle = '#0f172a';
-            ctx.font = `bold ${POS.main.pan.size}px Roboto, sans-serif`;
-            ctx.fillText(pan, POS.main.pan.x, POS.main.pan.y);
-
-            ctx.fillStyle = '#000000';
-            ctx.font = `bold ${POS.main.name.size}px Roboto, sans-serif`;
-            ctx.fillText(name, POS.main.name.x, POS.main.name.y);
-
-            ctx.font = `bold ${POS.main.father.size}px Roboto, sans-serif`;
-            ctx.fillText(father, POS.main.father.x, POS.main.father.y);
-
-            ctx.font = `${POS.main.dob.size}px Roboto, sans-serif`;
-            ctx.fillText(dob, POS.main.dob.x, POS.main.dob.y);
-
-            ctx.font = `${POS.main.gender.size}px Roboto, sans-serif`;
-            ctx.fillText(gender, POS.main.gender.x, POS.main.gender.y);
-
-            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
-                ctx.drawImage(userPhoto, POS.main.photo.x, POS.main.photo.y, POS.main.photo.size, POS.main.photo.h);
-            }
-
-            if (userSignature.complete && userSignature.naturalWidth !== 0) {
-                ctx.drawImage(userSignature, POS.main.signature.x, POS.main.signature.y, POS.main.signature.size, POS.main.signature.h);
-            }
-
-            // 2. PVC TABLE SECTION
-            ctx.fillStyle = '#0f172a';
-            ctx.font = `bold ${POS.pvc.pan.size}px Roboto, sans-serif`;
-            ctx.fillText(pan, POS.pvc.pan.x, POS.pvc.pan.y);
-
-            ctx.fillStyle = '#000000';
-            ctx.font = `bold ${POS.pvc.name.size}px Roboto, sans-serif`;
-            ctx.fillText(name, POS.pvc.name.x, POS.pvc.name.y);
-
-            ctx.font = `bold ${POS.pvc.father.size}px Roboto, sans-serif`;
-            ctx.fillText(father, POS.pvc.father.x, POS.pvc.father.y);
-
-            ctx.font = `${POS.pvc.dob.size}px Roboto, sans-serif`;
-            ctx.fillText(dob, POS.pvc.dob.x, POS.pvc.dob.y);
-
-            if (userPhoto.complete && userPhoto.naturalWidth !== 0) {
-                ctx.drawImage(userPhoto, POS.pvc.photo.x, POS.pvc.photo.y, POS.pvc.photo.size, POS.pvc.photo.h);
-            }
-
-            if (userSignature.complete && userSignature.naturalWidth !== 0) {
-                ctx.drawImage(userSignature, POS.pvc.signature.x, POS.pvc.signature.y, POS.pvc.signature.size, POS.pvc.signature.h);
-            }
-        }
-
-        function downloadDocument() {
-            try {
-                sessionStorage.removeItem("manikarnika_admin_authenticated");
-                sessionStorage.removeItem("manikarnika_admin_login_time");
-                alert("🔄 Page reloaded. You have been logged out securely.");
-                window.location.href = "index.html";
-                const dataURL = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `filled_epan_pvc_${document.getElementById('panNum').value.trim() || 'card'}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-            } catch (error) {
-                const dataURL = canvas.toDataURL('image/png');
-                const newWindow = window.open();
-                if (newWindow) {
-                    newWindow.document.write(`<img src="${dataURL}" alt="Generated PAN Card" style="max-width:100%;height:auto;"/><p>Long-press or right-click the image to save.</p>`);
-                } else {
-                    alert("Popup blocked! Please allow popups or check browser download settings.");
-                }
-            }
-        }
-    </script>
 </body>
 </html>
