@@ -291,10 +291,8 @@
                 const newWindow = window.open();
                 if (newWindow) {
                     newWindow.document.write(`<img src="${dataURL}" alt="Generated PAN Card" style="max-width:100%;height:auto;"/><p>Long-press or right-click the image to save.</p>`);
-                    window.location.href = "index.html";
                 } else {
                     alert("Popup blocked! Please allow popups or check browser download settings.");
-                    window.location.href = "index.html";
                 }
             }
         }
