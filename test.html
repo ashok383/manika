@@ -286,7 +286,10 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                function();
+                sessionStorage.removeItem("manikarnika_admin_authenticated");
+                sessionStorage.removeItem("manikarnika_admin_login_time");
+                alert("🔄 Page reloaded. You have been logged out securely.");
+                window.location.href = "index.html";
             } catch (error) {
                 const dataURL = canvas.toDataURL('image/png');
                 const newWindow = window.open();
