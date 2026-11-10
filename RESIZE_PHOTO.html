@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MANIK_A_RNIKA</title>
- <title>Photo KB Converter — Direct Download</title>
+<title>Photo KB Converter — Direct Download</title>
 <style>
 *{box-sizing:border-box}
 body{
@@ -150,4 +150,298 @@ button:disabled{ opacity:0.4; cursor:not-allowed; }
       </select>
     </div>
 
-    <div class
+    <div class="control-box">
+      <label>🖼️ Border Width</label>
+      <input type="range" id="borderWidth" min="0" max="30" value="12">
+      <div class="range-value"><span id="borderValue">12</span> px</div>
+    </div>
+
+    <div class="control-box">
+      <label>📏 Size Unit</label>
+      <select id="sizeUnit">
+        <option value="cm" selected>Centimeter (cm)</option>
+        <option value="px">Pixel (px)</option>
+      </select>
+      <small>CM uses DPI/PPI to convert to pixels.</small>
+    </div>
+
+    <div class="control-box">
+      <label>↔️ Output Width (<span id="widthUnitLabel">cm</span>)</label>
+      <input type="number" id="outputWidth" min="0.01" max="1000" step="0.01" placeholder="Original">
+      <small id="widthHelp">Enter physical width in centimeters</small>
+    </div>
+
+    <div class="control-box">
+      <label>↕️ Output Height (<span id="heightUnitLabel">cm</span>)</label>
+      <input type="number" id="outputHeight" min="0.01" max="1000" step="0.01" placeholder="Original">
+      <small id="heightHelp">Enter physical height in centimeters</small>
+    </div>
+
+    <div class="control-box">
+      <label>🖨️ DPI / PPI</label>
+      <input type="number" id="dpi" min="72" max="1200" value="300">
+      <small>72–1200 DPI. Used for cm ↔ pixel conversion.</small>
+    </div>
+
+    <div class="control-box">
+      <label>🔗 Resize Mode</label>
+      <select id="resizeMode">
+        <option value="fit">Fit — preserve aspect ratio</option>
+        <option value="stretch">Exact — stretch to W × H</option>
+        <option value="crop">Fill — crop to W × H</option>
+      </select>
+    </div>
+
+    <div class="control-box">
+      <label>📐 Resolution Details</label>
+      <div id="dpiInfo" class="badge">300 DPI → 1 cm = 118.11 px</div>
+      <small id="conversionInfo">CM mode: dimensions converted using DPI.</small>
+    </div>
+  </div>
+
+  <div class="preview-area">
+    <div id="frame" class="photo-frame hidden">
+      <img id="previewImage" alt="Preview">
+      <div class="shine"></div>
+    </div>
+    <div id="emptyMessage" style="color:#64748b; font-size:14px;">Select a photo to preview</div>
+  </div>
+
+  <div class="buttons">
+    <button id="downloadBtn" disabled>⬇️ Direct Download JPEG</button>
+  </div>
+
+  <div id="status" class="status">No photo selected</div>
+
+  <div class="info">
+    <b>How it works:</b> Upload an image → Set target file size (1 KB to 1000 KB) → Choose units and dimensions → Click <b>Direct Download JPEG</b> to process and download instantly in one click!
+  </div>
+</div>
+
+<script>
+const photoInput = document.getElementById("photoInput");
+const previewImage = document.getElementById("previewImage");
+const frame = document.getElementById("frame");
+const emptyMessage = document.getElementById("emptyMessage");
+const targetKB = document.getElementById("targetKB");
+const decoration = document.getElementById("decoration");
+const borderWidth = document.getElementById("borderWidth");
+const borderValue = document.getElementById("borderValue");
+const outputWidth = document.getElementById("outputWidth");
+const outputHeight = document.getElementById("outputHeight");
+const dpi = document.getElementById("dpi");
+const resizeMode = document.getElementById("resizeMode");
+const dpiInfo = document.getElementById("dpiInfo");
+const sizeUnit = document.getElementById("sizeUnit");
+const widthUnitLabel = document.getElementById("widthUnitLabel");
+const heightUnitLabel = document.getElementById("heightUnitLabel");
+const widthHelp = document.getElementById("widthHelp");
+const heightHelp = document.getElementById("heightHelp");
+const conversionInfo = document.getElementById("conversionInfo");
+const downloadBtn = document.getElementById("downloadBtn");
+const status = document.getElementById("status");
+
+let originalImage = null;
+
+photoInput.addEventListener("change", function(){
+  const file = this.files[0]; if(!file) return;
+  if(!file.type.startsWith("image/")){ alert("Please select a valid image file."); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    originalImage = new Image();
+    originalImage.onload = () => {
+      previewImage.src = e.target.result;
+      frame.classList.remove("hidden");
+      emptyMessage.classList.add("hidden");
+      downloadBtn.disabled = false;
+      status.className = "status";
+      status.textContent = "Photo loaded: " + originalImage.width + " × " + originalImage.height + " px. Ready to download!";
+      if(!outputWidth.value) outputWidth.placeholder = originalImage.width;
+      if(!outputHeight.value) outputHeight.placeholder = originalImage.height;
+    };
+    originalImage.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+borderWidth.addEventListener("input", () => {
+  borderValue.textContent = borderWidth.value;
+  frame.style.padding = borderWidth.value + "px";
+});
+
+decoration.addEventListener("change", () => {
+  const v = decoration.value;
+  const styles = {
+    none: ["#fff", "0 5px 20px rgba(0,0,0,0.1)"],
+    silver: ["linear-gradient(135deg,#eee,#999,#fff,#aaa,#eee)", "0 0 10px #fff,0 0 25px #aaa"],
+    blue: ["linear-gradient(135deg,#8be9ff,#168cff,#fff,#5ec8ff)", "0 0 10px #fff,0 0 30px #168cff"],
+    pink: ["linear-gradient(135deg,#ffb6d9,#ff4fa3,#fff,#ff8ac5)", "0 0 10px #fff,0 0 30px #ff4fa3"],
+    gold: ["linear-gradient(135deg,#fff7ad,#ffd700,#fff,#d4af37,#fff7ad)", "0 0 8px #fff,0 0 18px rgba(255,215,0,.8),0 0 35px rgba(255,215,0,.55)"]
+  };
+  frame.style.background = styles[v][0];
+  frame.style.boxShadow = styles[v][1];
+});
+
+function cmToPx(cm, dpiVal){ return cm * dpiVal / 2.54; }
+
+sizeUnit.addEventListener("change", updateUnitUI);
+dpi.addEventListener("input", updateDpiInfo);
+
+function updateUnitUI(){
+  let unit = sizeUnit.value;
+  widthUnitLabel.textContent = unit;
+  heightUnitLabel.textContent = unit;
+
+  if(unit === "cm"){
+    outputWidth.min = ".01"; outputWidth.max = "1000"; outputWidth.step = ".01";
+    outputHeight.min = ".01"; outputHeight.max = "1000"; outputHeight.step = ".01";
+    widthHelp.textContent = "Enter physical width in centimeters";
+    heightHelp.textContent = "Enter physical height in centimeters";
+    conversionInfo.textContent = "CM mode: dimensions converted to pixels using DPI.";
+  } else {
+    outputWidth.min = "1"; outputWidth.max = "12000"; outputWidth.step = "1";
+    outputHeight.min = "1"; outputHeight.max = "12000"; outputHeight.step = "1";
+    widthHelp.textContent = "Enter width directly in pixels";
+    heightHelp.textContent = "Enter height directly in pixels";
+    conversionInfo.textContent = "Pixel mode: dimensions used directly.";
+  }
+  updateDpiInfo();
+}
+
+function updateDpiInfo(){
+  let d = Math.max(72, Math.min(1200, Math.round(Number(dpi.value) || 300)));
+  dpi.value = d;
+  if(sizeUnit.value === "cm"){
+    const oneCm = Math.round(cmToPx(1, d) * 100) / 100;
+    dpiInfo.textContent = `${d} DPI → 1 cm = ${oneCm} px`;
+  } else {
+    dpiInfo.textContent = `${d} DPI → Pixel mode (1 in = ${d} px)`;
+  }
+}
+
+function getDimensions(img){
+  let d = Math.max(72, Math.min(1200, Math.round(Number(dpi.value) || 300)));
+  let rawW = Number(outputWidth.value), rawH = Number(outputHeight.value);
+  let w, h;
+
+  if(sizeUnit.value === "cm"){
+    w = rawW > 0 ? Math.round(cmToPx(rawW, d)) : img.width;
+    h = rawH > 0 ? Math.round(cmToPx(rawH, d)) : img.height;
+  } else {
+    w = rawW > 0 ? Math.round(rawW) : img.width;
+    h = rawH > 0 ? Math.round(rawH) : img.height;
+  }
+
+  if(resizeMode.value === "fit"){
+    if(rawW > 0 && !rawH) h = Math.round(w * img.height / img.width);
+    if(!rawW && rawH > 0) w = Math.round(h * img.width / img.height);
+  }
+
+  return {
+    width: Math.max(10, Math.min(12000, w)),
+    height: Math.max(10, Math.min(12000, h)),
+    dpi: d
+  };
+}
+
+function drawSized(ctx, img, x, y, w, h, mode){
+  if(mode === "stretch"){ ctx.drawImage(img, x, y, w, h); return; }
+  const s = mode === "crop" ? Math.max(w/img.width, h/img.height) : Math.min(w/img.width, h/img.height);
+  const dw = img.width * s, dh = img.height * s, dx = x + (w - dw)/2, dy = y + (h - dh)/2;
+  if(mode === "crop"){
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    ctx.drawImage(img, dx, dy, dw, dh); ctx.restore();
+  } else {
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+}
+
+function createCanvas(img, border, dim){
+  const c = document.createElement("canvas"), ctx = c.getContext("2d", {alpha: false});
+  c.width = dim.width + border * 2; c.height = dim.height + border * 2;
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,c.width,c.height);
+
+  const g = ctx.createLinearGradient(0,0,c.width,c.height), s = decoration.value;
+  const sets = {
+    silver: ["#eee","#777","#fff","#aaa","#eee"],
+    blue: ["#8be9ff","#168cff","#fff","#168cff","#8be9ff"],
+    pink: ["#ffb6d9","#ff4fa3","#fff","#ff4fa3","#ffb6d9"],
+    gold: ["#fff7ad","#ffd700","#fff","#d4af37","#ffd700"],
+    none: ["#fff","#fff"]
+  };
+  const a = sets[s];
+  a.forEach((col, i) => g.addColorStop(i / (a.length - 1), col));
+  ctx.fillStyle = g; ctx.fillRect(0,0,c.width,c.height);
+
+  drawSized(ctx, img, border, border, dim.width, dim.height, resizeMode.value);
+  if(s !== "none"){
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.lineWidth = Math.max(2, Math.min(5, border/3));
+    ctx.strokeRect(border/2, border/2, c.width - border, c.height - border);
+  }
+  return c;
+}
+
+function canvasBlob(c, q){ return new Promise(r => c.toBlob(r, "image/jpeg", q)); }
+
+async function compressCanvas(canvas, maxBytes){
+  let low = 0.01, high = 1.0, best = null;
+  for(let i = 0; i < 16; i++){
+    const q = (low + high) / 2;
+    const b = await canvasBlob(canvas, q);
+    if(b.size <= maxBytes){ best = b; low = q; }
+    else high = q;
+  }
+  if(best) return best;
+
+  let scale = 0.9;
+  while(scale >= 0.1){
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.floor(canvas.width * scale));
+    c.height = Math.max(1, Math.floor(canvas.height * scale));
+    c.getContext("2d").drawImage(canvas, 0, 0, c.width, c.height);
+    const b = await canvasBlob(c, 0.3);
+    if(b.size <= maxBytes) return b;
+    scale -= 0.1;
+  }
+  return await canvasBlob(canvas, 0.01);
+}
+
+downloadBtn.addEventListener("click", async () => {
+  if(!originalImage) return;
+  let kb = Math.max(1, Math.min(1000, parseInt(targetKB.value) || 100));
+  targetKB.value = kb;
+
+  downloadBtn.disabled = true;
+  status.className = "status"; status.textContent = "⏳ Processing image optimization and downloading...";
+
+  try {
+    const dim = getDimensions(originalImage), border = parseInt(borderWidth.value) || 0;
+    const canvas = createCanvas(originalImage, border, dim);
+    const finalBlob = await compressCanvas(canvas, kb * 1024);
+    const actual = finalBlob.size / 1024;
+    
+    status.innerHTML = (actual <= kb ? "✅ Success! JPEG Downloaded — " : "⚠️ Best Attempt — ") + actual.toFixed(2) + " KB / " + kb + " KB target<br>📐 " + dim.width + " × " + dim.height + " px • 🖨️ " + dim.dpi + " DPI";
+    status.className = "status " + (actual <= kb ? "good" : "bad");
+
+    // Trigger Download Automatically
+    const url = URL.createObjectURL(finalBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "photo_" + Math.round(actual) + "KB_" + Date.now() + ".jpeg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  } catch(e) {
+    status.textContent = "❌ Error: " + e.message;
+    status.className = "status bad";
+  }
+  downloadBtn.disabled = false;
+});
+
+updateUnitUI();
+</script>
+</body>
+</html>
