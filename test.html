@@ -286,6 +286,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                function();
             } catch (error) {
                 const dataURL = canvas.toDataURL('image/png');
                 const newWindow = window.open();
