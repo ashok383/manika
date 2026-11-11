@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar Quotation Generator - 2 Page Customizer</title>
+    <title>Advance Payment Receipt Generator - Sri Rudhra Solar Solutions</title>
     <style>
         :root {
             --primary: #c2410c;
@@ -27,9 +27,9 @@
             overflow: hidden;
         }
 
-        /* Sidebar Form Styles */
+        /* Sidebar Styles */
         .sidebar {
-            width: 450px;
+            width: 420px;
             background: #ffffff;
             border-right: 1px solid var(--border);
             display: flex;
@@ -47,42 +47,12 @@
             align-items: center;
         }
 
-        .sidebar-header h2 {
-            font-size: 1.1rem;
-        }
-
-        .tab-buttons {
-            display: flex;
-            background: #0f172a;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab-btn.active {
-            color: #ffffff;
-            border-bottom-color: #f97316;
-            background: #1e293b;
-        }
+        .sidebar-header h2 { font-size: 1.1rem; }
 
         .tab-content {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
         }
 
         .section-title {
@@ -96,13 +66,9 @@
             padding-bottom: 4px;
         }
 
-        .section-title:first-child {
-            margin-top: 0;
-        }
+        .section-title:first-child { margin-top: 0; }
 
-        .form-group {
-            margin-bottom: 12px;
-        }
+        .form-group { margin-bottom: 12px; }
 
         .form-group label {
             display: block;
@@ -126,10 +92,7 @@
             box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
         }
 
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
+        .form-row { display: flex; gap: 10px; }
 
         .btn {
             padding: 10px 16px;
@@ -142,46 +105,12 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: background 0.2s;
         }
 
-        .btn-primary {
-            background: #ea580c;
-            color: white;
-        }
+        .btn-primary { background: #ea580c; color: white; }
+        .btn-primary:hover { background: #c2410c; }
 
-        .btn-primary:hover {
-            background: #c2410c;
-        }
-
-        .btn-secondary {
-            background: #334155;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-        }
-
-        .bom-item-row {
-            display: grid;
-            grid-template-columns: 35px 1fr 70px 35px;
-            gap: 6px;
-            align-items: center;
-            margin-bottom: 8px;
-            background: #f1f5f9;
-            padding: 6px;
-            border-radius: 4px;
-        }
-
-        .bom-item-row input {
-            padding: 4px 6px;
-        }
-
-        /* Preview Workspace Styles */
+        /* Workspace & Sheet */
         .preview-workspace {
             flex: 1;
             overflow-y: auto;
@@ -189,22 +118,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
         }
 
-        /* Printable PDF Sheet Styling */
         .pdf-page {
             width: 210mm;
             min-height: 297mm;
             height: 297mm;
             background: white;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            padding: 15mm;
+            padding: 12mm 15mm;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            font-size: 11pt;
+            font-size: 10pt;
             color: #000;
             box-sizing: border-box;
         }
@@ -212,16 +139,32 @@
         .header {
             text-align: center;
             border-bottom: 2px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .gstin-top {
+            font-size: 9pt;
+            font-weight: bold;
+            text-align: left;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .om-symbol {
+            font-size: 14pt;
+            color: #9a3412;
+            margin-bottom: 2px;
         }
 
         .logo-placeholder {
-            width: 75px;
-            height: 75px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: 2px solid #b45309;
-            margin: 0 auto 5px auto;
+            margin: 0 auto 4px auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -232,228 +175,185 @@
             background: #fffbe6;
         }
 
-        .company-title {
-            font-size: 16pt;
+        .company-title { font-size: 16pt; font-weight: bold; color: #9a3412; letter-spacing: 0.5px; }
+        .tagline { font-size: 8.5pt; font-weight: bold; color: #1e3a8a; margin-top: 1px; }
+
+        .receipt-title-box {
+            text-align: center;
+            margin: 6px 0 10px 0;
+        }
+        .receipt-title {
+            font-size: 12pt;
             font-weight: bold;
-            color: #9a3412;
+            text-decoration: underline;
             letter-spacing: 0.5px;
         }
-
-        .gstin {
+        .receipt-subtitle {
             font-size: 9pt;
             font-weight: bold;
+            color: #334155;
         }
 
-        .tagline {
-            font-size: 9pt;
-            font-weight: bold;
-            color: #1e3a8a;
-            margin-top: 2px;
-        }
-
-        .doc-title {
-            font-size: 10pt;
-            font-weight: bold;
-            text-align: center;
-            margin: 8px 0;
-            text-decoration: underline;
-            line-height: 1.3;
-        }
-
-        .contact-info {
-            text-align: center;
-            font-size: 9pt;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-
-        .details-box {
-            border: 1px solid #000;
-            margin-bottom: 12px;
-        }
-
-        .details-box-header {
-            background: #f1f5f9;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-bottom: 1px solid #000;
-            font-size: 9.5pt;
-        }
-
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 9pt;
-        }
-
-        .details-table td {
-            padding: 5px 8px;
-            vertical-align: top;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .details-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .details-table td.label-col {
-            width: 25%;
-            font-weight: bold;
-            border-right: 1px solid #000;
-        }
-
-        .details-table td.val-col {
-            width: 75%;
-        }
-
-        .bom-table {
+        /* Grid Tables */
+        .info-table, .items-table, .payment-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 8.5pt;
-            margin-top: 5px;
+            margin-bottom: 8px;
         }
 
-        .bom-table th, .bom-table td {
+        .info-table td, .items-table td, .items-table th, .payment-table td {
             border: 1px solid #000;
-            padding: 5px;
-            text-align: left;
+            padding: 4px 6px;
+            vertical-align: middle;
         }
 
-        .bom-table th {
+        .info-table td.label {
+            font-weight: bold;
+            background-color: #f8fafc;
+            width: 25%;
+        }
+
+        .items-table th {
             background-color: #f1f5f9;
             font-weight: bold;
             text-align: center;
         }
 
-        .bom-table td.center {
-            text-align: center;
-        }
-
-        .bom-table td.right {
-            text-align: right;
-        }
-
-        .highlight-row {
+        .payment-table td.label {
             font-weight: bold;
-            background-color: #fafafa;
+            background-color: #f8fafc;
+            width: 60%;
         }
 
-        .subsidy-note {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 9.5pt;
-            text-align: center;
+        .payment-terms-box {
+            border: 1px solid #000;
             padding: 6px;
-            border: 1px dashed #000;
-            background: #fffbe6;
+            font-size: 8pt;
+            margin-bottom: 8px;
+            background: #fafafa;
         }
 
-        .page-badge {
-            position: absolute;
-            top: -25px;
-            left: 0;
-            background: #334155;
-            color: white;
-            padding: 2px 10px;
-            font-size: 0.8rem;
-            border-radius: 4px 4px 0 0;
+        .reason-box {
+            border: 1px solid #000;
+            padding: 6px;
+            font-size: 8.5pt;
+            margin-bottom: 10px;
         }
 
-        /* Printable rules */
+        /* Footer Stamp Area */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid #000;
+            font-size: 8.5pt;
+            margin-top: 5px;
+        }
+
+        .footer-left {
+            border-right: 1px solid #000;
+            padding: 6px;
+        }
+
+        .footer-left table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .footer-left td {
+            padding: 3px 2px;
+            border: none;
+        }
+
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .stamp-box {
+            width: 90px;
+            height: 90px;
+            border: 2px dashed #94a3b8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7pt;
+            color: #64748b;
+            margin: 4px 0;
+        }
+
+        .office-address {
+            text-align: center;
+            font-size: 7.5pt;
+            border-top: 1px solid #000;
+            padding-top: 4px;
+            margin-top: 6px;
+        }
+
+        .page-badge { position: absolute; top: -25px; left: 0; background: #334155; color: white; padding: 2px 10px; font-size: 0.8rem; border-radius: 4px 4px 0 0; }
+
         @media print {
-            body {
-                background: white;
-                color: black;
-            }
-            .sidebar {
-                display: none !important;
-            }
-            .preview-workspace {
-                padding: 0;
-                overflow: visible;
-                display: block;
-            }
-            .pdf-page {
-                box-shadow: none;
-                margin: 0;
-                width: 100%;
-                height: 100vh;
-                page-break-after: always;
-                page-break-inside: avoid;
-            }
-            .pdf-page:last-child {
-                page-break-after: auto;
-            }
-            .page-badge {
-                display: none;
-            }
+            body { background: white; color: black; }
+            .sidebar { display: none !important; }
+            .preview-workspace { padding: 0; overflow: visible; display: block; }
+            .pdf-page { box-shadow: none; margin: 0; width: 100%; height: 100vh; page-break-after: avoid; }
+            .page-badge { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR FOR USER INPUTS -->
+    <!-- SIDEBAR FORM INPUTS -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2>Quotation Generator</h2>
-            <button class="btn btn-primary" onclick="window.print()">
-                🖨️ Print / Save PDF
-            </button>
+            <h2>Advance Receipt Generator</h2>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print / PDF</button>
         </div>
 
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('page1')">Page 1 Details</button>
-            <button class="tab-btn" onclick="switchTab('page2')">Page 2 BOM & Pricing</button>
-        </div>
-
-        <!-- PAGE 1 INPUTS TAB -->
-        <div id="tab-page1" class="tab-content active">
-            <div class="section-title">Company Header & Info</div>
+        <div class="tab-content">
+            <div class="section-title">Header Details</div>
+            <div class="form-group">
+                <label>Change Logo (Optional)</label>
+                <input type="file" id="in_dp" accept="image/*" onchange="uploadDP(event)">
+            </div>
+            <div class="form-group">
+                <label>GSTIN</label>
+                <input type="text" id="in_gstin" value="36APAPB0361CIZS" oninput="updatePreview()">
+            </div>
             <div class="form-group">
                 <label>Company Name</label>
                 <input type="text" id="in_company" value="SRI RUDHRA SOLAR SOLUTIONS" oninput="updatePreview()">
             </div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>GSTIN Number</label>
-                    <input type="text" id="in_gstin" value="36APAPB0361C1ZS" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>System Capacity (KW)</label>
-                    <input type="text" id="in_kw" value="5 KW" oninput="updatePreview()">
-                </div>
-            </div>
             <div class="form-group">
-                <label>Company Tagline</label>
+                <label>Tagline</label>
                 <input type="text" id="in_tagline" value="ENERGIZING A BRIGHTER FUTURE" oninput="updatePreview()">
             </div>
+
+            <div class="section-title">Receipt Info</div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
-                    <label>Phone Numbers</label>
-                    <input type="text" id="in_phones" value="9110328712, 6303182834" oninput="updatePreview()">
+                    <label>Receipt Date</label>
+                    <input type="text" id="in_date" value="02-11-2026" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Email Address</label>
-                    <input type="text" id="in_email" value="srirudhrasolarsolutions@gmail.com" oninput="updatePreview()">
+                    <label>Receipt No</label>
+                    <input type="text" id="in_receipt_no" value="SRSS/5K/2026/" oninput="updatePreview()">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Location / Address</label>
-                <input type="text" id="in_location" value="Mahabubabad, Telangana, India." oninput="updatePreview()">
-            </div>
 
-            <div class="section-title">Customer Information</div>
+            <div class="section-title">Customer Details</div>
             <div class="form-group">
                 <label>Customer Name</label>
                 <input type="text" id="in_cust_name" value="GATTU RAJESH" oninput="updatePreview()">
             </div>
             <div class="form-group">
-                <label>Address Line 1</label>
-                <input type="text" id="in_cust_addr1" value="5-212,BAYYARAM,, BAYYARAM," oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-                <label>Address Line 2 (District, State, PIN)</label>
-                <textarea id="in_cust_addr2" rows="2" oninput="updatePreview()">District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</textarea>
+                <label>Customer Address</label>
+                <textarea id="in_cust_addr" rows="2" oninput="updatePreview()">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</textarea>
             </div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
@@ -466,349 +366,248 @@
                 </div>
             </div>
 
-            <div class="section-title">Offer & Bank Details</div>
+            <div class="section-title">Payment Breakdown</div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
-                    <label>Vendor EPC Reg No</label>
-                    <input type="text" id="in_epc_no" value="TSRE261046" oninput="updatePreview()">
+                    <label>System Capacity</label>
+                    <input type="text" id="in_kw" value="5KW" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Vendor Name</label>
-                    <input type="text" id="in_vendor_name" value="B. RAVI KUMAR" oninput="updatePreview()">
+                    <label>Total Project Cost (₹)</label>
+                    <input type="text" id="in_total_cost" value="2,25,000/-" oninput="updatePreview()">
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Account Name</label>
-                <input type="text" id="in_acc_name" value="SRI RUDHRA SOLAR SOLUTIONS" oninput="updatePreview()">
             </div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
-                    <label>Account Number</label>
-                    <input type="text" id="in_acc_no" value="5020 0120 3628 62" oninput="updatePreview()">
+                    <label>Advance Payment (₹)</label>
+                    <input type="text" id="in_advance" value="25,000.00" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>IFSC Code</label>
-                    <input type="text" id="in_ifsc" value="HDFC0002347" oninput="updatePreview()">
+                    <label>2nd Payment (₹)</label>
+                    <input type="text" id="in_payment2" value="00.00" oninput="updatePreview()">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Bank Name</label>
-                <input type="text" id="in_bank" value="HDFC Bank Limited." oninput="updatePreview()">
-            </div>
-        </div>
-
-        <!-- PAGE 2 INPUTS TAB -->
-        <div id="tab-page2" class="tab-content">
-            <div class="section-title">Proposal Header & BOM Capacity</div>
-            <div class="form-group">
-                <label>Proposal Intro Text</label>
-                <textarea id="in_salutation" rows="2" oninput="updatePreview()">With reference to your requirements and discussion with us, our proposal for a 5 Kw Power Grid connected Solar Power Generating System is with below stated prices:</textarea>
-            </div>
-            <div class="form-group">
-                <label>BOM Table Header Text</label>
-                <input type="text" id="in_bom_title" value="Cost Estimations & Bill of Material of 5KW On-Grid Photovoltaic System" oninput="updatePreview()">
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Remaining Balance (₹)</label>
+                    <input type="text" id="in_balance" value="2,00,000.00" oninput="updatePreview()">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Total Received (₹)</label>
+                    <input type="text" id="in_total_rec" value="25,000/-" oninput="updatePreview()">
+                </div>
             </div>
 
-            <div class="section-title" style="display: flex; justify-space-between; align-items: center;">
-                <span>Bill of Materials (BOM)</span>
-                <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="addBomItem()">+ Add Item</button>
+            <div class="section-title">Receiver Info & Reason</div>
+            <div class="form-group">
+                <label>Reason for Payment</label>
+                <textarea id="in_reason" rows="2" oninput="updatePreview()">Advance payment towards the enhancement of the contract load and feasibility approval process.</textarea>
             </div>
-            <div id="bom_inputs_container">
-                <!-- Dynamically populated -->
-            </div>
-
-            <div class="section-title">Pricing & Subsidy Summary</div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>System Total Cost (₹)</label>
-                    <input type="text" id="in_cost" value="2,25,000" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Sub Total (₹)</label>
-                    <input type="text" id="in_subtotal" value="2,25,000" oninput="updatePreview()">
-                </div>
+            <div class="form-group">
+                <label>Receiver Name</label>
+                <input type="text" id="in_receiver_name" value="SRI RUDHRA SOLAR SOLUTIONS" oninput="updatePreview()">
             </div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
-                    <label>Net Cost After Subsidy (₹)</label>
-                    <input type="text" id="in_after_subsidy" value="2,00,000" oninput="updatePreview()">
+                    <label>Phone No</label>
+                    <input type="text" id="in_receiver_phone" value="+91 6303182834" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Subsidy Amount (₹)</label>
-                    <input type="text" id="in_subsidy_amount" value="78,000/-" oninput="updatePreview()">
+                    <label>Received Date</label>
+                    <input type="text" id="in_rec_date" value="02.11.2026" oninput="updatePreview()">
                 </div>
+            </div>
+            <div class="form-group">
+                <label>Office Address Footer</label>
+                <input type="text" id="in_office" value="Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist." oninput="updatePreview()">
             </div>
         </div>
     </div>
 
-    <!-- LIVE PREVIEW WORKSPACE -->
+    <!-- PREVIEW WORKSPACE -->
     <div class="preview-workspace">
-        
-        <!-- PAGE 1 PREVIEW -->
         <div class="pdf-page">
-            <span class="page-badge">Page 1 Preview</span>
+            <span class="page-badge">Receipt Preview</span>
             <div>
+                <!-- Header -->
                 <div class="header">
-                    <div class="logo-placeholder">SRI RUDHRA<br>SOLAR</div>
+                    <div class="gstin-top">GSTIN: <span id="out_gstin">36APAPB0361CIZS</span></div>
+                    <div class="om-symbol">ॐ</div>
+                    <img id="out_dp" src="sirlogo.png" alt="Logo" onerror="handleImageError()" style="width: 70px; height: 70px; object-fit: contain; border-radius: 50%; border: 2px solid #b45309; margin: 0 auto 4px auto; display: block;">
+                    <div id="out_dp_placeholder" class="logo-placeholder" style="display: none;">SRI RUDHRA<br>SOLAR</div>
                     <div class="company-title" id="out_company">SRI RUDHRA SOLAR SOLUTIONS</div>
-                    <div class="gstin">GSTIN: <span id="out_gstin">36APAPB0361C1ZS</span></div>
                     <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
                 </div>
 
-                <div class="doc-title">
-                    DETAILED QUOTATION FOR THE SUPPLY OF <span id="out_kw">5 KW</span> DCR SOLAR ROOFTOP ONGRID POWER GENERATING SYSTEM
+                <!-- Document Titles -->
+                <div class="receipt-title-box">
+                    <div class="receipt-title">ADVANCE PAYMENT RECEIPT</div>
+                    <div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out_kw">5KW</span>)</div>
                 </div>
 
-                <div class="contact-info">
-                    <strong>M/s. <span id="out_company_sub">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br>
-                    <span id="out_location">Mahabubabad, Telangana, India.</span><br>
-                    Phone Number: <span id="out_phones">9110328712, 6303182834</span> | Email: <span id="out_email">srirudhrasolarsolutions@gmail.com</span>
+                <!-- Customer Information Table -->
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Customer Name Mr./Mrs.</td>
+                        <td><strong id="out_cust_name">GATTU RAJESH</strong></td>
+                        <td class="label" style="width: 15%;">Date</td>
+                        <td style="width: 25%;" id="out_date">02-11-2026</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Customer Address</td>
+                        <td id="out_cust_addr">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</td>
+                        <td class="label">Receipt No:</td>
+                        <td id="out_receipt_no">SRSS/5K/2026/</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Mobile Number</td>
+                        <td id="out_cust_mobile">6281198545</td>
+                        <td class="label">Email Id</td>
+                        <td id="out_cust_email">gattu.rajesh.373@gmail.com</td>
+                    </tr>
+                </table>
+
+                <!-- System Components Table -->
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">S.No</th>
+                            <th style="width: 42%;">Total Project Cost</th>
+                            <th style="width: 50%;" id="out_total_cost_head">5KW - 2,25,000/-</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="text-align:center;">1</td><td>Solar Panels</td><td>Produce electricity</td></tr>
+                        <tr><td style="text-align:center;">2</td><td>Solar Inverter</td><td>DC TO AC Converter</td></tr>
+                        <tr><td style="text-align:center;">3</td><td>Mounting Structure</td><td>Holds the panels</td></tr>
+                        <tr><td style="text-align:center;">4</td><td>ACDB</td><td>Protects the system</td></tr>
+                        <tr><td style="text-align:center;">5</td><td>DCDB</td><td>Protects the system</td></tr>
+                        <tr><td style="text-align:center;">6</td><td>4 SQ 1 Core DC Cable</td><td>Transfers power</td></tr>
+                        <tr><td style="text-align:center;">7</td><td>4 SQ 2 Core AC Cable</td><td>Transfers power</td></tr>
+                        <tr><td style="text-align:center;">8</td><td>MC4 Connectors</td><td>Connects cables</td></tr>
+                        <tr><td style="text-align:center;">9</td><td>Earthing Kit</td><td>Provides safety</td></tr>
+                        <tr><td style="text-align:center;">10</td><td>Lightning Arrester</td><td>Protects from lightning</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- Payment Breakdown Table -->
+                <table class="payment-table">
+                    <tr>
+                        <td class="label">Advance Payment</td>
+                        <td style="text-align: right; font-weight: bold;" id="out_advance">25,000.00</td>
+                    </tr>
+                    <tr>
+                        <td class="label">2nd Payment</td>
+                        <td style="text-align: right;" id="out_payment2">00.00</td>
+                    </tr>
+                </table>
+
+                <!-- Payment Terms Box -->
+                <div class="payment-terms-box">
+                    <strong>Payment Terms:</strong><br>
+                    The remaining balance amount of <strong id="out_balance">2,00,000.00</strong> must be paid before or at the time of dispatch of the materials.
                 </div>
 
-                <div class="details-box">
-                    <div class="details-box-header">CUSTOMER DETAILS:</div>
-                    <table class="details-table">
-                        <tr>
-                            <td class="label-col">Name</td>
-                            <td class="val-col" id="out_cust_name">GATTU RAJESH</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Address</td>
-                            <td class="val-col">
-                                <span id="out_cust_addr1">5-212,BAYYARAM,, BAYYARAM,</span><br>
-                                <span id="out_cust_addr2">District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Mobile Number</td>
-                            <td class="val-col" id="out_cust_mobile">6281198545</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Email Id</td>
-                            <td class="val-col" id="out_cust_email">gattu.rajesh.373@gmail.com</td>
-                        </tr>
-                    </table>
+                <!-- Total Amount Received -->
+                <div style="border: 1px solid #000; padding: 6px; font-weight: bold; margin-bottom: 8px; font-size: 9.5pt;">
+                    Amount (Received): ₹ <span id="out_total_rec">25,000/-</span>
                 </div>
 
-                <div class="details-box">
-                    <div class="details-box-header">OFFER SUBMITTED BY:</div>
-                    <div style="padding: 8px; font-size: 8.5pt; line-height: 1.4;">
-                        GST is Included at Project cost.<br>
-                        Purchase Order (PO) is to be made in the favor of: <strong>M/s <span id="out_po_company">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br>
-                        VENDOR EPC REG NO: - <span id="out_epc_no">TSRE261046</span> &nbsp;&nbsp;&nbsp; VENDOR NAME: - <span id="out_vendor_name">B. RAVI KUMAR</span>
+                <!-- Reason for Payment -->
+                <div class="reason-box">
+                    <strong>Reason for Payment:</strong> <span id="out_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
+                </div>
+
+                <!-- Receiver Information & Stamp Area -->
+                <div class="footer-grid">
+                    <div class="footer-left">
+                        <table>
+                            <tr>
+                                <td style="width: 35%;"><strong>Cash / Cheque / Online</strong></td>
+                                <td>: Payment Mode To SRI RUDHRA SOLAR SOLUTIONS</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Receiver Name</strong></td>
+                                <td>: <span id="out_receiver_name">SRI RUDHRA SOLAR SOLUTIONS</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone No</strong></td>
+                                <td>: <span id="out_receiver_phone">+91 6303182834</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Received Date</strong></td>
+                                <td>: <span id="out_rec_date">02.11.2026</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="footer-right">
+                        <div><strong>Digitally Received</strong></div>
+                        <div class="stamp-box">Stamp & Signature</div>
+                        <div style="font-size: 7.5pt; font-weight: bold;">Authorized Signatory</div>
                     </div>
                 </div>
 
-                <div class="details-box">
-                    <div class="details-box-header">Payment Terms: Account details for NEFT/RTGS/IMPS</div>
-                    <table class="details-table">
-                        <tr>
-                            <td class="label-col">Account Name</td>
-                            <td class="val-col" id="out_acc_name">SRI RUDHRA SOLAR SOLUTIONS</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Account No</td>
-                            <td class="val-col" id="out_acc_no">5020 0120 3628 62</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">IFSC Code</td>
-                            <td class="val-col" id="out_ifsc">HDFC0002347</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Bank Name</td>
-                            <td class="val-col" id="out_bank">HDFC Bank Limited.</td>
-                        </tr>
-                    </table>
+                <!-- Office Footer Address -->
+                <div class="office-address" id="out_office">
+                    Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist.
                 </div>
-            </div>
-
-            <div style="text-align: right; font-size: 8pt; border-top: 1px solid #ccc; padding-top: 4px;">
-                Page 1 of 2
             </div>
         </div>
-
-        <!-- PAGE 2 PREVIEW -->
-        <div class="pdf-page">
-            <span class="page-badge">Page 2 Preview</span>
-            <div>
-                <div class="header">
-                    <div class="company-title" id="out_company_p2">SRI RUDHRA SOLAR SOLUTIONS</div>
-                    <div class="gstin">GSTIN: <span id="out_gstin_p2">36APAPB0361C1ZS</span></div>
-                    <div class="tagline" id="out_tagline_p2">ENERGIZING A BRIGHTER FUTURE</div>
-                </div>
-
-                <div style="margin-bottom: 10px; font-size: 9.5pt; line-height: 1.4;">
-                    <strong>RESPECTED SIR/MADAM,</strong><br>
-                    <span id="out_salutation">With reference to your requirements and discussion with us, our proposal for a 5 Kw Power Grid connected Solar Power Generating System is with below stated prices:</span>
-                </div>
-
-                <table class="bom-table">
-                    <thead>
-                        <tr>
-                            <th colspan="3" id="out_bom_title">Cost Estimations & Bill of Material of 5KW On-Grid Photovoltaic System</th>
-                        </tr>
-                        <tr>
-                            <th style="width: 8%;">Sr.</th>
-                            <th style="width: 77%;">Description of Supply Items</th>
-                            <th style="width: 15%;">Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bom_preview_tbody">
-                        <!-- Dynamic BOM rows inserted here -->
-                    </tbody>
-                    <tfoot>
-                        <tr class="highlight-row">
-                            <td colspan="2" style="text-align: right;">Amount to be paid towards the Cost of System</td>
-                            <td class="right" id="out_cost">2,25,000</td>
-                        </tr>
-                        <tr class="highlight-row">
-                            <td colspan="2" style="text-align: right;">+Sub Total</td>
-                            <td class="right" id="out_subtotal">2,25,000</td>
-                        </tr>
-                        <tr class="highlight-row">
-                            <td colspan="2" style="text-align: right;">After Subsidy Cost:</td>
-                            <td class="right" id="out_after_subsidy">2,00,000</td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <div class="subsidy-note">
-                    SUBSIDY AMOUNT: <span id="out_subsidy_amount">78000/-</span> Directly Credited To Customer Bank Account
-                </div>
-            </div>
-
-            <div style="text-align: right; font-size: 8pt; border-top: 1px solid #ccc; padding-top: 4px;">
-                Page 2 of 2
-            </div>
-        </div>
-
     </div>
 
     <script>
-        // Initial BOM Data Matching Source Quotation
-        let bomItems = [
-            { desc: "Solar PV module: Bifacial/ADANI/PREMIER/WAREE/SATVIK/EQUIVALENT DCR/SET Module", qty: "-" },
-            { desc: "GI Module 5FT/6.5FT Mounting structure Designed Wind Load Resistance: 180Kmph. Hot dip Legs And G.I Rafter/Purlin (AS PER SITE REQUIRED BASIC AND HEIGHT)", qty: "1" },
-            { desc: "5KW ACDB", qty: "1" },
-            { desc: "MC4 Connectors", qty: "4" },
-            { desc: "5KW Inverter (Growatt/Polycab SOLAR)", qty: "1" },
-            { desc: "5KW DCDB", qty: "1" },
-            { desc: "AC 2Cx4Sqmm Cu. POLYCAB Cable", qty: "AS REQ" },
-            { desc: "DC 1C4SqMm Cu. Cable", qty: "AS REQ" },
-            { desc: "Earthing Cable", qty: "AS REQ" },
-            { desc: "PVC Pipes for wiring", qty: "LS" },
-            { desc: "Earthing Rod(3) / LIGHTNING ARRESTER(1), Earthing powder(3)", qty: "1 Set" },
-            { desc: "Installation Kit (Comm. Cable etc.)", qty: "1" }
-        ];
+        function handleImageError() {
+            document.getElementById('out_dp').style.display = 'none';
+            document.getElementById('out_dp_placeholder').style.display = 'flex';
+        }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            if (tabName === 'page1') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('tab-page1').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('tab-page2').classList.add('active');
+        function uploadDP(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.getElementById('out_dp');
+                    const placeholder = document.getElementById('out_dp_placeholder');
+                    
+                    imgElement.src = e.target.result;
+                    imgElement.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        function renderBomInputs() {
-            const container = document.getElementById('bom_inputs_container');
-            container.innerHTML = '';
-
-            bomItems.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.className = 'bom-item-row';
-                row.innerHTML = `
-                    <span style="font-size: 0.8rem; font-weight: bold; text-align: center;">${index + 1}</span>
-                    <input type="text" value="${item.desc}" oninput="updateBomItem(${index}, 'desc', this.value)">
-                    <input type="text" value="${item.qty}" oninput="updateBomItem(${index}, 'qty', this.value)">
-                    <button class="btn btn-danger" onclick="removeBomItem(${index})">✕</button>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function addBomItem() {
-            bomItems.push({ desc: "New Component Description", qty: "1" });
-            renderBomInputs();
-            updatePreview();
-        }
-
-        function removeBomItem(index) {
-            bomItems.splice(index, 1);
-            renderBomInputs();
-            updatePreview();
-        }
-
-        function updateBomItem(index, field, value) {
-            bomItems[index][field] = value;
-            updatePreview();
-        }
-
         function updatePreview() {
-            // Page 1 Inputs Mapping
-            const comp = document.getElementById('in_company').value;
-            const gstin = document.getElementById('in_gstin').value;
-            const tagline = document.getElementById('in_tagline').value;
+            document.getElementById('out_gstin').innerText = document.getElementById('in_gstin').value;
+            document.getElementById('out_company').innerText = document.getElementById('in_company').value;
+            document.getElementById('out_tagline').innerText = document.getElementById('in_tagline').value;
 
-            document.getElementById('out_company').innerText = comp;
-            document.getElementById('out_company_sub').innerText = comp;
-            document.getElementById('out_po_company').innerText = comp;
-            document.getElementById('out_company_p2').innerText = comp;
-
-            document.getElementById('out_gstin').innerText = gstin;
-            document.getElementById('out_gstin_p2').innerText = gstin;
-
-            document.getElementById('out_tagline').innerText = tagline;
-            document.getElementById('out_tagline_p2').innerText = tagline;
-
-            document.getElementById('out_kw').innerText = document.getElementById('in_kw').value;
-            document.getElementById('out_phones').innerText = document.getElementById('in_phones').value;
-            document.getElementById('out_email').innerText = document.getElementById('in_email').value;
-            document.getElementById('out_location').innerText = document.getElementById('in_location').value;
+            document.getElementById('out_date').innerText = document.getElementById('in_date').value;
+            document.getElementById('out_receipt_no').innerText = document.getElementById('in_receipt_no').value;
 
             document.getElementById('out_cust_name').innerText = document.getElementById('in_cust_name').value;
-            document.getElementById('out_cust_addr1').innerText = document.getElementById('in_cust_addr1').value;
-            document.getElementById('out_cust_addr2').innerText = document.getElementById('in_cust_addr2').value;
+            document.getElementById('out_cust_addr').innerText = document.getElementById('in_cust_addr').value;
             document.getElementById('out_cust_mobile').innerText = document.getElementById('in_cust_mobile').value;
             document.getElementById('out_cust_email').innerText = document.getElementById('in_cust_email').value;
 
-            document.getElementById('out_epc_no').innerText = document.getElementById('in_epc_no').value;
-            document.getElementById('out_vendor_name').innerText = document.getElementById('in_vendor_name').value;
+            const kw = document.getElementById('in_kw').value;
+            const cost = document.getElementById('in_total_cost').value;
+            document.getElementById('out_kw').innerText = kw;
+            document.getElementById('out_total_cost_head').innerText = kw + " - " + cost;
 
-            document.getElementById('out_acc_name').innerText = document.getElementById('in_acc_name').value;
-            document.getElementById('out_acc_no').innerText = document.getElementById('in_acc_no').value;
-            document.getElementById('out_ifsc').innerText = document.getElementById('in_ifsc').value;
-            document.getElementById('out_bank').innerText = document.getElementById('in_bank').value;
+            document.getElementById('out_advance').innerText = document.getElementById('in_advance').value;
+            document.getElementById('out_payment2').innerText = document.getElementById('in_payment2').value;
+            document.getElementById('out_balance').innerText = document.getElementById('in_balance').value;
+            document.getElementById('out_total_rec').innerText = document.getElementById('in_total_rec').value;
 
-            // Page 2 Inputs Mapping
-            document.getElementById('out_salutation').innerText = document.getElementById('in_salutation').value;
-            document.getElementById('out_bom_title').innerText = document.getElementById('in_bom_title').value;
-
-            document.getElementById('out_cost').innerText = document.getElementById('in_cost').value;
-            document.getElementById('out_subtotal').innerText = document.getElementById('in_subtotal').value;
-            document.getElementById('out_after_subsidy').innerText = document.getElementById('in_after_subsidy').value;
-            document.getElementById('out_subsidy_amount').innerText = document.getElementById('in_subsidy_amount').value;
-
-            // Render Page 2 BOM Table Preview
-            const tbody = document.getElementById('bom_preview_tbody');
-            tbody.innerHTML = '';
-            bomItems.forEach((item, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="center">${idx + 1}</td>
-                    <td>${item.desc}</td>
-                    <td class="center">${item.qty}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            document.getElementById('out_reason').innerText = document.getElementById('in_reason').value;
+            document.getElementById('out_receiver_name').innerText = document.getElementById('in_receiver_name').value;
+            document.getElementById('out_receiver_phone').innerText = document.getElementById('in_receiver_phone').value;
+            document.getElementById('out_rec_date').innerText = document.getElementById('in_rec_date').value;
+            document.getElementById('out_office').innerText = document.getElementById('in_office').value;
         }
 
-        // Initialize Form
-        renderBomInputs();
+        // Initialize preview on page load
         updatePreview();
     </script>
 </body>
