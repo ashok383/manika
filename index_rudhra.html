@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sri Rudhra Solar Solutions - Portal Index</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3c72;
+            --secondary: #2a5298;
+            --accent: #ff7e5f;
+            --accent-gradient: linear-gradient(135deg, #ff7e5f, #feb47b);
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #eef2f3, #d9e2ec);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .index-card {
+            background: #fff;
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Logo Styling */
+        .logo-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-circle {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+            border: 3px solid #fff;
+        }
+
+        .company-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 5px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .company-tagline {
+            font-size: 11px;
+            font-weight: 600;
+            color: #e67e22;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+        }
+
+        .divider {
+            height: 2px;
+            background: #edf2f7;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .welcome-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-primary-custom {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 6px 15px rgba(255, 126, 95, 0.35);
+        }
+
+        .btn-primary-custom:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 126, 95, 0.45);
+        }
+
+        .btn-secondary-custom {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 6px 15px rgba(30, 60, 114, 0.25);
+        }
+
+        .btn-secondary-custom:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.35);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 10px;
+            color: #999;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="index-card">
+        <!-- Profile / Display Logo named rudhralogo -->
+        <div class="logo-container">
+            <div class="logo-circle" id="rudhralogo">SRS</div>
+        </div>
+
+        <h1 class="company-title">SRI RUDHRA SOLAR SOLUTIONS</h1>
+        <div class="company-tagline">Energizing a Brighter Future</div>
+
+        <div class="divider"></div>
+
+        <p class="welcome-text">Select a document type below to open, edit, and print or download your paperwork.</p>
+
+        <div class="btn-group">
+            <!-- 1st Button: On Grid Payment Print -->
+            <button class="action-btn btn-primary-custom" onclick="openOnGridPayment()">
+                🖨️ On Grid Payment Print
+            </button>
+
+            <!-- 2nd Button: Quotations Print -->
+            <button class="action-btn btn-secondary-custom" onclick="openQuotationsPrint()">
+                📄 Quotations Print Button
+            </button>
+        </div>
+
+        <div class="footer-note">
+            GSTIN: 36APAPB0361C1ZS | Mahabubabad, Telangana
+        </div>
+    </div>
+
+    <script>
+        function openOnGridPayment() {
+            // Link or action for On Grid Payment printing
+            // You can replace this with window.location.href = 'ongrid_payment.html';
+            alert("Redirecting to On Grid Payment Print module...");
+        }
+
+        function openQuotationsPrint() {
+            // Link or action for Quotation Generator
+            // If using the quotation studio generated earlier, point to its filename:
+            window.location.href = 'modern_solar_quotation.html';
+        }
+    </script>
+
+</body>
+</html>
