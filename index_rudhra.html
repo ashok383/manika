@@ -18,19 +18,20 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #eef2f3, #d9e2ec);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             color: #333;
+            box-sizing: border-box;
         }
 
         .index-card {
             background: #fff;
             width: 100%;
-            max-width: 480px;
-            padding: 40px 30px;
+            max-width: 520px;
+            padding: 35px 30px;
             border-radius: 16px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
@@ -39,11 +40,23 @@
 
         /* Logo Styling */
         .logo-container {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
 
+        .logo-img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+            border: 3px solid #fff;
+            background: #fff;
+        }
+
+        /* Fallback circle if image doesn't load */
         .logo-circle {
             width: 90px;
             height: 90px;
@@ -60,48 +73,65 @@
         }
 
         .company-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--primary);
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             letter-spacing: 0.5px;
         }
 
         .company-tagline {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: #e67e22;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+        }
+
+        /* Highlighted Info Box for Proprietary & Vendor Details */
+        .info-highlight-box {
+            background: #fdf3e7;
+            border: 1px dashed #e67e22;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #2c3e50;
+            text-align: left;
+        }
+
+        .info-highlight-box strong {
+            color: var(--primary);
         }
 
         .divider {
             height: 2px;
             background: #edf2f7;
-            margin: 20px 0;
+            margin: 15px 0;
             width: 100%;
         }
 
         .welcome-text {
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         /* Action Buttons */
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .action-btn {
             width: 100%;
-            padding: 14px 20px;
+            padding: 13px 20px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -138,7 +168,7 @@
         }
 
         .footer-note {
-            margin-top: 30px;
+            margin-top: 20px;
             font-size: 10px;
             color: #999;
             letter-spacing: 0.5px;
@@ -148,13 +178,24 @@
 <body>
 
     <div class="index-card">
-        <!-- Profile / Display Logo named rudhralogo -->
+        <!-- Logo Image Integration named rudhralogo.png -->
         <div class="logo-container">
-            <div class="logo-circle" id="rudhralogo">SRS</div>
+            <img src="rudhralogo.png" alt="Sri Rudhra Solar Solutions Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('rudhralogo-fallback').style.display='flex';">
+            <div class="logo-circle" id="rudhralogo-fallback" style="display:none;">SRS</div>
         </div>
 
         <h1 class="company-title">SRI RUDHRA SOLAR SOLUTIONS</h1>
         <div class="company-tagline">Energizing a Brighter Future</div>
+
+        <!-- Highlighted Proprietary & Vendor Details with B. RAVI KUMAR -->
+        <div class="info-highlight-box">
+            <strong>M/s. SRI RUDHRA SOLAR SOLUTIONS</strong><br>
+            <strong>Proprietor / Vendor:</strong> B. RAVI KUMAR<br>
+            <strong>Office:</strong> 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist.<br>
+            <strong>Location:</strong> Mahabubabad, Telangana, India.<br>
+            <strong>Phone:</strong> 9110328712, 9866903175<br>
+            <strong>Email:</strong> srirudhrasolarsolutions@gmail.com
+        </div>
 
         <div class="divider"></div>
 
@@ -162,13 +203,14 @@
 
         <div class="btn-group">
             <!-- 1st Button: On Grid Payment Print -->
-<button class="action-btn btn-primary-custom" onclick="window.location.href='rudhra_advance.html'">
-    🖨️ On Grid Payment Print
-</button>
+            <button class="action-btn btn-primary-custom" onclick="window.location.href='rudhra_advance.html'">
+                🖨️ On Grid Payment Print
+            </button>
 
-<button class="action-btn btn-secondary-custom" onclick="window.location.href='rudhra_quotation'">
-    📄 Quotations Print Button
-</button>
+            <!-- 2nd Button: Quotations Print Button -->
+            <button class="action-btn btn-secondary-custom" onclick="window.location.href='modern_solar_quotation.html'">
+                📄 Quotations Print Button
+            </button>
         </div>
 
         <div class="footer-note">
@@ -177,31 +219,18 @@
     </div>
 
     <script>
-        function openOnGridPayment() {
-            // Link or action for On Grid Payment printing
-            // You can replace this with window.location.href = 'ongrid_payment.html';
-            alert("Redirecting to On Grid Payment Print module...");
-        }
+        document.addEventListener("contextmenu", e => e.preventDefault());
 
-        function openQuotationsPrint() {
-            // Link or action for Quotation Generator
-            // If using the quotation studio generated earlier, point to its filename:
-            window.location.href = 'modern_solar_quotation.html';
-        }
-    </script>
-<script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
-
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
+        document.addEventListener("keydown", function(e) {
+            if (
+                e.key === "F12" ||
+                (e.ctrlKey && e.shiftKey &&
+                ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+                (e.ctrlKey && e.key.toUpperCase() === "U")
+            ) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
