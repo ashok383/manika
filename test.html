@@ -159,20 +159,14 @@
             margin-bottom: 2px;
         }
 
-        .logo-placeholder {
-            width: 70px;
-            height: 70px;
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
             border-radius: 50%;
             border: 2px solid #b45309;
             margin: 0 auto 4px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8pt;
-            font-weight: bold;
-            color: #b45309;
-            text-align: center;
-            background: #fffbe6;
+            display: block;
         }
 
         .company-title { font-size: 16pt; font-weight: bold; color: #9a3412; letter-spacing: 0.5px; }
@@ -318,8 +312,8 @@
         <div class="tab-content">
             <div class="section-title">Header Details</div>
             <div class="form-group">
-                <label>Change Logo (Optional)</label>
-                <input type="file" id="in_dp" accept="image/*" onchange="uploadDP(event)">
+                <label>Fixed Logo Path</label>
+                <input type="text" value="sirlogo.png" readonly style="background-color: #e2e8f0; color: #475569; cursor: not-allowed;">
             </div>
             <div class="form-group">
                 <label>GSTIN</label>
@@ -433,8 +427,8 @@
                 <div class="header">
                     <div class="gstin-top">GSTIN: <span id="out_gstin">36APAPB0361CIZS</span></div>
                     <div class="om-symbol">ॐ</div>
-                    <img id="out_dp" src="sirlogo.png" alt="Logo" onerror="handleImageError()" style="width: 70px; height: 70px; object-fit: contain; border-radius: 50%; border: 2px solid #b45309; margin: 0 auto 4px auto; display: block;">
-                    <div id="out_dp_placeholder" class="logo-placeholder" style="display: none;">SRI RUDHRA<br>SOLAR</div>
+                    <!-- Fixed logo element linking to sirlogo.png -->
+                    <img class="logo-img" src="sirlogo.png" alt="Sri Rudhra Solar Logo">
                     <div class="company-title" id="out_company">SRI RUDHRA SOLAR SOLUTIONS</div>
                     <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
                 </div>
@@ -556,27 +550,6 @@
     </div>
 
     <script>
-        function handleImageError() {
-            document.getElementById('out_dp').style.display = 'none';
-            document.getElementById('out_dp_placeholder').style.display = 'flex';
-        }
-
-        function uploadDP(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgElement = document.getElementById('out_dp');
-                    const placeholder = document.getElementById('out_dp_placeholder');
-                    
-                    imgElement.src = e.target.result;
-                    imgElement.style.display = 'block';
-                    placeholder.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
         function updatePreview() {
             document.getElementById('out_gstin').innerText = document.getElementById('in_gstin').value;
             document.getElementById('out_company').innerText = document.getElementById('in_company').value;
