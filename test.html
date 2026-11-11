@@ -1,632 +1,607 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advance Payment Receipt Generator - Sri Rudhra Solar Solutions</title>
-    <style>
-        :root {
-            --primary-red: #b91c1c;
-            --accent-green: #15803d;
-            --accent-blue: #1d4ed8;
-            --accent-cyan: #0e7490;
-            --bg-slate: #f8fafc;
-            --border: #94a3b8;
-        }
+<meta charset="UTF-8">
+<title>(MANIK-A-RNIKA) Photo Tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Segoe UI',sans-serif;
+}
 
-        body {
-            background-color: #334155;
-            color: #1e293b;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:15px;
+  background:linear-gradient(
+    120deg,
+    #ff9a9e,
+    #fad0c4,
+    #a18cd1,
+    #fbc2eb
+  );
+  background-size:400% 400%;
+  animation:gradBG 15s ease infinite;
+}
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 420px;
-            background: #ffffff;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
+@keyframes gradBG{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
 
-        .sidebar-header {
-            padding: 16px 20px;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.app{
+  width:100%;
+  max-width:560px;
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(18px);
+  border-radius:26px;
+  padding:22px;
+  color:#fff;
+  box-shadow:0 12px 35px rgba(0,0,0,0.3);
+}
 
-        .sidebar-header h2 { font-size: 1.1rem; }
+header{
+  text-align:center;
+  margin-bottom:18px
+}
 
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
+header h2{
+  font-size:1.9em;
+  font-weight:700
+}
 
-        .section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--accent-cyan);
-            margin: 16px 0 8px 0;
-            font-weight: 700;
-            border-bottom: 2px solid var(--accent-cyan);
-            padding-bottom: 4px;
-        }
+.upload-btn,
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:28px;
+  font-size:16px;
+  font-weight:bold;
+  color:#fff;
+  cursor:pointer;
+  margin-top:10px;
+}
 
-        .section-title:first-child { margin-top: 0; }
+.upload-btn{
+  background:linear-gradient(
+    135deg,
+    #00c6ff,
+    #0072ff
+  );
+}
 
-        .form-group { margin-bottom: 12px; }
+.upload-btn input{
+  display:none;
+}
 
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 4px;
-        }
+.btn-photo{
+  background:linear-gradient(
+    135deg,
+    #f7971e,
+    #ffd200
+  );
+}
 
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.85rem;
-            outline: none;
-        }
+.btn-sheet{
+  background:linear-gradient(
+    135deg,
+    #00f260,
+    #0575e6
+  );
+}
 
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
-        }
+.color-box{
+  margin-top:12px;
+  background:rgba(255,255,255,0.25);
+  padding:12px 14px;
+  border-radius:16px;
+}
 
-        .form-row { display: flex; gap: 10px; }
+.color-box-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:8px;
+}
 
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+.color-box-row span{
+  font-size:14px;
+  font-weight:600;
+}
 
-        .btn-primary { background: var(--primary-red); color: white; }
-        .btn-primary:hover { background: #991b1b; }
 
-        /* Workspace & Sheet */
-        .preview-workspace {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* ================= NO BACKGROUND BUTTON ================= */
 
-        .pdf-page {
-            width: 210mm;
-            min-height: 297mm;
-            height: 297mm;
-            background: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            padding: 12mm 15mm;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            font-size: 10pt;
-            color: #000;
-            box-sizing: border-box;
-        }
+.no-bg-box{
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.25);
+  padding:12px 14px;
+  border-radius:16px;
+}
 
-        .header {
-            text-align: center;
-            border-bottom: 3px solid var(--primary-red);
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-            position: relative;
-        }
+.no-bg-label{
+  font-size:14px;
+  font-weight:600;
+}
 
-        .gstin-top {
-            font-size: 9pt;
-            font-weight: bold;
-            color: var(--accent-cyan);
-            text-align: left;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+.switch{
+  position:relative;
+  width:52px;
+  height:28px;
+}
 
-        .logo-img {
-            width: 75px;
-            height: 75px;
-            object-fit: contain;
-            border-radius: 50%;
-            border: 2px solid var(--primary-red);
-            margin: 0 auto 4px auto;
-            display: block;
-            background: #fff;
-        }
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
 
-        .company-title { 
-            font-size: 16pt; 
-            font-weight: bold; 
-            color: var(--primary-red); 
-            letter-spacing: 0.5px; 
-        }
+.slider{
+  position:absolute;
+  cursor:pointer;
+  inset:0;
+  background:#777;
+  border-radius:30px;
+  transition:.3s;
+}
 
-        .tagline { 
-            font-size: 8.5pt; 
-            font-weight: bold; 
-            color: var(--accent-blue); 
-            margin-top: 1px; 
-        }
+.slider:before{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.3s;
+}
 
-        .receipt-title-box {
-            text-align: center;
-            margin: 6px 0 10px 0;
-        }
-        
-        .receipt-title {
-            font-size: 12pt;
-            font-weight: bold;
-            color: var(--accent-cyan);
-            text-decoration: underline;
-            letter-spacing: 0.5px;
-        }
-        
-        .receipt-subtitle {
-            font-size: 9pt;
-            font-weight: bold;
-            color: var(--accent-blue);
-        }
+.switch input:checked + .slider{
+  background:#00c853;
+}
 
-        /* Grid Tables */
-        .info-table, .items-table, .payment-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8.5pt;
-            margin-bottom: 8px;
-        }
+.switch input:checked + .slider:before{
+  transform:translateX(24px);
+}
 
-        .info-table td, .items-table td, .items-table th, .payment-table td {
-            border: 1px solid var(--border);
-            padding: 4px 6px;
-            vertical-align: middle;
-        }
 
-        .info-table td.label {
-            font-weight: bold;
-            background-color: #f1f5f9;
-            color: var(--accent-blue);
-            width: 25%;
-        }
+/* ================= CANVAS ================= */
 
-        .items-table th {
-            background-color: var(--accent-cyan);
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-color: var(--accent-cyan);
-        }
+canvas{
+  display:block;
+  margin:15px auto;
+  max-width:100%;
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.35);
+}
 
-        .payment-table td.label {
-            font-weight: bold;
-            background-color: #f1f5f9;
-            color: var(--accent-cyan);
-            width: 50%;
-        }
-
-        .payment-terms-box {
-            border: 1px solid var(--accent-blue);
-            border-left: 4px solid var(--accent-blue);
-            padding: 6px;
-            font-size: 8pt;
-            margin-bottom: 8px;
-            background: #eff6ff;
-        }
-
-        .reason-box {
-            border: 1px solid var(--accent-cyan);
-            border-left: 4px solid var(--accent-cyan);
-            padding: 6px;
-            font-size: 8.5pt;
-            margin-bottom: 10px;
-            background: #ecfeff;
-        }
-
-        .received-box {
-            border: 1px solid var(--accent-green);
-            background-color: #f0fdf4;
-            color: var(--accent-green);
-            padding: 6px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 9.5pt;
-        }
-
-        /* Footer Stamp Area */
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border: 1px solid var(--border);
-            font-size: 8.5pt;
-            margin-top: 5px;
-        }
-
-        .footer-left {
-            border-right: 1px solid var(--border);
-            padding: 6px;
-            background: #fafafa;
-        }
-
-        .footer-left table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .footer-left td {
-            padding: 3px 2px;
-            border: none;
-        }
-
-        .footer-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px;
-            text-align: center;
-            background: #fff;
-        }
-
-        .stamp-box {
-            width: 90px;
-            height: 90px;
-            border: 2px dashed var(--primary-red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 7pt;
-            color: var(--primary-red);
-            margin: 4px 0;
-            background: #fef2f2;
-        }
-
-        .office-address {
-            text-align: center;
-            font-size: 7.5pt;
-            border-top: 1px solid var(--border);
-            padding-top: 4px;
-            margin-top: 6px;
-            color: #475569;
-        }
-
-        .page-badge { 
-            position: absolute; 
-            top: -25px; 
-            left: 0; 
-            background: var(--accent-cyan); 
-            color: white; 
-            padding: 2px 10px; 
-            font-size: 0.8rem; 
-            border-radius: 4px 4px 0 0; 
-        }
-
-        @media print {
-            body { background: white; color: black; }
-            .sidebar { display: none !important; }
-            .preview-workspace { padding: 0; overflow: visible; display: block; }
-            .pdf-page { box-shadow: none; margin: 0; width: 100%; height: 100vh; page-break-after: avoid; }
-            .page-badge { display: none; }
-        }
-    </style>
+.status{
+  text-align:center;
+  font-size:12px;
+  opacity:.8;
+  margin-top:8px;
+}
+</style>
 </head>
+
+
 <body>
 
-    <!-- SIDEBAR FORM INPUTS -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Advance Receipt Generator</h2>
-            <button class="btn btn-primary" onclick="window.print()">🖨️ Print / PDF</button>
-        </div>
+<div class="app">
 
-        <div class="tab-content">
-            <div class="section-title">Header Details</div>
-            <div class="form-group">
-                <label>Fixed Logo Path</label>
-                <input type="text" value="sirlogo.png" readonly style="background-color: #e2e8f0; color: #475569; cursor: not-allowed;">
-            </div>
-            <div class="form-group">
-                <label>GSTIN</label>
-                <input type="text" id="in_gstin" value="36APAPB0361CIZS" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-                <label>Company Name</label>
-                <input type="text" id="in_company" value="SRI RUDHRA SOLAR SOLUTIONS" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-                <label>Tagline</label>
-                <input type="text" id="in_tagline" value="ENERGIZING A BRIGHTER FUTURE" oninput="updatePreview()">
-            </div>
+<header>
+<h2>(MANIK-A-RNIKA) Photo Tool</h2>
+</header>
 
-            <div class="section-title">Receipt Info</div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>Receipt Date</label>
-                    <input type="text" id="in_date" value="02-11-2026" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Receipt No</label>
-                    <input type="text" id="in_receipt_no" value="SRSS/5K/2026/" oninput="updatePreview()">
-                </div>
-            </div>
 
-            <div class="section-title">Customer Details</div>
-            <div class="form-group">
-                <label>Customer Name</label>
-                <input type="text" id="in_cust_name" value="GATTU RAJESH" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-                <label>Customer Address</label>
-                <textarea id="in_cust_addr" rows="2" oninput="updatePreview()">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</textarea>
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>Mobile Number</label>
-                    <input type="text" id="in_cust_mobile" value="6281198545" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Email Id</label>
-                    <input type="text" id="in_cust_email" value="gattu.rajesh.373@gmail.com" oninput="updatePreview()">
-                </div>
-            </div>
+<!-- UPLOAD -->
 
-            <div class="section-title">Payment Breakdown</div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>System Capacity</label>
-                    <input type="text" id="in_kw" value="5KW" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Total Project Cost (₹)</label>
-                    <input type="text" id="in_total_cost" value="2,25,000/-" oninput="updatePreview()">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>Advance Payment Date</label>
-                    <input type="text" id="in_advance_date" value="02-11-2026" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Advance Payment (₹)</label>
-                    <input type="text" id="in_advance" value="25,000.00" oninput="updatePreview()">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>2nd Payment (₹)</label>
-                    <input type="text" id="in_payment2" value="00.00" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Remaining Balance (₹)</label>
-                    <input type="text" id="in_balance" value="2,00,000.00" oninput="updatePreview()">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Total Received (₹)</label>
-                <input type="text" id="in_total_rec" value="25,000/-" oninput="updatePreview()">
-            </div>
+<label class="upload-btn">
 
-            <div class="section-title">Receiver Info & Reason</div>
-            <div class="form-group">
-                <label>Reason for Payment</label>
-                <textarea id="in_reason" rows="2" oninput="updatePreview()">Advance payment towards the enhancement of the contract load and feasibility approval process.</textarea>
-            </div>
-            <div class="form-group">
-                <label>Receiver Name</label>
-                <input type="text" id="in_receiver_name" value="SRI RUDHRA SOLAR SOLUTIONS" oninput="updatePreview()">
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>Phone No</label>
-                    <input type="text" id="in_receiver_phone" value="+91 6303182834" oninput="updatePreview()">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Received Date</label>
-                    <input type="text" id="in_rec_date" value="02.11.2026" oninput="updatePreview()">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Office Address Footer</label>
-                <input type="text" id="in_office" value="Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist." oninput="updatePreview()">
-            </div>
-        </div>
-    </div>
+📸 Upload Photo
 
-    <!-- PREVIEW WORKSPACE -->
-    <div class="preview-workspace">
-        <div class="pdf-page">
-            <span class="page-badge">Receipt Preview</span>
-            <div>
-                <!-- Header -->
-                <div class="header">
-                    <div class="gstin-top">GSTIN: <span id="out_gstin">36APAPB0361CIZS</span></div>
-                    <img class="logo-img" src="sirlogo.png" alt="Sri Rudhra Solar Logo">
-                    <div class="company-title" id="out_company">SRI RUDHRA SOLAR SOLUTIONS</div>
-                    <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
-                </div>
+<input
+  type="file"
+  id="upload"
+  accept="image/*"
+>
 
-                <!-- Document Titles -->
-                <div class="receipt-title-box">
-                    <div class="receipt-title">ADVANCE PAYMENT RECEIPT</div>
-                    <div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out_kw">5KW</span>)</div>
-                </div>
+</label>
 
-                <!-- Customer Information Table -->
-                <table class="info-table">
-                    <tr>
-                        <td class="label">Customer Name Mr./Mrs.</td>
-                        <td><strong id="out_cust_name">GATTU RAJESH</strong></td>
-                        <td class="label" style="width: 15%;">Date</td>
-                        <td style="width: 25%;" id="out_date">02-11-2026</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Customer Address</td>
-                        <td id="out_cust_addr">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</td>
-                        <td class="label">Receipt No:</td>
-                        <td id="out_receipt_no">SRSS/5K/2026/</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Mobile Number</td>
-                        <td id="out_cust_mobile">6281198545</td>
-                        <td class="label">Email Id</td>
-                        <td id="out_cust_email">gattu.rajesh.373@gmail.com</td>
-                    </tr>
-                </table>
 
-                <!-- System Components Table -->
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 8%;">S.No</th>
-                            <th style="width: 42%;">Total Project Cost</th>
-                            <th style="width: 50%;" id="out_total_cost_head">5KW - 2,25,000/-</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td style="text-align:center;">1</td><td>Solar Panels</td><td>Produce electricity</td></tr>
-                        <tr><td style="text-align:center;">2</td><td>Solar Inverter</td><td>DC TO AC Converter</td></tr>
-                        <tr><td style="text-align:center;">3</td><td>Mounting Structure</td><td>Holds the panels</td></tr>
-                        <tr><td style="text-align:center;">4</td><td>ACDB</td><td>Protects the system</td></tr>
-                        <tr><td style="text-align:center;">5</td><td>DCDB</td><td>Protects the system</td></tr>
-                        <tr><td style="text-align:center;">6</td><td>4 SQ 1 Core DC Cable</td><td>Transfers power</td></tr>
-                        <tr><td style="text-align:center;">7</td><td>4 SQ 2 Core AC Cable</td><td>Transfers power</td></tr>
-                        <tr><td style="text-align:center;">8</td><td>MC4 Connectors</td><td>Connects cables</td></tr>
-                        <tr><td style="text-align:center;">9</td><td>Earthing Kit</td><td>Provides safety</td></tr>
-                        <tr><td style="text-align:center;">10</td><td>Lightning Arrester</td><td>Protects from lightning</td></tr>
-                    </tbody>
-                </table>
+<!-- GRADIENT BACKGROUND COLORS -->
 
-                <!-- Payment Breakdown Table -->
-                <table class="payment-table">
-                    <tr>
-                        <td class="label">Advance Payment (<span id="out_advance_date">02-11-2026</span>)</td>
-                        <td style="text-align: right; font-weight: bold; color: var(--primary-red);" id="out_advance">25,000.00</td>
-                    </tr>
-                    <tr>
-                        <td class="label">2nd Payment</td>
-                        <td style="text-align: right;" id="out_payment2">00.00</td>
-                    </tr>
-                </table>
+<div class="color-box">
+<span>🎨 Gradient Background Colors</span>
 
-                <!-- Payment Terms Box -->
-                <div class="payment-terms-box">
-                    <strong style="color: var(--accent-blue);">Payment Terms:</strong><br>
-                    The remaining balance amount of <strong id="out_balance">2,00,000.00</strong> must be paid before or at the time of dispatch of the materials.
-                </div>
+<div class="color-box-row">
+<span>Start Color</span>
+<input type="color" id="gradientStart" value="#00c6ff">
+</div>
 
-                <!-- Total Amount Received -->
-                <div class="received-box">
-                    Amount (Received): ₹ <span id="out_total_rec">25,000/-</span>
-                </div>
+<div class="color-box-row">
+<span>End Color</span>
+<input type="color" id="gradientEnd" value="#0072ff">
+</div>
+</div>
 
-                <!-- Reason for Payment -->
-                <div class="reason-box">
-                    <strong style="color: var(--accent-cyan);">Reason for Payment:</strong> <span id="out_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
-                </div>
 
-                <!-- Receiver Information & Stamp Area -->
-                <div class="footer-grid">
-                    <div class="footer-left">
-                        <table>
-                            <tr>
-                                <td style="width: 35%;"><strong>Cash / Online</strong></td>
-                                <td>: Payment Mode To SRI RUDHRA SOLAR SOLUTIONS</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Receiver Name</strong></td>
-                                <td>: <span id="out_receiver_name">SRI RUDHRA SOLAR SOLUTIONS</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Phone No</strong></td>
-                                <td>: <span id="out_receiver_phone">+91 6303182834</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Received Date</strong></td>
-                                <td>: <span id="out_rec_date">02.11.2026</span></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="footer-right">
-                        <div><strong style="color: var(--accent-green);">Digitally Received</strong></div>
-                        <div class="stamp-box">Stamp & Signature</div>
-                        <div style="font-size: 7.5pt; font-weight: bold; color: var(--primary-red);">Authorized Signatory</div>
-                    </div>
-                </div>
+<!-- NO BACKGROUND CHANGE -->
+<!-- CHECKED = DEFAULT -->
 
-                <!-- Office Footer Address -->
-                <div class="office-address" id="out_office">
-                    Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist.
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="no-bg-box">
 
-    <script>
-        function updatePreview() {
-            document.getElementById('out_gstin').innerText = document.getElementById('in_gstin').value;
-            document.getElementById('out_company').innerText = document.getElementById('in_company').value;
-            document.getElementById('out_tagline').innerText = document.getElementById('in_tagline').value;
+<span class="no-bg-label">
+🖼️ No Background Change
+</span>
 
-            document.getElementById('out_date').innerText = document.getElementById('in_date').value;
-            document.getElementById('out_receipt_no').innerText = document.getElementById('in_receipt_no').value;
+<label class="switch">
 
-            document.getElementById('out_cust_name').innerText = document.getElementById('in_cust_name').value;
-            document.getElementById('out_cust_addr').innerText = document.getElementById('in_cust_addr').value;
-            document.getElementById('out_cust_mobile').innerText = document.getElementById('in_cust_mobile').value;
-            document.getElementById('out_cust_email').innerText = document.getElementById('in_cust_email').value;
+<input
+  type="checkbox"
+  id="noBackground"
+  checked
+>
 
-            const kw = document.getElementById('in_kw').value;
-            const cost = document.getElementById('in_total_cost').value;
-            document.getElementById('out_kw').innerText = kw;
-            document.getElementById('out_total_cost_head').innerText = kw + " - " + cost;
+<span class="slider"></span>
 
-            document.getElementById('out_advance_date').innerText = document.getElementById('in_advance_date').value;
-            document.getElementById('out_advance').innerText = document.getElementById('in_advance').value;
-            document.getElementById('out_payment2').innerText = document.getElementById('in_payment2').value;
-            document.getElementById('out_balance').innerText = document.getElementById('in_balance').value;
-            document.getElementById('out_total_rec').innerText = document.getElementById('in_total_rec').value;
+</label>
 
-            document.getElementById('out_reason').innerText = document.getElementById('in_reason').value;
-            document.getElementById('out_receiver_name').innerText = document.getElementById('in_receiver_name').value;
-            document.getElementById('out_receiver_phone').innerText = document.getElementById('in_receiver_phone').value;
-            document.getElementById('out_rec_date').innerText = document.getElementById('in_rec_date').value;
-            document.getElementById('out_office').innerText = document.getElementById('in_office').value;
-        }
+</div>
 
-        // Initialize preview on page load
-        updatePreview();
-    </script>
+
+<div
+  class="status"
+  id="status"
+>
+Original background is ON
+</div>
+
+
+<!-- PHOTO -->
+
+<canvas
+  id="photoCanvas"
+></canvas>
+
+
+<button
+  class="btn btn-photo"
+  onclick="downloadPhoto()"
+>
+⬇ Download Photo
+</button>
+
+
+<!-- SHEET -->
+
+<canvas
+  id="sheetCanvas"
+></canvas>
+
+
+<button
+  class="btn btn-sheet"
+  onclick="downloadSheet()"
+>
+⬇ Download Photo Sheet
+</button>
+
+
+</div>
+
+
+<!-- MEDIAPIPE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+
+
+<script>
+
+const upload = document.getElementById("upload");
+const gradientStart = document.getElementById("gradientStart");
+const gradientEnd = document.getElementById("gradientEnd");
+const noBackground = document.getElementById("noBackground");
+const photoCanvas = document.getElementById("photoCanvas");
+const sheetCanvas = document.getElementById("sheetCanvas");
+const status = document.getElementById("status");
+
+let imageBitmap = null;
+let finalSheet = null;
+
+/*
+  Passport size:
+  35 × 45 mm @ 300 DPI
+*/
+
+const PW = Math.round(35 / 25.4 * 300);
+const PH = Math.round(45 / 25.4 * 300);
+
+
+/* ==================================================
+   LOAD IMAGE
+================================================== */
+
+upload.onchange = async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  imageBitmap = await createImageBitmap(file);
+  status.textContent = "Processing photo...";
+
+  await segmenter.send({
+    image: imageBitmap
+  });
+};
+
+
+/* ==================================================
+   AI SEGMENTATION
+================================================== */
+
+const segmenter = new SelfieSegmentation({
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+});
+
+segmenter.setOptions({
+  modelSelection: 1
+});
+
+
+/* ==================================================
+   AI RESULT
+================================================== */
+
+segmenter.onResults(res => {
+  if(!imageBitmap) return;
+
+  const targetRatio = PW / PH;
+  let sw = imageBitmap.width;
+  let sh = imageBitmap.height;
+  let sx = 0;
+  let sy = 0;
+
+  if(sw / sh > targetRatio){
+    sw = sh * targetRatio;
+    sx = (imageBitmap.width - sw) / 2;
+  } else {
+    sh = sw / targetRatio;
+    sy = (imageBitmap.height - sh) / 2;
+  }
+
+  const final = document.createElement("canvas");
+  final.width = PW;
+  final.height = PH;
+
+  const ctx = final.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  /* =================================================
+     DEFAULT MODE: NO BACKGROUND CHANGE
+  ================================================= */
+  if(noBackground.checked){
+    ctx.drawImage(
+      imageBitmap,
+      sx, sy, sw, sh,
+      0, 0, PW, PH
+    );
+    status.textContent = "Original background is ON";
+  }
+
+  /* =================================================
+     BACKGROUND GRADIENT CHANGE MODE
+  ================================================= */
+  else{
+    ctx.drawImage(
+      imageBitmap,
+      sx, sy, sw, sh,
+      0, 0, PW, PH
+    );
+
+    /* Apply AI person mask */
+    ctx.globalCompositeOperation = "destination-in";
+    ctx.drawImage(
+      res.segmentationMask,
+      0, 0,
+      PW, PH
+    );
+
+    /* Add selected gradient background */
+    ctx.globalCompositeOperation = "destination-over";
+    
+    // Create a vertical gradient (top to bottom)
+    const gradient = ctx.createLinearGradient(0, 0, 0, PH);
+    gradient.addColorStop(0, gradientStart.value);
+    gradient.addColorStop(1, gradientEnd.value);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, PW, PH);
+
+    ctx.globalCompositeOperation = "source-over";
+    status.textContent = "Gradient background replacement is ON";
+  }
+
+  /* Preview */
+  drawRounded(final, photoCanvas, 28, 6);
+
+  /* Create sheet */
+  finalSheet = createHighQualitySheet(photoCanvas);
+  previewSheet(finalSheet);
+});
+
+
+/* ==================================================
+   NO BACKGROUND TOGGLE
+================================================== */
+
+noBackground.addEventListener("change", function(){
+  if(!imageBitmap) return;
+  segmenter.send({ image: imageBitmap });
+});
+
+
+/* ==================================================
+   GRADIENT COLOR LISTENERS
+================================================== */
+
+gradientStart.addEventListener("input", function(){
+  if(imageBitmap && !noBackground.checked){
+    segmenter.send({ image: imageBitmap });
+  }
+});
+
+gradientEnd.addEventListener("input", function(){
+  if(imageBitmap && !noBackground.checked){
+    segmenter.send({ image: imageBitmap });
+  }
+});
+
+
+/* ==================================================
+   ROUNDED PREVIEW
+================================================== */
+
+function drawRounded(src, dst, r, b){
+  dst.width = src.width;
+  dst.height = src.height;
+
+  const c = dst.getContext("2d");
+  c.clearRect(0, 0, dst.width, dst.height);
+  c.save();
+
+  c.beginPath();
+  c.moveTo(r, 0);
+  c.arcTo(dst.width, 0, dst.width, dst.height, r);
+  c.arcTo(dst.width, dst.height, 0, dst.height, r);
+  c.arcTo(0, dst.height, 0, 0, r);
+  c.arcTo(0, 0, dst.width, 0, r);
+  c.closePath();
+  c.clip();
+
+  c.drawImage(src, 0, 0);
+  c.restore();
+
+  c.lineWidth = b;
+  c.strokeStyle = "#000";
+  c.stroke();
+}
+
+
+/* ==================================================
+   CREATE 2 × 4 SHEET
+================================================== */
+
+function createHighQualitySheet(photo){
+  const rows = 2;
+  const cols = 4;
+  const gap = 25;
+  const margin = 35;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = cols * photo.width + (cols - 1) * gap + margin * 2;
+  canvas.height = rows * photo.height + (rows - 1) * gap + margin * 2;
+
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for(let r = 0; r < rows; r++){
+    for(let c = 0; c < cols; c++){
+      ctx.drawImage(
+        photo,
+        margin + c * (photo.width + gap),
+        margin + r * (photo.height + gap)
+      );
+    }
+  }
+
+  return canvas;
+}
+
+
+/* ==================================================
+   SHEET PREVIEW
+================================================== */
+
+function previewSheet(sheet){
+  const ctx = sheetCanvas.getContext("2d");
+  const scale = Math.min(
+    520 / sheet.width,
+    380 / sheet.height
+  );
+
+  sheetCanvas.width = sheet.width;
+  sheetCanvas.height = sheet.height;
+
+  sheetCanvas.style.width = sheet.width * scale + "px";
+  sheetCanvas.style.height = sheet.height * scale + "px";
+
+  ctx.drawImage(sheet, 0, 0);
+}
+
+
+/* ==================================================
+   DOWNLOAD PHOTO
+================================================== */
+
+function downloadPhoto(){
+  if(!photoCanvas.width){
+    return alert("Upload photo first");
+  }
+
+  const a = document.createElement("a");
+  a.href = photoCanvas.toDataURL("image/png");
+  a.download = "passport_photo_gradient.png";
+  a.click();
+}
+
+
+/* ==================================================
+   DOWNLOAD SHEET
+================================================== */
+
+function downloadSheet(){
+  if(!finalSheet){
+    return alert("Sheet not ready");
+  }
+
+  const a = document.createElement("a");
+  a.href = finalSheet.toDataURL("image/png");
+  a.download = "passport_sheet_gradient_2x4.png";
+  a.click();
+}
+
+</script>
+
+<script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+
+  document.addEventListener("keydown", function(e) {
+      if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey &&
+          ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+          (e.ctrlKey && e.key.toUpperCase() === "U")
+      ) {
+          e.preventDefault();
+      }
+  });
+</script>
+
 </body>
 </html>
