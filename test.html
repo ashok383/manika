@@ -1,606 +1,556 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>(MANIK-A-RNIKA) Photo Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA - Multiple Image Cropper</title>
+
+<!-- ZIP Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:'Segoe UI',sans-serif;
+* {
+    box-sizing: border-box;
 }
 
-body{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  padding:15px;
-  background:linear-gradient(
-    120deg,
-    #ff9a9e,
-    #fad0c4,
-    #a18cd1,
-    #fbc2eb
-  );
-  background-size:400% 400%;
-  animation:gradBG 15s ease infinite;
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#10172b,#202c48);
+    color: white;
 }
 
-@keyframes gradBG{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+.container {
+    max-width: 950px;
+    margin: auto;
+    background: #ffffff;
+    color: #222;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px #0005;
 }
 
-.app{
-  width:100%;
-  max-width:560px;
-  background:rgba(255,255,255,0.25);
-  backdrop-filter:blur(18px);
-  border-radius:26px;
-  padding:22px;
-  color:#fff;
-  box-shadow:0 12px 35px rgba(0,0,0,0.3);
+header {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-header{
-  text-align:center;
-  margin-bottom:18px
+header h1 {
+    color: #e87916;
+    margin-bottom: 5px;
 }
 
-header h2{
-  font-size:1.9em;
-  font-weight:700
+header p {
+    color: #666;
 }
 
-.upload-btn,
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:28px;
-  font-size:16px;
-  font-weight:bold;
-  color:#fff;
-  cursor:pointer;
-  margin-top:10px;
+.upload {
+    border: 2px dashed #e87916;
+    border-radius: 14px;
+    padding: 35px 15px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff8ef;
+    margin-bottom: 20px;
 }
 
-.upload-btn{
-  background:linear-gradient(
-    135deg,
-    #00c6ff,
-    #0072ff
-  );
+.upload:hover {
+    background: #ffefd9;
 }
 
-.upload-btn input{
-  display:none;
+.upload h3 {
+    color: #d66b0a;
 }
 
-.btn-photo{
-  background:linear-gradient(
-    135deg,
-    #f7971e,
-    #ffd200
-  );
+.controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-.btn-sheet{
-  background:linear-gradient(
-    135deg,
-    #00f260,
-    #0575e6
-  );
+.controls label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 7px;
 }
 
-.color-box{
-  margin-top:12px;
-  background:rgba(255,255,255,0.25);
-  padding:12px 14px;
-  border-radius:16px;
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
 }
 
-.color-box-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:8px;
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
 }
 
-.color-box-row span{
-  font-size:14px;
-  font-weight:600;
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 13px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-
-/* ================= NO BACKGROUND BUTTON ================= */
-
-.no-bg-box{
-  margin-top:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(255,255,255,0.25);
-  padding:12px 14px;
-  border-radius:16px;
+.download {
+    background: #159447;
+    color: white;
+    flex: 1;
 }
 
-.no-bg-label{
-  font-size:14px;
-  font-weight:600;
+.reset {
+    background: #e74c3c;
+    color: white;
 }
 
-.switch{
-  position:relative;
-  width:52px;
-  height:28px;
+button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
 }
 
-.switch input{
-  opacity:0;
-  width:0;
-  height:0;
+#status {
+    background: #edf4ff;
+    color: #174c88;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: center;
+    font-weight: bold;
 }
 
-.slider{
-  position:absolute;
-  cursor:pointer;
-  inset:0;
-  background:#777;
-  border-radius:30px;
-  transition:.3s;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(145px,1fr));
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.slider:before{
-  content:"";
-  position:absolute;
-  width:22px;
-  height:22px;
-  left:3px;
-  top:3px;
-  background:white;
-  border-radius:50%;
-  transition:.3s;
+.item {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    overflow: hidden;
 }
 
-.switch input:checked + .slider{
-  background:#00c853;
+.item img {
+    width: 100%;
+    height: 145px;
+    object-fit: contain;
+    background: #eee;
+    border-radius: 7px;
 }
 
-.switch input:checked + .slider:before{
-  transform:translateX(24px);
+.item p {
+    font-size: 12px;
+    word-break: break-word;
 }
 
-
-/* ================= CANVAS ================= */
-
-canvas{
-  display:block;
-  margin:15px auto;
-  max-width:100%;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
-}
-
-.status{
-  text-align:center;
-  font-size:12px;
-  opacity:.8;
-  margin-top:8px;
+footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #888;
+    font-size: 12px;
 }
 </style>
 </head>
 
-
 <body>
 
-<div class="app">
+<div class="container">
 
 <header>
-<h2>(MANIK-A-RNIKA) Photo Tool</h2>
+    <h1>MANIKARNIKA</h1>
+    <h2>Multiple Image Auto Cropper</h2>
+    <p>Upload • Auto Crop • Preview • Download All</p>
 </header>
 
-
-<!-- UPLOAD -->
-
-<label class="upload-btn">
-
-📸 Upload Photo
-
-<input
-  type="file"
-  id="upload"
-  accept="image/*"
->
-
+<label class="upload" for="files">
+    <h3>📁 SELECT MULTIPLE IMAGES</h3>
+    <p>Click here or drag and drop images</p>
+    <small>JPG, JPEG, PNG, WEBP</small>
 </label>
 
+<input type="file" id="files" accept="image/*" multiple hidden>
 
-<!-- GRADIENT BACKGROUND COLORS -->
+<div class="controls">
 
-<div class="color-box">
-<span>🎨 Gradient Background Colors</span>
+    <div>
+        <label>Crop Size / Ratio</label>
+        <select id="ratio">
+            <option value="1">1 : 1 Square</option>
+            <option value="0.6666667">4 : 6 Portrait</option>
+            <option value="1.5">6 : 4 Landscape</option>
+            <option value="0.75">3 : 4 Portrait</option>
+            <option value="1.7777778">16 : 9 Landscape</option>
+            <option value="0.7777778">Passport 3.5 : 4.5</option>
+            <option value="original">Original Size</option>
+        </select>
+    </div>
 
-<div class="color-box-row">
-<span>Start Color</span>
-<input type="color" id="gradientStart" value="#00c6ff">
-</div>
-
-<div class="color-box-row">
-<span>End Color</span>
-<input type="color" id="gradientEnd" value="#0072ff">
-</div>
-</div>
-
-
-<!-- NO BACKGROUND CHANGE -->
-<!-- CHECKED = DEFAULT -->
-
-<div class="no-bg-box">
-
-<span class="no-bg-label">
-🖼️ No Background Change
-</span>
-
-<label class="switch">
-
-<input
-  type="checkbox"
-  id="noBackground"
-  checked
->
-
-<span class="slider"></span>
-
-</label>
+    <div>
+        <label>Output Format</label>
+        <select id="format">
+            <option value="image/jpeg">JPG</option>
+            <option value="image/png">PNG</option>
+        </select>
+    </div>
 
 </div>
 
+<div class="buttons">
+    <button class="download" id="download" disabled>
+        ⬇ DOWNLOAD ALL IMAGES (ZIP)
+    </button>
 
-<div
-  class="status"
-  id="status"
->
-Original background is ON
+    <button class="reset" id="reset">
+        RESET
+    </button>
 </div>
 
+<div id="status">Please select your images.</div>
 
-<!-- PHOTO -->
+<h3>Image Preview</h3>
 
-<canvas
-  id="photoCanvas"
-></canvas>
+<div class="grid" id="preview"></div>
 
-
-<button
-  class="btn btn-photo"
-  onclick="downloadPhoto()"
->
-⬇ Download Photo
-</button>
-
-
-<!-- SHEET -->
-
-<canvas
-  id="sheetCanvas"
-></canvas>
-
-
-<button
-  class="btn btn-sheet"
-  onclick="downloadSheet()"
->
-⬇ Download Photo Sheet
-</button>
-
+<footer>
+    MANIKARNIKA SOFTWARE & EMBEDDED SYSTEMS
+    <br>Multiple Image Processing Tool
+</footer>
 
 </div>
-
-
-<!-- MEDIAPIPE -->
-
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
-
 
 <script>
 
-const upload = document.getElementById("upload");
-const gradientStart = document.getElementById("gradientStart");
-const gradientEnd = document.getElementById("gradientEnd");
-const noBackground = document.getElementById("noBackground");
-const photoCanvas = document.getElementById("photoCanvas");
-const sheetCanvas = document.getElementById("sheetCanvas");
-const status = document.getElementById("status");
+const fileInput = document.getElementById("files");
+const ratioSelect = document.getElementById("ratio");
+const formatSelect = document.getElementById("format");
+const preview = document.getElementById("preview");
+const statusBox = document.getElementById("status");
+const downloadBtn = document.getElementById("download");
+const resetBtn = document.getElementById("reset");
 
-let imageBitmap = null;
-let finalSheet = null;
+let selectedFiles = [];
+let croppedImages = [];
+let processNumber = 0;
 
-/*
-  Passport size:
-  35 × 45 mm @ 300 DPI
-*/
+// Upload images
+fileInput.addEventListener("change", function() {
+    selectedFiles = Array.from(this.files)
+        .filter(file => file.type.startsWith("image/"));
 
-const PW = Math.round(35 / 25.4 * 300);
-const PH = Math.round(45 / 25.4 * 300);
-
-
-/* ==================================================
-   LOAD IMAGE
-================================================== */
-
-upload.onchange = async e => {
-  const file = e.target.files[0];
-  if(!file) return;
-
-  imageBitmap = await createImageBitmap(file);
-  status.textContent = "Processing photo...";
-
-  await segmenter.send({
-    image: imageBitmap
-  });
-};
-
-
-/* ==================================================
-   AI SEGMENTATION
-================================================== */
-
-const segmenter = new SelfieSegmentation({
-  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
+    processImages();
 });
 
-segmenter.setOptions({
-  modelSelection: 1
+// Drag and drop
+const dropArea = document.querySelector(".upload");
+
+dropArea.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropArea.style.background = "#ffe2bf";
 });
 
-
-/* ==================================================
-   AI RESULT
-================================================== */
-
-segmenter.onResults(res => {
-  if(!imageBitmap) return;
-
-  const targetRatio = PW / PH;
-  let sw = imageBitmap.width;
-  let sh = imageBitmap.height;
-  let sx = 0;
-  let sy = 0;
-
-  if(sw / sh > targetRatio){
-    sw = sh * targetRatio;
-    sx = (imageBitmap.width - sw) / 2;
-  } else {
-    sh = sw / targetRatio;
-    sy = (imageBitmap.height - sh) / 2;
-  }
-
-  const final = document.createElement("canvas");
-  final.width = PW;
-  final.height = PH;
-
-  const ctx = final.getContext("2d");
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  /* =================================================
-     DEFAULT MODE: NO BACKGROUND CHANGE
-  ================================================= */
-  if(noBackground.checked){
-    ctx.drawImage(
-      imageBitmap,
-      sx, sy, sw, sh,
-      0, 0, PW, PH
-    );
-    status.textContent = "Original background is ON";
-  }
-
-  /* =================================================
-     BACKGROUND GRADIENT CHANGE MODE
-  ================================================= */
-  else{
-    ctx.drawImage(
-      imageBitmap,
-      sx, sy, sw, sh,
-      0, 0, PW, PH
-    );
-
-    /* Apply AI person mask */
-    ctx.globalCompositeOperation = "destination-in";
-    ctx.drawImage(
-      res.segmentationMask,
-      0, 0,
-      PW, PH
-    );
-
-    /* Add selected gradient background */
-    ctx.globalCompositeOperation = "destination-over";
-    
-    // Create a vertical gradient (top to bottom)
-    const gradient = ctx.createLinearGradient(0, 0, 0, PH);
-    gradient.addColorStop(0, gradientStart.value);
-    gradient.addColorStop(1, gradientEnd.value);
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, PW, PH);
-
-    ctx.globalCompositeOperation = "source-over";
-    status.textContent = "Gradient background replacement is ON";
-  }
-
-  /* Preview */
-  drawRounded(final, photoCanvas, 28, 6);
-
-  /* Create sheet */
-  finalSheet = createHighQualitySheet(photoCanvas);
-  previewSheet(finalSheet);
+dropArea.addEventListener("dragleave", () => {
+    dropArea.style.background = "#fff8ef";
 });
 
+dropArea.addEventListener("drop", e => {
+    e.preventDefault();
+    dropArea.style.background = "#fff8ef";
 
-/* ==================================================
-   NO BACKGROUND TOGGLE
-================================================== */
+    selectedFiles = Array.from(e.dataTransfer.files)
+        .filter(file => file.type.startsWith("image/"));
 
-noBackground.addEventListener("change", function(){
-  if(!imageBitmap) return;
-  segmenter.send({ image: imageBitmap });
+    processImages();
 });
 
+// Re-crop when settings change
+ratioSelect.addEventListener("change", processImages);
+formatSelect.addEventListener("change", processImages);
 
-/* ==================================================
-   GRADIENT COLOR LISTENERS
-================================================== */
+function clearImages() {
+    croppedImages.forEach(item => {
+        URL.revokeObjectURL(item.url);
+    });
 
-gradientStart.addEventListener("input", function(){
-  if(imageBitmap && !noBackground.checked){
-    segmenter.send({ image: imageBitmap });
-  }
-});
-
-gradientEnd.addEventListener("input", function(){
-  if(imageBitmap && !noBackground.checked){
-    segmenter.send({ image: imageBitmap });
-  }
-});
-
-
-/* ==================================================
-   ROUNDED PREVIEW
-================================================== */
-
-function drawRounded(src, dst, r, b){
-  dst.width = src.width;
-  dst.height = src.height;
-
-  const c = dst.getContext("2d");
-  c.clearRect(0, 0, dst.width, dst.height);
-  c.save();
-
-  c.beginPath();
-  c.moveTo(r, 0);
-  c.arcTo(dst.width, 0, dst.width, dst.height, r);
-  c.arcTo(dst.width, dst.height, 0, dst.height, r);
-  c.arcTo(0, dst.height, 0, 0, r);
-  c.arcTo(0, 0, dst.width, 0, r);
-  c.closePath();
-  c.clip();
-
-  c.drawImage(src, 0, 0);
-  c.restore();
-
-  c.lineWidth = b;
-  c.strokeStyle = "#000";
-  c.stroke();
+    croppedImages = [];
+    preview.innerHTML = "";
 }
 
+// Process all images
+async function processImages() {
 
-/* ==================================================
-   CREATE 2 × 4 SHEET
-================================================== */
+    const currentProcess = ++processNumber;
 
-function createHighQualitySheet(photo){
-  const rows = 2;
-  const cols = 4;
-  const gap = 25;
-  const margin = 35;
+    clearImages();
 
-  const canvas = document.createElement("canvas");
-  canvas.width = cols * photo.width + (cols - 1) * gap + margin * 2;
-  canvas.height = rows * photo.height + (rows - 1) * gap + margin * 2;
+    downloadBtn.disabled = true;
 
-  const ctx = canvas.getContext("2d");
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for(let r = 0; r < rows; r++){
-    for(let c = 0; c < cols; c++){
-      ctx.drawImage(
-        photo,
-        margin + c * (photo.width + gap),
-        margin + r * (photo.height + gap)
-      );
+    if (selectedFiles.length === 0) {
+        statusBox.textContent = "Please select images first.";
+        return;
     }
-  }
 
-  return canvas;
+    const ratio = ratioSelect.value;
+    const format = formatSelect.value;
+
+    statusBox.textContent =
+        "Processing " + selectedFiles.length + " images...";
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+
+        if (currentProcess !== processNumber) return;
+
+        const file = selectedFiles[i];
+
+        statusBox.textContent =
+            "Cropping image " + (i + 1) +
+            " of " + selectedFiles.length;
+
+        try {
+
+            const blob = await cropImage(file, ratio, format);
+
+            if (currentProcess !== processNumber) return;
+
+            const extension =
+                format === "image/png" ? ".png" : ".jpg";
+
+            const name = file.name.replace(/\.[^.]+$/, "");
+
+            const outputName =
+                String(i + 1).padStart(3, "0") +
+                "_" + name + extension;
+
+            const url = URL.createObjectURL(blob);
+
+            const imageData = {
+                name: outputName,
+                blob: blob,
+                url: url
+            };
+
+            croppedImages.push(imageData);
+
+            showPreview(imageData);
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    if (currentProcess !== processNumber) return;
+
+    statusBox.textContent =
+        croppedImages.length + " images cropped successfully.";
+
+    downloadBtn.disabled = croppedImages.length === 0;
 }
 
+// Crop individual image
+function cropImage(file, ratioValue, format) {
 
-/* ==================================================
-   SHEET PREVIEW
-================================================== */
+    return new Promise((resolve, reject) => {
 
-function previewSheet(sheet){
-  const ctx = sheetCanvas.getContext("2d");
-  const scale = Math.min(
-    520 / sheet.width,
-    380 / sheet.height
-  );
+        const image = new Image();
+        const objectURL = URL.createObjectURL(file);
 
-  sheetCanvas.width = sheet.width;
-  sheetCanvas.height = sheet.height;
+        image.onload = function() {
 
-  sheetCanvas.style.width = sheet.width * scale + "px";
-  sheetCanvas.style.height = sheet.height * scale + "px";
+            try {
 
-  ctx.drawImage(sheet, 0, 0);
+                const width = image.naturalWidth;
+                const height = image.naturalHeight;
+
+                let cropWidth = width;
+                let cropHeight = height;
+                let startX = 0;
+                let startY = 0;
+
+                if (ratioValue !== "original") {
+
+                    const targetRatio = Number(ratioValue);
+                    const sourceRatio = width / height;
+
+                    if (sourceRatio > targetRatio) {
+
+                        cropWidth = height * targetRatio;
+
+                        startX = (width - cropWidth) / 2;
+
+                    } else {
+
+                        cropHeight = width / targetRatio;
+
+                        startY = (height - cropHeight) / 2;
+                    }
+                }
+
+                const canvas = document.createElement("canvas");
+
+                canvas.width = Math.round(cropWidth);
+                canvas.height = Math.round(cropHeight);
+
+                const ctx = canvas.getContext("2d");
+
+                // White background for JPG
+                if (format === "image/jpeg") {
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                // Draw cropped image
+                ctx.drawImage(
+                    image,
+                    startX,
+                    startY,
+                    cropWidth,
+                    cropHeight,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                canvas.toBlob(blob => {
+
+                    URL.revokeObjectURL(objectURL);
+
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error("Image conversion failed"));
+                    }
+
+                }, format, 0.95);
+
+            } catch (error) {
+
+                URL.revokeObjectURL(objectURL);
+                reject(error);
+
+            }
+        };
+
+        image.onerror = function() {
+            URL.revokeObjectURL(objectURL);
+            reject(new Error("Cannot read image"));
+        };
+
+        image.src = objectURL;
+
+    });
 }
 
+// Display preview
+function showPreview(item) {
 
-/* ==================================================
-   DOWNLOAD PHOTO
-================================================== */
+    const card = document.createElement("div");
+    card.className = "item";
 
-function downloadPhoto(){
-  if(!photoCanvas.width){
-    return alert("Upload photo first");
-  }
+    const img = document.createElement("img");
+    img.src = item.url;
 
-  const a = document.createElement("a");
-  a.href = photoCanvas.toDataURL("image/png");
-  a.download = "passport_photo_gradient.png";
-  a.click();
+    const name = document.createElement("p");
+    name.textContent = item.name;
+
+    card.appendChild(img);
+    card.appendChild(name);
+
+    preview.appendChild(card);
 }
 
+// Download all images in one ZIP
+downloadBtn.addEventListener("click", async function() {
 
-/* ==================================================
-   DOWNLOAD SHEET
-================================================== */
+    if (croppedImages.length === 0) return;
 
-function downloadSheet(){
-  if(!finalSheet){
-    return alert("Sheet not ready");
-  }
+    if (typeof JSZip === "undefined") {
+        statusBox.textContent =
+            "ZIP library not loaded. Check your internet connection.";
+        return;
+    }
 
-  const a = document.createElement("a");
-  a.href = finalSheet.toDataURL("image/png");
-  a.download = "passport_sheet_gradient_2x4.png";
-  a.click();
-}
+    downloadBtn.disabled = true;
 
-</script>
+    statusBox.textContent = "Creating ZIP file...";
 
-<script>
-  document.addEventListener("contextmenu", e => e.preventDefault());
+    try {
 
-  document.addEventListener("keydown", function(e) {
-      if (
-          e.key === "F12" ||
-          (e.ctrlKey && e.shiftKey &&
-          ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-          (e.ctrlKey && e.key.toUpperCase() === "U")
-      ) {
-          e.preventDefault();
-      }
-  });
+        const zip = new JSZip();
+
+        croppedImages.forEach(item => {
+            zip.file(item.name, item.blob);
+        });
+
+        const zipBlob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 5
+            }
+        }, metadata => {
+
+            statusBox.textContent =
+                "Creating ZIP: " +
+                Math.round(metadata.percent) + "%";
+
+        });
+
+        const url = URL.createObjectURL(zipBlob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "MANIKARNIKA_CROPPED_IMAGES.zip";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+
+        statusBox.textContent =
+            "ZIP file downloaded successfully!";
+
+    } catch (error) {
+
+        statusBox.textContent = "ZIP creation failed.";
+
+        console.error(error);
+
+    }
+
+    downloadBtn.disabled = false;
+});
+
+// Reset everything
+resetBtn.addEventListener("click", function() {
+
+    processNumber++;
+
+    clearImages();
+
+    selectedFiles = [];
+
+    fileInput.value = "";
+
+    downloadBtn.disabled = true;
+
+    statusBox.textContent = "Ready for new images.";
+
+});
+
 </script>
 
 </body>
