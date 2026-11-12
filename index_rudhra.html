@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Essential for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sri Rudhra Solar Solutions - Portal Index</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,41 +16,49 @@
             --light: #f8f9fa;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100dvh; /* Dynamic viewport height fits mobile address bars & desktop screens */
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #eef2f3, #d9e2ec);
-            margin: 0;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             color: #333;
-            box-sizing: border-box;
         }
 
         .index-card {
             background: #fff;
             width: 100%;
-            max-width: 520px;
-            padding: 35px 30px;
+            max-width: 500px;
+            padding: clamp(20px, 4vw, 35px) clamp(18px, 4vw, 30px);
             border-radius: 16px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
-            box-sizing: border-box;
+            margin: auto;
         }
 
         /* Logo Styling */
         .logo-container {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .logo-img {
-            width: 90px;
-            height: 90px;
+            width: clamp(72px, 18vw, 90px);
+            height: clamp(72px, 18vw, 90px);
             object-fit: contain;
             border-radius: 50%;
             box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
@@ -58,8 +68,8 @@
 
         /* Fallback circle if image doesn't load */
         .logo-circle {
-            width: 90px;
-            height: 90px;
+            width: clamp(72px, 18vw, 90px);
+            height: clamp(72px, 18vw, 90px);
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 50%;
             display: flex;
@@ -73,20 +83,21 @@
         }
 
         .company-title {
-            font-size: 20px;
+            font-size: clamp(17px, 4.5vw, 21px);
             font-weight: 700;
             color: var(--primary);
             margin: 0 0 4px 0;
             letter-spacing: 0.5px;
+            line-height: 1.25;
         }
 
         .company-tagline {
-            font-size: 10px;
+            font-size: clamp(9.5px, 2.5vw, 11px);
             font-weight: 600;
             color: #e67e22;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         /* Highlighted Info Box for Proprietary & Vendor Details */
@@ -94,12 +105,14 @@
             background: #fdf3e7;
             border: 1px dashed #e67e22;
             border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            font-size: 11px;
-            line-height: 1.5;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            font-size: clamp(11px, 2.8vw, 12px);
+            line-height: 1.55;
             color: #2c3e50;
             text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .info-highlight-box strong {
@@ -109,14 +122,15 @@
         .divider {
             height: 2px;
             background: #edf2f7;
-            margin: 15px 0;
+            margin: 14px 0;
             width: 100%;
         }
 
         .welcome-text {
-            font-size: 12px;
+            font-size: clamp(11.5px, 3vw, 12.5px);
             color: #666;
-            margin-bottom: 20px;
+            margin: 0 0 18px 0;
+            line-height: 1.4;
         }
 
         /* Action Buttons */
@@ -128,10 +142,11 @@
 
         .action-btn {
             width: 100%;
-            padding: 13px 20px;
+            padding: 14px 18px;
             border: none;
             border-radius: 8px;
-            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(13px, 3.4vw, 14px);
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -140,7 +155,7 @@
             gap: 10px;
             transition: all 0.3s ease;
             text-decoration: none;
-            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary-custom {
@@ -149,7 +164,7 @@
             box-shadow: 0 6px 15px rgba(255, 126, 95, 0.35);
         }
 
-        .btn-primary-custom:hover {
+        .btn-primary-custom:hover, .btn-primary-custom:active {
             opacity: 0.95;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 126, 95, 0.45);
@@ -161,17 +176,45 @@
             box-shadow: 0 6px 15px rgba(30, 60, 114, 0.25);
         }
 
-        .btn-secondary-custom:hover {
+        .btn-secondary-custom:hover, .btn-secondary-custom:active {
             background: var(--secondary);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(30, 60, 114, 0.35);
         }
 
         .footer-note {
-            margin-top: 20px;
-            font-size: 10px;
+            margin-top: 18px;
+            font-size: clamp(9.5px, 2.5vw, 10.5px);
             color: #999;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
+            line-height: 1.4;
+        }
+
+        /* Desktop / Wide Screen Enhancement */
+        @media (min-width: 768px) {
+            body {
+                padding: 24px;
+            }
+            .index-card {
+                max-width: 540px;
+            }
+        }
+
+        /* Compact Mobile Screens (e.g., iPhone SE / older Androids) */
+        @media (max-width: 380px) {
+            body {
+                padding: 10px;
+            }
+            .index-card {
+                padding: 18px 14px;
+                border-radius: 12px;
+            }
+            .info-highlight-box {
+                padding: 10px;
+            }
+            .action-btn {
+                padding: 12px 14px;
+            }
         }
     </style>
 </head>
@@ -208,7 +251,7 @@
             </button>
 
             <!-- 2nd Button: Quotations Print Button -->
-            <button class="action-btn btn-secondary-custom" onclick="window.location.href='modern_solar_quotation.html'">
+            <button class="action-btn btn-secondary-custom" onclick="window.location.href='rudhra_quotation.html'">
                 📄 Quotations Print Button
             </button>
         </div>
