@@ -125,16 +125,16 @@
 
         .pdf-page {
             width: 210mm;
-            height: 297mm;
-            max-height: 297mm;
+            min-height: 297mm;
             background: white;
             box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-            padding: 9mm 12mm;
+            padding: 10mm 13mm;
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            font-size: 9.5pt;
+            justify-content: flex-start;
+            gap: 8px;
+            font-size: 9.8pt;
             color: #000;
             border: 2px solid var(--dark-border);
         }
@@ -142,13 +142,12 @@
         .header {
             text-align: center;
             border-bottom: 3px solid var(--dark-border);
-            padding-bottom: 5px;
-            margin-bottom: 6px;
+            padding-bottom: 7px;
             position: relative;
         }
 
         .gstin-top {
-            font-size: 8.5pt;
+            font-size: 8.8pt;
             font-weight: 800;
             color: #000;
             text-align: left;
@@ -158,7 +157,7 @@
         }
 
         .proprietor-top {
-            font-size: 8.5pt;
+            font-size: 8.8pt;
             font-weight: 800;
             color: #000;
             text-align: right;
@@ -168,37 +167,37 @@
         }
 
         .logo-img {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
             border-radius: 50%;
             border: 2.5px solid var(--dark-border);
-            margin: 0 auto 3px auto;
+            margin: 0 auto 4px auto;
             display: block;
             background: #fff;
         }
 
         .company-title { 
-            font-size: 15.5pt; 
+            font-size: 16.5pt; 
             font-weight: 900; 
             color: var(--primary-red); 
             letter-spacing: 0.5px; 
         }
 
         .tagline { 
-            font-size: 8pt; 
+            font-size: 8.5pt; 
             font-weight: 800; 
             color: var(--accent-blue); 
-            margin-top: 1px; 
+            margin-top: 2px; 
         }
 
         .receipt-title-box {
             text-align: center;
-            margin: 4px 0 6px 0;
+            margin: 2px 0;
         }
         
         .receipt-title {
-            font-size: 11.5pt;
+            font-size: 12pt;
             font-weight: 900;
             color: #000;
             text-decoration: underline;
@@ -206,23 +205,23 @@
         }
         
         .receipt-subtitle {
-            font-size: 8.5pt;
+            font-size: 9pt;
             font-weight: 800;
             color: var(--accent-blue);
+            margin-top: 2px;
         }
 
         /* Dark & Thick Grid Tables */
-        .info-table, .items-table, .payment-table, .bank-table {
+        .info-table, .items-table, .payment-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.2pt;
-            margin-bottom: 6px;
+            font-size: 8.8pt;
             border: 2px solid var(--dark-border);
         }
 
-        .info-table td, .items-table td, .items-table th, .payment-table td, .bank-table td, .bank-table th {
+        .info-table td, .items-table td, .items-table th, .payment-table td {
             border: 1.5px solid var(--dark-border);
-            padding: 3.5px 6px;
+            padding: 5px 8px;
             vertical-align: middle;
         }
 
@@ -239,6 +238,7 @@
             font-weight: 800;
             text-align: center;
             border: 1.5px solid var(--dark-border);
+            padding: 6px 8px;
         }
 
         .payment-table td.label {
@@ -248,51 +248,14 @@
             width: 55%;
         }
 
-        /* Highlighted Bank Details Box */
-        .bank-highlight-wrapper {
-            border: 2px solid var(--dark-border);
-            border-left: 5px solid var(--primary-red);
-            background-color: #fefce8;
-            padding: 5px 7px;
-            margin-bottom: 6px;
-        }
-
-        .bank-header-title {
-            font-size: 8.5pt;
-            font-weight: 900;
-            color: var(--primary-red);
-            text-transform: uppercase;
-            margin-bottom: 3px;
-            border-bottom: 1.5px solid var(--dark-border);
-            padding-bottom: 2px;
-        }
-
-        .bank-table {
-            margin-bottom: 0;
-            background: #ffffff;
-        }
-
-        .bank-table td.b-label {
-            font-weight: 800;
-            background-color: #fef08a;
-            color: #000;
-            width: 22%;
-        }
-
-        .bank-table td.b-val {
-            font-weight: 700;
-            color: #000;
-            width: 28%;
-        }
-
         .payment-terms-box {
             border: 2px solid var(--dark-border);
             border-left: 5px solid var(--accent-blue);
-            padding: 4px 6px;
-            font-size: 7.8pt;
-            margin-bottom: 5px;
+            padding: 6px 8px;
+            font-size: 8.5pt;
             background: #eff6ff;
             font-weight: 600;
+            line-height: 1.35;
         }
 
         .received-box {
@@ -300,34 +263,39 @@
             border-left: 5px solid var(--accent-green);
             background-color: #dcfce7;
             color: #000;
-            padding: 5px 6px;
+            padding: 7px 8px;
             font-weight: 900;
-            margin-bottom: 5px;
-            font-size: 9.2pt;
+            font-size: 9.8pt;
         }
 
         .reason-box {
             border: 2px solid var(--dark-border);
             border-left: 5px solid var(--accent-cyan);
-            padding: 4px 6px;
-            font-size: 8pt;
-            margin-bottom: 6px;
+            padding: 6px 8px;
+            font-size: 8.6pt;
             background: #ecfeff;
             font-weight: 600;
+            line-height: 1.35;
         }
 
         /* Footer Vendor & Proprietor Area */
+        .footer-section {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         .footer-grid {
             display: grid;
             grid-template-columns: 1.4fr 0.6fr;
             border: 2px solid var(--dark-border);
-            font-size: 8.2pt;
-            margin-top: 4px;
+            font-size: 8.6pt;
         }
 
         .footer-left {
             border-right: 2px solid var(--dark-border);
-            padding: 5px 7px;
+            padding: 6px 8px;
             background: #f8fafc;
         }
 
@@ -337,7 +305,7 @@
         }
 
         .footer-left td {
-            padding: 2.5px 2px;
+            padding: 3px 2px;
             border: none;
             color: #000;
         }
@@ -347,25 +315,24 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 5px;
+            padding: 6px;
             text-align: center;
             background: #fff;
             font-weight: 800;
-            font-size: 7.8pt;
+            font-size: 8.2pt;
         }
 
         .stamp-space {
-            height: 46px;
+            height: 55px;
             width: 100%;
         }
 
         .office-address {
             text-align: center;
-            font-size: 7.5pt;
+            font-size: 8pt;
             font-weight: 800;
             border-top: 2px solid var(--dark-border);
-            padding-top: 4px;
-            margin-top: 5px;
+            padding-top: 5px;
             color: #000;
         }
 
@@ -433,7 +400,7 @@
                 margin: 0 !important;
                 width: 210mm !important;
                 height: 297mm !important;
-                max-height: 297mm !important;
+                min-height: 297mm !important;
                 page-break-after: avoid !important;
                 page-break-inside: avoid !important;
                 -webkit-print-color-adjust: exact !important;
@@ -540,8 +507,6 @@
                 <input type="text" id="in_total_rec" value="25,000/-" oninput="updatePreview()">
             </div>
 
-
-
             <div class="section-title">Receiver Info & Reason</div>
             <div class="form-group">
                 <label>Reason for Payment</label>
@@ -576,99 +541,97 @@
     <div class="preview-workspace">
         <div class="pdf-page">
             <span class="page-badge">A4 Receipt Preview (Fit to Page)</span>
-            <div>
-                <!-- Header -->
-                <div class="header">
-                    <div class="gstin-top">GSTIN: <span id="out_gstin">36APAPB0361C1ZS</span></div>
-                    <div class="proprietor-top"><strong>PROPRIETOR: <span id="out_proprietor_top">B. RAVI KUMAR</span></strong></div>
-                    <img class="logo-img" src="sirlogo.png" alt="Sri Rudhra Solar Logo">
-                    <div class="company-title" id="out_company">SRI RUDHRA SOLAR SOLUTIONS</div>
-                    <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
-                </div>
 
-                <!-- Document Titles -->
-                <div class="receipt-title-box">
-                    <div class="receipt-title">ADVANCE PAYMENT RECEIPT</div>
-                    <div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out_kw">5KW</span>)</div>
-                </div>
-
-                <!-- Customer Information Table -->
-                <table class="info-table">
-                    <tr>
-                        <td class="label">Customer Name Mr./Mrs.</td>
-                        <td><strong id="out_cust_name">GATTU RAJESH</strong></td>
-                        <td class="label" style="width: 14%;">Date</td>
-                        <td style="width: 24%; font-weight: 700;" id="out_date">02-11-2026</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Customer Address</td>
-                        <td id="out_cust_addr">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</td>
-                        <td class="label">Receipt No:</td>
-                        <td style="font-weight: 700;" id="out_receipt_no">SRSS/5K/2026/</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Mobile Number</td>
-                        <td style="font-weight: 700;" id="out_cust_mobile">6281198545</td>
-                        <td class="label">Email Id</td>
-                        <td id="out_cust_email">gattu.rajesh.373@gmail.com</td>
-                    </tr>
-                </table>
-
-                <!-- System Components Table -->
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 8%;">S.No</th>
-                            <th style="width: 42%;">Total Project Cost</th>
-                            <th style="width: 50%;" id="out_total_cost_head">5KW - 2,25,000/-</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td style="text-align:center; font-weight:700;">1</td><td><strong>Solar Panels</strong></td><td>Produce electricity</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">2</td><td><strong>Solar Inverter</strong></td><td>DC TO AC Converter</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">3</td><td><strong>Mounting Structure</strong></td><td>Holds the panels</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">4</td><td><strong>ACDB</strong></td><td>Protects the system</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">5</td><td><strong>DCDB</strong></td><td>Protects the system</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">6</td><td><strong>4 SQ 1 Core DC Cable</strong></td><td>Transfers power</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">7</td><td><strong>4 SQ 2 Core AC Cable</strong></td><td>Transfers power</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">8</td><td><strong>MC4 Connectors</strong></td><td>Connects cables</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">9</td><td><strong>Earthing Kit</strong></td><td>Provides safety</td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">10</td><td><strong>Lightning Arrester</strong></td><td>Protects from lightning</td></tr>
-                    </tbody>
-                </table>
-
-                <!-- Payment Breakdown Table -->
-                <table class="payment-table">
-                    <tr>
-                        <td class="label">Advance Payment (<span id="out_advance_date">02-11-2026</span>)</td>
-                        <td style="text-align: right; font-weight: 900; color: var(--primary-red); font-size: 9pt;" id="out_advance">25,000.00</td>
-                    </tr>
-                    <tr>
-                        <td class="label">2nd Payment</td>
-                        <td style="text-align: right; font-weight: 700;" id="out_payment2">00.00</td>
-                    </tr>
-                </table>
-
-               
-                <!-- Payment Terms Box -->
-                <div class="payment-terms-box">
-                    <strong style="color: var(--accent-blue);">Payment Terms:</strong>
-                    The remaining balance amount of <strong id="out_balance">2,00,000.00</strong> must be paid before or at the time of dispatch of the materials.
-                </div>
-
-                <!-- Total Amount Received -->
-                <div class="received-box">
-                    Amount (Received): ₹ <span id="out_total_rec">25,000/-</span>
-                </div>
-
-                <!-- Reason for Payment -->
-                <div class="reason-box">
-                    <strong style="color: var(--accent-cyan);">Reason for Payment:</strong> <span id="out_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
-                </div>
+            <!-- Header -->
+            <div class="header">
+                <div class="gstin-top">GSTIN: <span id="out_gstin">36APAPB0361C1ZS</span></div>
+                <div class="proprietor-top"><strong>PROPRIETOR: <span id="out_proprietor_top">B. RAVI KUMAR</span></strong></div>
+                <img class="logo-img" src="sirlogo.png" alt="Sri Rudhra Solar Logo">
+                <div class="company-title" id="out_company">SRI RUDHRA SOLAR SOLUTIONS</div>
+                <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
             </div>
 
-            <div>
-                <!-- Receiver / Vendor Information & Authorized Signatory Area -->
+            <!-- Document Titles -->
+            <div class="receipt-title-box">
+                <div class="receipt-title">ADVANCE PAYMENT RECEIPT</div>
+                <div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out_kw">5KW</span>)</div>
+            </div>
+
+            <!-- Customer Information Table -->
+            <table class="info-table">
+                <tr>
+                    <td class="label">Customer Name Mr./Mrs.</td>
+                    <td><strong id="out_cust_name">GATTU RAJESH</strong></td>
+                    <td class="label" style="width: 14%;">Date</td>
+                    <td style="width: 24%; font-weight: 700;" id="out_date">02-11-2026</td>
+                </tr>
+                <tr>
+                    <td class="label">Customer Address</td>
+                    <td id="out_cust_addr">5-212, BAYYARAM,, BAYYARAM, District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</td>
+                    <td class="label">Receipt No:</td>
+                    <td style="font-weight: 700;" id="out_receipt_no">SRSS/5K/2026/</td>
+                </tr>
+                <tr>
+                    <td class="label">Mobile Number</td>
+                    <td style="font-weight: 700;" id="out_cust_mobile">6281198545</td>
+                    <td class="label">Email Id</td>
+                    <td id="out_cust_email">gattu.rajesh.373@gmail.com</td>
+                </tr>
+            </table>
+
+            <!-- System Components Table -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">S.No</th>
+                        <th style="width: 42%;">Total Project Cost</th>
+                        <th style="width: 50%;" id="out_total_cost_head">5KW - 2,25,000/-</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="text-align:center; font-weight:700;">1</td><td><strong>Solar Panels</strong></td><td>Produce electricity</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">2</td><td><strong>Solar Inverter</strong></td><td>DC TO AC Converter</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">3</td><td><strong>Mounting Structure</strong></td><td>Holds the panels</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">4</td><td><strong>ACDB</strong></td><td>Protects the system</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">5</td><td><strong>DCDB</strong></td><td>Protects the system</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">6</td><td><strong>4 SQ 1 Core DC Cable</strong></td><td>Transfers power</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">7</td><td><strong>4 SQ 2 Core AC Cable</strong></td><td>Transfers power</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">8</td><td><strong>MC4 Connectors</strong></td><td>Connects cables</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">9</td><td><strong>Earthing Kit</strong></td><td>Provides safety</td></tr>
+                    <tr><td style="text-align:center; font-weight:700;">10</td><td><strong>Lightning Arrester</strong></td><td>Protects from lightning</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Payment Breakdown Table -->
+            <table class="payment-table">
+                <tr>
+                    <td class="label">Advance Payment (<span id="out_advance_date">02-11-2026</span>)</td>
+                    <td style="text-align: right; font-weight: 900; color: var(--primary-red); font-size: 9.5pt;" id="out_advance">25,000.00</td>
+                </tr>
+                <tr>
+                    <td class="label">2nd Payment</td>
+                    <td style="text-align: right; font-weight: 700;" id="out_payment2">00.00</td>
+                </tr>
+            </table>
+
+            <!-- Payment Terms Box -->
+            <div class="payment-terms-box">
+                <strong style="color: var(--accent-blue);">Payment Terms:</strong>
+                The remaining balance amount of <strong id="out_balance">2,00,000.00</strong> must be paid before or at the time of dispatch of the materials.
+            </div>
+
+            <!-- Total Amount Received -->
+            <div class="received-box">
+                Amount (Received): ₹ <span id="out_total_rec">25,000/-</span>
+            </div>
+
+            <!-- Reason for Payment -->
+            <div class="reason-box">
+                <strong style="color: var(--accent-cyan);">Reason for Payment:</strong> <span id="out_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
+            </div>
+
+            <!-- Bottom Section anchored cleanly without artificial gaps -->
+            <div class="footer-section">
                 <div class="footer-grid">
                     <div class="footer-left">
                         <table>
@@ -736,13 +699,6 @@
             document.getElementById('out_balance').innerText = document.getElementById('in_balance').value;
             document.getElementById('out_total_rec').innerText = document.getElementById('in_total_rec').value;
 
-            // Bank Details Sync
-            document.getElementById('out_bank_holder').innerText = document.getElementById('in_bank_holder').value;
-            document.getElementById('out_bank_name').innerText = document.getElementById('in_bank_name').value;
-            document.getElementById('out_bank_branch').innerText = document.getElementById('in_bank_branch').value;
-            document.getElementById('out_bank_acc').innerText = document.getElementById('in_bank_acc').value;
-            document.getElementById('out_bank_ifsc').innerText = document.getElementById('in_bank_ifsc').value;
-
             document.getElementById('out_reason').innerText = document.getElementById('in_reason').value;
             document.getElementById('out_pay_mode').innerText = document.getElementById('in_pay_mode').value;
             document.getElementById('out_receiver_name').innerText = document.getElementById('in_receiver_name').value;
@@ -753,20 +709,19 @@
 
         // Initialize preview on page load
         updatePreview();
-    </script>
-    <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
+        document.addEventListener("contextmenu", e => e.preventDefault());
+
+        document.addEventListener("keydown", function(e) {
+            if (
+                e.key === "F12" ||
+                (e.ctrlKey && e.shiftKey &&
+                ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+                (e.ctrlKey && e.key.toUpperCase() === "U")
+            ) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
