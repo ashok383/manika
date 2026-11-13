@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA - Multiple Image Manual Cropper</title>
+
+<!-- Cropper.js: interactive manual crop tool -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
+<!-- JSZip: download all cropped images in one ZIP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- jsPDF: export all cropped images into a single PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 18px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #10172b, #263957);
+    color: #222;
+}
+
+.container {
+    max-width: 1050px;
+    margin: auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px #0005;
+}
+
+header { text-align: center; margin-bottom: 24px; }
+header h1 { color: #e87916; margin: 0 0 7px; letter-spacing: 1px; }
+header h2 { margin: 0 0 7px; font-size: 22px; }
+header p { color: #666; margin: 0; }
+
+.upload {
+    display: block;
+    padding: 30px 15px;
+    margin-bottom: 18px;
+    text-align: center;
+    border: 2px dashed #e87916;
+    border-radius: 14px;
+    background: #fff8ef;
+    cursor: pointer;
+}
+.upload:hover { background: #ffefd9; }
+.upload h3 { color: #d66b0a; margin: 0 0 8px; }
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+    align-items: end;
+}
+.controls label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+}
+
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 17px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+.download { background: #159447; color: white; width: 100%; font-size: 16px; padding: 15px; }
+.reset { background: #e74c3c; color: white; width: 100%; padding: 12px; }
+.secondary { background: #1769aa; color: white; }
+.manual-btn { background: #e87916; color: white; width: 100%; }
+
+#status {
+    padding: 12px;
+    border-radius: 8px;
+    margin: 14px 0;
+    text-align: center;
+    background: #edf4ff;
+    color: #174c88;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.section-title { margin: 24px 0 12px; }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 14px;
+}
+.item {
+    border: 1px solid #ddd;
+    border-radius: 11px;
+    padding: 10px;
+    min-width: 0;
+    background: #fff;
+}
+.item img {
+    display: block;
+    width: 100%;
+    height: 135px;
+    object-fit: contain;
+    background: #f0f0f0;
+    border-radius: 7px;
+}
+.item p {
+    margin: 8px 0;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+.item .state { color: #168044; font-weight: bold; }
+.item .pending { color: #a45b00; font-weight: bold; }
+
+.preview-grid .item img { height: 155px; }
+
+.bottom-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+.note {
+    color: #666;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 14px;
+}
+
+footer {
+    text-align: center;
+    margin-top: 28px;
+    color: #888;
+    font-size: 12px;
+}
+
+/* Manual crop popup */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    padding: 12px;
+    background: rgba(0,0,0,.82);
+    align-items: center;
+    justify-content: center;
+}
+.modal.show { display: flex; }
+.modal-box {
+    width: min(950px, 100%);
+    max-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 13px;
+    overflow: hidden;
+}
+.modal-head, .modal-foot {
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.modal-head { border-bottom: 1px solid #ddd; }
+.modal-head h3 { margin: 0; font-size: 17px; }
+.crop-area {
+    min-height: 220px;
+    max-height: 68vh;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: #222;
+}
+.crop-area img {
+    display: block;
+    max-width: 100%;
+    max-height: 64vh;
+}
+.modal-foot { border-top: 1px solid #ddd; }
+.modal-foot .left, .modal-foot .right {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.cancel-btn { background: #666; color: white; }
+.apply-btn { background: #159447; color: white; }
+.crop-hint {
+    width: 100%;
+    color: #555;
+    font-size: 12px;
+    margin: 0;
+}
+@media (max-width: 600px) {
+    body { padding: 8px; }
+    .container { padding: 15px; }
+    .modal { padding: 5px; }
+    .crop-area { min-height: 200px; }
+    .crop-area img { max-height: 58vh; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <h1>MANIKARNIKA</h1>
+    <h2>Multiple Image Manual Cropper</h2>
+    <p>Upload • Crop Each Manually • Preview • Download</p>
+</header>
+
+<label class="upload" for="files" id="dropArea">
+    <h3>📁 SELECT MULTIPLE IMAGES</h3>
+    <p>Tap here or drag and drop your images</p>
+    <small>JPG, JPEG, PNG, WEBP and other browser-supported image files</small>
+</label>
+<input type="file" id="files" accept="image/*" multiple hidden>
+
+<div class="controls">
+    <div>
+        <label for="ratio">Crop Size / Ratio</label>
+        <select id="ratio">
+            <option value="free">Free crop</option>
+            <option value="1">1 : 1 Square</option>
+            <option value="0.6666667">4 : 6 Portrait</option>
+            <option value="1.5">6 : 4 Landscape</option>
+            <option value="0.75">3 : 4 Portrait</option>
+            <option value="1.7777778">16 : 9 Landscape</option>
+            <option value="0.7777778">Passport 3.5 : 4.5</option>
+            <option value="original">Original image ratio</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="format">Output Mode</label>
+        <select id="format">
+            <option value="image/jpeg">JPEG (ZIP)</option>
+            <option value="image/png">PNG (ZIP)</option>
+            <option value="application/pdf">PDF (Combined Document)</option>
+        </select>
+    </div>
+
+    <div>
+        <button class="reset" id="reset" type="button">RESET ALL</button>
+    </div>
+</div>
+
+<div id="status">Select multiple images to begin.</div>
+
+<h3 class="section-title">Your Images — Open Manual Crop for each image</h3>
+<div class="grid" id="workGrid"></div>
+
+<h3 class="section-title">Cropped Image Preview</h3>
+<div class="grid preview-grid" id="preview"></div>
+
+<div class="bottom-actions">
+    <button class="download" id="download" disabled>
+        ⬇ DOWNLOAD ALL CROPPED IMAGES (ZIP)
+    </button>
+</div>
+
+<p class="note">
+    Manual crop: open an image, move the crop box, drag its corners or edges to resize,
+    then press “Apply Crop”. All images must be cropped before the download button at the bottom is enabled.
+</p>
+
+<footer>
+    MANIKARNIKA SOFTWARE & EMBEDDED SYSTEMS
+    <br>Multiple Image Processing Tool
+</footer>
+</div>
+
+<!-- Manual crop modal -->
+<div class="modal" id="cropModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 id="modalTitle">Manual Crop</h3>
+            <button class="cancel-btn" id="closeTop" type="button">✕ Close</button>
+        </div>
+        <div class="crop-area">
+            <img id="cropImage" alt="Image to crop">
+        </div>
+        <div class="modal-foot">
+            <p class="crop-hint">
+                Drag inside the crop box to move it. Drag its corners or edges to resize.
+                Use the mouse wheel or pinch gesture to zoom where supported.
+            </p>
+            <div class="left">
+                <button class="secondary" id="rotateLeft" type="button">↶ Rotate</button>
+                <button class="secondary" id="rotateRight" type="button">↷ Rotate</button>
+                <button class="secondary" id="resetCrop" type="button">Reset Crop</button>
+            </div>
+            <div class="right">
+                <button class="cancel-btn" id="cancelCrop" type="button">Cancel</button>
+                <button class="apply-btn" id="applyCrop" type="button">✓ Apply Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById("files");
+const ratioSelect = document.getElementById("ratio");
+const formatSelect = document.getElementById("format");
+const workGrid = document.getElementById("workGrid");
+const preview = document.getElementById("preview");
+const statusBox = document.getElementById("status");
+const downloadBtn = document.getElementById("download");
+const resetBtn = document.getElementById("reset");
+const dropArea = document.getElementById("dropArea");
+
+const cropModal = document.getElementById("cropModal");
+const cropImage = document.getElementById("cropImage");
+const modalTitle = document.getElementById("modalTitle");
+
+let items = [];
+let cropper = null;
+let activeItem = null;
+
+function ratioValue() {
+    const value = ratioSelect.value;
+    if (value === "free") return NaN;
+    if (value === "original") return "original";
+    return Number(value);
+}
+
+function getManualRatio(imageElement) {
+    const value = ratioValue();
+    if (value === "original") {
+        return imageElement.naturalWidth / imageElement.naturalHeight;
+    }
+    return value;
+}
+
+function getCanvasMime() {
+    // PDF embeds high-quality JPEG data internally
+    return formatSelect.value === "image/png" ? "image/png" : "image/jpeg";
+}
+
+function revokeItemURLs() {
+    items.forEach(item => {
+        if (item.sourceUrl) URL.revokeObjectURL(item.sourceUrl);
+        if (item.outputUrl) URL.revokeObjectURL(item.outputUrl);
+    });
+}
+
+function setStatus() {
+    const done = items.filter(item => item.blob).length;
+    const total = items.length;
+    const modeLabel = formatSelect.value === "application/pdf" ? "PDF document" : "ZIP file";
+
+    if (!total) {
+        statusBox.textContent = "Select multiple images to begin.";
+    } else if (done === total) {
+        statusBox.textContent = `All ${total} images are ready. You can download the ${modeLabel} below.`;
+    } else {
+        statusBox.textContent = `${done} of ${total} images cropped. Crop the remaining ${total - done} image(s).`;
+    }
+
+    updateDownloadState();
+}
+
+function updateDownloadState() {
+    const isPdf = formatSelect.value === "application/pdf";
+    downloadBtn.textContent = isPdf
+        ? "⬇ DOWNLOAD COMBINED PDF"
+        : "⬇ DOWNLOAD ALL CROPPED IMAGES (ZIP)";
+    downloadBtn.disabled = !items.length || items.some(item => !item.blob);
+}
+
+function makeOutputName(item) {
+    const ext = formatSelect.value === "image/png" ? ".png" : ".jpg";
+    const base = item.file.name.replace(/\.[^.]+$/, "");
+    return base + "_cropped" + ext;
+}
+
+function addOutput(item, blob, width, height) {
+    if (item.outputUrl) URL.revokeObjectURL(item.outputUrl);
+
+    item.blob = blob;
+    item.width = width;
+    item.height = height;
+    item.outputName = makeOutputName(item);
+    item.outputUrl = URL.createObjectURL(blob);
+
+    renderWorkGrid();
+    renderPreview();
+    setStatus();
+}
+
+function renderWorkGrid() {
+    workGrid.innerHTML = "";
+
+    items.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "item";
+
+        const img = document.createElement("img");
+        img.src = item.sourceUrl;
+        img.alt = item.file.name;
+
+        const name = document.createElement("p");
+        name.textContent = item.file.name;
+
+        const state = document.createElement("p");
+        state.className = item.blob ? "state" : "pending";
+        state.textContent = item.blob ? "✓ Cropped and ready" : "● Waiting for crop";
+
+        const button = document.createElement("button");
+        button.className = "manual-btn";
+        button.type = "button";
+        button.textContent = item.blob ? "Edit Manual Crop" : "Open Manual Crop";
+        button.addEventListener("click", () => openManualCrop(index));
+
+        card.append(img, name, state, button);
+        workGrid.appendChild(card);
+    });
+}
+
+function renderPreview() {
+    preview.innerHTML = "";
+
+    items.forEach((item, index) => {
+        if (!item.blob || !item.outputUrl) return;
+
+        const card = document.createElement("div");
+        card.className = "item";
+
+        const img = document.createElement("img");
+        img.src = item.outputUrl;
+        img.alt = item.outputName;
+
+        const name = document.createElement("p");
+        name.textContent = formatSelect.value === "application/pdf"
+            ? `Page ${index + 1}: ${item.file.name}`
+            : makeOutputName(item);
+
+        card.append(img, name);
+        preview.appendChild(card);
+    });
+}
+
+function canvasToBlob(canvas, mime) {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+            if (blob) resolve(blob);
+            else reject(new Error("Image conversion failed."));
+        }, mime, 0.95);
+    });
+}
+
+function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+function openManualCrop(index) {
+    if (typeof Cropper === "undefined") {
+        statusBox.textContent =
+            "Manual crop library could not load. Connect to the internet and refresh this page.";
+        return;
+    }
+
+    activeItem = items[index];
+    if (!activeItem) return;
+
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+
+    cropImage.src = activeItem.sourceUrl;
+    modalTitle.textContent = "Manual Crop — " + activeItem.file.name;
+    cropModal.classList.add("show");
+
+    cropImage.onload = () => {
+        if (cropper) cropper.destroy();
+
+        cropper = new Cropper(cropImage, {
+            viewMode: 1,
+            dragMode: "crop",
+            autoCropArea: 0.85,
+            responsive: true,
+            background: false,
+            movable: true,
+            zoomable: true,
+            zoomOnWheel: true,
+            rotatable: true,
+            scalable: false,
+            aspectRatio: getManualRatio(cropImage),
+            guides: true,
+            center: true,
+            highlight: true,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false
+        });
+    };
+
+    if (cropImage.complete && cropImage.naturalWidth) {
+        cropImage.onload();
+    }
+}
+
+function closeManualCrop() {
+    cropModal.classList.remove("show");
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    cropImage.onload = null;
+    activeItem = null;
+}
+
+function refreshCropAspect() {
+    if (cropper) {
+        cropper.setAspectRatio(getManualRatio(cropImage));
+    }
+}
+
+async function applyManualCrop() {
+    if (!cropper || !activeItem) return;
+
+    const mime = getCanvasMime();
+
+    const canvas = cropper.getCroppedCanvas({
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: "high",
+        fillColor: mime === "image/jpeg" ? "#ffffff" : "transparent"
+    });
+
+    if (!canvas) {
+        statusBox.textContent = "Could not create the cropped image.";
+        return;
+    }
+
+    const applyButton = document.getElementById("applyCrop");
+    applyButton.disabled = true;
+    applyButton.textContent = "Processing...";
+
+    try {
+        const blob = await canvasToBlob(canvas, mime);
+        const item = activeItem;
+        const w = canvas.width;
+        const h = canvas.height;
+        closeManualCrop();
+        addOutput(item, blob, w, h);
+    } catch (error) {
+        console.error(error);
+        statusBox.textContent = "Manual crop failed. Please try again.";
+    } finally {
+        applyButton.disabled = false;
+        applyButton.textContent = "✓ Apply Crop";
+    }
+}
+
+function loadFiles(fileList) {
+    const newFiles = Array.from(fileList).filter(file =>
+        file.type.startsWith("image/")
+    );
+
+    if (!newFiles.length) {
+        statusBox.textContent = "Please select valid image files.";
+        return;
+    }
+
+    closeManualCrop();
+    revokeItemURLs();
+
+    items = newFiles.map(file => ({
+        file,
+        sourceUrl: URL.createObjectURL(file),
+        outputUrl: null,
+        blob: null,
+        outputName: null,
+        width: 0,
+        height: 0
+    }));
+
+    preview.innerHTML = "";
+    renderWorkGrid();
+    setStatus();
+}
+
+fileInput.addEventListener("change", event => {
+    loadFiles(event.target.files);
+});
+
+ratioSelect.addEventListener("change", () => {
+    refreshCropAspect();
+});
+
+formatSelect.addEventListener("change", () => {
+    // Re-encode existing blobs if switching between PNG and JPEG/PDF
+    items.forEach(item => {
+        if (item.blob) {
+            item.outputName = makeOutputName(item);
+        }
+    });
+    renderPreview();
+    setStatus();
+});
+
+// Drag and drop upload
+dropArea.addEventListener("dragover", event => {
+    event.preventDefault();
+    dropArea.style.background = "#ffe2bf";
+});
+
+dropArea.addEventListener("dragleave", () => {
+    dropArea.style.background = "#fff8ef";
+});
+
+dropArea.addEventListener("drop", event => {
+    event.preventDefault();
+    dropArea.style.background = "#fff8ef";
+    loadFiles(event.dataTransfer.files);
+});
+
+// Manual crop controls
+document.getElementById("closeTop").addEventListener("click", closeManualCrop);
+document.getElementById("cancelCrop").addEventListener("click", closeManualCrop);
+document.getElementById("applyCrop").addEventListener("click", applyManualCrop);
+
+document.getElementById("rotateLeft").addEventListener("click", () => {
+    if (cropper) cropper.rotate(-90);
+});
+
+document.getElementById("rotateRight").addEventListener("click", () => {
+    if (cropper) cropper.rotate(90);
+});
+
+document.getElementById("resetCrop").addEventListener("click", () => {
+    if (cropper) cropper.reset();
+});
+
+cropModal.addEventListener("click", event => {
+    if (event.target === cropModal) closeManualCrop();
+});
+
+// Download handler (ZIP for JPEG/PNG or single PDF)
+downloadBtn.addEventListener("click", async () => {
+    if (!items.length || items.some(item => !item.blob)) return;
+
+    const selectedMode = formatSelect.value;
+    downloadBtn.disabled = true;
+
+    try {
+        if (selectedMode === "application/pdf") {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                statusBox.textContent =
+                    "PDF library could not load. Connect to the internet and refresh this page.";
+                updateDownloadState();
+                return;
+            }
+
+            statusBox.textContent = "Generating PDF document...";
+            const { jsPDF } = window.jspdf;
+            let pdf = null;
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const dataUrl = await blobToDataURL(item.blob);
+                const imgType = item.blob.type === "image/png" ? "PNG" : "JPEG";
+
+                // Match each PDF page orientation and dimensions to the cropped image
+                const orientation = item.width >= item.height ? "l" : "p";
+                const pxToMm = 0.264583;
+                const pageW = Math.max(10, item.width * pxToMm);
+                const pageH = Math.max(10, item.height * pxToMm);
+
+                if (i === 0) {
+                    pdf = new jsPDF({
+                        orientation: orientation,
+                        unit: "mm",
+                        format: [pageW, pageH]
+                    });
+                } else {
+                    pdf.addPage([pageW, pageH], orientation);
+                }
+
+                pdf.addImage(dataUrl, imgType, 0, 0, pageW, pageH);
+                statusBox.textContent = `Adding image ${i + 1} of ${items.length} to PDF...`;
+            }
+
+            pdf.save("MANIKARNIKA_CROPPED_IMAGES.pdf");
+            statusBox.textContent = `Success! ${items.length} cropped images saved in one PDF.`;
+
+        } else {
+            if (typeof JSZip === "undefined") {
+                statusBox.textContent =
+                    "ZIP library could not load. Connect to the internet and refresh this page.";
+                updateDownloadState();
+                return;
+            }
+
+            statusBox.textContent = "Creating ZIP file...";
+            const zip = new JSZip();
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const name = makeOutputName(item);
+
+                // Re-encode if user changed between JPEG and PNG after cropping
+                if (item.blob.type !== selectedMode) {
+                    const img = new Image();
+                    img.src = item.outputUrl;
+                    await new Promise(r => { img.onload = r; });
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext("2d");
+
+                    if (selectedMode === "image/jpeg") {
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                    ctx.drawImage(img, 0, 0);
+                    const convertedBlob = await canvasToBlob(canvas, selectedMode);
+                    zip.file(name, convertedBlob);
+                } else {
+                    zip.file(name, item.blob);
+                }
+            }
+
+            const zipBlob = await zip.generateAsync({
+                type: "blob",
+                compression: "DEFLATE",
+                compressionOptions: { level: 5 }
+            }, metadata => {
+                statusBox.textContent = `Creating ZIP file: ${Math.round(metadata.percent)}%`;
+            });
+
+            const zipUrl = URL.createObjectURL(zipBlob);
+            const link = document.createElement("a");
+            link.href = zipUrl;
+            link.download = "MANIKARNIKA_CROPPED_IMAGES.zip";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            setTimeout(() => URL.revokeObjectURL(zipUrl), 30000);
+            statusBox.textContent = `Success! ${items.length} cropped images downloaded in one ZIP file.`;
+        }
+    } catch (error) {
+        console.error(error);
+        statusBox.textContent = "Download failed. Please try again.";
+    }
+
+    updateDownloadState();
+});
+
+// Reset
+resetBtn.addEventListener("click", () => {
+    closeManualCrop();
+    revokeItemURLs();
+    items = [];
+    fileInput.value = "";
+    workGrid.innerHTML = "";
+    preview.innerHTML = "";
+    updateDownloadState();
+    statusBox.textContent = "Ready. Select images to begin.";
+});
+</script>
+<script>
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.addEventListener("keydown", function(e) {
+    if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey &&
+        ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")
+    ) {
+        e.preventDefault();
+    }
+});
+</script>
+</body>
+</html>
