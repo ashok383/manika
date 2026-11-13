@@ -420,6 +420,99 @@
             .pdf-page:last-child { page-break-after: auto; }
             .page-badge { display: none; }
         }
+
+        /* STRONG PRINT TYPOGRAPHY: BOTH QUOTATION PAGES */
+        .pdf-page {
+            font-weight: 700;
+            color: #000 !important;
+        }
+        .pdf-page p,
+        .pdf-page div,
+        .pdf-page span,
+        .pdf-page td,
+        .pdf-page th {
+            font-weight: 650;
+        }
+        .pdf-page .company-title,
+        .pdf-page .doc-title,
+        .pdf-page .details-box-header,
+        .pdf-page .section-title,
+        .pdf-page .subsidy-note,
+        .pdf-page .highlight-row,
+        .pdf-page .bom-table th {
+            font-weight: 900 !important;
+        }
+        .pdf-page .details-table td.label-col {
+            font-weight: 900 !important;
+            color: #111;
+        }
+        .pdf-page .details-table td.val-col {
+            font-weight: 800 !important;
+            color: #000;
+        }
+        .pdf-page .contact-info {
+            font-weight: 750 !important;
+        }
+        .pdf-page .bom-table td {
+            font-weight: 750 !important;
+            border: 1.5px solid #111;
+        }
+        .pdf-page .bom-table th {
+            border: 2px solid #111;
+        }
+        .pdf-page .highlight-row td {
+            font-weight: 900 !important;
+            border-top: 2px solid #111;
+            border-bottom: 2px solid #111;
+        }
+
+        /* VENDOR / PROPRIETOR INFORMATION - PROMINENT HIGHLIGHT */
+        .proprietor-details-box {
+            border: 3px solid #172554 !important;
+            border-radius: 5px;
+            overflow: hidden;
+            background: linear-gradient(90deg, #fff1f2, #eff6ff 55%, #ecfeff);
+        }
+        .proprietor-details-box .details-box-header {
+            color: #fff !important;
+            background: linear-gradient(90deg, #b91c1c, #1d4ed8, #0891b2) !important;
+            border-bottom: 3px solid #172554 !important;
+            font-size: 10pt !important;
+            font-weight: 900 !important;
+            padding: 7px 9px !important;
+        }
+        .proprietor-details-box .proprietor-content {
+            padding: 10px !important;
+            background: linear-gradient(90deg, #fff7ed, #eff6ff, #ecfeff);
+            font-size: 9.5pt !important;
+            line-height: 1.55 !important;
+            font-weight: 800 !important;
+            border-left: 6px solid #dc2626;
+        }
+        .proprietor-details-box .proprietor-content strong,
+        .proprietor-details-box .proprietor-value {
+            font-weight: 900 !important;
+            color: #991b1b !important;
+            background: #ffedd5;
+            border: 1.5px solid #f97316;
+            border-radius: 3px;
+            padding: 1px 4px;
+        }
+        .proprietor-details-box .proprietor-value {
+            color: #1e3a8a !important;
+            background: #dbeafe;
+            border-color: #2563eb;
+        }
+        @media print {
+            .pdf-page, .pdf-page *,
+            .proprietor-details-box,
+            .proprietor-details-box * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                text-rendering: geometricPrecision;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -454,7 +547,7 @@
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>System Capacity (KW)</label>
-                    <input type="text" id="in_kw" value="5 KW" oninput="updatePreview()">
+                    <input type="text" id="in_kw" value="3KW" oninput="updatePreview()">
                 </div>
             </div>
             <div class="form-group">
@@ -479,24 +572,24 @@
             <div class="section-title">Customer Information</div>
             <div class="form-group">
                 <label>Customer Name</label>
-                <input type="text" id="in_cust_name" value="GATTU RAJESH" oninput="updatePreview()">
+                <input type="text" id="in_cust_name" value=" " oninput="updatePreview()">
             </div>
             <div class="form-group">
                 <label>Address Line 1</label>
-                <input type="text" id="in_cust_addr1" value="5-212,BAYYARAM,, BAYYARAM," oninput="updatePreview()">
+                <input type="text" id="in_cust_addr1" value=" " oninput="updatePreview()">
             </div>
             <div class="form-group">
                 <label>Address Line 2</label>
-                <textarea id="in_cust_addr2" rows="2" oninput="updatePreview()">District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</textarea>
+                <textarea id="in_cust_addr2" rows="2" oninput="updatePreview()">District: MAHABUBABAD, State: TELANGANA, PIN Code: </textarea>
             </div>
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
                     <label>Mobile Number</label>
-                    <input type="text" id="in_cust_mobile" value="6281198545" oninput="updatePreview()">
+                    <input type="text" id="in_cust_mobile" value="" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Email Id</label>
-                    <input type="text" id="in_cust_email" value="gattu.rajesh.373@gmail.com" oninput="updatePreview()">
+                    <input type="text" id="in_cust_email" value="   @gmail.com" oninput="updatePreview()">
                 </div>
             </div>
 
@@ -536,11 +629,11 @@
             <div class="section-title">Proposal Header & BOM Capacity</div>
             <div class="form-group">
                 <label>Proposal Intro Text</label>
-                <textarea id="in_salutation" rows="2" oninput="updatePreview()">With reference to your requirements and discussion with us, our proposal for a 5 Kw Power Grid connected Solar Power Generating System is with below stated prices:</textarea>
+                <textarea id="in_salutation" rows="2" oninput="updatePreview()">With reference to your requirements and discussion with us, our proposal for a 3Kw Power Grid connected Solar Power Generating System is with below stated prices:</textarea>
             </div>
             <div class="form-group">
                 <label>BOM Table Header Text</label>
-                <input type="text" id="in_bom_title" value="Cost Estimations & Bill of Material of 5KW On-Grid Photovoltaic System" oninput="updatePreview()">
+                <input type="text" id="in_bom_title" value="Cost Estimations & Bill of Material of 3KW On-Grid Photovoltaic System" oninput="updatePreview()">
             </div>
 
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
@@ -592,13 +685,13 @@
                 </div>
 
                 <div class="doc-title">
-                    DETAILED QUOTATION FOR THE SUPPLY OF <span id="out_kw">5 KW</span> DCR SOLAR ROOFTOP ONGRID POWER GENERATING SYSTEM
+                    DETAILED QUOTATION FOR THE SUPPLY OF <span id="out_kw">3 KW</span> DCR SOLAR ROOFTOP ONGRID POWER GENERATING SYSTEM
                 </div>
 
                 <div class="contact-info">
                     <strong>M/s. <span id="out_company_sub">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br>
                     <span id="out_location">Mahabubabad, Telangana, India.</span><br>
-                    Phone Number: <span id="out_phones">9110328712, 6303182834</span> | Email: <span id="out_email">srirudhrasolarsolutions@gmail.com</span>
+                    Phone Number: <span id="out_phones">9110328712, 9866903175</span> | Email: <span id="out_email">srirudhrasolarsolutions@gmail.com</span>
                 </div>
 
                 <div class="details-box">
@@ -606,32 +699,36 @@
                     <table class="details-table">
                         <tr>
                             <td class="label-col">Name</td>
-                            <td class="val-col" id="out_cust_name">GATTU RAJESH</td>
+                            <td class="val-col" id="out_cust_name">Name of Customer</td>
                         </tr>
                         <tr>
                             <td class="label-col">Address</td>
                             <td class="val-col">
-                                <span id="out_cust_addr1">5-212,BAYYARAM,, BAYYARAM,</span><br>
-                                <span id="out_cust_addr2">District: MAHABUBABAD, State: TELANGANA, PIN Code: 507211</span>
+                                <span id="out_cust_addr1">  </span><br>
+                                <span id="out_cust_addr2">District: MAHABUBABAD, State: TELANGANA, PIN Code: </span>
                             </td>
                         </tr>
                         <tr>
                             <td class="label-col">Mobile Number</td>
-                            <td class="val-col" id="out_cust_mobile">6281198545</td>
+                            <td class="val-col" id="out_cust_mobile"></td>
                         </tr>
                         <tr>
                             <td class="label-col">Email Id</td>
-                            <td class="val-col" id="out_cust_email">gattu.rajesh.373@gmail.com</td>
+                            <td class="val-col" id="out_cust_email">@gmail.com</td>
                         </tr>
                     </table>
                 </div>
 
-                <div class="details-box">
-                    <div class="details-box-header">OFFER SUBMITTED BY:</div>
-                    <div style="padding: 8px; font-size: 8.5pt; line-height: 1.4;">
+                <div class="details-box proprietor-details-box">
+                    <div class="details-box-header">OFFER SUBMITTED BY / VENDOR & PROPRIETOR DETAILS:</div>
+                    <div class="proprietor-content">
                         GST is Included at Project cost.<br>
-                        Purchase Order (PO) is to be made in the favor of: <strong>M/s <span id="out_po_company">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br>
-                        VENDOR EPC REG NO: - <span id="out_epc_no">TSRE261046</span> &nbsp;&nbsp;&nbsp; VENDOR NAME: - <span id="out_vendor_name">B. RAVI KUMAR</span>
+                        Purchase Order (PO) is to be made in the favor of:
+                        <strong>M/s <span id="out_po_company">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br>
+                        VENDOR EPC REG NO: -
+                        <span class="proprietor-value" id="out_epc_no">TSRE261046</span>
+                        &nbsp;&nbsp;&nbsp; VENDOR / PROPRIETOR NAME: -
+                        <span class="proprietor-value" id="out_vendor_name">B. RAVI KUMAR</span>
                     </div>
                 </div>
 
@@ -673,13 +770,13 @@
 
                 <div style="margin-bottom: 10px; font-size: 9.5pt; line-height: 1.4;">
                     <strong>RESPECTED SIR/MADAM,</strong><br>
-                    <span id="out_salutation">With reference to your requirements and discussion with us, our proposal for a 5 Kw Power Grid connected Solar Power Generating System is with below stated prices:</span>
+                    <span id="out_salutation">With reference to your requirements and discussion with us, our proposal for a 3Kw Power Grid connected Solar Power Generating System is with below stated prices:</span>
                 </div>
 
                 <table class="bom-table">
                     <thead>
                         <tr>
-                            <th colspan="3" id="out_bom_title">Cost Estimations & Bill of Material of 5KW On-Grid Photovoltaic System</th>
+                            <th colspan="3" id="out_bom_title">Cost Estimations & Bill of Material of 3Kw On-Grid Photovoltaic System</th>
                         </tr>
                         <tr>
                             <th style="width: 8%;">Sr.</th>
@@ -718,10 +815,10 @@
         let bomItems = [
             { desc: "Solar PV module: Bifacial/ADANI/PREMIER/WAREE/SATVIK/EQUIVALENT DCR/SET Module", qty: "-" },
             { desc: "GI Module 5FT/6.5FT Mounting structure Designed Wind Load Resistance: 180Kmph. Hot dip Legs And G.I Rafter/Purlin (AS PER SITE REQUIRED BASIC AND HEIGHT)", qty: "1" },
-            { desc: "5KW ACDB", qty: "1" },
+            { desc: "3KW ACDB", qty: "1" },
             { desc: "MC4 Connectors", qty: "4" },
-            { desc: "5KW Inverter (Growatt/Polycab SOLAR)", qty: "1" },
-            { desc: "5KW DCDB", qty: "1" },
+            { desc: "3KW Inverter (Growatt/Polycab SOLAR)", qty: "1" },
+            { desc: "3KW DCDB", qty: "1" },
             { desc: "AC 2Cx4Sqmm Cu. POLYCAB Cable", qty: "AS REQ" },
             { desc: "DC 1C4SqMm Cu. Cable", qty: "AS REQ" },
             { desc: "Earthing Cable", qty: "AS REQ" },
