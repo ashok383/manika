@@ -2,1041 +2,115 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>(MANIK-A-RNIKA) Photo Tool</title>
+<title>(MANIK-A-RNIKA) Photo Tool - FIXED NO SHADE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:'Segoe UI',sans-serif;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  padding:15px;
-  background:linear-gradient(
-    120deg,
-    #ff9a9e,
-    #fad0c4,
-    #a18cd1,
-    #fbc2eb
-  );
-  background-size:400% 400%;
-  animation:gradBG 15s ease infinite;
-}
-
-@keyframes gradBG{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
-}
-
-.app{
-  width:100%;
-  max-width:560px;
-  background:rgba(255,255,255,0.25);
-  backdrop-filter:blur(18px);
-  border-radius:26px;
-  padding:22px;
-  color:#fff;
-  box-shadow:0 12px 35px rgba(0,0,0,0.3);
-}
-
-header{
-  text-align:center;
-  margin-bottom:18px
-}
-
-header h2{
-  font-size:1.9em;
-  font-weight:700
-}
-
-.upload-btn,
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:28px;
-  font-size:16px;
-  font-weight:bold;
-  color:#fff;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.upload-btn{
-  background:linear-gradient(
-    135deg,
-    #00c6ff,
-    #0072ff
-  );
-}
-
-.upload-btn input{
-  display:none;
-}
-
-.btn-photo{
-  background:linear-gradient(
-    135deg,
-    #f7971e,
-    #ffd200
-  );
-}
-
-.btn-sheet{
-  background:linear-gradient(
-    135deg,
-    #00f260,
-    #0575e6
-  );
-}
-
-.color-box{
-  margin-top:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(255,255,255,0.25);
-  padding:10px 14px;
-  border-radius:16px;
-}
-
-
-/* ================= NO BACKGROUND BUTTON ================= */
-
-.no-bg-box{
-  margin-top:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(255,255,255,0.25);
-  padding:12px 14px;
-  border-radius:16px;
-}
-
-.no-bg-label{
-  font-size:14px;
-  font-weight:600;
-}
-
-.switch{
-  position:relative;
-  width:52px;
-  height:28px;
-}
-
-.switch input{
-  opacity:0;
-  width:0;
-  height:0;
-}
-
-.slider{
-  position:absolute;
-  cursor:pointer;
-  inset:0;
-  background:#777;
-  border-radius:30px;
-  transition:.3s;
-}
-
-.slider:before{
-  content:"";
-  position:absolute;
-  width:22px;
-  height:22px;
-  left:3px;
-  top:3px;
-  background:white;
-  border-radius:50%;
-  transition:.3s;
-}
-
-.switch input:checked + .slider{
-  background:#00c853;
-}
-
-.switch input:checked + .slider:before{
-  transform:translateX(24px);
-}
-
-
-/* ================= CANVAS ================= */
-
-canvas{
-  display:block;
-  margin:15px auto;
-  max-width:100%;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
-}
-
-.status{
-  text-align:center;
-  font-size:12px;
-  opacity:.8;
-  margin-top:8px;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:15px;background:linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);background-size:400% 400%;animation:gradBG 15s ease infinite;}
+@keyframes gradBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.app{width:100%;max-width:560px;background:rgba(255,255,255,0.25);backdrop-filter:blur(18px);border-radius:26px;padding:22px;color:#fff;box-shadow:0 12px 35px rgba(0,0,0,0.3);}
+header{text-align:center;margin-bottom:18px;}header h2{font-size:1.9em;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.15);}
+.upload-btn,.btn{width:100%;padding:14px;border:none;border-radius:28px;font-size:16px;font-weight:bold;color:#fff;cursor:pointer;margin-top:10px;display:block;text-align:center;text-decoration:none;box-shadow:0 4px 15px rgba(0,0,0,0.15);transition:transform 0.2s;}
+.upload-btn:hover,.btn:hover{transform:translateY(-1px);}
+.upload-btn{background:linear-gradient(135deg,#00c6ff,#0072ff);}.upload-btn input{display:none;}
+.btn-photo{background:linear-gradient(135deg,#f7971e,#ffd200);color:#1e293b;}.btn-sheet{background:linear-gradient(135deg,#00f260,#0575e6);}
+.control-box{margin-top:12px;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,0.25);padding:12px 14px;border-radius:16px;}
+.control-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;font-weight:600;}
+.gradient-presets{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px;}
+.preset-swatch{height:32px;border-radius:10px;border:2px solid rgba(255,255,255,0.6);cursor:pointer;transition:transform .2s,border-color .2s;}
+.preset-swatch:hover,.preset-swatch.active{transform:scale(1.06);border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,0.7);}
+.color-pickers{display:flex;align-items:center;gap:8px;} .color-pickers input[type="color"]{width:36px;height:30px;border:none;border-radius:8px;cursor:pointer;background:transparent;}
+select{padding:6px 10px;border-radius:10px;border:none;font-weight:600;color:#1e293b;background:rgba(255,255,255,0.9);cursor:pointer;outline:none;}
+.no-bg-box{margin-top:10px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.25);padding:12px 14px;border-radius:16px;}
+.no-bg-label{font-size:14px;font-weight:600;} .switch{position:relative;width:52px;height:28px;} .switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;inset:0;background:#777;border-radius:30px;transition:.3s;} .slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.3s;}
+.switch input:checked+.slider{background:#00c853;} .switch input:checked+.slider:before{transform:translateX(24px);}
+canvas{display:block;margin:15px auto;max-width:100%;border-radius:18px;box-shadow:0 10px 25px rgba(0,0,0,.35);} .status{text-align:center;font-size:13px;opacity:.95;margin-top:8px;font-weight:600;}
 </style>
 </head>
-
-
 <body>
-
 <div class="app">
-
-<header>
-<h2>(MANIK-A-RNIKA) Photo Tool</h2>
-</header>
-
-
-<!-- UPLOAD -->
-
-<label class="upload-btn">
-
-📸 Upload Photo
-
-<input
-  type="file"
-  id="upload"
-  accept="image/*"
->
-
-</label>
-
-
-<!-- BACKGROUND COLOR -->
-
-<div class="color-box">
-
-<span>
-🎨 Background Color
-</span>
-
-<input
-  type="color"
-  id="bgColor"
-  value="#87CEEB"
->
-
+<header><h2>(MANIK-A-RNIKA) Photo Tool</h2></header>
+<label class="upload-btn">📸 Upload Photo<input type="file" id="upload" accept="image/*"></label>
+<div class="control-box">
+  <div class="control-row"><span>🌈 Studio Gradient</span>
+    <div class="color-pickers">
+      <input type="color" id="gradColor1" value="#4facfe"><input type="color" id="gradColor2" value="#00f2fe">
+      <select id="gradAngle"><option value="vertical">Top → Bottom</option><option value="diagonal">Diagonal ↘</option><option value="radial">Studio Radial ◉</option></select>
+    </div>
+  </div>
+  <div class="gradient-presets">
+    <div class="preset-swatch active" data-c1="#4facfe" data-c2="#00f2fe" style="background:linear-gradient(180deg,#4facfe,#00f2fe)"></div>
+    <div class="preset-swatch" data-c1="#1e3c72" data-c2="#2a5298" style="background:linear-gradient(180deg,#1e3c72,#2a5298)"></div>
+    <div class="preset-swatch" data-c1="#ffffff" data-c2="#dbeafe" style="background:linear-gradient(180deg,#ffffff,#dbeafe)"></div>
+    <div class="preset-swatch" data-c1="#e0c3fc" data-c2="#8ec5fc" style="background:linear-gradient(180deg,#e0c3fc,#8ec5fc)"></div>
+    <div class="preset-swatch" data-c1="#ffecd2" data-c2="#fcb69f" style="background:linear-gradient(180deg,#ffecd2,#fcb69f)"></div>
+  </div>
 </div>
-
-
-<!-- NO BACKGROUND CHANGE -->
-<!-- CHECKED = DEFAULT -->
-
-<div class="no-bg-box">
-
-<span class="no-bg-label">
-🖼️ No Background Change
-</span>
-
-<label class="switch">
-
-<input
-  type="checkbox"
-  id="noBackground"
-  checked
->
-
-<span class="slider"></span>
-
-</label>
-
+<div class="no-bg-box"><span class="no-bg-label">🖼️ No Background Change</span><label class="switch"><input type="checkbox" id="noBackground" checked><span class="slider"></span></label></div>
+<div class="status" id="status">Loading AI Engines & OpenCV...</div>
+<canvas id="photoCanvas"></canvas>
+<button class="btn btn-photo" onclick="downloadPhoto()">⬇ Download Photo</button>
+<canvas id="sheetCanvas"></canvas>
+<button class="btn btn-sheet" onclick="downloadSheet()">⬇ Download Photo Sheet</button>
 </div>
-
-
-<div
-  class="status"
-  id="status"
->
-Original background is ON
-</div>
-
-
-<!-- PHOTO -->
-
-<canvas
-  id="photoCanvas"
-></canvas>
-
-
-<button
-  class="btn btn-photo"
-  onclick="downloadPhoto()"
->
-⬇ Download Photo
-</button>
-
-
-<!-- SHEET -->
-
-<canvas
-  id="sheetCanvas"
-></canvas>
-
-
-<button
-  class="btn btn-sheet"
-  onclick="downloadSheet()"
->
-⬇ Download Photo Sheet
-</button>
-
-
-</div>
-
-
-<!-- MEDIAPIPE -->
-
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
+<script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCvReady()"></script>
 <script>
-
-const upload =
-document.getElementById("upload");
-
-const bgColor =
-document.getElementById("bgColor");
-
-const noBackground =
-document.getElementById("noBackground");
-
-const photoCanvas =
-document.getElementById("photoCanvas");
-
-const sheetCanvas =
-document.getElementById("sheetCanvas");
-
-const status =
-document.getElementById("status");
-
-
-let imageBitmap = null;
-
-let finalSheet = null;
-
-
-/*
-  Passport size:
-  35 × 45 mm @ 300 DPI
-*/
-
-const PW =
-Math.round(
-  35 / 25.4 * 300
-);
-
-const PH =
-Math.round(
-  45 / 25.4 * 300
-);
-
-
-/* ==================================================
-   LOAD IMAGE
-================================================== */
-
-upload.onchange = async e => {
-
-  const file =
-    e.target.files[0];
-
-  if(!file)
-    return;
-
-
-  imageBitmap =
-    await createImageBitmap(file);
-
-
-  status.textContent =
-    "Processing photo...";
-
-
-  /*
-    Always send image to MediaPipe.
-    This means background replacement
-    can be activated immediately later.
-  */
-
-  await segmenter.send({
-    image:imageBitmap
-  });
-
-};
-
-
-/* ==================================================
-   AI SEGMENTATION
-================================================== */
-
-const segmenter =
-new SelfieSegmentation({
-
-  locateFile:f =>
-    `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`
-
-});
-
-
-segmenter.setOptions({
-
-  modelSelection:1
-
-});
-
-
-/* ==================================================
-   AI RESULT
-================================================== */
-
-segmenter.onResults(res => {
-
-  if(!imageBitmap)
-    return;
-
-
-  /*
-    Maintain original aspect ratio.
-  */
-
-  const targetRatio =
-    PW / PH;
-
-
-  let sw =
-    imageBitmap.width;
-
-  let sh =
-    imageBitmap.height;
-
-
-  let sx = 0;
-  let sy = 0;
-
-
-  if(
-    sw / sh >
-    targetRatio
-  ){
-
-    sw =
-      sh * targetRatio;
-
-    sx =
-      (imageBitmap.width - sw) / 2;
-
-  }
-  else{
-
-    sh =
-      sw / targetRatio;
-
-    sy =
-      (imageBitmap.height - sh) / 2;
-
-  }
-
-
-  /*
-    High quality canvas.
-  */
-
-  const final =
-    document.createElement(
-      "canvas"
-    );
-
-
-  final.width =
-    PW;
-
-  final.height =
-    PH;
-
-
-  const ctx =
-    final.getContext("2d");
-
-
-  ctx.imageSmoothingEnabled =
-    true;
-
-  ctx.imageSmoothingQuality =
-    "high";
-
-
-  /* =================================================
-     DEFAULT MODE
-     
-     NO BACKGROUND CHANGE
-  ================================================= */
-
-  if(
-    noBackground.checked
-  ){
-
-    /*
-      Simply draw the original photo.
-      NO AI MASK IS APPLIED.
-    */
-
-    ctx.drawImage(
-
-      imageBitmap,
-
-      sx,
-      sy,
-      sw,
-      sh,
-
-      0,
-      0,
-      PW,
-      PH
-
-    );
-
-
-    status.textContent =
-      "Original background is ON";
-
-  }
-
-
-  /* =================================================
-     BACKGROUND CHANGE MODE
-  ================================================= */
-
-  else{
-
-    /*
-      Draw original photo.
-    */
-
-    ctx.drawImage(
-
-      imageBitmap,
-
-      sx,
-      sy,
-      sw,
-      sh,
-
-      0,
-      0,
-      PW,
-      PH
-
-    );
-
-
-    /*
-      Apply AI person mask.
-    */
-
-    ctx.globalCompositeOperation =
-      "destination-in";
-
-
-    ctx.drawImage(
-
-      res.segmentationMask,
-
-      0,
-      0,
-      PW,
-      PH
-
-    );
-
-
-    /*
-      Add selected background.
-    */
-
-    ctx.globalCompositeOperation =
-      "destination-over";
-
-
-    ctx.fillStyle =
-      bgColor.value;
-
-
-    ctx.fillRect(
-
-      0,
-      0,
-      PW,
-      PH
-
-    );
-
-
-    ctx.globalCompositeOperation =
-      "source-over";
-
-
-    status.textContent =
-      "Background replacement is ON";
-
-  }
-
-
-  /*
-    Preview.
-  */
-
-  drawRounded(
-    final,
-    photoCanvas,
-    28,
-    6
-  );
-
-
-  /*
-    Create sheet.
-  */
-
-  finalSheet =
-    createHighQualitySheet(
-      photoCanvas
-    );
-
-
-  previewSheet(
-    finalSheet
-  );
-
-});
-
-
-/* ==================================================
-   NO BACKGROUND TOGGLE
-================================================== */
-
-noBackground.addEventListener(
-  "change",
-  function(){
-
-    if(!imageBitmap)
-      return;
-
-
-    /*
-      Re-run MediaPipe when user
-      changes the option.
-    */
-
-    segmenter.send({
-      image:imageBitmap
-    });
-
-  }
-);
-
-
-/* ==================================================
-   BACKGROUND COLOR
-================================================== */
-
-bgColor.addEventListener(
-  "input",
-  function(){
-
-    /*
-      Only refresh if background
-      replacement mode is active.
-    */
-
-    if(
-      imageBitmap &&
-      !noBackground.checked
-    ){
-
-      segmenter.send({
-        image:imageBitmap
-      });
-
-    }
-
-  }
-);
-
-
-/* ==================================================
-   ROUNDED PREVIEW
-================================================== */
-
-function drawRounded(
-  src,
-  dst,
-  r,
-  b
-){
-
-  dst.width =
-    src.width;
-
-  dst.height =
-    src.height;
-
-
-  const c =
-    dst.getContext("2d");
-
-
-  c.clearRect(
-    0,
-    0,
-    dst.width,
-    dst.height
-  );
-
-
-  c.save();
-
-
-  c.beginPath();
-
-
-  c.moveTo(
-    r,
-    0
-  );
-
-
-  c.arcTo(
-    dst.width,
-    0,
-    dst.width,
-    dst.height,
-    r
-  );
-
-
-  c.arcTo(
-    dst.width,
-    dst.height,
-    0,
-    dst.height,
-    r
-  );
-
-
-  c.arcTo(
-    0,
-    dst.height,
-    0,
-    0,
-    r
-  );
-
-
-  c.arcTo(
-    0,
-    0,
-    dst.width,
-    0,
-    r
-  );
-
-
-  c.closePath();
-
-
-  c.clip();
-
-
-  c.drawImage(
-    src,
-    0,
-    0
-  );
-
-
-  c.restore();
-
-
-  c.lineWidth =
-    b;
-
-  c.strokeStyle =
-    "#000";
-
-  c.stroke();
-
+const upload=document.getElementById("upload");const gradColor1=document.getElementById("gradColor1");const gradColor2=document.getElementById("gradColor2");const gradAngle=document.getElementById("gradAngle");const noBackground=document.getElementById("noBackground");const photoCanvas=document.getElementById("photoCanvas");const sheetCanvas=document.getElementById("sheetCanvas");const status=document.getElementById("status");
+let imageBitmap=null;let finalSheet=null;let cvReady=false;let detectedFaceBox=null;let latestSegMask=null;
+const PW=Math.round(35/25.4*300);const PH=Math.round(45/25.4*300);
+function onOpenCvReady(){if(typeof cv!=="undefined"){cv["onRuntimeInitialized"]=()=>{cvReady=true;status.textContent="Ready - NO SHADE FIX Active";};}}
+document.querySelectorAll(".preset-swatch").forEach(swatch=>{swatch.addEventListener("click",()=>{document.querySelectorAll(".preset-swatch").forEach(s=>s.classList.remove("active"));swatch.classList.add("active");gradColor1.value=swatch.dataset.c1;gradColor2.value=swatch.dataset.c2;if(imageBitmap&&!noBackground.checked){renderComposite();}});});
+[gradColor1,gradColor2,gradAngle].forEach(el=>{el.addEventListener("input",()=>{if(imageBitmap&&!noBackground.checked){renderComposite();}});});
+const faceDetector=new FaceDetection({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${f}`});faceDetector.setOptions({model:"short",minDetectionConfidence:0.5});faceDetector.onResults(results=>{if(results.detections&&results.detections.length>0){detectedFaceBox=results.detections[0].boundingBox;}else{detectedFaceBox=null;}});
+const segmenter=new SelfieSegmentation({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${f}`});segmenter.setOptions({modelSelection:1});segmenter.onResults(res=>{if(!imageBitmap)return;latestSegMask=res.segmentationMask;renderComposite();});
+upload.onchange=async e=>{const file=e.target.files[0];if(!file)return;imageBitmap=await createImageBitmap(file);status.textContent="Detecting...";await faceDetector.send({image:imageBitmap});await segmenter.send({image:imageBitmap});};
+function computeSmartCropRect(imgW,imgH,faceBox){const targetRatio=PW/PH;if(!faceBox){let sw=imgW,sh=imgH,sx=0,sy=0;if(sw/sh>targetRatio){sw=sh*targetRatio;sx=(imgW-sw)/2;}else{sh=sw/targetRatio;sy=(imgH-sh)/2;}return{sx,sy,sw,sh};}const fW=faceBox.width*imgW;const fH=faceBox.height*imgH;const fCenterX=faceBox.xCenter*imgW;const fCenterY=faceBox.yCenter*imgH;let cropH=fH/0.52;let cropW=cropH*targetRatio;const minWForEars=fW*2.35;if(cropW<minWForEars){cropW=minWForEars;cropH=cropW/targetRatio;}if(cropW>imgW){cropW=imgW;cropH=cropW/targetRatio;}if(cropH>imgH){cropH=imgH;cropW=cropH*targetRatio;}let sx=fCenterX-cropW/2;let sy=fCenterY-cropH*0.46;sx=Math.max(0,Math.min(imgW-cropW,sx));sy=Math.max(0,Math.min(imgH-cropH,sy));return{sx,sy,sw:cropW,sh:cropH};}
+function refineMaskWithOpenCV(rawMaskCanvas){
+  if(!cvReady||typeof cv==="undefined"){return rawMaskCanvas;}
+  try{
+    let src=cv.imread(rawMaskCanvas);
+    let gray=new cv.Mat();cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY,0);
+    let thresh=new cv.Mat();cv.threshold(gray,thresh,120,255,cv.THRESH_BINARY);
+    let kernel=cv.getStructuringElement(cv.MORPH_ELLIPSE,new cv.Size(11,11));
+    let closed=new cv.Mat();cv.morphologyEx(thresh,closed,cv.MORPH_CLOSE,kernel);
+    let opened=new cv.Mat();cv.morphologyEx(closed,opened,cv.MORPH_OPEN,new cv.Size(3,3));
+    cv.imshow(rawMaskCanvas,opened);
+    src.delete();gray.delete();thresh.delete();kernel.delete();closed.delete();opened.delete();
+    return rawMaskCanvas;
+  }catch(err){console.warn(err);return rawMaskCanvas;}
 }
-
-
-/* ==================================================
-   CREATE 2 × 4 SHEET
-================================================== */
-
-function createHighQualitySheet(
-  photo
-){
-
-  const rows = 2;
-
-  const cols = 4;
-
-  const gap = 25;
-
-  const margin = 35;
-
-
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
-
-
-  canvas.width =
-    cols * photo.width +
-    (cols - 1) * gap +
-    margin * 2;
-
-
-  canvas.height =
-    rows * photo.height +
-    (rows - 1) * gap +
-    margin * 2;
-
-
-  const ctx =
-    canvas.getContext("2d");
-
-
-  ctx.imageSmoothingEnabled =
-    true;
-
-  ctx.imageSmoothingQuality =
-    "high";
-
-
-  /*
-    White print background.
-  */
-
-  ctx.fillStyle =
-    "#fff";
-
-
-  ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-
-  /*
-    Put 8 photos.
-  */
-
-  for(
-    let r = 0;
-    r < rows;
-    r++
-  ){
-
-    for(
-      let c = 0;
-      c < cols;
-      c++
-    ){
-
-      ctx.drawImage(
-
-        photo,
-
-        margin +
-        c * (
-          photo.width +
-          gap
-        ),
-
-        margin +
-        r * (
-          photo.height +
-          gap
-        )
-
-      );
-
-    }
-
+function createBackgroundGradient(ctx,w,h){const c1=gradColor1.value;const c2=gradColor2.value;const mode=gradAngle.value;let grad;if(mode==="radial"){grad=ctx.createRadialGradient(w*0.5,h*0.42,w*0.08,w*0.5,h*0.5,h*0.75);}else if(mode==="diagonal"){grad=ctx.createLinearGradient(0,0,w,h);}else{grad=ctx.createLinearGradient(0,0,0,h);}grad.addColorStop(0,c1);grad.addColorStop(1,c2);return grad;}
+function renderComposite(){
+  if(!imageBitmap)return;
+  const{sx,sy,sw,sh}=computeSmartCropRect(imageBitmap.width,imageBitmap.height,detectedFaceBox);
+  const final=document.createElement("canvas");final.width=PW;final.height=PH;const ctx=final.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+  if(noBackground.checked||!latestSegMask){
+    ctx.drawImage(imageBitmap,sx,sy,sw,sh,0,0,PW,PH);
+    status.textContent=detectedFaceBox?"Ear-Safe Crop ON - Original BG":"Original BG ON";
+  }else{
+    const maskCanvas=document.createElement("canvas");maskCanvas.width=PW;maskCanvas.height=PH;const mCtx=maskCanvas.getContext("2d");mCtx.imageSmoothingEnabled=true;mCtx.imageSmoothingQuality="high";
+    const scaleX=latestSegMask.width/imageBitmap.width;const scaleY=latestSegMask.height/imageBitmap.height;
+    mCtx.drawImage(latestSegMask,sx*scaleX,sy*scaleY,sw*scaleX,sh*scaleY,0,0,PW,PH);
+    const cleanMaskCanvas=refineMaskWithOpenCV(maskCanvas);
+    const fgCanvas=document.createElement("canvas");fgCanvas.width=PW;fgCanvas.height=PH;const fgCtx=fgCanvas.getContext("2d");fgCtx.imageSmoothingEnabled=true;fgCtx.imageSmoothingQuality="high";
+    fgCtx.drawImage(imageBitmap,sx,sy,sw,sh,0,0,PW,PH);
+    fgCtx.globalCompositeOperation="destination-in";fgCtx.drawImage(cleanMaskCanvas,0,0,PW,PH);fgCtx.globalCompositeOperation="source-over";
+    ctx.fillStyle=createBackgroundGradient(ctx,PW,PH);ctx.fillRect(0,0,PW,PH);
+    ctx.drawImage(fgCanvas,0,0);
+    status.textContent="NO SHADE FIX - Studio BG Active";
   }
-
-
-  return canvas;
-
+  drawRounded(final,photoCanvas,28,6);finalSheet=createHighQualitySheet(photoCanvas);previewSheet(finalSheet);
 }
-
-
-/* ==================================================
-   SHEET PREVIEW
-================================================== */
-
-function previewSheet(
-  sheet
-){
-
-  const ctx =
-    sheetCanvas.getContext(
-      "2d"
-    );
-
-
-  const scale =
-    Math.min(
-
-      520 / sheet.width,
-
-      380 / sheet.height
-
-    );
-
-
-  sheetCanvas.width =
-    sheet.width;
-
-  sheetCanvas.height =
-    sheet.height;
-
-
-  sheetCanvas.style.width =
-    sheet.width *
-    scale +
-    "px";
-
-
-  sheetCanvas.style.height =
-    sheet.height *
-    scale +
-    "px";
-
-
-  ctx.drawImage(
-    sheet,
-    0,
-    0
-  );
-
-}
-
-
-/* ==================================================
-   DOWNLOAD PHOTO
-================================================== */
-
-function downloadPhoto(){
-
-  if(
-    !photoCanvas.width
-  ){
-
-    return alert(
-      "Upload photo first"
-    );
-
-  }
-
-
-  const a =
-    document.createElement(
-      "a"
-    );
-
-
-  a.href =
-    photoCanvas.toDataURL(
-      "image/png"
-    );
-
-
-  a.download =
-    "passport_photo.png";
-
-
-  a.click();
-
-}
-
-
-/* ==================================================
-   DOWNLOAD SHEET
-================================================== */
-
-function downloadSheet(){
-
-  if(!finalSheet){
-
-    return alert(
-      "Sheet not ready"
-    );
-
-  }
-
-
-  const a =
-    document.createElement(
-      "a"
-    );
-
-
-  a.href =
-    finalSheet.toDataURL(
-      "image/png"
-    );
-
-
-  a.download =
-    "passport_sheet_2x4.png";
-
-
-  a.click();
-
-}
-
+noBackground.addEventListener("change",function(){if(!imageBitmap)return;renderComposite();});
+function drawRounded(src,dst,r,b){dst.width=src.width;dst.height=src.height;const c=dst.getContext("2d");c.clearRect(0,0,dst.width,dst.height);c.save();c.beginPath();c.moveTo(r,0);c.arcTo(dst.width,0,dst.width,dst.height,r);c.arcTo(dst.width,dst.height,0,dst.height,r);c.arcTo(0,dst.height,0,0,r);c.arcTo(0,0,dst.width,0,r);c.closePath();c.clip();c.drawImage(src,0,0);c.restore();c.lineWidth=b;c.strokeStyle="#000";c.stroke();}
+function createHighQualitySheet(photo){const rows=2;const cols=4;const gap=25;const margin=35;const canvas=document.createElement("canvas");canvas.width=cols*photo.width+(cols-1)*gap+margin*2;canvas.height=rows*photo.height+(rows-1)*gap+margin*2;const ctx=canvas.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){ctx.drawImage(photo,margin+c*(photo.width+gap),margin+r*(photo.height+gap));}}return canvas;}
+function previewSheet(sheet){const ctx=sheetCanvas.getContext("2d");const scale=Math.min(520/sheet.width,380/sheet.height);sheetCanvas.width=sheet.width;sheetCanvas.height=sheet.height;sheetCanvas.style.width=sheet.width*scale+"px";sheetCanvas.style.height=sheet.height*scale+"px";ctx.drawImage(sheet,0,0);}
+function downloadPhoto(){if(!photoCanvas.width)return alert("Upload photo first");const a=document.createElement("a");a.href=photoCanvas.toDataURL("image/png");a.download="passport_photo.png";a.click();}
+function downloadSheet(){if(!finalSheet)return alert("Sheet not ready");const a=document.createElement("a");a.href=finalSheet.toDataURL("image/png");a.download="passport_sheet_2x4.png";a.click();}
+document.addEventListener("contextmenu",e=>e.preventDefault());
 </script>
-
 </body>
-  <!DOCTYPE html>
-<html>
-<head>
-    <title>MANIKARNIKA</title>
-</head>
-
-<body>
-
-  
-
-    <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
-
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
-    </script>
-
-</body>
-</html>
 </html>
