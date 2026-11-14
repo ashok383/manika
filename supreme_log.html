@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,6 +133,10 @@
 
 <script>
     // 1. SUPABASE PROJECT DETAILS
+
+
+    // 3. FUNCTION 1: SAVE FIXED MESSAGE ("hellow")
+    async function saveMessage() {
     const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
@@ -143,9 +145,6 @@
 
     const statusEl = document.getElementById("status");
     const recordsContainer = document.getElementById("recordsContainer");
-
-    // 3. FUNCTION 1: SAVE FIXED MESSAGE ("hellow")
-    async function saveMessage() {
         const saveButton = document.getElementById("saveButton");
 
         saveButton.disabled = true;
@@ -198,6 +197,14 @@
 
     // 5. FUNCTION 3: DELETE PARTICULAR MESSAGE DIRECTLY VIA BUTTON CLICK ON CARD
     async function deleteRecord(id) {
+    const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
+
+    // 2. INITIALIZE SUPABASE CLIENT
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById("status");
+    const recordsContainer = document.getElementById("recordsContainer");
         if (!confirm(`Are you sure you want to delete record #${id}?`)) return;
 
         statusEl.textContent = `Deleting record #${id}...`;
@@ -220,6 +227,14 @@
 
     // 6. FUNCTION 4: FETCH MESSAGES
     async function fetchMessages() {
+    const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
+
+    // 2. INITIALIZE SUPABASE CLIENT
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById("status");
+    const recordsContainer = document.getElementById("recordsContainer");
         statusEl.textContent = "Fetching records...";
 
         try {
@@ -270,21 +285,6 @@
     // Initial load when page opens
     fetchMessages();
 </script>
-
-  <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
-
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
-    </script>
 
 </body>
 </html>
