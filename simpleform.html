@@ -269,7 +269,692 @@ function initializeDatabase() {
     }
 
     if (
-        SUPABASE_URL === "YOUR_PROJECT_URL" ||
+        SUPABASE_URL === "<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MANIKARNIKA Database Manager</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #edf1f7;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px #0002;
+}
+
+h2 {
+    color: #087b55;
+    text-align: center;
+}
+
+h3 {
+    color: #176b50;
+}
+
+input, textarea, button {
+    width: 100%;
+    padding: 13px;
+    margin: 7px 0;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 15px;
+}
+
+textarea {
+    min-height: 75px;
+}
+
+button {
+    background: #16845b;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.blue {
+    background: #2563eb;
+}
+
+.red {
+    background: #dc2626;
+}
+
+.status {
+    padding: 13px;
+    background: #f1f5f9;
+    border-radius: 7px;
+    overflow-wrap: anywhere;
+}
+
+.box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+}
+
+.delete-box {
+    border: 2px solid #dc2626;
+    background: #fff5f5;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.record {
+    background: #effaf4;
+    padding: 14px;
+    margin: 12px 0;
+    border-radius: 9px;
+    border: 1px solid #cce9d5;
+    overflow-wrap: anywhere;
+}
+
+.record button {
+    width: 48%;
+}
+
+.small {
+    font-size: 12px;
+    color: #666;
+    overflow-wrap: anywhere;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 22px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>MANIKARNIKA DATABASE MANAGER</h2>
+
+<p style="text-align:center">
+Supabase Database Application
+</p>
+
+<!-- CONNECTION -->
+
+<div class="box">
+
+<h3>Database Connection</h3>
+
+<div id="status" class="status">
+Waiting for connection...
+</div>
+
+<button type="button" class="blue"
+onclick="testConnection()">
+TEST CONNECTION
+</button>
+
+</div>
+
+<!-- INSERT -->
+
+<div class="box">
+
+<h3>ADD NEW RECORD</h3>
+
+<form id="saveForm">
+
+<input
+type="text"
+id="name"
+placeholder="Enter Name"
+required>
+
+<textarea
+id="message"
+placeholder="Enter Message"
+required></textarea>
+
+<button type="submit" id="saveButton">
+SAVE TO DATABASE
+</button>
+
+</form>
+
+</div>
+
+<!-- UPDATE -->
+
+<div class="box">
+
+<h3>UPDATE EXISTING RECORD</h3>
+
+<input
+type="text"
+id="updateId"
+placeholder="Enter Record UUID">
+
+<textarea
+id="updateMessage"
+placeholder="Enter New Message"></textarea>
+
+<button type="button" class="blue"
+onclick="updateRecord()">
+UPDATE RECORD
+</button>
+
+<p id="updateStatus"></p>
+
+</div>
+
+<!-- SEPARATE DELETE BOX -->
+
+<div class="delete-box">
+
+<h3 style="color:#dc2626">
+DELETE DATABASE RECORD
+</h3>
+
+<p>Enter the UUID of the record you want to delete.</p>
+
+<input
+type="text"
+id="deleteId"
+placeholder="Enter Record UUID">
+
+<button type="button" class="red"
+onclick="deleteById()">
+DELETE RECORD
+</button>
+
+<p id="deleteStatus"></p>
+
+</div>
+
+<hr>
+
+<!-- READ -->
+
+<h3>ALL DATABASE RECORDS</h3>
+
+<button type="button" class="blue"
+onclick="readData()">
+REFRESH / READ DATABASE
+</button>
+
+<div id="records">
+Loading records...
+</div>
+
+</div>
+
+<script>
+
+// ====================================
+// 1. SUPABASE CONFIGURATION
+// ====================================
+
+const SUPABASE_URL = "YOUR_PROJECT_URL";
+
+const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+let db = null;
+
+
+// ====================================
+// 2. INITIALIZE DATABASE
+// ====================================
+
+function initializeDatabase() {
+
+    if (!window.supabase) {
+        throw new Error(
+            "Supabase library not loaded. Check internet."
+        );
+    }
+
+    if (
+        SUPABASE_URL === "https://ashok383.github.io/manika/simpleform.html" ||
+        SUPABASE_KEY === "sb_publishable_vsp39BuZDOugE0l0zvabrA_fTxgyoG5"
+    ) {
+        throw new Error(
+            "Enter your actual Supabase URL and Publishable Key."
+        );
+    }
+
+    if (!db) {
+
+        db = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+    }
+
+    return db;
+}
+
+
+// ====================================
+// 3. CONNECTION TEST
+// ====================================
+
+async function testConnection() {
+
+    const status = document.getElementById("status");
+
+    status.textContent = "Connecting...";
+
+    try {
+
+        const client = initializeDatabase();
+
+        const { data, error } = await client
+            .from("demo_messages")
+            .select("id")
+            .limit(1);
+
+        if (error) throw error;
+
+        status.textContent =
+            "CONNECTED SUCCESSFULLY!";
+
+        status.style.color = "green";
+
+        await readData();
+
+    }
+
+    catch(error) {
+
+        status.textContent =
+            "CONNECTION ERROR: " + error.message;
+
+        status.style.color = "red";
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ====================================
+// 4. INSERT RECORD
+// ====================================
+
+document.getElementById("saveForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const name = document.getElementById("name")
+        .value.trim();
+
+    const message = document.getElementById("message")
+        .value.trim();
+
+    const status = document.getElementById("status");
+
+    const button = document.getElementById("saveButton");
+
+    button.disabled = true;
+
+    status.textContent = "Saving data...";
+
+    try {
+
+        const client = initializeDatabase();
+
+        const { error } = await client
+            .from("demo_messages")
+            .insert({
+                name: name,
+                message: message
+            });
+
+        if (error) throw error;
+
+        document.getElementById("saveForm").reset();
+
+        status.textContent =
+            "Record saved successfully!";
+
+        status.style.color = "green";
+
+        await readData();
+
+    }
+
+    catch(error) {
+
+        status.textContent =
+            "INSERT ERROR: " + error.message;
+
+        status.style.color = "red";
+
+    }
+
+    finally {
+
+        button.disabled = false;
+
+    }
+
+});
+
+
+// ====================================
+// 5. READ RECORDS
+// ====================================
+
+async function readData() {
+
+    const records = document.getElementById("records");
+
+    records.textContent = "Loading records...";
+
+    try {
+
+        const client = initializeDatabase();
+
+        const { data, error } = await client
+            .from("demo_messages")
+            .select("id,name,message,created_at")
+            .order("created_at", {
+                ascending: false
+            });
+
+        if (error) throw error;
+
+        records.replaceChildren();
+
+        if (!data || data.length === 0) {
+
+            records.textContent = "No records found.";
+
+            return;
+
+        }
+
+        data.forEach(function(item) {
+
+            const card = document.createElement("div");
+
+            card.className = "record";
+
+            const heading = document.createElement("h3");
+
+            heading.textContent = item.name;
+
+            const message = document.createElement("p");
+
+            message.textContent = item.message;
+
+            const date = document.createElement("p");
+
+            date.className = "small";
+
+            date.textContent =
+                new Date(item.created_at).toLocaleString();
+
+            const id = document.createElement("p");
+
+            id.className = "small";
+
+            id.textContent = "UUID: " + item.id;
+
+            // EDIT BUTTON
+
+            const edit = document.createElement("button");
+
+            edit.className = "blue";
+
+            edit.textContent = "EDIT";
+
+            edit.onclick = function() {
+
+                document.getElementById("updateId").value =
+                    item.id;
+
+                document.getElementById("updateMessage").value =
+                    item.message;
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+            };
+
+            // DELETE BUTTON
+
+            const del = document.createElement("button");
+
+            del.className = "red";
+
+            del.textContent = "DELETE";
+
+            del.onclick = function() {
+
+                document.getElementById("deleteId").value =
+                    item.id;
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+            };
+
+            card.append(
+                heading,
+                message,
+                date,
+                id,
+                edit,
+                del
+            );
+
+            records.appendChild(card);
+
+        });
+
+    }
+
+    catch(error) {
+
+        records.textContent =
+            "READ ERROR: " + error.message;
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ====================================
+// 6. UPDATE RECORD
+// ====================================
+
+async function updateRecord() {
+
+    const id = document.getElementById("updateId")
+        .value.trim();
+
+    const message = document.getElementById("updateMessage")
+        .value.trim();
+
+    const status = document.getElementById("updateStatus");
+
+    if (!id || !message) {
+
+        status.textContent =
+            "Enter UUID and new message.";
+
+        return;
+
+    }
+
+    status.textContent = "Updating...";
+
+    try {
+
+        const client = initializeDatabase();
+
+        const { data, error } = await client
+            .from("demo_messages")
+            .update({
+                message: message
+            })
+            .eq("id", id)
+            .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+
+            status.textContent =
+                "Record not found or update not permitted.";
+
+            return;
+
+        }
+
+        status.textContent =
+            "Record updated successfully!";
+
+        document.getElementById("updateId").value = "";
+
+        document.getElementById("updateMessage").value = "";
+
+        await readData();
+
+    }
+
+    catch(error) {
+
+        status.textContent =
+            "UPDATE ERROR: " + error.message;
+
+    }
+
+}
+
+
+// ====================================
+// 7. DELETE USING SEPARATE BOX
+// ====================================
+
+async function deleteById() {
+
+    const id = document.getElementById("deleteId")
+        .value.trim();
+
+    const status = document.getElementById("deleteStatus");
+
+    if (!id) {
+
+        status.textContent =
+            "Please enter Record UUID.";
+
+        return;
+
+    }
+
+    const confirmDelete = confirm(
+        "Are you sure you want to permanently delete this record?"
+    );
+
+    if (!confirmDelete) return;
+
+    status.textContent = "Deleting record...";
+
+    try {
+
+        const client = initializeDatabase();
+
+        const { data, error } = await client
+            .from("demo_messages")
+            .delete()
+            .eq("id", id)
+            .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+
+            status.textContent =
+                "Record not found or deletion not permitted.";
+
+            return;
+
+        }
+
+        status.textContent =
+            "Record deleted successfully!";
+
+        status.style.color = "green";
+
+        document.getElementById("deleteId").value = "";
+
+        await readData();
+
+    }
+
+    catch(error) {
+
+        status.textContent =
+            "DELETE ERROR: " + error.message;
+
+        status.style.color = "red";
+
+    }
+
+}
+
+
+// ====================================
+// 8. START APPLICATION
+// ====================================
+
+window.addEventListener("load", function() {
+
+    testConnection();
+
+});
+
+</script>
+
+</body>
+</html>" ||
         SUPABASE_KEY === "YOUR_PUBLISHABLE_KEY"
     ) {
         throw new Error(
