@@ -1,50 +1,95 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supabase Message Test</title>
+<title>Supabase Message Board</title>
 
+<!-- Load Supabase JS v2 SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body {
-    font-family: Arial;
-    background: #eef3f8;
-    padding: 25px;
-}
-.container {
-    max-width: 450px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 3px 15px #ccc;
-}
-textarea, button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    box-sizing: border-box;
-}
-button {
-    background: #16845b;
-    color: white;
-    border: 0;
-    border-radius: 6px;
-    cursor: pointer;
-}
-#messageBox {
-    background: #eef8f2;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
-    overflow-wrap: anywhere;
-}
-#status {
-    color: #16845b;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f4f8;
+        padding: 20px;
+        color: #1e293b;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h2 { margin-top: 0; color: #0f172a; }
+
+    textarea, button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+
+    textarea {
+        border: 1px solid #cbd5e1;
+        resize: vertical;
+        min-height: 80px;
+        outline: none;
+    }
+
+    textarea:focus {
+        border-color: #16845b;
+        box-shadow: 0 0 0 3px rgba(22, 132, 91, 0.15);
+    }
+
+    button {
+        background: #16845b;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+    button:hover { background: #126a48; }
+
+    .btn-read {
+        background: #2563eb;
+        margin-top: 15px;
+    }
+    .btn-read:hover { background: #1d4ed8; }
+
+    .record {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 8px;
+        word-break: break-word;
+    }
+
+    .record p {
+        margin: 0 0 6px 0;
+        font-size: 0.95rem;
+    }
+
+    .record small {
+        color: #64748b;
+        font-size: 0.75rem;
+    }
+
+    #status {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #16845b;
+        margin-top: 10px;
+    }
 </style>
 </head>
 
@@ -52,109 +97,119 @@ button {
 
 <div class="container">
 
-<h2>Supabase Test</h2>
-<p>Send and read one message</p>
+    <h2>Supabase Demo Board</h2>
+    <p>Write and read messages from your <code>demo_messages</code> table.</p>
 
-<textarea id="message" placeholder="Enter your message"></textarea>
+    <!-- WRITE FORM -->
+    <form id="messageForm">
+        <textarea id="messageInput" placeholder="Type your message here..." required></textarea>
+        <button type="submit" id="saveButton">SAVE TO DATABASE</button>
+    </form>
 
-<button onclick="saveMessage()">SEND MESSAGE</button>
+    <p id="status">Connecting to Supabase...</p>
 
-<button onclick="readMessage()">READ LATEST MESSAGE</button>
+    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
 
-<p id="status">Connecting...</p>
-
-<div id="messageBox">No message loaded.</div>
+    <!-- READ SECTION -->
+    <h3>Database Records</h3>
+    <button type="button" class="btn-read" id="readButton">REFRESH DATA</button>
+    
+    <div id="recordsContainer"></div>
 
 </div>
 
 <script>
+    // 1. ENTER YOUR SUPABASE PROJECT DETAILS
+    // Make sure your URL points to the base domain (without /rest/v1/)
+    const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
-// SUPABASE CONNECTION
-const SUPABASE_URL = "https://hecozzzeasnefcrpgjrt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_vsp39BuZDOugE0l0zvabrA_fTxgyoG5";
+    // 2. INITIALIZE SUPABASE CLIENT
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+    const statusEl = document.getElementById("status");
+    const recordsContainer = document.getElementById("recordsContainer");
 
-// SAVE MESSAGE
-async function saveMessage() {
+    // 3. WRITE DATA (INSERT)
+    document.getElementById("messageForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
 
-    const message = document.getElementById("message").value.trim();
-    const status = document.getElementById("status");
+        const messageText = document.getElementById("messageInput").value.trim();
+        const saveButton = document.getElementById("saveButton");
 
-    if (!message) {
-        status.textContent = "Please enter a message.";
-        return;
-    }
+        if (!messageText) return;
 
-    status.textContent = "Sending...";
+        saveButton.disabled = true;
+        statusEl.textContent = "Saving message...";
 
-    try {
+        try {
+            const { error } = await supabaseClient
+                .from("demo_messages")
+                .insert([{ message: messageText }]);
 
-        const { error } = await db
-            .from("demo_messages")
-            .insert({ message: message });
+            if (error) throw error;
 
-        if (error) throw error;
+            document.getElementById("messageForm").reset();
+            statusEl.textContent = "Message saved successfully!";
+            
+            // Automatically refresh the list
+            await fetchMessages();
 
-        document.getElementById("message").value = "";
-
-        status.textContent = "Message sent successfully!";
-
-        await readMessage();
-
-    } catch (error) {
-        status.textContent = "Error: " + error.message;
-    }
-}
-
-// READ ONLY THE LATEST MESSAGE
-async function readMessage() {
-
-    const status = document.getElementById("status");
-    const box = document.getElementById("messageBox");
-
-    status.textContent = "Loading message...";
-
-    try {
-
-        const { data, error } = await db
-            .from("demo_messages")
-            .select("message,created_at")
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-        if (error) throw error;
-
-        if (!data) {
-            box.textContent = "No messages found.";
-            status.textContent = "Database is connected.";
-            return;
+        } catch (err) {
+            statusEl.textContent = "Error: " + err.message;
+        } finally {
+            saveButton.disabled = false;
         }
+    });
 
-        box.replaceChildren();
+    // 4. READ DATA (SELECT)
+    async function fetchMessages() {
+        statusEl.textContent = "Fetching records...";
 
-        const msg = document.createElement("p");
-        msg.textContent = data.message;
+        try {
+            const { data, error } = await supabaseClient
+                .from("demo_messages")
+                .select("id, message, created_at")
+                .order("created_at", { ascending: false });
 
-        const date = document.createElement("small");
-        date.textContent = new Date(data.created_at).toLocaleString();
+            if (error) throw error;
 
-        box.append(msg, date);
+            recordsContainer.innerHTML = "";
 
-        status.textContent = "Latest message loaded.";
+            if (!data || data.length === 0) {
+                recordsContainer.innerHTML = "<div class='record'><small>No messages found in database.</small></div>";
+                statusEl.textContent = "Ready (0 records)";
+                return;
+            }
 
-    } catch (error) {
-        status.textContent = "Read error: " + error.message;
+            data.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "record";
+
+                const msgP = document.createElement("p");
+                msgP.textContent = item.message;
+
+                const timeSmall = document.createElement("small");
+                // Format the timestamp nicely
+                timeSmall.textContent = new Date(item.created_at).toLocaleString();
+
+                card.appendChild(msgP);
+                card.appendChild(timeSmall);
+                recordsContainer.appendChild(card);
+            });
+
+            statusEl.textContent = `${data.length} record(s) loaded successfully.`;
+
+        } catch (err) {
+            statusEl.textContent = "Read error: " + err.message;
+        }
     }
-}
 
-// LOAD MESSAGE ON PAGE OPEN
-readMessage();
+    // 5. ATTACH REFRESH BUTTON EVENT
+    document.getElementById("readButton").addEventListener("click", fetchMessages);
 
+    // Initial load on page open
+    fetchMessages();
 </script>
 
 </body>
