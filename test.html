@@ -1,821 +1,228 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANIKARNIKA - Multiple Image Cropper</title>
+<title>My First Supabase Database</title>
 
-<!-- Cropper.js: interactive manual crop tool -->
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-
-<!-- JSZip: download all cropped images in one ZIP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* { box-sizing: border-box; }
-
 body {
-    margin: 0;
-    padding: 18px;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #10172b, #263957);
-    color: #222;
+    font-family: Arial;
+    background: #f0f4f8;
+    padding: 20px;
 }
 
 .container {
-    max-width: 1050px;
+    max-width: 500px;
     margin: auto;
-    padding: 24px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 12px 35px #0005;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px #ccc;
 }
 
-header { text-align: center; margin-bottom: 24px; }
-header h1 { color: #e87916; margin: 0 0 7px; letter-spacing: 1px; }
-header h2 { margin: 0 0 7px; font-size: 22px; }
-header p { color: #666; margin: 0; }
-
-.upload {
-    display: block;
-    padding: 30px 15px;
-    margin-bottom: 18px;
-    text-align: center;
-    border: 2px dashed #e87916;
-    border-radius: 14px;
-    background: #fff8ef;
-    cursor: pointer;
-}
-.upload:hover { background: #ffefd9; }
-.upload h3 { color: #d66b0a; margin: 0 0 8px; }
-
-.controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 14px;
-    margin: 18px 0;
-}
-.controls label {
-    display: block;
-    margin-bottom: 7px;
-    font-weight: bold;
-}
-select {
+input, textarea, button {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: white;
-    font-size: 15px;
+    margin: 8px 0;
+    box-sizing: border-box;
 }
 
-.buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 18px 0;
-}
 button {
-    border: 0;
-    border-radius: 8px;
-    padding: 12px 17px;
-    font-size: 14px;
-    font-weight: bold;
+    background: #16845b;
+    color: white;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
 }
-button:disabled { opacity: .5; cursor: not-allowed; }
-.download { background: #159447; color: white; flex: 1; }
-.reset { background: #e74c3c; color: white; }
-.secondary { background: #1769aa; color: white; }
-.manual-btn { background: #e87916; color: white; width: 100%; }
+
+.record {
+    background: #eef8f2;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 7px;
+    overflow-wrap: anywhere;
+}
 
 #status {
-    padding: 12px;
-    border-radius: 8px;
-    margin: 14px 0;
-    text-align: center;
-    background: #edf4ff;
-    color: #174c88;
-    font-weight: bold;
-    overflow-wrap: anywhere;
-}
-
-.section-title { margin: 24px 0 12px; }
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 14px;
-}
-.item {
-    border: 1px solid #ddd;
-    border-radius: 11px;
-    padding: 10px;
-    min-width: 0;
-    background: #fff;
-}
-.item img {
-    display: block;
-    width: 100%;
-    height: 135px;
-    object-fit: contain;
-    background: #f0f0f0;
-    border-radius: 7px;
-}
-.item p {
-    margin: 8px 0;
-    font-size: 12px;
-    overflow-wrap: anywhere;
-}
-.item .state { color: #168044; font-weight: bold; }
-.item .pending { color: #a45b00; font-weight: bold; }
-
-.preview-grid .item img { height: 155px; }
-
-.note {
-    color: #666;
-    font-size: 13px;
-    line-height: 1.5;
-    margin-top: 8px;
-}
-
-footer {
-    text-align: center;
-    margin-top: 28px;
-    color: #888;
-    font-size: 12px;
-}
-
-/* Manual crop popup */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    inset: 0;
-    padding: 12px;
-    background: rgba(0,0,0,.82);
-    align-items: center;
-    justify-content: center;
-}
-.modal.show { display: flex; }
-.modal-box {
-    width: min(950px, 100%);
-    max-height: 96vh;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 13px;
-    overflow: hidden;
-}
-.modal-head, .modal-foot {
-    padding: 12px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.modal-head { border-bottom: 1px solid #ddd; }
-.modal-head h3 { margin: 0; font-size: 17px; }
-.crop-area {
-    min-height: 220px;
-    max-height: 68vh;
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background: #222;
-}
-.crop-area img {
-    display: block;
-    max-width: 100%;
-    max-height: 64vh;
-}
-.modal-foot { border-top: 1px solid #ddd; }
-.modal-foot .left, .modal-foot .right {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.cancel-btn { background: #666; color: white; }
-.apply-btn { background: #159447; color: white; }
-.crop-hint {
-    width: 100%;
-    color: #555;
-    font-size: 12px;
-    margin: 0;
-}
-@media (max-width: 600px) {
-    body { padding: 8px; }
-    .container { padding: 15px; }
-    .modal { padding: 5px; }
-    .crop-area { min-height: 200px; }
-    .crop-area img { max-height: 58vh; }
+    color: #16845b;
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<header>
-    <h1>MANIKARNIKA</h1>
-    <h2>Multiple Image Auto & Manual Cropper</h2>
-    <p>Upload • Auto Crop • Adjust Manually • Preview • Download All</p>
-</header>
+<h2>Supabase Database Demo</h2>
 
-<label class="upload" for="files" id="dropArea">
-    <h3>📁 SELECT MULTIPLE IMAGES</h3>
-    <p>Tap here or drag and drop your images</p>
-    <small>JPG, JPEG, PNG, WEBP and other browser-supported image files</small>
-</label>
-<input type="file" id="files" accept="image/*" multiple hidden>
+<p>Write data into your database</p>
 
-<div class="controls">
-    <div>
-        <label for="mode">Cropping Mode</label>
-        <select id="mode">
-            <option value="auto">Automatic centre crop</option>
-            <option value="manual">Manual crop each image</option>
-        </select>
-    </div>
+<form id="myForm">
 
-    <div>
-        <label for="ratio">Crop Size / Ratio</label>
-        <select id="ratio">
-            <option value="1">1 : 1 Square</option>
-            <option value="0.6666667">4 : 6 Portrait</option>
-            <option value="1.5">6 : 4 Landscape</option>
-            <option value="0.75">3 : 4 Portrait</option>
-            <option value="1.7777778">16 : 9 Landscape</option>
-            <option value="0.7777778">Passport 3.5 : 4.5</option>
-            <option value="original">Original image ratio</option>
-            <option value="free">Free crop (manual only)</option>
-        </select>
-    </div>
+<input
+type="text"
+id="name"
+placeholder="Enter your name"
+required>
 
-    <div>
-        <label for="format">Output Format</label>
-        <select id="format">
-            <option value="image/jpeg">JPG</option>
-            <option value="image/png">PNG</option>
-        </select>
-    </div>
-</div>
+<textarea
+id="message"
+placeholder="Enter your message"
+required></textarea>
 
-<div class="buttons">
-    <button class="download" id="download" disabled>
-        ⬇ DOWNLOAD ALL IMAGES (ZIP)
-    </button>
-    <button class="reset" id="reset">RESET</button>
-</div>
+<button type="submit" id="saveButton">
+SAVE TO DATABASE
+</button>
 
-<div id="status">Select multiple images to begin.</div>
+</form>
 
-<h3 class="section-title">Your Images — Open Manual Crop to adjust any image</h3>
-<div class="grid" id="workGrid"></div>
+<hr>
 
-<h3 class="section-title">Cropped Image Preview</h3>
-<div class="grid preview-grid" id="preview"></div>
+<h3>Read Database Records</h3>
 
-<p class="note">
-    Manual crop: open an image, move the crop box, drag its corners or edges to resize,
-    then press “Apply Crop”. You can manually adjust any image even after automatic cropping.
-    All images must be cropped before the ZIP download is enabled.
-</p>
+<button type="button" id="readButton">
+READ DATA
+</button>
 
-<footer>
-    MANIKARNIKA SOFTWARE & EMBEDDED SYSTEMS
-    <br>Multiple Image Processing Tool
-</footer>
-</div>
+<p id="status">Waiting for connection...</p>
 
-<!-- Manual crop modal -->
-<div class="modal" id="cropModal">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3 id="modalTitle">Manual Crop</h3>
-            <button class="cancel-btn" id="closeTop" type="button">✕ Close</button>
-        </div>
-        <div class="crop-area">
-            <img id="cropImage" alt="Image to crop">
-        </div>
-        <div class="modal-foot">
-            <p class="crop-hint">
-                Drag inside the crop box to move it. Drag its corners or edges to resize.
-                Use the mouse wheel or pinch gesture to zoom where supported.
-            </p>
-            <div class="left">
-                <button class="secondary" id="rotateLeft" type="button">↶ Rotate</button>
-                <button class="secondary" id="rotateRight" type="button">↷ Rotate</button>
-                <button class="secondary" id="resetCrop" type="button">Reset Crop</button>
-            </div>
-            <div class="right">
-                <button class="cancel-btn" id="cancelCrop" type="button">Cancel</button>
-                <button class="apply-btn" id="applyCrop" type="button">✓ Apply Crop</button>
-            </div>
-        </div>
-    </div>
+<div id="records"></div>
+
 </div>
 
 <script>
-const fileInput = document.getElementById("files");
-const modeSelect = document.getElementById("mode");
-const ratioSelect = document.getElementById("ratio");
-const formatSelect = document.getElementById("format");
-const workGrid = document.getElementById("workGrid");
-const preview = document.getElementById("preview");
-const statusBox = document.getElementById("status");
-const downloadBtn = document.getElementById("download");
-const resetBtn = document.getElementById("reset");
-const dropArea = document.getElementById("dropArea");
 
-const cropModal = document.getElementById("cropModal");
-const cropImage = document.getElementById("cropImage");
-const modalTitle = document.getElementById("modalTitle");
+// 1. ENTER YOUR SUPABASE DETAILS
 
-let items = [];
-let cropper = null;
-let activeItem = null;
-let processNumber = 0;
+const SUPABASE_URL = "YOUR_PROJECT_URL";
 
-function ratioValue() {
-    const value = ratioSelect.value;
-    if (value === "free") return NaN;
-    if (value === "original") return "original";
-    return Number(value);
-}
+const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
 
-function getManualRatio(imageElement) {
-    const value = ratioValue();
-    if (value === "original") {
-        return imageElement.naturalWidth / imageElement.naturalHeight;
-    }
-    return value; // NaN means free crop
-}
+// 2. CONNECT DATABASE
 
-function revokeItemURLs() {
-    items.forEach(item => {
-        if (item.sourceUrl) URL.revokeObjectURL(item.sourceUrl);
-        if (item.outputUrl) URL.revokeObjectURL(item.outputUrl);
-    });
-}
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-function clearOutputs() {
-    items.forEach(item => {
-        if (item.outputUrl) URL.revokeObjectURL(item.outputUrl);
-        item.outputUrl = null;
-        item.blob = null;
-        item.outputName = null;
-    });
-    preview.innerHTML = "";
-    updateDownloadState();
-}
+// 3. WRITE DATA
 
-function setStatus() {
-    const done = items.filter(item => item.blob).length;
-    const total = items.length;
+document.getElementById("myForm")
+.addEventListener("submit", async function(e) {
 
-    if (!total) {
-        statusBox.textContent = "Select multiple images to begin.";
-    } else if (done === total) {
-        statusBox.textContent = `All ${total} images are ready. You can download the ZIP file.`;
-    } else {
-        statusBox.textContent = `${done} of ${total} images cropped. Crop the remaining ${total - done} image(s).`;
-    }
+    e.preventDefault();
 
-    updateDownloadState();
-}
+    const name = document.getElementById("name").value.trim();
+    const message = document.getElementById("message").value.trim();
 
-function updateDownloadState() {
-    downloadBtn.disabled = !items.length || items.some(item => !item.blob);
-}
+    const button = document.getElementById("saveButton");
+    const status = document.getElementById("status");
 
-function makeOutputName(item) {
-    const ext = formatSelect.value === "image/png" ? ".png" : ".jpg";
-    const base = item.file.name.replace(/\.[^.]+$/, "");
-    return base + "_cropped" + ext;
-}
-
-function addOutput(item, blob) {
-    if (item.outputUrl) URL.revokeObjectURL(item.outputUrl);
-
-    item.blob = blob;
-    item.outputName = makeOutputName(item);
-    item.outputUrl = URL.createObjectURL(blob);
-
-    renderWorkGrid();
-    renderPreview();
-    setStatus();
-}
-
-function renderWorkGrid() {
-    workGrid.innerHTML = "";
-
-    items.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "item";
-
-        const img = document.createElement("img");
-        img.src = item.sourceUrl;
-        img.alt = item.file.name;
-
-        const name = document.createElement("p");
-        name.textContent = item.file.name;
-
-        const state = document.createElement("p");
-        state.className = item.blob ? "state" : "pending";
-        state.textContent = item.blob ? "✓ Cropped and ready" : "● Waiting for crop";
-
-        const button = document.createElement("button");
-        button.className = "manual-btn";
-        button.type = "button";
-        button.textContent = item.blob ? "Edit Manual Crop" : "Open Manual Crop";
-        button.addEventListener("click", () => openManualCrop(index));
-
-        card.append(img, name, state, button);
-        workGrid.appendChild(card);
-    });
-}
-
-function renderPreview() {
-    preview.innerHTML = "";
-
-    items.forEach(item => {
-        if (!item.blob || !item.outputUrl) return;
-
-        const card = document.createElement("div");
-        card.className = "item";
-
-        const img = document.createElement("img");
-        img.src = item.outputUrl;
-        img.alt = item.outputName;
-
-        const name = document.createElement("p");
-        name.textContent = item.outputName;
-
-        card.append(img, name);
-        preview.appendChild(card);
-    });
-}
-
-function canvasToBlob(canvas, format) {
-    return new Promise((resolve, reject) => {
-        canvas.toBlob(blob => {
-            if (blob) resolve(blob);
-            else reject(new Error("Image conversion failed."));
-        }, format, 0.95);
-    });
-}
-
-async function autoCropItem(item, selectedRatio, selectedFormat) {
-    const image = new Image();
-    image.src = item.sourceUrl;
-
-    await new Promise((resolve, reject) => {
-        image.onload = resolve;
-        image.onerror = () => reject(new Error("Cannot load " + item.file.name));
-    });
-
-    const width = image.naturalWidth;
-    const height = image.naturalHeight;
-
-    let cropWidth = width;
-    let cropHeight = height;
-    let startX = 0;
-    let startY = 0;
-
-    // "Original" and "Free" mean no automatic crop.
-    if (selectedRatio !== "original" && !Number.isNaN(selectedRatio)) {
-        const sourceRatio = width / height;
-
-        if (sourceRatio > selectedRatio) {
-            cropWidth = height * selectedRatio;
-            startX = (width - cropWidth) / 2;
-        } else {
-            cropHeight = width / selectedRatio;
-            startY = (height - cropHeight) / 2;
-        }
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(cropWidth));
-    canvas.height = Math.max(1, Math.round(cropHeight));
-
-    const ctx = canvas.getContext("2d");
-
-    if (selectedFormat === "image/jpeg") {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    ctx.drawImage(
-        image,
-        startX, startY, cropWidth, cropHeight,
-        0, 0, canvas.width, canvas.height
-    );
-
-    return canvasToBlob(canvas, selectedFormat);
-}
-
-async function processAutomatic() {
-    const current = ++processNumber;
-    clearOutputs();
-    renderWorkGrid();
-
-    const selectedRatio = ratioValue();
-    const selectedFormat = formatSelect.value;
-
-    for (let i = 0; i < items.length; i++) {
-        if (current !== processNumber) return;
-
-        statusBox.textContent = `Automatically cropping image ${i + 1} of ${items.length}...`;
-
-        try {
-            const blob = await autoCropItem(items[i], selectedRatio, selectedFormat);
-            if (current !== processNumber) return;
-            addOutput(items[i], blob);
-        } catch (error) {
-            console.error(error);
-            items[i].error = true;
-        }
-    }
-
-    if (current === processNumber) {
-        renderWorkGrid();
-        setStatus();
-    }
-}
-
-function processSelection() {
-    if (!items.length) {
-        setStatus();
-        return;
-    }
-
-    if (modeSelect.value === "auto") {
-        processAutomatic();
-    } else {
-        ++processNumber;
-        clearOutputs();
-        renderWorkGrid();
-        setStatus();
-    }
-}
-
-function openManualCrop(index) {
-    if (typeof Cropper === "undefined") {
-        statusBox.textContent =
-            "Manual crop library could not load. Connect to the internet and refresh this page.";
-        return;
-    }
-
-    activeItem = items[index];
-    if (!activeItem) return;
-
-    if (cropper) {
-        cropper.destroy();
-        cropper = null;
-    }
-
-    cropImage.src = activeItem.sourceUrl;
-    modalTitle.textContent = "Manual Crop — " + activeItem.file.name;
-    cropModal.classList.add("show");
-
-    cropImage.onload = () => {
-        if (cropper) cropper.destroy();
-
-        cropper = new Cropper(cropImage, {
-            viewMode: 1,
-            dragMode: "crop",
-            autoCropArea: 0.85,
-            responsive: true,
-            background: false,
-            movable: true,
-            zoomable: true,
-            zoomOnWheel: true,
-            rotatable: true,
-            scalable: false,
-            aspectRatio: getManualRatio(cropImage),
-            guides: true,
-            center: true,
-            highlight: true,
-            cropBoxMovable: true,
-            cropBoxResizable: true,
-            toggleDragModeOnDblclick: false
-        });
-    };
-
-    // Handle cached images whose load event may have already fired.
-    if (cropImage.complete && cropImage.naturalWidth) {
-        cropImage.onload();
-    }
-}
-
-function closeManualCrop() {
-    cropModal.classList.remove("show");
-    if (cropper) {
-        cropper.destroy();
-        cropper = null;
-    }
-    cropImage.onload = null;
-    activeItem = null;
-}
-
-function refreshCropAspect() {
-    if (cropper) {
-        cropper.setAspectRatio(getManualRatio(cropImage));
-    }
-}
-
-async function applyManualCrop() {
-    if (!cropper || !activeItem) return;
-
-    const selectedFormat = formatSelect.value;
-
-    const canvas = cropper.getCroppedCanvas({
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: "high",
-        fillColor: selectedFormat === "image/jpeg" ? "#ffffff" : "transparent"
-    });
-
-    if (!canvas) {
-        statusBox.textContent = "Could not create the cropped image.";
-        return;
-    }
-
-    const applyButton = document.getElementById("applyCrop");
-    applyButton.disabled = true;
-    applyButton.textContent = "Processing...";
+    button.disabled = true;
+    status.textContent = "Saving data...";
 
     try {
-        const blob = await canvasToBlob(canvas, selectedFormat);
-        const item = activeItem;
-        closeManualCrop();
-        addOutput(item, blob);
-    } catch (error) {
-        console.error(error);
-        statusBox.textContent = "Manual crop failed. Please try again.";
+
+        const { error } = await db
+            .from("demo_messages")
+            .insert({
+                name: name,
+                message: message
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        document.getElementById("myForm").reset();
+
+        await readData();
+
+        status.textContent = "Data saved successfully!";
+
+    } catch(error) {
+
+        status.textContent = "Error: " + error.message;
+
     } finally {
-        applyButton.disabled = false;
-        applyButton.textContent = "✓ Apply Crop";
-    }
-}
 
-function loadFiles(fileList) {
-    const newFiles = Array.from(fileList).filter(file =>
-        file.type.startsWith("image/")
-    );
+        button.disabled = false;
 
-    if (!newFiles.length) {
-        statusBox.textContent = "Please select valid image files.";
-        return;
     }
 
-    ++processNumber;
-    closeManualCrop();
-    revokeItemURLs();
-
-    items = newFiles.map(file => ({
-        file,
-        sourceUrl: URL.createObjectURL(file),
-        outputUrl: null,
-        blob: null,
-        outputName: null
-    }));
-
-    preview.innerHTML = "";
-    renderWorkGrid();
-    processSelection();
-}
-
-fileInput.addEventListener("change", event => {
-    loadFiles(event.target.files);
 });
 
-modeSelect.addEventListener("change", processSelection);
+// 4. READ DATA
 
-ratioSelect.addEventListener("change", () => {
-    refreshCropAspect();
-    processSelection();
-});
+async function readData() {
 
-formatSelect.addEventListener("change", processSelection);
+    const status = document.getElementById("status");
+    const records = document.getElementById("records");
 
-// Drag and drop upload
-dropArea.addEventListener("dragover", event => {
-    event.preventDefault();
-    dropArea.style.background = "#ffe2bf";
-});
-
-dropArea.addEventListener("dragleave", () => {
-    dropArea.style.background = "#fff8ef";
-});
-
-dropArea.addEventListener("drop", event => {
-    event.preventDefault();
-    dropArea.style.background = "#fff8ef";
-    loadFiles(event.dataTransfer.files);
-});
-
-// Manual crop controls
-document.getElementById("closeTop").addEventListener("click", closeManualCrop);
-document.getElementById("cancelCrop").addEventListener("click", closeManualCrop);
-document.getElementById("applyCrop").addEventListener("click", applyManualCrop);
-
-document.getElementById("rotateLeft").addEventListener("click", () => {
-    if (cropper) cropper.rotate(-90);
-});
-
-document.getElementById("rotateRight").addEventListener("click", () => {
-    if (cropper) cropper.rotate(90);
-});
-
-document.getElementById("resetCrop").addEventListener("click", () => {
-    if (cropper) cropper.reset();
-});
-
-cropModal.addEventListener("click", event => {
-    if (event.target === cropModal) closeManualCrop();
-});
-
-// Download all outputs in one ZIP
-downloadBtn.addEventListener("click", async () => {
-    if (!items.length || items.some(item => !item.blob)) return;
-
-    if (typeof JSZip === "undefined") {
-        statusBox.textContent =
-            "ZIP library could not load. Connect to the internet and refresh this page.";
-        return;
-    }
-
-    downloadBtn.disabled = true;
-    statusBox.textContent = "Creating ZIP file...";
+    status.textContent = "Reading database...";
 
     try {
-        const zip = new JSZip();
 
-        items.forEach((item, index) => {
-            const name = item.outputName || `cropped_${index + 1}.jpg`;
-            zip.file(name, item.blob);
+        const { data, error } = await db
+            .from("demo_messages")
+            .select("id,name,message,created_at")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+
+        records.replaceChildren();
+
+        if (data.length === 0) {
+            records.textContent = "No records found.";
+        }
+
+        data.forEach(function(item) {
+
+            const card = document.createElement("div");
+            card.className = "record";
+
+            const heading = document.createElement("h3");
+            heading.textContent = item.name;
+
+            const message = document.createElement("p");
+            message.textContent = item.message;
+
+            const date = document.createElement("small");
+            date.textContent = new Date(
+                item.created_at
+            ).toLocaleString();
+
+            card.append(heading, message, date);
+            records.appendChild(card);
+
         });
 
-        const zipBlob = await zip.generateAsync({
-            type: "blob",
-            compression: "DEFLATE",
-            compressionOptions: { level: 5 }
-        }, metadata => {
-            statusBox.textContent =
-                `Creating ZIP file: ${Math.round(metadata.percent)}%`;
-        });
+        status.textContent =
+            data.length + " record(s) loaded.";
 
-        const zipUrl = URL.createObjectURL(zipBlob);
-        const link = document.createElement("a");
-        link.href = zipUrl;
-        link.download = "MANIKARNIKA_CROPPED_IMAGES.zip";
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    } catch(error) {
 
-        setTimeout(() => URL.revokeObjectURL(zipUrl), 30000);
-        statusBox.textContent =
-            `Success! ${items.length} cropped images downloaded in one ZIP file.`;
-    } catch (error) {
-        console.error(error);
-        statusBox.textContent = "ZIP creation failed. Please try again.";
+        status.textContent = "Read error: " + error.message;
+
     }
 
-    updateDownloadState();
-});
+}
 
-// Reset
-resetBtn.addEventListener("click", () => {
-    ++processNumber;
-    closeManualCrop();
-    revokeItemURLs();
-    items = [];
-    fileInput.value = "";
-    workGrid.innerHTML = "";
-    preview.innerHTML = "";
-    downloadBtn.disabled = true;
-    statusBox.textContent = "Ready. Select images to begin.";
-});
+// 5. READ BUTTON
+
+document.getElementById("readButton")
+.addEventListener("click", readData);
+
+// Initial database reading
+readData();
+
 </script>
-    <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
-    </script>
 </body>
 </html>
