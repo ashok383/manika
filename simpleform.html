@@ -4,49 +4,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My First Supabase Database</title>
+<title>Supabase Message Test</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body {
     font-family: Arial;
-    background: #f0f4f8;
-    padding: 20px;
+    background: #eef3f8;
+    padding: 25px;
 }
-
 .container {
-    max-width: 500px;
+    max-width: 450px;
     margin: auto;
     background: white;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 3px 15px #ccc;
 }
-
-input, textarea, button {
+textarea, button {
     width: 100%;
     padding: 12px;
-    margin: 8px 0;
+    margin-top: 12px;
     box-sizing: border-box;
 }
-
 button {
     background: #16845b;
     color: white;
-    border: none;
+    border: 0;
     border-radius: 6px;
     cursor: pointer;
 }
-
-.record {
+#messageBox {
     background: #eef8f2;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 7px;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
     overflow-wrap: anywhere;
 }
-
 #status {
     color: #16845b;
 }
@@ -57,170 +52,108 @@ button {
 
 <div class="container">
 
-<h2>Supabase Database Demo</h2>
+<h2>Supabase Test</h2>
+<p>Send and read one message</p>
 
-<p>Write data into your database</p>
+<textarea id="message" placeholder="Enter your message"></textarea>
 
-<form id="myForm">
+<button onclick="saveMessage()">SEND MESSAGE</button>
 
-<input
-type="text"
-id="name"
-placeholder="Enter your name"
-required>
+<button onclick="readMessage()">READ LATEST MESSAGE</button>
 
-<textarea
-id="message"
-placeholder="Enter your message"
-required></textarea>
+<p id="status">Connecting...</p>
 
-<button type="submit" id="saveButton">
-SAVE TO DATABASE
-</button>
-
-</form>
-
-<hr>
-
-<h3>Read Database Records</h3>
-
-<button type="button" id="readButton">
-READ DATA
-</button>
-
-<p id="status">Waiting for connection...</p>
-
-<div id="records"></div>
+<div id="messageBox">No message loaded.</div>
 
 </div>
 
 <script>
 
-// 1. ENTER YOUR SUPABASE DETAILS
-
+// SUPABASE CONNECTION
 const SUPABASE_URL = "https://hecozzzeasnefcrpgjrt.supabase.co/rest/v1/";
-
 const SUPABASE_KEY = "sb_publishable_vsp39BuZDOugE0l0zvabrA_fTxgyoG5";
-
-// 2. CONNECT DATABASE
 
 const db = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-// 3. WRITE DATA
+// SAVE MESSAGE
+async function saveMessage() {
 
-document.getElementById("myForm")
-.addEventListener("submit", async function(e) {
-
-    e.preventDefault();
-
-    const name = document.getElementById("name").value.trim();
     const message = document.getElementById("message").value.trim();
-
-    const button = document.getElementById("saveButton");
     const status = document.getElementById("status");
 
-    button.disabled = true;
-    status.textContent = "Saving data...";
+    if (!message) {
+        status.textContent = "Please enter a message.";
+        return;
+    }
+
+    status.textContent = "Sending...";
 
     try {
 
         const { error } = await db
             .from("demo_messages")
-            .insert({
-                name: name,
-                message: message
-            });
+            .insert({ message: message });
 
-        if (error) {
-            throw error;
-        }
+        if (error) throw error;
 
-        document.getElementById("myForm").reset();
+        document.getElementById("message").value = "";
 
-        await readData();
+        status.textContent = "Message sent successfully!";
 
-        status.textContent = "Data saved successfully!";
+        await readMessage();
 
-    } catch(error) {
-
+    } catch (error) {
         status.textContent = "Error: " + error.message;
-
-    } finally {
-
-        button.disabled = false;
-
     }
+}
 
-});
-
-// 4. READ DATA
-
-async function readData() {
+// READ ONLY THE LATEST MESSAGE
+async function readMessage() {
 
     const status = document.getElementById("status");
-    const records = document.getElementById("records");
+    const box = document.getElementById("messageBox");
 
-    status.textContent = "Reading database...";
+    status.textContent = "Loading message...";
 
     try {
 
         const { data, error } = await db
             .from("demo_messages")
-            .select("id,name,message,created_at")
-            .order("created_at", { ascending: false });
+            .select("message,created_at")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (error) {
-            throw error;
+        if (error) throw error;
+
+        if (!data) {
+            box.textContent = "No messages found.";
+            status.textContent = "Database is connected.";
+            return;
         }
 
-        records.replaceChildren();
+        box.replaceChildren();
 
-        if (data.length === 0) {
-            records.textContent = "No records found.";
-        }
+        const msg = document.createElement("p");
+        msg.textContent = data.message;
 
-        data.forEach(function(item) {
+        const date = document.createElement("small");
+        date.textContent = new Date(data.created_at).toLocaleString();
 
-            const card = document.createElement("div");
-            card.className = "record";
+        box.append(msg, date);
 
-            const heading = document.createElement("h3");
-            heading.textContent = item.name;
+        status.textContent = "Latest message loaded.";
 
-            const message = document.createElement("p");
-            message.textContent = item.message;
-
-            const date = document.createElement("small");
-            date.textContent = new Date(
-                item.created_at
-            ).toLocaleString();
-
-            card.append(heading, message, date);
-            records.appendChild(card);
-
-        });
-
-        status.textContent =
-            data.length + " record(s) loaded.";
-
-    } catch(error) {
-
+    } catch (error) {
         status.textContent = "Read error: " + error.message;
-
     }
-
 }
 
-// 5. READ BUTTON
-
-document.getElementById("readButton")
-.addEventListener("click", readData);
-
-// Initial database reading
-readData();
+// LOAD MESSAGE ON PAGE OPEN
+readMessage();
 
 </script>
 
