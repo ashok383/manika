@@ -4,56 +4,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supabase Database Tester</title>
+<title>My First Supabase Database</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: #f1f5f9;
+    font-family: Arial;
+    background: #f0f4f8;
     padding: 20px;
 }
+
 .container {
-    max-width: 550px;
+    max-width: 500px;
     margin: auto;
     background: white;
-    padding: 22px;
+    padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 3px 15px #0002;
+    box-shadow: 0 3px 15px #ccc;
 }
-h2 { color: #16865c; text-align: center; }
-input {
+
+input, textarea, button {
     width: 100%;
-    box-sizing: border-box;
     padding: 12px;
     margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    box-sizing: border-box;
 }
+
 button {
-    width: 100%;
-    padding: 12px;
-    margin: 6px 0;
+    background: #16845b;
+    color: white;
     border: none;
     border-radius: 6px;
-    background: #16865c;
-    color: white;
-    font-size: 15px;
     cursor: pointer;
 }
-button:hover { background: #106b48; }
-#status {
+
+.record {
+    background: #eef8f2;
     padding: 12px;
-    margin-top: 12px;
-    background: #eee;
-    border-radius: 6px;
+    margin-top: 10px;
+    border-radius: 7px;
     overflow-wrap: anywhere;
 }
-li {
-    padding: 9px;
-    border-bottom: 1px solid #ddd;
-    overflow-wrap: anywhere;
+
+#status {
+    color: #16845b;
 }
 </style>
 </head>
@@ -62,129 +57,170 @@ li {
 
 <div class="container">
 
-<h2>Supabase Database Tester</h2>
+<h2>Supabase Database Demo</h2>
 
-<label>Enter Message</label>
-<input id="message" placeholder="Type a test message">
+<p>Write data into your database</p>
 
-<button onclick="testConnection()">1. Test Connection</button>
+<form id="myForm">
 
-<button onclick="saveData()">2. Insert Data</button>
+<input
+type="text"
+id="name"
+placeholder="Enter your name"
+required>
 
-<button onclick="readData()">3. Read Database</button>
+<textarea
+id="message"
+placeholder="Enter your message"
+required></textarea>
 
-<div id="status">Waiting for connection...</div>
+<button type="submit" id="saveButton">
+SAVE TO DATABASE
+</button>
 
-<h3>Database Records</h3>
-<ul id="records"></ul>
+</form>
+
+<hr>
+
+<h3>Read Database Records</h3>
+
+<button type="button" id="readButton">
+READ DATA
+</button>
+
+<p id="status">Waiting for connection...</p>
+
+<div id="records"></div>
 
 </div>
 
 <script>
 
-// YOUR SUPABASE DETAILS
-const SUPABASE_URL = "https://hecozzzeasnefcrpgjrt.supabase.co/rest/v1/";
+// 1. ENTER YOUR SUPABASE DETAILS
 
-const SUPABASE_KEY = "sb_publishable_vsp39BuZDOugE0l0zvabrA_fTxgyoG5";
+const SUPABASE_URL = "YOUR_PROJECT_URL";
 
-// CREATE CONNECTION
+const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+// 2. CONNECT DATABASE
+
 const db = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-function status(message, error = false) {
-    const box = document.getElementById("status");
-    box.textContent = message;
-    box.style.color = error ? "red" : "green";
-}
+// 3. WRITE DATA
 
-// 1. TEST CONNECTION
-async function testConnection() {
+document.getElementById("myForm")
+.addEventListener("submit", async function(e) {
 
-    if (SUPABASE_URL.includes("YOUR_PROJECT") ||
-        SUPABASE_KEY.includes("YOUR_")) {
-        status("Please enter your Supabase URL and key.", true);
-        return;
-    }
+    e.preventDefault();
 
-    status("Testing connection...");
-
-    const { data, error } = await db
-        .from("test_messages")
-        .select("id")
-        .limit(1);
-
-    if (error) {
-        status("Connection failed: " + error.message, true);
-        return;
-    }
-
-    status("SUCCESS! Supabase database connected.");
-}
-
-// 2. INSERT DATA
-async function saveData() {
-
+    const name = document.getElementById("name").value.trim();
     const message = document.getElementById("message").value.trim();
 
-    if (!message) {
-        status("Please enter a message.", true);
-        return;
+    const button = document.getElementById("saveButton");
+    const status = document.getElementById("status");
+
+    button.disabled = true;
+    status.textContent = "Saving data...";
+
+    try {
+
+        const { error } = await db
+            .from("demo_messages")
+            .insert({
+                name: name,
+                message: message
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        document.getElementById("myForm").reset();
+
+        await readData();
+
+        status.textContent = "Data saved successfully!";
+
+    } catch(error) {
+
+        status.textContent = "Error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+
     }
 
-    status("Saving data...");
+});
 
-    const { error } = await db
-        .from("test_messages")
-        .insert([{ message: message }]);
+// 4. READ DATA
 
-    if (error) {
-        status("Insert failed: " + error.message, true);
-        return;
-    }
-
-    document.getElementById("message").value = "";
-
-    status("SUCCESS! Data inserted.");
-
-    await readData();
-}
-
-// 3. READ DATA
 async function readData() {
 
-    status("Reading database...");
+    const status = document.getElementById("status");
+    const records = document.getElementById("records");
 
-    const { data, error } = await db
-        .from("test_messages")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
+    status.textContent = "Reading database...";
 
-    if (error) {
-        status("Read failed: " + error.message, true);
-        return;
+    try {
+
+        const { data, error } = await db
+            .from("demo_messages")
+            .select("id,name,message,created_at")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+
+        records.replaceChildren();
+
+        if (data.length === 0) {
+            records.textContent = "No records found.";
+        }
+
+        data.forEach(function(item) {
+
+            const card = document.createElement("div");
+            card.className = "record";
+
+            const heading = document.createElement("h3");
+            heading.textContent = item.name;
+
+            const message = document.createElement("p");
+            message.textContent = item.message;
+
+            const date = document.createElement("small");
+            date.textContent = new Date(
+                item.created_at
+            ).toLocaleString();
+
+            card.append(heading, message, date);
+            records.appendChild(card);
+
+        });
+
+        status.textContent =
+            data.length + " record(s) loaded.";
+
+    } catch(error) {
+
+        status.textContent = "Read error: " + error.message;
+
     }
 
-    const records = document.getElementById("records");
-    records.replaceChildren();
-
-    data.forEach(row => {
-
-        const li = document.createElement("li");
-
-        li.textContent =
-            "ID: " + row.id +
-            " | Message: " + row.message +
-            " | Date: " + new Date(row.created_at).toLocaleString();
-
-        records.appendChild(li);
-
-    });
-
-    status("SUCCESS! " + data.length + " records loaded.");
 }
+
+// 5. READ BUTTON
+
+document.getElementById("readButton")
+.addEventListener("click", readData);
+
+// Initial database reading
+readData();
 
 </script>
 
