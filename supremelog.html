@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supabase Message Board with Delete</title>
+
+<!-- Load Supabase JS v2 SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f4f8;
+        padding: 20px;
+        color: #1e293b;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h2 { margin-top: 0; color: #0f172a; }
+
+    input, button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+
+    input {
+        border: 1px solid #cbd5e1;
+        outline: none;
+    }
+
+    input:focus {
+        border-color: #16845b;
+        box-shadow: 0 0 0 3px rgba(22, 132, 91, 0.15);
+    }
+
+    button {
+        background: #16845b;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+    button:hover { background: #126a48; }
+
+    .btn-read {
+        background: #2563eb;
+        margin-top: 15px;
+    }
+    .btn-read:hover { background: #1d4ed8; }
+
+    .btn-delete {
+        background: #dc2626;
+        margin-top: 6px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        width: auto;
+    }
+    .btn-delete:hover { background: #b91c1c; }
+
+    .record {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 8px;
+        word-break: break-word;
+    }
+
+    .record p {
+        margin: 0 0 4px 0;
+        font-size: 0.95rem;
+    }
+
+    .record small {
+        color: #64748b;
+        font-size: 0.75rem;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    #status {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #16845b;
+        margin-top: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Supabase Demo Board</h2>
+    <p>Manage messages in your <code>demo_messages</code> table.</p>
+
+    <!-- WRITE SECTION -->
+    <button type="button" id="saveButton" onclick="saveMessage()">SAVE FIXED MESSAGE ("hellow")</button>
+
+    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
+
+    <!-- DELETE BY ID SECTION -->
+    <h3>Delete Record by ID</h3>
+    <input type="number" id="deleteIdInput" placeholder="Enter Record ID to delete...">
+    <button type="button" style="background:#dc2626;" onclick="deleteMessageById()">DELETE RECORD</button>
+
+    <p id="status">Ready...</p>
+
+    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
+
+    <!-- READ SECTION -->
+    <h3>Database Records</h3>
+    <button type="button" class="btn-read" id="readButton" onclick="fetchMessages()">REFRESH DATA</button>
+    
+    <div id="recordsContainer"></div>
+
+</div>
+
+<script>
+    // 1. SUPABASE PROJECT DETAILS
+    const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
+
+    // 2. INITIALIZE SUPABASE CLIENT
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById("status");
+    const recordsContainer = document.getElementById("recordsContainer");
+
+    // 3. FUNCTION 1: SAVE FIXED MESSAGE ("hellow")
+    async function saveMessage() {
+        const saveButton = document.getElementById("saveButton");
+
+        saveButton.disabled = true;
+        statusEl.textContent = "Saving message...";
+
+        try {
+            const { error } = await supabaseClient
+                .from("demo_messages")
+                .insert([{ message: "hellow" }]);
+
+            if (error) throw error;
+
+            statusEl.textContent = "Fixed message 'hellow' sent successfully!";
+            fetchMessages();
+
+        } catch (err) {
+            statusEl.textContent = "Error: " + err.message;
+        } finally {
+            saveButton.disabled = false;
+        }
+    }
+
+    // 4. FUNCTION 2: DELETE PARTICULAR MESSAGE BY ID (From Input Field)
+    async function deleteMessageById() {
+        const idVal = document.getElementById("deleteIdInput").value.trim();
+
+        if (!idVal) {
+            statusEl.textContent = "Please enter a valid record ID to delete.";
+            return;
+        }
+
+        statusEl.textContent = `Deleting record ID ${idVal}...`;
+
+        try {
+            const { error } = await supabaseClient
+                .from("demo_messages")
+                .delete()
+                .eq("id", idVal);
+
+            if (error) throw error;
+
+            document.getElementById("deleteIdInput").value = "";
+            statusEl.textContent = `Record ID ${idVal} deleted successfully!`;
+            fetchMessages();
+
+        } catch (err) {
+            statusEl.textContent = "Delete error: " + err.message;
+        }
+    }
+
+    // 5. FUNCTION 3: DELETE PARTICULAR MESSAGE DIRECTLY VIA BUTTON CLICK ON CARD
+    async function deleteRecord(id) {
+        if (!confirm(`Are you sure you want to delete record #${id}?`)) return;
+
+        statusEl.textContent = `Deleting record #${id}...`;
+
+        try {
+            const { error } = await supabaseClient
+                .from("demo_messages")
+                .delete()
+                .eq("id", id);
+
+            if (error) throw error;
+
+            statusEl.textContent = `Record #${id} deleted successfully!`;
+            fetchMessages();
+
+        } catch (err) {
+            statusEl.textContent = "Delete error: " + err.message;
+        }
+    }
+
+    // 6. FUNCTION 4: FETCH MESSAGES
+    async function fetchMessages() {
+        statusEl.textContent = "Fetching records...";
+
+        try {
+            const { data, error } = await supabaseClient
+                .from("demo_messages")
+                .select("id, message, created_at")
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
+
+            recordsContainer.innerHTML = "";
+
+            if (!data || data.length === 0) {
+                recordsContainer.innerHTML = "<div class='record'><small>No messages found in database.</small></div>";
+                statusEl.textContent = "Ready (0 records)";
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "record";
+
+                const idSmall = document.createElement("small");
+                idSmall.innerHTML = `<b>ID:</b> ${item.id} | 🕒 ${new Date(item.created_at).toLocaleString()}`;
+
+                const msgP = document.createElement("p");
+                msgP.textContent = item.message;
+
+                // Individual delete button attached directly to each record card
+                const delBtn = document.createElement("button");
+                delBtn.className = "btn-delete";
+                delBtn.textContent = "Delete This Record";
+                delBtn.onclick = () => deleteRecord(item.id);
+
+                card.appendChild(idSmall);
+                card.appendChild(msgP);
+                card.appendChild(delBtn);
+                recordsContainer.appendChild(card);
+            });
+
+            statusEl.textContent = `${data.length} record(s) loaded successfully.`;
+
+        } catch (err) {
+            statusEl.textContent = "Read error: " + err.message;
+        }
+    }
+
+    // Initial load when page opens
+    fetchMessages();
+</script>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+</body>
+</html>
