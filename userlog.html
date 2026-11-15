@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Password Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="database_script.js" defer></script>
+  <script src="database_script.js" defer></script>
   <style>
     * {
       box-sizing: border-box;
@@ -133,32 +133,21 @@
     <h2>Access Portal</h2>
     <p>Enter your assigned password to continue</p>
 
-    <form id="loginForm">
-      <div class="input-group">
-        <input 
-          type="password" 
-          id="passwordInput" 
-          placeholder="Enter password..." 
-          required 
-          autocomplete="off"
-        />
-        <button type="button" class="toggle-password" id="toggleBtn">Show</button>
-      </div>
-      <button type="submit" class="login-btn">Unlock</button>
-      <div class="error-msg" id="errorMsg"></div>
-    </form>
+    <!-- Uses onclick trigger instead of full form submit if preferred -->
+    <div class="input-group">
+      <input 
+        type="password" 
+        id="passwordInput" 
+        placeholder="Enter password..." 
+        autocomplete="off"
+      />
+      <button type="button" class="toggle-password" id="toggleBtn">Show</button>
+    </div>
+    <button type="button" class="login-btn" onclick="verifyPassword()">Unlock</button>
+    <div class="error-msg" id="errorMsg"></div>
   </div>
 
   <script>
-    // Map each password to its specific destination HTML file or URL
-    const passwordRoutes = {
-      "rudhra@123": "index_rudhra.html",
-      "client2026": "client-portal.html",
-      "admin123": "admin-dashboard.html",
-      "client2026": "client-portal.html",
-    };
-
-    const form = document.getElementById("loginForm");
     const passwordInput = document.getElementById("passwordInput");
     const errorMsg = document.getElementById("errorMsg");
     const loginCard = document.getElementById("loginCard");
@@ -171,14 +160,16 @@
       toggleBtn.textContent = isPassword ? "Hide" : "Show";
     });
 
-    // Handle form submission
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+    // On-click verification function using password "user123"
+    function verifyPassword() {
       const enteredPassword = passwordInput.value.trim();
+      const correctPassword = "user123";
 
-      if (passwordRoutes[enteredPassword]) {
+      if (enteredPassword === correctPassword) {
         errorMsg.textContent = "";
-        window.location.href = passwordRoutes[enteredPassword];
+        alert("Access Granted! Welcome.");
+        // If you want it to redirect to a specific page or reload this file upon success, change below:
+        // window.location.href = "index.html"; 
       } else {
         errorMsg.textContent = "Invalid password. Please try again.";
         loginCard.classList.remove("shake");
@@ -186,9 +177,10 @@
         loginCard.classList.add("shake");
         passwordInput.value = "";
       }
-    });
+    }
   </script>
-<script>
+
+  <script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -201,6 +193,6 @@
             e.preventDefault();
         }
     });
-    </script>
+  </script>
 </body>
 </html>
