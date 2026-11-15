@@ -1,109 +1,66 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supabase Query Box Board</title>
+<title>(MANIK_A_RNIKA) Query InputS Here 👇🏻</title>
 
-<!-- Load Supabase JS v2 SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f0f4f8;
-        padding: 20px;
-        color: #1e293b;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background: #eef3f8;
+    padding: 20px;
+}
 
-    .container {
-        max-width: 500px;
-        margin: auto;
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
+.container {
+    max-width: 450px;
+    margin: 50px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px #0002;
+}
 
-    h2 { margin-top: 0; color: #0f172a; }
+h2 {
+    color: #16845b;
+}
 
-    input, textarea, button {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        box-sizing: border-box;
-        border-radius: 6px;
-        font-size: 0.95rem;
-    }
+textarea, button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 12px;
+    box-sizing: border-box;
+    border-radius: 7px;
+    font-size: 15px;
+}
 
-    textarea, input {
-        border: 1px solid #cbd5e1;
-        outline: none;
-    }
+textarea {
+    border: 1px solid #ccc;
+    min-height: 110px;
+    resize: vertical;
+}
 
-    textarea:focus, input:focus {
-        border-color: #16845b;
-        box-shadow: 0 0 0 3px rgba(22, 132, 91, 0.15);
-    }
+button {
+    background: linear-gradient(135deg, #16a36b, #087443);
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-    textarea {
-        resize: vertical;
-        min-height: 70px;
-    }
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
-    button {
-        background: #16845b;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background 0.2s;
-    }
-
-    button:hover { background: #126a48; }
-
-    .btn-query {
-        background: #2563eb;
-    }
-    .btn-query:hover { background: #1d4ed8; }
-
-    .btn-delete {
-        background: #dc2626;
-        margin-top: 6px;
-        padding: 6px 10px;
-        font-size: 0.8rem;
-        width: auto;
-    }
-    .btn-delete:hover { background: #b91c1c; }
-
-    .record {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        padding: 12px;
-        margin-top: 10px;
-        border-radius: 8px;
-        word-break: break-word;
-    }
-
-    .record p {
-        margin: 0 0 4px 0;
-        font-size: 0.95rem;
-    }
-
-    .record small {
-        color: #64748b;
-        font-size: 0.75rem;
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    #status {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #16845b;
-        margin-top: 10px;
-    }
+#status {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
 </style>
 </head>
 
@@ -111,179 +68,84 @@
 
 <div class="container">
 
-    <h2>Supabase Query Board</h2>
-    <p>Insert messages and query your database.</p>
+    <h2>Supabase Query Box</h2>
 
-    <!-- WRITE / INSERT SECTION -->
-    <textarea id="messageInput" placeholder="Type message to save..."></textarea>
-    <button type="button" id="saveButton" onclick="saveMessage()">SAVE TO DATABASE</button>
+    <p>Enter your Adiveces & Complaints</p>
 
-    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
+    <textarea
+        id="queryInput"
+        placeholder="Type your query here..."
+    ></textarea>
 
-    <!-- QUERY / SEARCH SECTION -->
-    <h3>Query Database</h3>
-    <input type="text" id="queryInput" placeholder="Search message text...">
-    <button type="button" class="btn-query" onclick="queryMessages()">RUN QUERY / SEARCH</button>
+    <button id="saveButton" onclick="saveQuery()">
+        SEND TO MANIKARNIKA
+    </button>
 
-    <p id="status">Ready...</p>
-
-    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
-
-    <!-- READ / DISPLAY SECTION -->
-    <h3>Database Records</h3>
-    <button type="button" class="btn-query" onclick="fetchMessages()">REFRESH ALL</button>
-    
-    <div id="recordsContainer"></div>
+    <p id="status">Ready to send.</p>
 
 </div>
 
 <script>
-    // 1. SUPABASE PROJECT DETAILS
-    const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
-    // 2. INITIALIZE SUPABASE CLIENT
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// 1. SUPABASE CONNECTION
 
-    const statusEl = document.getElementById("status");
-    const recordsContainer = document.getElementById("recordsContainer");
+const SUPABASE_URL ="https://rkykifprxauikmucqwaa.supabase.co";
 
-    // 3. SAVE CUSTOM MESSAGE FROM TEXTAREA
-    async function saveMessage() {
-        const messageText = document.getElementById("messageInput").value.trim();
-        const saveButton = document.getElementById("saveButton");
+const SUPABASE_KEY ="sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
-        if (!messageText) {
-            statusEl.textContent = "Please enter a message to save!";
-            return;
-        }
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-        saveButton.disabled = true;
-        statusEl.textContent = "Saving message...";
+// 2. SAVE QUERY TO DATABASE
 
-        try {
-            const { error } = await supabaseClient
-                .from("demo_messages")
-                .insert([{ message: messageText }]);
+async function saveQuery() {
 
-            if (error) throw error;
+    const queryText = document
+        .getElementById("queryInput")
+        .value.trim();
 
-            document.getElementById("messageInput").value = "";
-            statusEl.textContent = "Message saved successfully!";
-            fetchMessages();
+    const button = document.getElementById("saveButton");
+    const status = document.getElementById("status");
 
-        } catch (err) {
-            statusEl.textContent = "Error: " + err.message;
-        } finally {
-            saveButton.disabled = false;
-        }
+    if (!queryText) {
+        status.textContent = "Please enter a query!";
+        return;
     }
 
-    // 4. QUERY / SEARCH MESSAGES
-    async function queryMessages() {
-        const queryText = document.getElementById("queryInput").value.trim();
-        statusEl.textContent = "Querying database...";
+    button.disabled = true;
+    status.textContent = "Saving to Supabase...";
 
-        try {
-            let query = supabaseClient
-                .from("demo_messages")
-                .select("id, message, created_at")
-                .order("created_at", { ascending: false });
+    try {
 
-            // If text is entered in query box, filter results using .ilike()
-            if (queryText) {
-                query = query.ilike("message", `%${queryText}%`);
-            }
+        const { error } = await supabaseClient
+            .from("demo_messages")
+            .insert({
+                message: queryText
+            });
 
-            const { data, error } = await query;
+        if (error) throw error;
 
-            if (error) throw error;
-
-            renderRecords(data);
-            statusEl.textContent = `Query returned ${data.length} record(s).`;
-
-        } catch (err) {
-            statusEl.textContent = "Query error: " + err.message;
-        }
-    }
-
-    // 5. DELETE PARTICULAR RECORD BY ID
-    async function deleteRecord(id) {
-        if (!confirm(`Are you sure you want to delete record #${id}?`)) return;
-
-        statusEl.textContent = `Deleting record #${id}...`;
-
-        try {
-            const { error } = await supabaseClient
-                .from("demo_messages")
-                .delete()
-                .eq("id", id);
-
-            if (error) throw error;
-
-            statusEl.textContent = `Record #${id} deleted successfully!`;
-            fetchMessages();
-
-        } catch (err) {
-            statusEl.textContent = "Delete error: " + err.message;
-        }
-    }
-
-    // 6. FETCH ALL MESSAGES
-    async function fetchMessages() {
         document.getElementById("queryInput").value = "";
-        statusEl.textContent = "Fetching records...";
 
-        try {
-            const { data, error } = await supabaseClient
-                .from("demo_messages")
-                .select("id, message, created_at")
-                .order("created_at", { ascending: false });
+        status.textContent =
+            "Query saved successfully to Supabase!";
 
-            if (error) throw error;
+    } catch (error) {
 
-            renderRecords(data);
-            statusEl.textContent = `${data.length} record(s) loaded successfully.`;
+        status.textContent =
+            "Database error: " + error.message;
 
-        } catch (err) {
-            statusEl.textContent = "Read error: " + err.message;
-        }
+    } finally {
+
+        button.disabled = false;
+
     }
+}
 
-    // 7. HELPER TO RENDER RECORDS HTML
-    function renderRecords(data) {
-        recordsContainer.innerHTML = "";
-
-        if (!data || data.length === 0) {
-            recordsContainer.innerHTML = "<div class='record'><small>No records found.</small></div>";
-            return;
-        }
-
-        data.forEach(item => {
-            const card = document.createElement("div");
-            card.className = "record";
-
-            const idSmall = document.createElement("small");
-            idSmall.innerHTML = `<b>ID:</b> ${item.id} | 🕒 ${new Date(item.created_at).toLocaleString()}`;
-
-            const msgP = document.createElement("p");
-            msgP.textContent = item.message;
-
-            const delBtn = document.createElement("button");
-            delBtn.className = "btn-delete";
-            delBtn.textContent = "Delete This Record";
-            delBtn.onclick = () => deleteRecord(item.id);
-
-            card.appendChild(idSmall);
-            card.appendChild(msgP);
-            card.appendChild(delBtn);
-            recordsContainer.appendChild(card);
-        });
-    }
-
-    // Initial load when page opens
-    fetchMessages();
 </script>
 
 </body>
 </html>
+
