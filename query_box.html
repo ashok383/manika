@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supabase Message Board with Delete</title>
+<title>Supabase Query Box Board</title>
 
 <!-- Load Supabase JS v2 SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -28,7 +28,7 @@
 
     h2 { margin-top: 0; color: #0f172a; }
 
-    input, button {
+    input, textarea, button {
         width: 100%;
         padding: 12px;
         margin: 8px 0;
@@ -37,14 +37,19 @@
         font-size: 0.95rem;
     }
 
-    input {
+    textarea, input {
         border: 1px solid #cbd5e1;
         outline: none;
     }
 
-    input:focus {
+    textarea:focus, input:focus {
         border-color: #16845b;
         box-shadow: 0 0 0 3px rgba(22, 132, 91, 0.15);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 70px;
     }
 
     button {
@@ -58,11 +63,10 @@
 
     button:hover { background: #126a48; }
 
-    .btn-read {
+    .btn-query {
         background: #2563eb;
-        margin-top: 15px;
     }
-    .btn-read:hover { background: #1d4ed8; }
+    .btn-query:hover { background: #1d4ed8; }
 
     .btn-delete {
         background: #dc2626;
@@ -107,26 +111,27 @@
 
 <div class="container">
 
-    <h2>Query_Box</h2>
-    <p>Compliants <code>Suggestions&Advices</code> table.</p>
+    <h2>Supabase Query Board</h2>
+    <p>Insert messages and query your database.</p>
 
-    <!-- WRITE SECTION -->
-    <button type="button" id="saveButton" onclick="saveMessage()">SAVE FIXED MESSAGE ("hellow")</button>
+    <!-- WRITE / INSERT SECTION -->
+    <textarea id="messageInput" placeholder="Type message to save..."></textarea>
+    <button type="button" id="saveButton" onclick="saveMessage()">SAVE TO DATABASE</button>
 
     <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
 
-    <!-- DELETE BY ID SECTION -->
-    <h3>Delete Record by ID</h3>
-    <input type="number" id="deleteIdInput" placeholder="Enter Record ID to delete...">
-    <button type="button" style="background:#dc2626;" onclick="deleteMessageById()">DELETE RECORD</button>
+    <!-- QUERY / SEARCH SECTION -->
+    <h3>Query Database</h3>
+    <input type="text" id="queryInput" placeholder="Search message text...">
+    <button type="button" class="btn-query" onclick="queryMessages()">RUN QUERY / SEARCH</button>
 
     <p id="status">Ready...</p>
 
     <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
 
-    <!-- READ SECTION -->
+    <!-- READ / DISPLAY SECTION -->
     <h3>Database Records</h3>
-    <button type="button" class="btn-read" id="readButton" onclick="fetchMessages()">REFRESH DATA</button>
+    <button type="button" class="btn-query" onclick="fetchMessages()">REFRESH ALL</button>
     
     <div id="recordsContainer"></div>
 
@@ -134,10 +139,6 @@
 
 <script>
     // 1. SUPABASE PROJECT DETAILS
-
-
-    // 3. FUNCTION 1: SAVE FIXED MESSAGE ("hellow")
-    async function saveMessage() {
     const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
@@ -146,7 +147,16 @@
 
     const statusEl = document.getElementById("status");
     const recordsContainer = document.getElementById("recordsContainer");
+
+    // 3. SAVE CUSTOM MESSAGE FROM TEXTAREA
+    async function saveMessage() {
+        const messageText = document.getElementById("messageInput").value.trim();
         const saveButton = document.getElementById("saveButton");
+
+        if (!messageText) {
+            statusEl.textContent = "Please enter a message to save!";
+            return;
+        }
 
         saveButton.disabled = true;
         statusEl.textContent = "Saving message...";
@@ -154,11 +164,12 @@
         try {
             const { error } = await supabaseClient
                 .from("demo_messages")
-                .insert([{ message: "hellow" }]);
+                .insert([{ message: messageText }]);
 
             if (error) throw error;
 
-            statusEl.textContent = "Fixed message 'hellow' sent successfully!";
+            document.getElementById("messageInput").value = "";
+            statusEl.textContent = "Message saved successfully!";
             fetchMessages();
 
         } catch (err) {
@@ -168,27 +179,49 @@
         }
     }
 
-    // 4. FUNCTION 2: DELETE PARTICULAR MESSAGE BY ID (From Input Field)
-    async function deleteMessageById() {
-        const idVal = document.getElementById("deleteIdInput").value.trim();
+    // 4. QUERY / SEARCH MESSAGES
+    async function queryMessages() {
+        const queryText = document.getElementById("queryInput").value.trim();
+        statusEl.textContent = "Querying database...";
 
-        if (!idVal) {
-            statusEl.textContent = "Please enter a valid record ID to delete.";
-            return;
+        try {
+            let query = supabaseClient
+                .from("demo_messages")
+                .select("id, message, created_at")
+                .order("created_at", { ascending: false });
+
+            // If text is entered in query box, filter results using .ilike()
+            if (queryText) {
+                query = query.ilike("message", `%${queryText}%`);
+            }
+
+            const { data, error } = await query;
+
+            if (error) throw error;
+
+            renderRecords(data);
+            statusEl.textContent = `Query returned ${data.length} record(s).`;
+
+        } catch (err) {
+            statusEl.textContent = "Query error: " + err.message;
         }
+    }
 
-        statusEl.textContent = `Deleting record ID ${idVal}...`;
+    // 5. DELETE PARTICULAR RECORD BY ID
+    async function deleteRecord(id) {
+        if (!confirm(`Are you sure you want to delete record #${id}?`)) return;
+
+        statusEl.textContent = `Deleting record #${id}...`;
 
         try {
             const { error } = await supabaseClient
                 .from("demo_messages")
                 .delete()
-                .eq("id", idVal);
+                .eq("id", id);
 
             if (error) throw error;
 
-            document.getElementById("deleteIdInput").value = "";
-            statusEl.textContent = `Record ID ${idVal} deleted successfully!`;
+            statusEl.textContent = `Record #${id} deleted successfully!`;
             fetchMessages();
 
         } catch (err) {
@@ -196,9 +229,60 @@
         }
     }
 
-    // 5. FUNCTION 3: DELETE PARTICULAR MESSAGE DIRECTLY VIA BUTTON CLICK ON CARD
-    // 6. FUNCTION 4: FETCH MESSAGES
+    // 6. FETCH ALL MESSAGES
+    async function fetchMessages() {
+        document.getElementById("queryInput").value = "";
+        statusEl.textContent = "Fetching records...";
 
+        try {
+            const { data, error } = await supabaseClient
+                .from("demo_messages")
+                .select("id, message, created_at")
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
+
+            renderRecords(data);
+            statusEl.textContent = `${data.length} record(s) loaded successfully.`;
+
+        } catch (err) {
+            statusEl.textContent = "Read error: " + err.message;
+        }
+    }
+
+    // 7. HELPER TO RENDER RECORDS HTML
+    function renderRecords(data) {
+        recordsContainer.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            recordsContainer.innerHTML = "<div class='record'><small>No records found.</small></div>";
+            return;
+        }
+
+        data.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "record";
+
+            const idSmall = document.createElement("small");
+            idSmall.innerHTML = `<b>ID:</b> ${item.id} | 🕒 ${new Date(item.created_at).toLocaleString()}`;
+
+            const msgP = document.createElement("p");
+            msgP.textContent = item.message;
+
+            const delBtn = document.createElement("button");
+            delBtn.className = "btn-delete";
+            delBtn.textContent = "Delete This Record";
+            delBtn.onclick = () => deleteRecord(item.id);
+
+            card.appendChild(idSmall);
+            card.appendChild(msgP);
+            card.appendChild(delBtn);
+            recordsContainer.appendChild(card);
+        });
+    }
+
+    // Initial load when page opens
+    fetchMessages();
 </script>
 
 </body>
