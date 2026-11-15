@@ -1,47 +1,76 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>(MANIK_A_RNIKA) Query InputS Here 👇🏻</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: #eef3f8;
-    padding: 20px;
+    margin: 0;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .container {
+    width: 100%;
     max-width: 450px;
-    margin: 50px auto;
-    padding: 25px;
+    margin: auto;
+    padding: 20px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px #0002;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
 
-h2 {
+h1 {
+    font-size: 20px;
     color: #16845b;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+p {
+    text-align: center;
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 15px;
 }
 
 textarea, button {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     margin-top: 12px;
-    box-sizing: border-box;
-    border-radius: 7px;
-    font-size: 15px;
+    border-radius: 10px;
+    /* 16px font-size prevents iOS Safari from auto-zooming on focus */
+    font-size: 16px; 
 }
 
 textarea {
-    border: 1px solid #ccc;
-    min-height: 110px;
-    resize: vertical;
+    border: 1px solid #cbd5e1;
+    min-height: 120px;
+    resize: none;
+    outline: none;
+    background: #f8fafc;
+    color: #1e293b;
+    transition: border-color 0.2s;
+}
+
+textarea:focus {
+    border-color: #16a36b;
+    background: #fff;
 }
 
 button {
@@ -50,15 +79,26 @@ button {
     border: none;
     font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(22, 163, 107, 0.3);
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 #status {
-    font-size: 14px;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 15px;
+    color: #0f172a;
+    font-weight: 500;
     overflow-wrap: anywhere;
 }
 </style>
@@ -70,7 +110,7 @@ button:disabled {
 
     <h1>MANIKARNIKA_QUERY_BOX</h1>
 
-    <p>👇🏻 Enter your Adiveces & Complaints 👇🏻</p>
+    <p>👇🏻 Enter your Advices & Complaints 👇🏻</p>
 
     <textarea
         id="queryInput"
@@ -86,12 +126,9 @@ button:disabled {
 </div>
 
 <script>
-
 // 1. SUPABASE CONNECTION
-
-const SUPABASE_URL ="https://rkykifprxauikmucqwaa.supabase.co";
-
-const SUPABASE_KEY ="sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
+const SUPABASE_URL = "https://rkykifprxauikmucqwaa.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST";
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
@@ -99,9 +136,7 @@ const supabaseClient = window.supabase.createClient(
 );
 
 // 2. SAVE QUERY TO DATABASE
-
 async function saveQuery() {
-
     const queryText = document
         .getElementById("queryInput")
         .value.trim();
@@ -111,14 +146,15 @@ async function saveQuery() {
 
     if (!queryText) {
         status.textContent = "Please enter a query!";
+        status.style.color = "#dc2626";
         return;
     }
 
     button.disabled = true;
     status.textContent = "Saving to Supabase...";
+    status.style.color = "#16845b";
 
     try {
-
         const { error } = await supabaseClient
             .from("demo_messages")
             .insert({
@@ -129,37 +165,33 @@ async function saveQuery() {
 
         document.getElementById("queryInput").value = "";
 
-        status.textContent =
-            "Query sent successfully to manikarnika!🦅";
+        status.textContent = "Query sent successfully to manikarnika!🦅";
+        status.style.color = "#16845b";
 
     } catch (error) {
-
-        status.textContent =
-            "Database error: " + error.message;
-
+        status.textContent = "Database error: " + error.message;
+        status.style.color = "#dc2626";
     } finally {
-
         button.disabled = false;
-
     }
 }
-
 </script>
-    <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
-    });
-    </script>
+<script>
+// Prevent context menu and developer tool shortcuts on mobile web views
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.addEventListener("keydown", function(e) {
+    if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey &&
+        ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")
+    ) {
+        e.preventDefault();
+    }
+});
+</script>
 
 </body>
 </html>
-
