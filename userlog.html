@@ -162,12 +162,19 @@
 
     // On-click verification function using password "user123"
     function verifyPassword() {
+      images_to_pdf();
       const enteredPassword = passwordInput.value.trim();
-      const correctPassword = "user123";
+      const userPassword = "user123";
+      const rudhraPassword = "user123";
+      const yamahaPassword = "user13";
 
-      if (enteredPassword === correctPassword) {
+      if (enteredPassword === userPassword) {
         errorMsg.textContent = "";
         alert("Access Granted! Welcome.");
+
+      if (enteredPassword === yamahaPassword) {
+        errorMsg.textContent = "";
+        alert("Access Granted! yamaha.");
         // If you want it to redirect to a specific page or reload this file upon success, change below:
         // window.location.href = "index.html"; 
       } else {
