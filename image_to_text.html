@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA - Image to Text OCR</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#e8f7f7,#f4f0ff);
+    color: #263238;
+}
+
+.container {
+    max-width: 750px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 5px 25px #0002;
+    border: 1px solid #d8eeee;
+}
+
+h2 {
+    text-align: center;
+    color: #008b83;
+    font-size: 27px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+}
+
+.upload-box {
+    border: 2px dashed #00a99d;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    background: #f2ffff;
+    margin-top: 20px;
+}
+
+input[type=file] {
+    width: 100%;
+    margin-top: 12px;
+}
+
+#preview {
+    display: none;
+    max-width: 100%;
+    max-height: 350px;
+    margin: 20px auto;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+select {
+    width: 100%;
+    padding: 13px;
+    margin-top: 10px;
+    border: 1px solid #00a99d;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+}
+
+label {
+    display: block;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #087c73;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:hover {
+    filter: brightness(.92);
+}
+
+.extract-btn {
+    background: linear-gradient(135deg,#00bfa5,#00897b);
+}
+
+.download-btn {
+    background: linear-gradient(135deg,#536dfe,#304ffe);
+}
+
+.clear-btn {
+    background: linear-gradient(135deg,#ff5252,#d50000);
+}
+
+button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+textarea {
+    width: 100%;
+    min-height: 280px;
+    margin-top: 15px;
+    padding: 14px;
+    border: 1px solid #bbb;
+    border-radius: 9px;
+    font-size: 16px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+#status {
+    color: #00897b;
+    font-weight: bold;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.progress {
+    width: 100%;
+    height: 13px;
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#00bfa5,#536dfe);
+    transition: width .2s;
+}
+
+.footer {
+    text-align: center;
+    color: #888;
+    margin-top: 20px;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>MANIKARNIKA OCR</h2>
+
+<p class="subtitle">
+IMAGE TO TEXT CONVERTER
+</p>
+
+<p class="subtitle">
+Extract English, Telugu and Hindi text from uploaded images.
+</p>
+
+<!-- IMAGE UPLOAD -->
+
+<div class="upload-box">
+
+<strong>SELECT YOUR IMAGE</strong>
+
+<p>Upload JPG, PNG or another supported image format.</p>
+
+<input
+type="file"
+id="imageInput"
+accept="image/*">
+
+<img id="preview" alt="Uploaded image preview">
+
+</div>
+
+<!-- LANGUAGE SELECTION -->
+
+<label for="ocrLanguage">SELECT OCR LANGUAGE</label>
+
+<select id="ocrLanguage">
+
+<option value="eng+tel+hin">
+All Languages - English + Telugu + Hindi
+</option>
+
+<option value="eng">
+English Only
+</option>
+
+<option value="tel">
+Telugu Only
+</option>
+
+<option value="hin">
+Hindi Only
+</option>
+
+</select>
+
+<!-- EXTRACT BUTTON -->
+
+<button
+class="extract-btn"
+id="extractButton"
+onclick="extractText()">
+
+EXTRACT TEXT
+
+</button>
+
+<p id="status">Select an image to begin.</p>
+
+<!-- PROGRESS -->
+
+<div class="progress">
+<div id="progressBar"></div>
+</div>
+
+<!-- OUTPUT -->
+
+<h3>EXTRACTED TEXT</h3>
+
+<textarea
+id="outputText"
+placeholder="Your extracted English, Telugu or Hindi text will appear here. You can edit the text..."></textarea>
+
+<!-- DOWNLOAD -->
+
+<button
+class="download-btn"
+onclick="downloadText()">
+
+DOWNLOAD TEXT FILE
+
+</button>
+
+<!-- CLEAR -->
+
+<button
+class="clear-btn"
+onclick="clearAll()">
+
+CLEAR ALL
+
+</button>
+
+<div class="footer">
+MANIKARNIKA IMAGE TO TEXT OCR
+</div>
+
+</div>
+
+<script>
+
+// =================================
+// GLOBAL VARIABLES
+// =================================
+
+let selectedImage = null;
+let previewURL = null;
+
+// =================================
+// IMAGE UPLOAD AND PREVIEW
+// =================================
+
+document.getElementById("imageInput")
+.addEventListener("change", function(event) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+
+        alert("Please select a valid image.");
+
+        this.value = "";
+        return;
+    }
+
+    selectedImage = file;
+
+    const preview = document.getElementById("preview");
+
+    if (previewURL) {
+        URL.revokeObjectURL(previewURL);
+    }
+
+    previewURL = URL.createObjectURL(file);
+
+    preview.src = previewURL;
+    preview.style.display = "block";
+
+    document.getElementById("status").textContent =
+        "Image uploaded successfully.";
+
+    document.getElementById("outputText").value = "";
+
+    document.getElementById("progressBar").style.width = "0%";
+
+});
+
+// =================================
+// OCR TEXT EXTRACTION
+// ENGLISH + TELUGU + HINDI
+// =================================
+
+async function extractText() {
+
+    if (!selectedImage) {
+
+        alert("Please upload an image first.");
+
+        return;
+    }
+
+    const button = document.getElementById("extractButton");
+
+    const status = document.getElementById("status");
+
+    const output = document.getElementById("outputText");
+
+    const progressBar = document.getElementById("progressBar");
+
+    const language = document.getElementById("ocrLanguage").value;
+
+    button.disabled = true;
+
+    output.value = "";
+
+    progressBar.style.width = "0%";
+
+    status.textContent = "Loading OCR language data...";
+
+    try {
+
+        const result = await Tesseract.recognize(
+
+            selectedImage,
+
+            language,
+
+            {
+
+                logger: function(info) {
+
+                    if (info.status) {
+
+                        status.textContent =
+                            info.status + " " +
+                            Math.round((info.progress || 0) * 100) + "%";
+
+                    }
+
+                    if (info.status === "recognizing text") {
+
+                        progressBar.style.width =
+                            Math.round(info.progress * 100) + "%";
+
+                    }
+
+                }
+
+            }
+
+        );
+
+        // DISPLAY EXTRACTED TEXT
+
+        output.value = result.data.text.trim();
+
+        if (output.value) {
+
+            status.textContent =
+                "Text extracted successfully!";
+
+            progressBar.style.width = "100%";
+
+        } else {
+
+            status.textContent =
+                "No readable text found. Try a clearer image.";
+
+        }
+
+    } catch(error) {
+
+        console.error(error);
+
+        status.textContent =
+            "OCR Error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+// =================================
+// DOWNLOAD TEXT FILE
+// =================================
+
+function downloadText() {
+
+    const text = document.getElementById("outputText").value;
+
+    if (!text.trim()) {
+
+        alert("No text available to download.");
+
+        return;
+    }
+
+    const blob = new Blob(
+
+        [text],
+
+        {type: "text/plain;charset=utf-8"}
+
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = "Manikarnika_Extracted_Text.txt";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+}
+
+// =================================
+// CLEAR ALL
+// =================================
+
+function clearAll() {
+
+    selectedImage = null;
+
+    document.getElementById("imageInput").value = "";
+
+    const preview = document.getElementById("preview");
+
+    preview.removeAttribute("src");
+
+    preview.style.display = "none";
+
+    if (previewURL) {
+
+        URL.revokeObjectURL(previewURL);
+
+        previewURL = null;
+
+    }
+
+    document.getElementById("outputText").value = "";
+
+    document.getElementById("status").textContent =
+        "Select an image to begin.";
+
+    document.getElementById("progressBar").style.width = "0%";
+
+    document.getElementById("extractButton").disabled = false;
+
+}
+
+</script>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+</body>
+</html>
