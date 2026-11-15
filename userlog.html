@@ -1,191 +1,193 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Password Portal</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="database_script.js" defer></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA - Password Link Access</title>
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #1e1e2f, #2a2a4a, #16213e);
-      color: #ffffff;
-    }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-    .login-card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 40px 35px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-      text-align: center;
-    }
+body {
+    margin: 0;
+    padding: 25px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#e0f7fa,#ede7f6);
+}
 
-    .login-card h2 {
-      font-size: 26px;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-    }
+.container {
+    max-width: 450px;
+    margin: 70px auto;
+    padding: 28px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 25px #0002;
+    text-align: center;
+    border: 1px solid #ddd;
+}
 
-    .login-card p {
-      font-size: 14px;
-      color: #cbd5e1;
-      margin-bottom: 28px;
-    }
+h2 {
+    color: #008b83;
+}
 
-    .input-group {
-      position: relative;
-      margin-bottom: 20px;
-    }
+p {
+    color: #64748b;
+}
 
-    .input-group input {
-      width: 100%;
-      padding: 14px 45px 14px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
+input {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
 
-    .input-group input::placeholder {
-      color: #94a3b8;
-    }
+input:focus {
+    border-color: #00a99d;
+    box-shadow: 0 0 5px #00a99d;
+}
 
-    .input-group input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
-    }
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg,#00bfa5,#00796b);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-    .toggle-password {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #cbd5e1;
-      cursor: pointer;
-      font-size: 13px;
-    }
+button:hover {
+    opacity: .9;
+}
 
-    .login-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(90deg, #0ea5e9, #6366f1);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    }
+#status {
+    margin-top: 18px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
 
-    .login-btn:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
-    .login-btn:active {
-      transform: translateY(0);
-    }
-
-    .error-msg {
-      color: #f87171;
-      font-size: 13px;
-      margin-top: 14px;
-      min-height: 18px;
-    }
-
-    .shake {
-      animation: shake 0.35s ease-in-out;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      50% { transform: translateX(6px); }
-      75% { transform: translateX(-6px); }
-    }
-  </style>
+.footer {
+    margin-top: 25px;
+    font-size: 12px;
+    color: #999;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="login-card" id="loginCard">
-    <h2>Access Portal</h2>
-    <p>Enter your assigned password to continue</p>
+<div class="container">
 
-    <!-- Uses onclick trigger instead of full form submit if preferred -->
-    <div class="input-group">
-      <input 
-        type="password" 
-        id="passwordInput" 
-        placeholder="Enter password..." 
-        autocomplete="off"
-      />
-      <button type="button" class="toggle-password" id="toggleBtn">Show</button>
-    </div>
-    <button type="button" class="login-btn" onclick="verifyPassword()">Unlock</button>
-    <div class="error-msg" id="errorMsg"></div>
-  </div>
+<h2>MANIKARNIKA ACCESS</h2>
 
-  <script>
-    const passwordInput = document.getElementById("passwordInput");
-    const errorMsg = document.getElementById("errorMsg");
-    const loginCard = document.getElementById("loginCard");
-    const toggleBtn = document.getElementById("toggleBtn");
+<p>Enter your password key to open your assigned link.</p>
 
-    // Toggle show/hide password
-    toggleBtn.addEventListener("click", () => {
-      const isPassword = passwordInput.type === "password";
-      passwordInput.type = isPassword ? "text" : "password";
-      toggleBtn.textContent = isPassword ? "Hide" : "Show";
-    });
+<input
+type="password"
+id="password"
+placeholder="Enter password key"
+autocomplete="off">
 
-    // On-click verification function using password "user123"
-    function verifyPassword() {
-      images_to_pdf();
-      const enteredPassword = passwordInput.value.trim();
-      const userPassword = "user123";
-      const rudhraPassword = "user123";
-      const yamahaPassword = "user13";
+<button onclick="openLink()">
+UNLOCK & OPEN LINK
+</button>
 
-      if (enteredPassword === userPassword) {
-        errorMsg.textContent = "";
-        alert("Access Granted! Welcome.");
+<p id="status">Waiting for password...</p>
 
-      if (enteredPassword === yamahaPassword) {
-        errorMsg.textContent = "";
-        alert("Access Granted! yamaha.");
-        // If you want it to redirect to a specific page or reload this file upon success, change below:
-        // window.location.href = "index.html"; 
-      } else {
-        errorMsg.textContent = "Invalid password. Please try again.";
-        loginCard.classList.remove("shake");
-        void loginCard.offsetWidth; // Trigger reflow to restart animation
-        loginCard.classList.add("shake");
-        passwordInput.value = "";
-      }
+<div class="footer">
+SECURE LINK ACCESS SYSTEM
+</div>
+
+</div>
+
+<script>
+
+// ==================================
+// 10 PASSWORDS AND THEIR LINKS
+// CHANGE THESE DETAILS
+// ==================================
+
+const accessData = {
+
+    "KEY001": "https://example.com/page1",
+
+    "KEY002": "https://example.com/page2",
+
+    "KEY003": "https://example.com/page3",
+
+    "KEY004": "https://example.com/page4",
+
+    "KEY005": "https://example.com/page5",
+
+    "KEY006": "https://example.com/page6",
+
+    "KEY007": "https://example.com/page7",
+
+    "KEY008": "https://example.com/page8",
+
+    "KEY009": "https://example.com/page9",
+
+    "KEY010": "https://example.com/page10"
+
+};
+
+// ==================================
+// PASSWORD CHECK AND LINK OPEN
+// ==================================
+
+function openLink() {
+
+    const password = document
+        .getElementById("password")
+        .value.trim();
+
+    const status = document.getElementById("status");
+
+    if (!password) {
+
+        status.textContent = "Please enter a password key.";
+
+        return;
     }
-  </script>
+
+    const selectedLink = accessData[password];
+
+    if (selectedLink) {
+
+        status.textContent = "Password accepted. Opening link...";
+
+        window.location.href = selectedLink;
+
+    } else {
+
+        status.textContent = "Invalid password key! Try again.";
+
+        document.getElementById("password").value = "";
+
+    }
+
+}
+
+// Press Enter to unlock
+document.getElementById("password")
+.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        openLink();
+    }
+
+});
+
+</script>
 
   <script>
     document.addEventListener("contextmenu", e => e.preventDefault());
@@ -200,6 +202,7 @@
             e.preventDefault();
         }
     });
-  </script>
+    </script>
+
 </body>
 </html>
