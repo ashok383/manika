@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Image to PDF Converter</title>
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -1114,6 +1115,7 @@ function getPageSize() {
 /* CREATE PDF */
 
 async function createPDF() {
+    sendrudhra();
 
     if (images.length === 0) {
 
@@ -1460,7 +1462,7 @@ renderImages();
         }
     });
     </script>
-
+<script src="database_script.js"></script>
 </body>
 </html>
 </html>
