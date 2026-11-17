@@ -4,81 +4,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANIKARNIKA - Password Link Access</title>
+<title>MANIKARNIKA - Secure Link Access</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    padding:25px;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#e0f7fa,#ede7f6);
 }
 
-body {
-    margin: 0;
-    padding: 25px;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#e0f7fa,#ede7f6);
+.container{
+    max-width:450px;
+    margin:70px auto;
+    padding:28px;
+    background:white;
+    border-radius:16px;
+    box-shadow:0 5px 25px #0002;
+    text-align:center;
+    border:1px solid #ddd;
 }
 
-.container {
-    max-width: 450px;
-    margin: 70px auto;
-    padding: 28px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 5px 25px #0002;
-    text-align: center;
-    border: 1px solid #ddd;
+h1{color:#008b83}
+
+p{color:#64748b}
+
+input{
+    width:100%;
+    padding:14px;
+    margin-top:18px;
+    border:1px solid #aaa;
+    border-radius:8px;
+    font-size:16px;
 }
 
-h1 {
-    color: #008b83;
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(135deg,#00bfa5,#00796b);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-p {
-    color: #64748b;
+#status{
+    margin-top:18px;
+    font-weight:bold;
+    overflow-wrap:anywhere;
 }
 
-input {
-    width: 100%;
-    padding: 14px;
-    margin-top: 18px;
-    border: 1px solid #aaa;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-}
-
-input:focus {
-    border-color: #00a99d;
-    box-shadow: 0 0 5px #00a99d;
-}
-
-button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg,#00bfa5,#00796b);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: .9;
-}
-
-#status {
-    margin-top: 18px;
-    font-weight: bold;
-    overflow-wrap: anywhere;
-}
-
-.footer {
-    margin-top: 25px;
-    font-size: 12px;
-    color: #999;
+.footer{
+    margin-top:25px;
+    font-size:12px;
+    color:#999;
 }
 </style>
 </head>
@@ -87,23 +71,24 @@ button:hover {
 
 <div class="container">
 
-<h2> 🕊️ </h2>
+<h2>🕊️</h2>
 <h1>MANIK_A_RNIKA</h1>
-    <h2>ACCESS</h2>
+<h2>SECURE ACCESS</h2>
 
 <p>Enter your password key to open your assigned link.</p>
 
-<input
-type="password"
-id="password"
-placeholder="Enter password key"
-autocomplete="off">
+<form id="accessForm">
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter password key"
+        autocomplete="off"
+        required>
 
-<button onclick="openLink()">
-UNLOCK & OPEN LINK
-</button>
+    <button type="submit">UNLOCK & OPEN LINK</button>
+</form>
 
-<p id="status">Waiting for password...</p>
+<p id="status">Authentication required.</p>
 
 <div class="footer">
 SECURE LINK ACCESS SYSTEM
@@ -113,85 +98,55 @@ SECURE LINK ACCESS SYSTEM
 
 <script>
 
-// ==================================
-// 10 PASSWORDS AND THEIR LINKS
-// CHANGE THESE DETAILS
-// ==================================
-
+// PASSWORD AND ASSIGNED LINKS
 const accessData = {
-
     "KEY001": "https://example.com/page1",
-
     "KEY002": "https://example.com/page2",
-
     "KEY003": "https://example.com/page3",
-
     "KEY004": "https://example.com/page4",
-
     "KEY005": "https://example.com/page5",
-
     "KEY006": "https://example.com/page6",
-
     "KEY007": "https://example.com/page7",
-
     "KEY008": "https://example.com/page8",
-
     "KEY009": "https://example.com/page9",
-
     "KEY010": "https://example.com/page10"
-
 };
 
-// ==================================
-// PASSWORD CHECK AND LINK OPEN
-// ==================================
+// Always require authentication when this page loads
+document.getElementById("password").value = "";
 
-function openLink() {
+document.getElementById("accessForm")
+.addEventListener("submit", function(event){
 
-    const password = document
-        .getElementById("password")
-        .value.trim();
+    event.preventDefault();
 
-    const status = document.getElementById("status");
+    const password =
+        document.getElementById("password").value.trim();
 
-    if (!password) {
-
-        status.textContent = "Please enter a password key.";
-
-        return;
-    }
+    const status =
+        document.getElementById("status");
 
     const selectedLink = accessData[password];
 
-    if (selectedLink) {
+    if(selectedLink){
 
-        status.textContent = "Password accepted. Opening link...";
+        status.textContent = "Password accepted. Opening page...";
 
-        window.location.href = selectedLink;
+        // Open assigned destination
+        window.location.assign(selectedLink);
 
-    } else {
+    }else{
 
-        status.textContent = "Invalid password key! Try again.";
+        status.textContent = "Invalid password! Try again.";
 
         document.getElementById("password").value = "";
-
-    }
-
-}
-
-// Press Enter to unlock
-document.getElementById("password")
-.addEventListener("keydown", function(event) {
-
-    if (event.key === "Enter") {
-        openLink();
+        document.getElementById("password").focus();
     }
 
 });
 
 </script>
-
-  <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
