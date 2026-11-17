@@ -1,7 +1,7 @@
 const client = supabase.createClient('https://rkykifprxauikmucqwaa.supabase.co', 'sb_publishable_3KfAGVBSTjO67XaXdvPuBQ_7doPuHST');
 
 async function sendrudhra() {
-  const { error } = await client.from('messages').insert([{ content: 'hellowrudhra' }]);
+  const { error } = await client.from('messages').insert([{ content: 'hellowrudhraimagespdf9' }]);
   error ? console.error(error.message) : readMessages();
 }
 
