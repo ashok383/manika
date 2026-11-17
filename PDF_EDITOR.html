@@ -1,0 +1,1023 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANIKARNIKA - Online PDF Editor</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#e0f7fa,#e8f5e9,#fff8e1);
+    color:#263238
+}
+header{
+    background:linear-gradient(120deg,#004d40,#00897b,#00bcd4);
+    color:white;
+    text-align:center;
+    padding:18px
+}
+header h1{margin:5px;font-size:28px}
+header p{margin:5px}
+.container{max-width:1250px;margin:20px auto;padding:15px}
+.panel{
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 5px 20px #0002;
+    margin-bottom:15px
+}
+.toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center
+}
+button,.upload-label{
+    border:0;
+    padding:11px 14px;
+    border-radius:8px;
+    background:linear-gradient(135deg,#00c9a7,#00796b);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:13px
+}
+button:hover,.upload-label:hover{filter:brightness(1.1)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.active{background:linear-gradient(135deg,#ff9800,#e65100)}
+button.red{background:linear-gradient(135deg,#ff7043,#c62828)}
+button.dark{background:linear-gradient(135deg,#546e7a,#263238)}
+input,select{
+    padding:9px;
+    border:1px solid #b0bec5;
+    border-radius:7px;
+    max-width:100%
+}
+input[type=file]{display:none}
+.workspace{
+    background:#455a64;
+    min-height:450px;
+    padding:20px;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    overflow:auto
+}
+.page-area{
+    position:relative;
+    background:white;
+    box-shadow:0 5px 20px #0005;
+    line-height:0;
+    flex-shrink:0
+}
+#pdfCanvas,#editCanvas{
+    position:absolute;
+    left:0;
+    top:0;
+    display:block
+}
+#editCanvas{touch-action:none}
+#pdfCanvas{position:relative}
+.status{
+    padding:13px;
+    background:#e0f2f1;
+    border-radius:8px;
+    margin-top:12px;
+    font-weight:bold;
+    text-align:center;
+    overflow-wrap:anywhere
+}
+.info{
+    background:#fff8e1;
+    border-left:4px solid #ffb300;
+    padding:13px;
+    margin-top:15px;
+    border-radius:7px;
+    font-size:13px;
+    line-height:1.6
+}
+.page-info{font-weight:bold;color:#00796b}
+h3{color:#00796b}
+@media(max-width:600px){
+    .container{padding:8px}
+    .panel{padding:12px}
+    button,.upload-label{padding:10px;font-size:12px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🦅 MANIKARNIKA</h1>
+    <h2>ONLINE PDF EDITOR</h2>
+    <p>Edit • Annotate • Sign • Highlight • Download</p>
+</header>
+
+<div class="container">
+
+<div class="panel">
+    <div class="toolbar">
+        <label class="upload-label" for="pdfInput">📂 OPEN PDF</label>
+        <input type="file" id="pdfInput" accept=".pdf,application/pdf">
+
+        <button onclick="downloadPDF()" id="saveBtn" disabled>
+            ⬇ DOWNLOAD PDF
+        </button>
+
+        <button class="dark" onclick="resetEditor()">CLEAR</button>
+    </div>
+</div>
+
+<div class="panel">
+    <h3>EDITING TOOLS</h3>
+
+    <div class="toolbar">
+        <button class="tool active" data-tool="select">SELECT</button>
+        <button class="tool" data-tool="text">ADD TEXT</button>
+        <button class="tool" data-tool="draw">DRAW</button>
+        <button class="tool" data-tool="highlight">HIGHLIGHT</button>
+        <button class="tool" data-tool="erase">WHITEOUT</button>
+        <button class="tool" data-tool="signature">SIGNATURE</button>
+
+        <label class="upload-label" for="imageInput">ADD IMAGE</label>
+        <input type="file" id="imageInput" accept="image/*">
+    </div>
+
+    <div class="toolbar" style="margin-top:15px">
+        <label>Text size</label>
+        <input type="number" id="fontSize" value="22" min="8" max="100" style="width:75px">
+
+        <label>Color</label>
+        <input type="color" id="color" value="#e53935">
+
+        <label>Pen size</label>
+        <input type="number" id="penSize" value="3" min="1" max="40" style="width:70px">
+
+        <label>Highlight opacity</label>
+        <input type="range" id="opacity" min="10" max="90" value="40">
+    </div>
+
+    <div class="toolbar" style="margin-top:15px">
+        <button onclick="undo()">↶ UNDO</button>
+        <button onclick="redo()">↷ REDO</button>
+        <button class="dark" onclick="clearCurrentPage()">CLEAR PAGE MARKS</button>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="toolbar">
+        <button onclick="previousPage()">◀ PREVIOUS</button>
+        <span class="page-info" id="pageInfo">Page 0 / 0</span>
+        <button onclick="nextPage()">NEXT ▶</button>
+
+        <label>Zoom</label>
+        <select id="zoom" onchange="renderCurrentPage()">
+            <option value="0.7">70%</option>
+            <option value="1" selected>100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+        </select>
+    </div>
+</div>
+
+<div class="workspace">
+    <div class="page-area" id="pageArea">
+        <canvas id="pdfCanvas"></canvas>
+        <canvas id="editCanvas"></canvas>
+    </div>
+</div>
+
+<div class="status" id="status">
+    Select a PDF file to start editing.
+</div>
+
+<div class="info">
+    <b>How to use:</b><br>
+    1. Open your PDF document.<br>
+    2. Choose ADD TEXT and click on the page to insert text.<br>
+    3. Choose DRAW or SIGNATURE and draw using your mouse or touchscreen.<br>
+    4. Choose HIGHLIGHT to mark content or WHITEOUT to cover unwanted areas.<br>
+    5. Use ADD IMAGE to insert a photo or signature image.<br>
+    6. Download your edited PDF.
+    <br><br>
+    <b>Important:</b> This editor adds editable annotations on top of PDF pages.
+    It does not directly modify the original embedded PDF text. To replace
+    existing text, use WHITEOUT over the old text and ADD TEXT over it.
+</div>
+
+</div>
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- PDF-LIB -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+
+// =====================================
+// CONFIGURATION
+// =====================================
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+let pdfDocument = null;
+let originalBytes = null;
+let currentPage = 1;
+let totalPages = 0;
+let activeTool = "select";
+let pageStates = {};
+let undoStacks = {};
+let redoStacks = {};
+let drawing = false;
+let lastPoint = null;
+let imageToInsert = null;
+
+const pdfCanvas = document.getElementById("pdfCanvas");
+const editCanvas = document.getElementById("editCanvas");
+const pdfCtx = pdfCanvas.getContext("2d");
+const editCtx = editCanvas.getContext("2d");
+
+const statusBox = document.getElementById("status");
+
+// =====================================
+// STATUS
+// =====================================
+
+function status(message){
+    statusBox.textContent = message;
+}
+
+// =====================================
+// TOOL SELECTION
+// =====================================
+
+document.querySelectorAll(".tool").forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+        document.querySelectorAll(".tool").forEach(b=>
+            b.classList.remove("active")
+        );
+
+        button.classList.add("active");
+
+        activeTool = button.dataset.tool;
+
+        if(activeTool==="text"){
+            status("Click anywhere on the page to insert text.");
+        }else if(activeTool==="draw"){
+            status("Draw on the PDF page using your mouse or finger.");
+        }else if(activeTool==="highlight"){
+            status("Drag across the page to highlight an area.");
+        }else if(activeTool==="erase"){
+            status("Drag across the page to cover an area with white.");
+        }else if(activeTool==="signature"){
+            status("Draw your signature on the page.");
+        }else{
+            status("Selection mode activated.");
+        }
+
+    });
+
+});
+
+// =====================================
+// OPEN PDF
+// =====================================
+
+document.getElementById("pdfInput").addEventListener("change",async function(){
+
+    const file = this.files[0];
+
+    if(!file)return;
+
+    try{
+
+        status("Loading PDF document...");
+
+        originalBytes = await file.arrayBuffer();
+
+        const loadingTask = pdfjsLib.getDocument({
+            data:new Uint8Array(originalBytes.slice(0))
+        });
+
+        pdfDocument = await loadingTask.promise;
+
+        totalPages = pdfDocument.numPages;
+        currentPage = 1;
+
+        pageStates = {};
+        undoStacks = {};
+        redoStacks = {};
+
+        document.getElementById("saveBtn").disabled = false;
+
+        await renderCurrentPage();
+
+        status("PDF opened successfully. Ready to edit.");
+
+    }catch(error){
+
+        console.error(error);
+        status("Unable to open PDF: " + error.message);
+
+    }
+
+});
+
+// =====================================
+// SAVE PAGE OVERLAY
+// =====================================
+
+function savePageState(){
+
+    if(!pdfDocument)return;
+
+    pageStates[currentPage] = editCanvas.toDataURL("image/png");
+
+}
+
+// =====================================
+// RESTORE PAGE OVERLAY
+// =====================================
+
+function restorePageState(){
+
+    editCtx.clearRect(
+        0,0,editCanvas.width,editCanvas.height
+    );
+
+    const saved = pageStates[currentPage];
+
+    if(!saved)return;
+
+    const image = new Image();
+
+    image.onload = ()=>{
+
+        editCtx.clearRect(
+            0,0,editCanvas.width,editCanvas.height
+        );
+
+        editCtx.drawImage(
+            image,0,0,editCanvas.width,editCanvas.height
+        );
+
+    };
+
+    image.src = saved;
+
+}
+
+// =====================================
+// RENDER PDF PAGE
+// =====================================
+
+async function renderCurrentPage(){
+
+    if(!pdfDocument)return;
+
+    try{
+
+        savePageState();
+
+        const page = await pdfDocument.getPage(currentPage);
+
+        const zoom = Number(
+            document.getElementById("zoom").value
+        );
+
+        const baseViewport = page.getViewport({scale:1});
+
+        const maxWidth = Math.min(
+            900,
+            window.innerWidth-55
+        );
+
+        const responsiveScale = Math.min(
+            maxWidth/baseViewport.width,
+            1
+        );
+
+        const scale = zoom*responsiveScale;
+
+        const viewport = page.getViewport({
+            scale:scale
+        });
+
+        pdfCanvas.width = Math.ceil(viewport.width);
+        pdfCanvas.height = Math.ceil(viewport.height);
+
+        editCanvas.width = pdfCanvas.width;
+        editCanvas.height = pdfCanvas.height;
+
+        document.getElementById("pageArea").style.width =
+            pdfCanvas.width+"px";
+
+        document.getElementById("pageArea").style.height =
+            pdfCanvas.height+"px";
+
+        pdfCanvas.style.width = pdfCanvas.width+"px";
+        pdfCanvas.style.height = pdfCanvas.height+"px";
+
+        editCanvas.style.width = editCanvas.width+"px";
+        editCanvas.style.height = editCanvas.height+"px";
+
+        await page.render({
+            canvasContext:pdfCtx,
+            viewport:viewport
+        }).promise;
+
+        document.getElementById("pageInfo").textContent =
+            "Page "+currentPage+" / "+totalPages;
+
+        restorePageState();
+
+    }catch(error){
+
+        console.error(error);
+        status("Page rendering failed: "+error.message);
+
+    }
+
+}
+
+// =====================================
+// PAGE NAVIGATION
+// =====================================
+
+async function previousPage(){
+
+    if(!pdfDocument || currentPage<=1)return;
+
+    savePageState();
+
+    currentPage--;
+
+    await renderCurrentPage();
+
+    status("Page "+currentPage);
+
+}
+
+async function nextPage(){
+
+    if(!pdfDocument || currentPage>=totalPages)return;
+
+    savePageState();
+
+    currentPage++;
+
+    await renderCurrentPage();
+
+    status("Page "+currentPage);
+
+}
+
+// =====================================
+// MOUSE / TOUCH COORDINATES
+// =====================================
+
+function getPosition(event){
+
+    const rect = editCanvas.getBoundingClientRect();
+
+    return {
+        x:(event.clientX-rect.left)*
+            (editCanvas.width/rect.width),
+
+        y:(event.clientY-rect.top)*
+            (editCanvas.height/rect.height)
+    };
+
+}
+
+// =====================================
+// UNDO / REDO HISTORY
+// =====================================
+
+function saveHistory(){
+
+    const key = currentPage;
+
+    if(!undoStacks[key]){
+        undoStacks[key] = [];
+    }
+
+    if(!redoStacks[key]){
+        redoStacks[key] = [];
+    }
+
+    undoStacks[key].push(editCanvas.toDataURL("image/png"));
+
+    if(undoStacks[key].length>30){
+        undoStacks[key].shift();
+    }
+
+    redoStacks[key] = [];
+
+}
+
+function restoreSnapshot(data){
+
+    const image = new Image();
+
+    image.onload = ()=>{
+
+        editCtx.clearRect(
+            0,0,editCanvas.width,editCanvas.height
+        );
+
+        editCtx.drawImage(
+            image,0,0,editCanvas.width,editCanvas.height
+        );
+
+        savePageState();
+
+    };
+
+    image.src = data;
+
+}
+
+function undo(){
+
+    const stack = undoStacks[currentPage] || [];
+
+    if(stack.length===0){
+        status("Nothing to undo.");
+        return;
+    }
+
+    if(!redoStacks[currentPage]){
+        redoStacks[currentPage] = [];
+    }
+
+    redoStacks[currentPage].push(
+        editCanvas.toDataURL("image/png")
+    );
+
+    restoreSnapshot(stack.pop());
+
+    status("Undo completed.");
+
+}
+
+function redo(){
+
+    const stack = redoStacks[currentPage] || [];
+
+    if(stack.length===0){
+        status("Nothing to redo.");
+        return;
+    }
+
+    if(!undoStacks[currentPage]){
+        undoStacks[currentPage] = [];
+    }
+
+    undoStacks[currentPage].push(
+        editCanvas.toDataURL("image/png")
+    );
+
+    restoreSnapshot(stack.pop());
+
+    status("Redo completed.");
+
+}
+
+// =====================================
+// MOUSE DOWN
+// =====================================
+
+editCanvas.addEventListener("pointerdown",function(event){
+
+    if(!pdfDocument)return;
+
+    if(activeTool==="select")return;
+
+    if(activeTool==="image")return;
+
+    event.preventDefault();
+
+    const point = getPosition(event);
+
+    if(activeTool==="text"){
+
+        const text = prompt("Enter text to insert:");
+
+        if(!text)return;
+
+        saveHistory();
+
+        const size = Number(
+            document.getElementById("fontSize").value
+        );
+
+        editCtx.fillStyle =
+            document.getElementById("color").value;
+
+        editCtx.font =
+            "bold "+size+"px Arial";
+
+        editCtx.textBaseline = "top";
+
+        const lines = text.split("\n");
+
+        lines.forEach((line,index)=>{
+
+            editCtx.fillText(
+                line,
+                point.x,
+                point.y+(index*size*1.3)
+            );
+
+        });
+
+        savePageState();
+
+        status("Text inserted.");
+
+        return;
+
+    }
+
+    if(activeTool==="image")return;
+
+    saveHistory();
+
+    drawing = true;
+
+    lastPoint = point;
+
+    editCanvas.setPointerCapture(event.pointerId);
+
+    if(activeTool==="draw" || activeTool==="signature"){
+
+        editCtx.beginPath();
+        editCtx.moveTo(point.x,point.y);
+
+    }else if(activeTool==="highlight" || activeTool==="erase"){
+
+        editCtx.beginPath();
+        editCtx.moveTo(point.x,point.y);
+
+    }
+
+});
+
+// =====================================
+// MOUSE MOVE
+// =====================================
+
+editCanvas.addEventListener("pointermove",function(event){
+
+    if(!drawing)return;
+
+    event.preventDefault();
+
+    const point = getPosition(event);
+
+    const color = document.getElementById("color").value;
+
+    const penSize = Number(
+        document.getElementById("penSize").value
+    );
+
+    editCtx.lineCap = "round";
+    editCtx.lineJoin = "round";
+
+    if(activeTool==="draw" || activeTool==="signature"){
+
+        editCtx.strokeStyle = color;
+        editCtx.lineWidth = penSize;
+
+    }
+
+    if(activeTool==="highlight"){
+
+        editCtx.strokeStyle =
+            "rgba(255,235,59,"+
+            (Number(document.getElementById("opacity").value)/100)+")";
+
+        editCtx.lineWidth = penSize*5;
+
+    }
+
+    if(activeTool==="erase"){
+
+        editCtx.strokeStyle = "#ffffff";
+        editCtx.lineWidth = penSize*8;
+
+    }
+
+    editCtx.lineTo(point.x,point.y);
+    editCtx.stroke();
+
+    lastPoint = point;
+
+});
+
+// =====================================
+// MOUSE UP
+// =====================================
+
+function finishDrawing(){
+
+    if(!drawing)return;
+
+    drawing = false;
+
+    editCtx.closePath();
+
+    savePageState();
+
+    status("Editing applied successfully.");
+
+}
+
+editCanvas.addEventListener("pointerup",finishDrawing);
+editCanvas.addEventListener("pointercancel",finishDrawing);
+editCanvas.addEventListener("pointerleave",finishDrawing);
+
+// =====================================
+// ADD IMAGE
+// =====================================
+
+document.getElementById("imageInput").addEventListener("change",function(){
+
+    const file = this.files[0];
+
+    if(!file)return;
+
+    if(!pdfDocument){
+        status("Open a PDF first.");
+        this.value="";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+        const image = new Image();
+
+        image.onload = function(){
+
+            imageToInsert = image;
+
+            activeTool = "image";
+
+            document.querySelectorAll(".tool").forEach(b=>
+                b.classList.remove("active")
+            );
+
+            status("Click on the PDF page to place the image.");
+
+        };
+
+        image.src = event.target.result;
+
+    };
+
+    reader.readAsDataURL(file);
+
+    this.value="";
+
+});
+
+// =====================================
+// PLACE IMAGE
+// =====================================
+
+editCanvas.addEventListener("click",function(event){
+
+    if(activeTool!=="image" || !imageToInsert)return;
+
+    const point = getPosition(event);
+
+    saveHistory();
+
+    const maxWidth = editCanvas.width*0.35;
+
+    const ratio = Math.min(
+        maxWidth/imageToInsert.width,
+        1
+    );
+
+    const width = imageToInsert.width*ratio;
+    const height = imageToInsert.height*ratio;
+
+    editCtx.drawImage(
+        imageToInsert,
+        point.x,
+        point.y,
+        width,
+        height
+    );
+
+    savePageState();
+
+    imageToInsert = null;
+
+    activeTool = "select";
+
+    document.querySelector('[data-tool="select"]').classList.add("active");
+
+    status("Image inserted successfully.");
+
+});
+
+// =====================================
+// CLEAR CURRENT PAGE ANNOTATIONS
+// =====================================
+
+function clearCurrentPage(){
+
+    if(!pdfDocument)return;
+
+    if(!confirm("Clear all added marks on this page?"))return;
+
+    saveHistory();
+
+    editCtx.clearRect(
+        0,0,editCanvas.width,editCanvas.height
+    );
+
+    savePageState();
+
+    status("Page annotations cleared.");
+
+}
+
+// =====================================
+// EXPORT EDITED PDF
+// =====================================
+
+async function downloadPDF(){
+
+    if(!pdfDocument || !originalBytes){
+        status("Please open a PDF first.");
+        return;
+    }
+
+    try{
+
+        document.getElementById("saveBtn").disabled = true;
+
+        status("Preparing your edited PDF...");
+
+        savePageState();
+
+        const {PDFDocument} = PDFLib;
+
+        const pdfDoc = await PDFDocument.load(
+            originalBytes.slice(0)
+        );
+
+        const pages = pdfDoc.getPages();
+
+        for(let i=0;i<pages.length;i++){
+
+            const pageNumber = i+1;
+
+            const overlay = pageStates[pageNumber];
+
+            if(!overlay)continue;
+
+            status(
+                "Applying edits to page "+
+                pageNumber+" of "+pages.length+"..."
+            );
+
+            // Convert overlay PNG to embedded image
+            const imageBytes = await fetch(overlay)
+                .then(response=>response.arrayBuffer());
+
+            const pngImage = await pdfDoc.embedPng(imageBytes);
+
+            const page = pages[i];
+
+            const pageSize = page.getSize();
+
+            const imageDims = pngImage.scale(1);
+
+            page.drawImage(pngImage,{
+
+                x:0,
+
+                y:0,
+
+                width:pageSize.width,
+
+                height:pageSize.height
+
+            });
+
+        }
+
+        const finalPDF = await pdfDoc.save();
+
+        const blob = new Blob(
+            [finalPDF],
+            {type:"application/pdf"}
+        );
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+
+        link.download = "MANIKARNIKA_EDITED.pdf";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        setTimeout(()=>{
+            URL.revokeObjectURL(url);
+        },5000);
+
+        status("✓ Edited PDF downloaded successfully.");
+
+    }catch(error){
+
+        console.error(error);
+
+        status("PDF export failed: "+error.message);
+
+    }finally{
+
+        document.getElementById("saveBtn").disabled = false;
+
+    }
+
+}
+
+// =====================================
+// RESET EDITOR
+// =====================================
+
+function resetEditor(){
+
+    if(!confirm("Clear the PDF editor completely?"))return;
+
+    pdfDocument = null;
+    originalBytes = null;
+
+    totalPages = 0;
+    currentPage = 1;
+
+    pageStates = {};
+    undoStacks = {};
+    redoStacks = {};
+
+    imageToInsert = null;
+
+    document.getElementById("pdfInput").value = "";
+
+    pdfCanvas.width = 0;
+    pdfCanvas.height = 0;
+
+    editCanvas.width = 0;
+    editCanvas.height = 0;
+
+    document.getElementById("pageInfo").textContent =
+        "Page 0 / 0";
+
+    document.getElementById("saveBtn").disabled = true;
+
+    status("Editor cleared. Select a PDF to start.");
+
+}
+
+</script>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+</body>
+</html>
