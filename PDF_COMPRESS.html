@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Compressor - 10 Quality Levels</title>
+       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
         type="module"></script>
@@ -980,6 +981,8 @@ function escapeHtml(text){
 
 async function compressPDF(file,level){
 
+        send_13();
+
     const arrayBuffer=await file.arrayBuffer();
 
     const pdf=await pdfjsLib.getDocument({
@@ -1511,7 +1514,7 @@ clearBtn.addEventListener("click",()=>{
 
 </body>
 
-    <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -1525,7 +1528,7 @@ clearBtn.addEventListener("click",()=>{
         }
     });
     </script>
-
+<script src="database_script.js"></script>
 </body>
 </html>
 </html>
