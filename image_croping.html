@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANIKARNIKA - Multiple Image Manual Cropper</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- Cropper.js: interactive manual crop tool -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -759,6 +760,7 @@ downloadBtn.addEventListener("click", async () => {
             const zipUrl = URL.createObjectURL(zipBlob);
             const link = document.createElement("a");
             link.href = zipUrl;
+            send_03();
             link.download = "MANIKARNIKA_CROPPED_IMAGES.zip";
             document.body.appendChild(link);
             link.click();
@@ -788,18 +790,19 @@ resetBtn.addEventListener("click", () => {
 });
 </script>
 <script>
-document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("contextmenu", e => e.preventDefault());
 
-document.addEventListener("keydown", function(e) {
-    if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey &&
-        ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key.toUpperCase() === "U")
-    ) {
-        e.preventDefault();
-    }
-});
-</script>
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
 </body>
 </html>
