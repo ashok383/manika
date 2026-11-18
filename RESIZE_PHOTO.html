@@ -245,6 +245,7 @@ const status = document.getElementById("status");
 let originalImage = null;
 
 photoInput.addEventListener("change", function(){
+  send_04();
   const file = this.files[0]; if(!file) return;
   if(!file.type.startsWith("image/")){ alert("Please select a valid image file."); return; }
   const reader = new FileReader();
