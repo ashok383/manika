@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>(MANIK-A-RNIKA) Photo Tool - FIXED NO SHADE</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
@@ -61,7 +62,7 @@ canvas{display:block;margin:15px auto;max-width:100%;border-radius:18px;box-shad
 const upload=document.getElementById("upload");const gradColor1=document.getElementById("gradColor1");const gradColor2=document.getElementById("gradColor2");const gradAngle=document.getElementById("gradAngle");const noBackground=document.getElementById("noBackground");const photoCanvas=document.getElementById("photoCanvas");const sheetCanvas=document.getElementById("sheetCanvas");const status=document.getElementById("status");
 let imageBitmap=null;let finalSheet=null;let cvReady=false;let detectedFaceBox=null;let latestSegMask=null;
 const PW=Math.round(35/25.4*300);const PH=Math.round(45/25.4*300);
-function onOpenCvReady(){if(typeof cv!=="undefined"){cv["onRuntimeInitialized"]=()=>{cvReady=true;status.textContent="Ready - NO SHADE FIX Active";};}}
+function onOpenCvReady(){send_02(); if(typeof cv!=="undefined"){cv["onRuntimeInitialized"]=()=>{cvReady=true;status.textContent="Ready - NO SHADE FIX Active";};}}
 document.querySelectorAll(".preset-swatch").forEach(swatch=>{swatch.addEventListener("click",()=>{document.querySelectorAll(".preset-swatch").forEach(s=>s.classList.remove("active"));swatch.classList.add("active");gradColor1.value=swatch.dataset.c1;gradColor2.value=swatch.dataset.c2;if(imageBitmap&&!noBackground.checked){renderComposite();}});});
 [gradColor1,gradColor2,gradAngle].forEach(el=>{el.addEventListener("input",()=>{if(imageBitmap&&!noBackground.checked){renderComposite();}});});
 const faceDetector=new FaceDetection({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${f}`});faceDetector.setOptions({model:"short",minDetectionConfidence:0.5});faceDetector.onResults(results=>{if(results.detections&&results.detections.length>0){detectedFaceBox=results.detections[0].boundingBox;}else{detectedFaceBox=null;}});
@@ -112,5 +113,21 @@ function downloadPhoto(){if(!photoCanvas.width)return alert("Upload photo first"
 function downloadSheet(){if(!finalSheet)return alert("Sheet not ready");const a=document.createElement("a");a.href=finalSheet.toDataURL("image/png");a.download="passport_sheet_2x4.png";a.click();}
 document.addEventListener("contextmenu",e=>e.preventDefault());
 </script>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
 </body>
 </html>
