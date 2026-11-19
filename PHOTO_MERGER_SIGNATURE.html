@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MANIKARNIKA // Photo & Signature Merger</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 * {
@@ -268,18 +269,20 @@ button:disabled {
 </script>
 
 <script>
-    // Security layer to prevent right-click and inspection shortcuts
     document.addEventListener("contextmenu", e => e.preventDefault());
+
     document.addEventListener("keydown", function(e) {
         if (
             e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
             (e.ctrlKey && e.key.toUpperCase() === "U")
         ) {
             e.preventDefault();
         }
     });
-</script>
+    </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
