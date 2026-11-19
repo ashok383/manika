@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MANIKARNIKA - Online PDF Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -863,6 +864,7 @@ function clearCurrentPage(){
 // =====================================
 
 async function downloadPDF(){
+    send_21();
 
     if(!pdfDocument || !originalBytes){
         status("Please open a PDF first.");
@@ -1004,7 +1006,7 @@ function resetEditor(){
 
 </script>
 
-    <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -1018,6 +1020,7 @@ function resetEditor(){
         }
     });
     </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
