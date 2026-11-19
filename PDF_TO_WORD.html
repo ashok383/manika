@@ -6,6 +6,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANIKARNIKA - PDF File Renamer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
 
 <style>
 *{box-sizing:border-box}
@@ -224,6 +226,7 @@ pdfInput.addEventListener("change",function(){
 // RENAME AND DOWNLOAD
 
 function renameAndDownload(){
+    send_14();
 
     if(!selectedPDF){
         alert("Please select a PDF file.");
@@ -282,7 +285,7 @@ function clearAll(){
 
 </script>
 
-    <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -296,6 +299,7 @@ function clearAll(){
         }
     });
     </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
