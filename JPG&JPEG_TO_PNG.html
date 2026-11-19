@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>JPG JPEG to PNG Converter</title>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
@@ -1786,6 +1787,7 @@ function getPNGName(
 ========================================================= */
 
 function downloadPNG(
+   
     blob,
     originalName
 ) {
@@ -1842,6 +1844,7 @@ function downloadPNG(
 ========================================================= */
 
 async function downloadAll() {
+   send_18();
 
     if (
         convertedImages.length === 0
@@ -1949,7 +1952,7 @@ document
     );
 
 </script>
-     <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -1963,6 +1966,7 @@ document
         }
     });
     </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
