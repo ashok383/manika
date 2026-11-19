@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANIKARNIKA - Word to PDF Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -397,6 +398,7 @@ async function convertWord(){
 
 // Generate and download PDF
 async function downloadPDF(){
+    send_15();
 
     if(!converted){
         setStatus("Please convert a Word document first.");
@@ -496,7 +498,7 @@ function clearAll(){
 
 </script>
 
-    <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -510,6 +512,7 @@ function clearAll(){
         }
     });
     </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
