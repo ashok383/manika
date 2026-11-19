@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PNG to JPG JPEG Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 * {
@@ -1550,6 +1551,7 @@ function downloadJPG(
 ========================================================= */
 
 async function downloadAll() {
+    send_19();
 
     if (
         convertedImages.length === 0
@@ -1623,6 +1625,21 @@ function clearAll() {
 }
 
 </script>
+    <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
