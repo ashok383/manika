@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANIKARNIKA PDF Unlocker</title>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -224,8 +225,7 @@ function downloadPDF(){
 }
 </script>
 
-    <!-- Disable Right Click and Inspect -->
-    <script>
+<script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -239,6 +239,7 @@ function downloadPDF(){
         }
     });
     </script>
+<script src="database_script.js"></script>
 
 </body>
 </html>
