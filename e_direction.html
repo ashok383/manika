@@ -1,0 +1,550 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f294a">
+<title>Indian Citizen Services Directory</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+:root {
+    --bg-page: #f3f6fb;
+    --navy: #0f294a;
+    --navy-light: #1e4375;
+    --saffron: #e67e22;
+    --green: #167c47;
+    --text-main: #1b2432;
+    --text-muted: #5a677a;
+    --border: #dfe6f0;
+    --shadow-sm: 0 4px 14px rgba(15,41,74,.06);
+    --shadow-md: 0 10px 26px rgba(15,41,74,.11);
+    --radius: 14px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(230,126,34,.08), transparent 36%),
+        radial-gradient(circle at top right, rgba(22,124,71,.08), transparent 36%),
+        var(--bg-page);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+.tricolor-bar {
+    height: 7px;
+    background: linear-gradient(
+        90deg,
+        #ff9933 0% 33.33%,
+        #ffffff 33.33% 66.66%,
+        #138808 66.66% 100%
+    );
+}
+
+header {
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    color: #fff;
+    text-align: center;
+    padding: 35px 20px;
+    border-bottom: 4px solid var(--saffron);
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* EAGLE LOGO */
+.eagle-logo {
+    font-size: 78px;
+    line-height: 1.2;
+    text-align: center;
+    margin-bottom: 14px;
+    filter: drop-shadow(0 4px 5px rgba(0,0,0,.25));
+    animation: eagleFloat 3s ease-in-out infinite;
+}
+
+@keyframes eagleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.emblem-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.12);
+    margin-bottom: 14px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 2.3rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    opacity: .9;
+    max-width: 750px;
+    margin: auto;
+}
+
+.container {
+    max-width: 1150px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.service-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: .25s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: #b7c9e2;
+}
+
+.card-top {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    min-height: 55px;
+}
+
+.serial-num {
+    min-width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eef3fa;
+    border: 1px solid #d4dfef;
+    color: var(--navy);
+    font-weight: 700;
+}
+
+.service-title {
+    font-size: 1.05rem;
+    color: var(--navy);
+    margin-bottom: 5px;
+}
+
+.service-note {
+    color: var(--text-muted);
+    font-size: .85rem;
+}
+
+.action-btn {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    padding: 12px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--btn-color, #0f294a);
+    transition: .2s;
+}
+
+.action-btn:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: scale(1.01);
+}
+
+.action-btn:disabled {
+    background: #8b98ab;
+    cursor: not-allowed;
+}
+
+.secondary-links {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mini-link-btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #f8fafe;
+    color: var(--navy);
+    font-weight: 600;
+}
+
+.mini-link-btn:hover {
+    background: #eaf1fb;
+}
+
+.notice-banner {
+    margin-top: 30px;
+    background: #fff9ef;
+    border: 1px solid #f4d8a8;
+    border-left: 5px solid var(--saffron);
+    padding: 15px;
+    border-radius: 10px;
+    line-height: 1.6;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-size: .9rem;
+}
+
+@media(max-width:600px) {
+    h1 {
+        font-size: 1.7rem;
+    }
+
+    .eagle-logo {
+        font-size: 65px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="tricolor-bar"></div>
+
+<header>
+    <div class="header-inner">
+
+        <div class="eagle-logo">🦅</div>
+
+        <div class="emblem-badge">
+            🇮🇳 Citizen Services Portal Index
+        </div>
+
+        <h1>Essential Indian Citizen Services</h1>
+
+        <p class="subtitle">
+            Quick access to important Government of India citizen service portals.
+        </p>
+
+    </div>
+</header>
+
+<main class="container">
+
+    <div id="servicesGrid" class="grid"></div>
+
+    <div class="notice-banner">
+        <strong>📢 Important Note:</strong>
+        Some services such as Ration Card, Birth Certificate,
+        Income Certificate, Domicile Certificate and Marriage Certificate
+        are managed by individual states and municipalities.
+        Always verify the official website before submitting personal information.
+    </div>
+
+</main>
+
+<footer>
+    🇮🇳 Citizen Services Quick Launcher
+    <br><br>
+    Official Portals Open in New Tabs
+    <br>
+    © 2026 Citizen Services Directory
+</footer>
+
+<script>
+
+const services = [
+
+{
+id:1,
+name:"Aadhaar Card",
+emoji:"🪪",
+color:"#b83227",
+url:"https://uidai.gov.in/en",
+buttonLabel:"Open UIDAI Portal",
+note:"Unique Identification Authority of India"
+},
+
+{
+id:2,
+name:"PAN Card",
+emoji:"💳",
+color:"#1b4f72",
+url:"https://www.protean-tinpan.com",
+buttonLabel:"Open PAN Services",
+note:"Permanent Account Number Services"
+},
+
+{
+id:3,
+name:"Voter ID Card (EPIC)",
+emoji:"🗳️",
+color:"#5b2c6f",
+url:"https://voters.eci.gov.in",
+buttonLabel:"Open Voter Services",
+note:"Election Commission of India"
+},
+
+{
+id:4,
+name:"Bank Account & Debit Card",
+emoji:"🏦",
+color:"#6c7a89",
+url:null,
+buttonLabel:"Issued By Respective Bank",
+note:"No single national portal"
+},
+
+{
+id:5,
+name:"Driving Licence",
+emoji:"🚗",
+color:"#117864",
+url:"https://parivahan.gov.in",
+buttonLabel:"Open Parivahan Sewa",
+note:"Road Transport Services"
+},
+
+{
+id:6,
+name:"ABHA Health ID",
+emoji:"🏥",
+color:"#1e8449",
+url:"https://abha.abdm.gov.in",
+buttonLabel:"Open ABHA Portal",
+note:"Ayushman Bharat Digital Mission"
+},
+
+{
+id:7,
+name:"Ration Card",
+emoji:"🌾",
+color:"#b9770e",
+url:"https://www.india.gov.in/services",
+buttonLabel:"Open National Services Portal",
+note:"State Food & Civil Supplies",
+extraLinks:[
+{
+label:"🏛 Telangana",
+url:"https://www.telangana.gov.in"
+}
+]
+},
+
+{
+id:8,
+name:"Birth Certificate",
+emoji:"👶",
+color:"#2874a6",
+url:"https://www.india.gov.in/services",
+buttonLabel:"Open Services Portal",
+note:"State/Municipal Registration"
+},
+
+{
+id:9,
+name:"Income / Caste / Domicile Certificate",
+emoji:"📜",
+color:"#7d3c98",
+url:"https://www.india.gov.in/services",
+buttonLabel:"Open Services Portal",
+note:"State e-District Services"
+},
+
+{
+id:10,
+name:"Marriage Certificate",
+emoji:"💍",
+color:"#c0392b",
+url:"https://www.india.gov.in/services",
+buttonLabel:"Open Services Portal",
+note:"Registration Department",
+extraLinks:[
+{
+label:"📁 DigiLocker",
+url:"https://www.digilocker.gov.in"
+}
+]
+},
+
+{
+id:11,
+name:"Death Certificate",
+emoji:"🕊️",
+color:"#34495e",
+url:"https://www.india.gov.in/services",
+buttonLabel:"Open Services Portal",
+note:"Civil Registration Services"
+},
+
+{
+id:12,
+name:"Passport",
+emoji:"🛂",
+color:"#0e4d92",
+url:"https://www.passportindia.gov.in",
+buttonLabel:"Open Passport Seva",
+note:"Ministry of External Affairs"
+},
+
+{
+id:13,
+name:"EPFO / UAN",
+emoji:"💼",
+color:"#1f618d",
+url:"https://www.epfindia.gov.in",
+buttonLabel:"Open EPFO Portal",
+note:"Provident Fund Services"
+},
+
+{
+id:14,
+name:"Senior Citizen Services",
+emoji:"🧓",
+color:"#9c640c",
+url:"https://jeevanpramaan.gov.in",
+buttonLabel:"Open Jeevan Pramaan",
+note:"Digital Life Certificate"
+},
+
+{
+id:15,
+name:"UDID Disability Card",
+emoji:"♿",
+color:"#145a32",
+url:"https://www.swavlambancard.gov.in",
+buttonLabel:"Open UDID Portal",
+note:"Unique Disability ID"
+}
+
+];
+
+function openOfficialLink(url) {
+            
+    if (!url) return;
+
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+
+    if (!newWindow) {
+        alert("Popup blocked. Please allow popups to open the official portal.");
+    }
+}
+
+const grid = document.getElementById("servicesGrid");
+
+services.forEach(item => {
+
+    const card = document.createElement("article");
+    card.className = "service-card";
+
+    const top = document.createElement("div");
+    top.className = "card-top";
+
+    const serial = document.createElement("div");
+    serial.className = "serial-num";
+    serial.textContent = item.id;
+
+    const info = document.createElement("div");
+
+    const title = document.createElement("h2");
+    title.className = "service-title";
+    title.textContent = item.name;
+
+    const note = document.createElement("p");
+    note.className = "service-note";
+    note.textContent = item.note;
+
+    info.appendChild(title);
+    info.appendChild(note);
+
+    top.appendChild(serial);
+    top.appendChild(info);
+
+    card.appendChild(top);
+
+    const btn = document.createElement("button");
+    btn.className = "action-btn";
+    btn.style.setProperty("--btn-color", item.color);
+    btn.textContent = item.emoji + " " + item.buttonLabel;
+
+    if (item.url) {
+        btn.onclick = () => openOfficialLink(item.url);
+    } else {
+        btn.disabled = true;
+    }
+
+    card.appendChild(btn);
+
+    if (item.extraLinks) {
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "secondary-links";
+
+        item.extraLinks.forEach(link => {
+
+            const mini = document.createElement("button");
+            mini.className = "mini-link-btn";
+            mini.textContent = link.label;
+
+            mini.onclick = () => openOfficialLink(link.url);
+
+            wrapper.appendChild(mini);
+
+        });
+
+        card.appendChild(wrapper);
+    }
+
+    grid.appendChild(card);
+
+});
+
+</script>
+<script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
+
+</body>
+</html>
