@@ -1,113 +1,178 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MANIKARNIKA - Online PDF Editor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIKARNIKA - Smart PDF Editor</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:linear-gradient(135deg,#e0f7fa,#e8f5e9,#fff8e1);
-    color:#263238
+  font-family:Arial,Helvetica,sans-serif;
+  background:#edf2f8;color:#172033;min-height:100vh
 }
 header{
-    background:linear-gradient(120deg,#004d40,#00897b,#00bcd4);
-    color:white;
-    text-align:center;
-    padding:18px
+  background:linear-gradient(120deg,#071629,#123d59,#071629);
+  color:white;padding:17px 22px;
+  display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:15px;
+  border-bottom:3px solid #f4b942;
+  box-shadow:0 4px 18px #0002
 }
-header h1{margin:5px;font-size:28px}
-header p{margin:5px}
-.container{max-width:1250px;margin:20px auto;padding:15px}
-.panel{
-    background:white;
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 5px 20px #0002;
-    margin-bottom:15px
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;font-size:27px;
+  background:linear-gradient(135deg,#172d40,#020817);
+  border:2px solid #f4bd48;
+  box-shadow:0 0 14px #f4bd4860
 }
+.brand h1{
+  color:#ffe5a0;font-size:23px;letter-spacing:2px
+}
+.brand small{display:block;color:#c6d9e8;margin-top:4px}
+.page-nav{display:flex;align-items:center;gap:9px}
+#pageIndicator{font-size:13px;font-weight:bold;white-space:nowrap}
 .toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center
+  background:#fff;padding:13px 17px;
+  display:flex;align-items:center;flex-wrap:wrap;gap:9px;
+  border-bottom:1px solid #d7e0eb;
+  box-shadow:0 3px 10px #00000008;
+  position:relative;z-index:5
 }
-button,.upload-label{
-    border:0;
-    padding:11px 14px;
-    border-radius:8px;
-    background:linear-gradient(135deg,#00c9a7,#00796b);
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    font-size:13px
+.btn{
+  border:0;border-radius:8px;padding:10px 14px;
+  cursor:pointer;font-size:13px;font-weight:bold;
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:7px;transition:.2s;color:white
 }
-button:hover,.upload-label:hover{filter:brightness(1.1)}
-button:disabled{opacity:.4;cursor:not-allowed}
-button.active{background:linear-gradient(135deg,#ff9800,#e65100)}
-button.red{background:linear-gradient(135deg,#ff7043,#c62828)}
-button.dark{background:linear-gradient(135deg,#546e7a,#263238)}
-input,select{
-    padding:9px;
-    border:1px solid #b0bec5;
-    border-radius:7px;
-    max-width:100%
-}
+.btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.blue{background:linear-gradient(135deg,#1685df,#0752a0)}
+.purple{background:linear-gradient(135deg,#8952e8,#5927a8)}
+.green{background:linear-gradient(135deg,#0dbb83,#087c61)}
+.gold{background:linear-gradient(135deg,#f4c34e,#c17b0c);color:#182033}
+.red{background:linear-gradient(135deg,#f05252,#b91c1c)}
+.gray{background:#e7edf5;color:#23354b}
+.active-mode{box-shadow:0 0 0 3px #9560ed55}
 input[type=file]{display:none}
+.control-group{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 8px;border:1px solid #d5dfeb;
+  background:#f5f8fc;border-radius:9px
+}
+.control-group input{
+  min-width:0;border:1px solid #ccd7e5;
+  border-radius:5px;padding:6px;font-size:13px
+}
+#textInput{width:145px}
+#fontSizeInput{width:60px}
+#textColorInput{width:38px;height:31px;padding:2px}
+.hint{
+  background:#eaf5ff;color:#16466b;padding:10px 18px;
+  font-size:12px;border-bottom:1px solid #cbdff0
+}
 .workspace{
-    background:#455a64;
-    min-height:450px;
-    padding:20px;
-    border-radius:12px;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    overflow:auto
+  min-height:calc(100vh - 170px);
+  display:flex;justify-content:center;align-items:flex-start;
+  padding:24px;overflow:auto
 }
-.page-area{
-    position:relative;
-    background:white;
-    box-shadow:0 5px 20px #0005;
-    line-height:0;
-    flex-shrink:0
+.empty-state{
+  text-align:center;padding:75px 20px;color:#66788c;
+  width:100%
 }
-#pdfCanvas,#editCanvas{
-    position:absolute;
-    left:0;
-    top:0;
-    display:block
+.empty-state h2{font-size:27px;color:#173e59;margin-bottom:12px}
+.empty-state p{line-height:1.7}
+.canvas-wrapper{
+  position:relative;background:white;
+  box-shadow:0 8px 35px #17203330;
+  border:1px solid #b9c8d8;
+  display:none;max-width:100%;height:auto
 }
-#editCanvas{touch-action:none}
-#pdfCanvas{position:relative}
+#pdfCanvas{display:block;max-width:100%;height:auto}
+#overlayLayer{
+  position:absolute;left:0;top:0;
+  overflow:hidden;touch-action:pan-y
+}
+.pdf-native-text{
+  position:absolute;display:flex;align-items:center;
+  cursor:text;color:transparent;
+  border:1px dashed #8b5cf680;
+  background:#8b5cf610;
+  white-space:pre;overflow:visible;
+  min-width:8px;min-height:8px;
+  line-height:1.15;padding:0
+}
+.pdf-native-text:hover{
+  border-color:#7c3aed;background:#8b5cf625
+}
+.pdf-native-text.modified{
+  border:1px solid #7c3aed;
+  padding:0 2px;z-index:20
+}
+.pdf-native-text.editing{
+  border:2px solid #7c3aed;
+  outline:none;z-index:40;
+  box-shadow:0 2px 12px #7c3aed44;
+  white-space:pre;overflow:visible
+}
+.draggable-item{
+  position:absolute;cursor:move;
+  border:1px dashed transparent;
+  user-select:none;touch-action:none;z-index:30
+}
+.draggable-item.active{border:1px dashed #1685df}
+.draggable-text{
+  white-space:pre-wrap;min-width:25px;
+  min-height:20px;padding:3px 5px;
+  line-height:1.25
+}
+.draggable-text.editing{
+  background:#ffffffed!important;
+  border:2px solid #1685df!important;
+  color:#111!important;cursor:text;
+  user-select:text
+}
+.draggable-item img{display:block;width:100%;height:100%;pointer-events:none}
+.resize-handle{
+  display:none;position:absolute;right:-7px;bottom:-7px;
+  width:14px;height:14px;border-radius:50%;
+  background:#1685df;border:2px solid white;
+  cursor:nwse-resize
+}
+.draggable-item.active .resize-handle{display:block}
+.delete-badge{
+  display:none;position:absolute;right:-10px;top:-10px;
+  background:#dc2626;color:white;border-radius:50%;
+  width:21px;height:21px;text-align:center;
+  line-height:21px;font-weight:bold;cursor:pointer
+}
+.draggable-item.active .delete-badge{display:block}
+.footer{
+  padding:13px;text-align:center;font-size:11px;
+  color:#738399;background:#fff;border-top:1px solid #dce4ed
+}
 .status{
-    padding:13px;
-    background:#e0f2f1;
-    border-radius:8px;
-    margin-top:12px;
-    font-weight:bold;
-    text-align:center;
-    overflow-wrap:anywhere
+  color:#0a8a62;font-weight:bold;margin-left:auto;
+  font-size:12px
 }
-.info{
-    background:#fff8e1;
-    border-left:4px solid #ffb300;
-    padding:13px;
-    margin-top:15px;
-    border-radius:7px;
-    font-size:13px;
-    line-height:1.6
-}
-.page-info{font-weight:bold;color:#00796b}
-h3{color:#00796b}
-@media(max-width:600px){
-    .container{padding:8px}
-    .panel{padding:12px}
-    button,.upload-label{padding:10px;font-size:12px}
+@media(max-width:700px){
+  header{padding:13px}
+  .brand h1{font-size:19px}
+  .toolbar{padding:10px;gap:7px}
+  .btn{padding:9px 10px;font-size:12px}
+  .control-group{width:100%;flex-wrap:wrap}
+  #textInput{flex:1;width:auto}
+  .workspace{padding:10px;justify-content:flex-start}
+  .canvas-wrapper{transform-origin:top left}
+  .page-nav{width:100%;justify-content:center}
+  .status{width:100%;margin:0}
 }
 </style>
 </head>
@@ -115,898 +180,1127 @@ h3{color:#00796b}
 <body>
 
 <header>
-    <h1>🦅 MANIKARNIKA</h1>
-    <h2>ONLINE PDF EDITOR</h2>
-    <p>Edit • Annotate • Sign • Highlight • Download</p>
+  <div class="brand">
+    <div class="logo">🦅</div>
+    <div>
+      <h1>MANIKARNIKA</h1>
+      <small>SMART PDF EDITOR & IMAGE STUDIO</small>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="btn gray" id="prevPageBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+    <span id="pageIndicator">Page 0 / 0</span>
+    <button class="btn gray" id="nextPageBtn" onclick="changePage(1)" disabled>Next ▶</button>
+  </div>
 </header>
 
-<div class="container">
+<div class="toolbar">
 
-<div class="panel">
-    <div class="toolbar">
-        <label class="upload-label" for="pdfInput">📂 OPEN PDF</label>
-        <input type="file" id="pdfInput" accept=".pdf,application/pdf">
+  <label class="btn blue">
+    📂 Upload PDF Files
+    <input type="file" id="pdfUpload" accept=".pdf,application/pdf"
+      multiple onchange="handlePdfUpload(event)">
+  </label>
 
-        <button onclick="downloadPDF()" id="saveBtn" disabled>
-            ⬇ DOWNLOAD PDF
-        </button>
+  <button class="btn purple" id="editPdfTextBtn"
+    onclick="toggleEditPdfMode()" disabled>
+    ✏️ Edit Existing Text
+  </button>
 
-        <button class="dark" onclick="resetEditor()">CLEAR</button>
-    </div>
+  <label class="btn gray" id="imgUploadLabel"
+    style="opacity:.45;pointer-events:none">
+    🖼️ Add Image / Signature
+    <input type="file" id="imgUpload"
+      accept="image/png,image/jpeg" onchange="handleImageUpload(event)">
+  </label>
+
+  <button class="btn gold" id="stampEagleBtn"
+    onclick="insertManikarnikaStamp()" disabled>
+    🦅 Eagle Stamp
+  </button>
+
+  <div class="control-group">
+    <input type="text" id="textInput" placeholder="Enter new text..."
+      onkeydown="if(event.key==='Enter')addTextOverlay()">
+    <input type="number" id="fontSizeInput"
+      value="18" min="5" max="120" title="Font size">
+    <input type="color" id="textColorInput" value="#000000"
+      title="Text colour">
+    <button class="btn gray" id="addTextBtn"
+      onclick="addTextOverlay()" disabled>➕ Add Text</button>
+  </div>
+
+  <button class="btn red" id="clearPageBtn"
+    onclick="clearCurrentPageOverlays()" disabled>
+    🗑 Clear Page
+  </button>
+
+  <button class="btn green" id="exportPdfBtn"
+    onclick="exportEditedPdf()" disabled>
+    📥 Download Edited PDF
+  </button>
+
+  <span class="status" id="statusText">● READY</span>
 </div>
 
-<div class="panel">
-    <h3>EDITING TOOLS</h3>
-
-    <div class="toolbar">
-        <button class="tool active" data-tool="select">SELECT</button>
-        <button class="tool" data-tool="text">ADD TEXT</button>
-        <button class="tool" data-tool="draw">DRAW</button>
-        <button class="tool" data-tool="highlight">HIGHLIGHT</button>
-        <button class="tool" data-tool="erase">WHITEOUT</button>
-        <button class="tool" data-tool="signature">SIGNATURE</button>
-
-        <label class="upload-label" for="imageInput">ADD IMAGE</label>
-        <input type="file" id="imageInput" accept="image/*">
-    </div>
-
-    <div class="toolbar" style="margin-top:15px">
-        <label>Text size</label>
-        <input type="number" id="fontSize" value="22" min="8" max="100" style="width:75px">
-
-        <label>Color</label>
-        <input type="color" id="color" value="#e53935">
-
-        <label>Pen size</label>
-        <input type="number" id="penSize" value="3" min="1" max="40" style="width:70px">
-
-        <label>Highlight opacity</label>
-        <input type="range" id="opacity" min="10" max="90" value="40">
-    </div>
-
-    <div class="toolbar" style="margin-top:15px">
-        <button onclick="undo()">↶ UNDO</button>
-        <button onclick="redo()">↷ REDO</button>
-        <button class="dark" onclick="clearCurrentPage()">CLEAR PAGE MARKS</button>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="toolbar">
-        <button onclick="previousPage()">◀ PREVIOUS</button>
-        <span class="page-info" id="pageInfo">Page 0 / 0</span>
-        <button onclick="nextPage()">NEXT ▶</button>
-
-        <label>Zoom</label>
-        <select id="zoom" onchange="renderCurrentPage()">
-            <option value="0.7">70%</option>
-            <option value="1" selected>100%</option>
-            <option value="1.25">125%</option>
-            <option value="1.5">150%</option>
-        </select>
-    </div>
+<div class="hint" id="hintText">
+  Select one or more PDFs. Files will be combined in the order selected.
+  Turn on Edit Existing Text and click a text box to change it.
 </div>
 
 <div class="workspace">
-    <div class="page-area" id="pageArea">
-        <canvas id="pdfCanvas"></canvas>
-        <canvas id="editCanvas"></canvas>
-    </div>
+  <div class="empty-state" id="emptyState">
+    <h2>🦅 MANIKARNIKA PDF EDITOR</h2>
+    <p>Upload multiple PDF files and edit them in one workspace.</p>
+    <p>Modify text, insert images, signatures and stamps, then download your PDF.</p>
+  </div>
+
+  <div class="canvas-wrapper" id="canvasWrapper">
+    <canvas id="pdfCanvas"></canvas>
+    <div id="overlayLayer" onclick="deselectAll(event)"></div>
+  </div>
 </div>
 
-<div class="status" id="status">
-    Select a PDF file to start editing.
+<div class="footer">
+  MANIKARNIKA SMART PDF EDITOR · MULTI-PAGE WORKSPACE
 </div>
-
-<div class="info">
-    <b>How to use:</b><br>
-    1. Open your PDF document.<br>
-    2. Choose ADD TEXT and click on the page to insert text.<br>
-    3. Choose DRAW or SIGNATURE and draw using your mouse or touchscreen.<br>
-    4. Choose HIGHLIGHT to mark content or WHITEOUT to cover unwanted areas.<br>
-    5. Use ADD IMAGE to insert a photo or signature image.<br>
-    6. Download your edited PDF.
-    <br><br>
-    <b>Important:</b> This editor adds editable annotations on top of PDF pages.
-    It does not directly modify the original embedded PDF text. To replace
-    existing text, use WHITEOUT over the old text and ADD TEXT over it.
-</div>
-
-</div>
-
-<!-- PDF.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-<!-- PDF-LIB -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
 <script>
-
-// =====================================
-// CONFIGURATION
-// =====================================
+'use strict';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-let pdfDocument = null;
-let originalBytes = null;
+let pdfBytes = null;
+let pdfJsDoc = null;
 let currentPage = 1;
 let totalPages = 0;
-let activeTool = "select";
-let pageStates = {};
-let undoStacks = {};
-let redoStacks = {};
-let drawing = false;
-let lastPoint = null;
-let imageToInsert = null;
+let renderScale = 1.5;
 
-const pdfCanvas = document.getElementById("pdfCanvas");
-const editCanvas = document.getElementById("editCanvas");
-const pdfCtx = pdfCanvas.getContext("2d");
-const editCtx = editCanvas.getContext("2d");
+let overlaysByPage = {};
+let nativeTextByPage = {};
 
-const statusBox = document.getElementById("status");
+let isEditPdfMode = false;
+let activeOverlayId = null;
+let editingOverlayId = null;
+let editingNativeId = null;
 
-// =====================================
-// STATUS
-// =====================================
+let renderToken = 0;
 
-function status(message){
-    statusBox.textContent = message;
+/* ---------------------------------
+   STATUS AND HELPERS
+--------------------------------- */
+
+function setStatus(message, error=false){
+  const el=document.getElementById('statusText');
+  el.textContent=(error?'● ERROR: ':'● ')+message;
+  el.style.color=error?'#dc2626':'#07835e';
 }
 
-// =====================================
-// TOOL SELECTION
-// =====================================
+function enableEditor(){
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('canvasWrapper').style.display='block';
 
-document.querySelectorAll(".tool").forEach(button=>{
+  [
+    'editPdfTextBtn','stampEagleBtn',
+    'addTextBtn','clearPageBtn','exportPdfBtn'
+  ].forEach(id=>{
+    document.getElementById(id).disabled=false;
+  });
 
-    button.addEventListener("click",()=>{
+  const label=document.getElementById('imgUploadLabel');
+  label.style.opacity='1';
+  label.style.pointerEvents='auto';
+}
 
-        document.querySelectorAll(".tool").forEach(b=>
-            b.classList.remove("active")
-        );
+function clamp(value,min,max){
+  return Math.max(min,Math.min(max,value));
+}
 
-        button.classList.add("active");
+function rgbArrayToPdfColor(rgb){
+  return PDFLib.rgb(
+    clamp(rgb[0]/255,0,1),
+    clamp(rgb[1]/255,0,1),
+    clamp(rgb[2]/255,0,1)
+  );
+}
 
-        activeTool = button.dataset.tool;
+function hexToRgb(hex){
+  const value=parseInt(hex.replace('#',''),16);
+  return [
+    (value>>16)&255,
+    (value>>8)&255,
+    value&255
+  ];
+}
 
-        if(activeTool==="text"){
-            status("Click anywhere on the page to insert text.");
-        }else if(activeTool==="draw"){
-            status("Draw on the PDF page using your mouse or finger.");
-        }else if(activeTool==="highlight"){
-            status("Drag across the page to highlight an area.");
-        }else if(activeTool==="erase"){
-            status("Drag across the page to cover an area with white.");
-        }else if(activeTool==="signature"){
-            status("Draw your signature on the page.");
-        }else{
-            status("Selection mode activated.");
-        }
+function rgbToCss(rgb){
+  return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+}
 
-    });
+/* ---------------------------------
+   MULTI PDF UPLOAD AND MERGE
+--------------------------------- */
 
-});
+async function handlePdfUpload(event){
+  const files=Array.from(event.target.files||[]);
+  if(!files.length)return;
 
-// =====================================
-// OPEN PDF
-// =====================================
+  const validFiles=files.filter(file=>
+    file.type==='application/pdf' ||
+    file.name.toLowerCase().endsWith('.pdf')
+  );
 
-document.getElementById("pdfInput").addEventListener("change",async function(){
+  if(!validFiles.length){
+    alert('Please select valid PDF files.');
+    event.target.value='';
+    return;
+  }
 
-    const file = this.files[0];
+  const uploadBtn=document.querySelector('label.btn.blue');
+  uploadBtn.style.opacity='.5';
+  setStatus('MERGING PDF FILES...');
 
-    if(!file)return;
+  try{
+    const mergedPdf=await PDFLib.PDFDocument.create();
 
-    try{
+    for(let i=0;i<validFiles.length;i++){
+      setStatus(`PROCESSING FILE ${i+1}/${validFiles.length}`);
 
-        status("Loading PDF document...");
+      const bytes=new Uint8Array(
+        await validFiles[i].arrayBuffer()
+      );
 
-        originalBytes = await file.arrayBuffer();
+      const sourcePdf=await PDFLib.PDFDocument.load(bytes);
 
-        const loadingTask = pdfjsLib.getDocument({
-            data:new Uint8Array(originalBytes.slice(0))
-        });
+      const copiedPages=await mergedPdf.copyPages(
+        sourcePdf,
+        sourcePdf.getPageIndices()
+      );
 
-        pdfDocument = await loadingTask.promise;
-
-        totalPages = pdfDocument.numPages;
-        currentPage = 1;
-
-        pageStates = {};
-        undoStacks = {};
-        redoStacks = {};
-
-        document.getElementById("saveBtn").disabled = false;
-
-        await renderCurrentPage();
-
-        status("PDF opened successfully. Ready to edit.");
-
-    }catch(error){
-
-        console.error(error);
-        status("Unable to open PDF: " + error.message);
-
+      copiedPages.forEach(page=>mergedPdf.addPage(page));
     }
 
-});
+    pdfBytes=new Uint8Array(await mergedPdf.save());
 
-// =====================================
-// SAVE PAGE OVERLAY
-// =====================================
+    pdfJsDoc=await pdfjsLib.getDocument({
+      data:pdfBytes.slice()
+    }).promise;
 
-function savePageState(){
+    totalPages=pdfJsDoc.numPages;
+    currentPage=1;
 
-    if(!pdfDocument)return;
+    overlaysByPage={};
+    nativeTextByPage={};
 
-    pageStates[currentPage] = editCanvas.toDataURL("image/png");
+    isEditPdfMode=false;
+    activeOverlayId=null;
+    editingOverlayId=null;
+    editingNativeId=null;
 
-}
+    for(let i=1;i<=totalPages;i++){
+      overlaysByPage[i]=[];
+      nativeTextByPage[i]=null;
+    }
 
-// =====================================
-// RESTORE PAGE OVERLAY
-// =====================================
+    const editBtn=document.getElementById('editPdfTextBtn');
+    editBtn.classList.remove('active-mode');
+    editBtn.textContent='✏️ Edit Existing Text';
 
-function restorePageState(){
+    enableEditor();
 
-    editCtx.clearRect(
-        0,0,editCanvas.width,editCanvas.height
+    document.getElementById('hintText').textContent=
+      `${validFiles.length} PDF file(s) combined successfully. `+
+      `${totalPages} total pages. Edit any page and download one PDF.`;
+
+    setStatus(`${totalPages} PAGES READY`);
+    await renderPage(1);
+
+  }catch(error){
+    console.error(error);
+    alert(
+      'Unable to open or merge the selected PDFs.\n\n'+
+      'Possible reasons: password protection, damaged PDF, '+
+      'unsupported encryption or invalid file.\n\n'+error.message
     );
-
-    const saved = pageStates[currentPage];
-
-    if(!saved)return;
-
-    const image = new Image();
-
-    image.onload = ()=>{
-
-        editCtx.clearRect(
-            0,0,editCanvas.width,editCanvas.height
-        );
-
-        editCtx.drawImage(
-            image,0,0,editCanvas.width,editCanvas.height
-        );
-
-    };
-
-    image.src = saved;
-
+    setStatus('UPLOAD FAILED',true);
+  }finally{
+    uploadBtn.style.opacity='1';
+    event.target.value='';
+  }
 }
 
-// =====================================
-// RENDER PDF PAGE
-// =====================================
+/* ---------------------------------
+   BACKGROUND AND TEXT COLOUR DETECTION
 
-async function renderCurrentPage(){
+   Samples the rendered PDF canvas around
+   the original text box. This avoids
+   automatically painting every edit white.
+--------------------------------- */
 
-    if(!pdfDocument)return;
+function median(values){
+  if(!values.length)return 255;
+  const sorted=values.slice().sort((a,b)=>a-b);
+  return sorted[Math.floor(sorted.length/2)];
+}
 
-    try{
+function detectTextColors(x,y,width,height){
+  const canvas=document.getElementById('pdfCanvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
 
-        savePageState();
+  const left=clamp(Math.floor(x),0,canvas.width-1);
+  const top=clamp(Math.floor(y),0,canvas.height-1);
+  const right=clamp(Math.ceil(x+width),0,canvas.width);
+  const bottom=clamp(Math.ceil(y+height),0,canvas.height);
 
-        const page = await pdfDocument.getPage(currentPage);
+  const samples=[];
 
-        const zoom = Number(
-            document.getElementById("zoom").value
-        );
+  // Collect background pixels outside the text box.
+  const margin=5;
 
-        const baseViewport = page.getViewport({scale:1});
+  for(let px=left-margin;px<right+margin;px+=2){
+    for(let py=top-margin;py<bottom+margin;py+=2){
 
-        const maxWidth = Math.min(
-            900,
-            window.innerWidth-55
-        );
+      if(px>=left&&px<right&&py>=top&&py<bottom)continue;
 
-        const responsiveScale = Math.min(
-            maxWidth/baseViewport.width,
-            1
-        );
+      if(px<0||py<0||px>=canvas.width||py>=canvas.height)continue;
 
-        const scale = zoom*responsiveScale;
-
-        const viewport = page.getViewport({
-            scale:scale
-        });
-
-        pdfCanvas.width = Math.ceil(viewport.width);
-        pdfCanvas.height = Math.ceil(viewport.height);
-
-        editCanvas.width = pdfCanvas.width;
-        editCanvas.height = pdfCanvas.height;
-
-        document.getElementById("pageArea").style.width =
-            pdfCanvas.width+"px";
-
-        document.getElementById("pageArea").style.height =
-            pdfCanvas.height+"px";
-
-        pdfCanvas.style.width = pdfCanvas.width+"px";
-        pdfCanvas.style.height = pdfCanvas.height+"px";
-
-        editCanvas.style.width = editCanvas.width+"px";
-        editCanvas.style.height = editCanvas.height+"px";
-
-        await page.render({
-            canvasContext:pdfCtx,
-            viewport:viewport
-        }).promise;
-
-        document.getElementById("pageInfo").textContent =
-            "Page "+currentPage+" / "+totalPages;
-
-        restorePageState();
-
-    }catch(error){
-
-        console.error(error);
-        status("Page rendering failed: "+error.message);
-
+      const d=ctx.getImageData(px,py,1,1).data;
+      samples.push([d[0],d[1],d[2]]);
     }
+  }
 
-}
-
-// =====================================
-// PAGE NAVIGATION
-// =====================================
-
-async function previousPage(){
-
-    if(!pdfDocument || currentPage<=1)return;
-
-    savePageState();
-
-    currentPage--;
-
-    await renderCurrentPage();
-
-    status("Page "+currentPage);
-
-}
-
-async function nextPage(){
-
-    if(!pdfDocument || currentPage>=totalPages)return;
-
-    savePageState();
-
-    currentPage++;
-
-    await renderCurrentPage();
-
-    status("Page "+currentPage);
-
-}
-
-// =====================================
-// MOUSE / TOUCH COORDINATES
-// =====================================
-
-function getPosition(event){
-
-    const rect = editCanvas.getBoundingClientRect();
-
+  if(!samples.length){
     return {
-        x:(event.clientX-rect.left)*
-            (editCanvas.width/rect.width),
+      backgroundColor:[255,255,255],
+      textColor:[0,0,0]
+    };
+  }
 
-        y:(event.clientY-rect.top)*
-            (editCanvas.height/rect.height)
+  const backgroundColor=[0,1,2].map(channel=>
+    median(samples.map(c=>c[channel]))
+  );
+
+  const foregroundSamples=[];
+
+  // Detect contrasting pixels inside the text area.
+  for(let px=left;px<right;px+=1){
+    for(let py=top;py<bottom;py+=1){
+      const d=ctx.getImageData(px,py,1,1).data;
+
+      const difference=
+        Math.abs(d[0]-backgroundColor[0])+
+        Math.abs(d[1]-backgroundColor[1])+
+        Math.abs(d[2]-backgroundColor[2]);
+
+      if(difference>110){
+        foregroundSamples.push([d[0],d[1],d[2]]);
+      }
+    }
+  }
+
+  let textColor=[0,0,0];
+
+  if(foregroundSamples.length){
+    textColor=[0,1,2].map(channel=>
+      Math.round(
+        median(foregroundSamples.map(c=>c[channel]))
+      )
+    );
+  }
+
+  return {backgroundColor,textColor};
+}
+
+/* ---------------------------------
+   EXTRACT EXISTING PDF TEXT
+--------------------------------- */
+
+async function extractNativeTextForPage(pageNum){
+  if(nativeTextByPage[pageNum]!==null)return;
+
+  const page=await pdfJsDoc.getPage(pageNum);
+  const viewport=page.getViewport({scale:renderScale});
+  const textContent=await page.getTextContent();
+
+  const items=[];
+
+  for(let idx=0;idx<textContent.items.length;idx++){
+    const item=textContent.items[idx];
+
+    if(!item.str||!item.str.trim())continue;
+
+    const tx=pdfjsLib.Util.transform(
+      viewport.transform,item.transform
+    );
+
+    const fontHeight=Math.hypot(tx[2],tx[3])||
+      (item.height*renderScale)||14;
+
+    const x=tx[4];
+    const y=tx[5]-fontHeight*.85;
+
+    const width=Math.max(item.width*renderScale,8);
+    const height=Math.max(fontHeight*1.2,8);
+
+    const detected=detectTextColors(x,y,width,height);
+
+    const style=textContent.styles[item.fontName]||{};
+
+    items.push({
+      id:`nat_${pageNum}_${idx}`,
+      origText:item.str,
+      text:item.str,
+      x,y,width,height,
+      fontSize:fontHeight,
+      backgroundColor:detected.backgroundColor,
+      textColor:detected.textColor,
+      fontFamily:style.fontFamily||'Arial',
+      modified:false
+    });
+  }
+
+  nativeTextByPage[pageNum]=items;
+}
+
+/* ---------------------------------
+   EDIT MODE
+--------------------------------- */
+
+async function toggleEditPdfMode(){
+  if(!pdfJsDoc)return;
+
+  isEditPdfMode=!isEditPdfMode;
+
+  const btn=document.getElementById('editPdfTextBtn');
+
+  if(isEditPdfMode){
+    btn.classList.add('active-mode');
+    btn.textContent='✅ Text Editing ON';
+
+    document.getElementById('hintText').textContent=
+      'EDIT MODE: Click an existing text box to edit its contents.';
+
+    await extractNativeTextForPage(currentPage);
+  }else{
+    btn.classList.remove('active-mode');
+    btn.textContent='✏️ Edit Existing Text';
+    editingNativeId=null;
+
+    document.getElementById('hintText').textContent=
+      'Text editing is OFF. Turn it ON to edit existing PDF text.';
+  }
+
+  renderOverlays();
+}
+
+/* ---------------------------------
+   PAGE RENDERING
+--------------------------------- */
+
+async function renderPage(pageNum){
+  if(!pdfJsDoc)return;
+
+  const thisRender=++renderToken;
+
+  try{
+    const page=await pdfJsDoc.getPage(pageNum);
+
+    const viewport=page.getViewport({scale:renderScale});
+    const canvas=document.getElementById('pdfCanvas');
+    const ctx=canvas.getContext('2d');
+
+    canvas.width=Math.ceil(viewport.width);
+    canvas.height=Math.ceil(viewport.height);
+
+    const layer=document.getElementById('overlayLayer');
+    layer.style.width=canvas.width+'px';
+    layer.style.height=canvas.height+'px';
+
+    await page.render({
+      canvasContext:ctx,
+      viewport
+    }).promise;
+
+    if(thisRender!==renderToken)return;
+
+    if(isEditPdfMode){
+      await extractNativeTextForPage(pageNum);
+    }
+
+    document.getElementById('pageIndicator').textContent=
+      `Page ${currentPage} / ${totalPages}`;
+
+    document.getElementById('prevPageBtn').disabled=
+      currentPage<=1;
+
+    document.getElementById('nextPageBtn').disabled=
+      currentPage>=totalPages;
+
+    renderOverlays();
+
+  }catch(error){
+    console.error(error);
+    setStatus('PAGE RENDER FAILED',true);
+  }
+}
+
+async function changePage(delta){
+  const next=currentPage+delta;
+
+  if(next<1||next>totalPages)return;
+
+  currentPage=next;
+  activeOverlayId=null;
+  editingOverlayId=null;
+  editingNativeId=null;
+
+  await renderPage(currentPage);
+}
+
+/* ---------------------------------
+   NATIVE TEXT OVERLAYS
+--------------------------------- */
+
+function renderOverlays(){
+  const layer=document.getElementById('overlayLayer');
+  layer.innerHTML='';
+
+  const nativeItems=nativeTextByPage[currentPage]||[];
+
+  nativeItems.forEach(nat=>{
+    if(!isEditPdfMode&&!nat.modified)return;
+
+    const box=document.createElement('div');
+
+    box.className='pdf-native-text'+
+      (nat.modified?' modified':'')+
+      (editingNativeId===nat.id?' editing':'');
+
+    box.style.left=nat.x+'px';
+    box.style.top=nat.y+'px';
+    box.style.width=Math.max(nat.width,8)+'px';
+    box.style.height=Math.max(nat.height,8)+'px';
+    box.style.fontSize=nat.fontSize+'px';
+    box.style.fontWeight='normal';
+    box.style.fontFamily=nat.fontFamily||'Arial';
+
+    if(nat.modified||editingNativeId===nat.id){
+      box.style.backgroundColor=rgbToCss(
+        nat.backgroundColor||[255,255,255]
+      );
+
+      box.style.color=rgbToCss(
+        nat.textColor||[0,0,0]
+      );
+    }
+
+    box.textContent=nat.text;
+
+    if(editingNativeId===nat.id){
+      box.contentEditable='true';
+
+      box.oninput=()=>{
+        nat.text=box.innerText;
+        nat.modified=nat.text!==nat.origText;
+      };
+
+      box.onblur=()=>{
+        nat.text=box.innerText;
+        nat.modified=nat.text!==nat.origText;
+        editingNativeId=null;
+        renderOverlays();
+      };
+
+      box.onkeydown=e=>{
+        e.stopPropagation();
+        if(e.key==='Escape'||e.key==='Enter'){
+          e.preventDefault();
+          box.blur();
+        }
+      };
+
+      setTimeout(()=>{
+        box.focus();
+        const range=document.createRange();
+        range.selectNodeContents(box);
+        const sel=window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      },30);
+    }
+
+    box.onclick=e=>{
+      e.stopPropagation();
+
+      if(!isEditPdfMode)return;
+
+      if(editingNativeId!==nat.id){
+        editingNativeId=nat.id;
+        activeOverlayId=null;
+        editingOverlayId=null;
+        renderOverlays();
+      }
     };
 
-}
-
-// =====================================
-// UNDO / REDO HISTORY
-// =====================================
-
-function saveHistory(){
-
-    const key = currentPage;
-
-    if(!undoStacks[key]){
-        undoStacks[key] = [];
-    }
-
-    if(!redoStacks[key]){
-        redoStacks[key] = [];
-    }
-
-    undoStacks[key].push(editCanvas.toDataURL("image/png"));
-
-    if(undoStacks[key].length>30){
-        undoStacks[key].shift();
-    }
-
-    redoStacks[key] = [];
-
-}
-
-function restoreSnapshot(data){
-
-    const image = new Image();
-
-    image.onload = ()=>{
-
-        editCtx.clearRect(
-            0,0,editCanvas.width,editCanvas.height
-        );
-
-        editCtx.drawImage(
-            image,0,0,editCanvas.width,editCanvas.height
-        );
-
-        savePageState();
-
-    };
-
-    image.src = data;
-
-}
-
-function undo(){
-
-    const stack = undoStacks[currentPage] || [];
-
-    if(stack.length===0){
-        status("Nothing to undo.");
-        return;
-    }
-
-    if(!redoStacks[currentPage]){
-        redoStacks[currentPage] = [];
-    }
-
-    redoStacks[currentPage].push(
-        editCanvas.toDataURL("image/png")
-    );
-
-    restoreSnapshot(stack.pop());
-
-    status("Undo completed.");
-
-}
-
-function redo(){
-
-    const stack = redoStacks[currentPage] || [];
-
-    if(stack.length===0){
-        status("Nothing to redo.");
-        return;
-    }
-
-    if(!undoStacks[currentPage]){
-        undoStacks[currentPage] = [];
-    }
-
-    undoStacks[currentPage].push(
-        editCanvas.toDataURL("image/png")
-    );
-
-    restoreSnapshot(stack.pop());
-
-    status("Redo completed.");
-
-}
-
-// =====================================
-// MOUSE DOWN
-// =====================================
-
-editCanvas.addEventListener("pointerdown",function(event){
-
-    if(!pdfDocument)return;
-
-    if(activeTool==="select")return;
-
-    if(activeTool==="image")return;
-
-    event.preventDefault();
-
-    const point = getPosition(event);
-
-    if(activeTool==="text"){
-
-        const text = prompt("Enter text to insert:");
-
-        if(!text)return;
-
-        saveHistory();
-
-        const size = Number(
-            document.getElementById("fontSize").value
-        );
-
-        editCtx.fillStyle =
-            document.getElementById("color").value;
-
-        editCtx.font =
-            "bold "+size+"px Arial";
-
-        editCtx.textBaseline = "top";
-
-        const lines = text.split("\n");
-
-        lines.forEach((line,index)=>{
-
-            editCtx.fillText(
-                line,
-                point.x,
-                point.y+(index*size*1.3)
-            );
-
-        });
-
-        savePageState();
-
-        status("Text inserted.");
-
-        return;
-
-    }
-
-    if(activeTool==="image")return;
-
-    saveHistory();
-
-    drawing = true;
-
-    lastPoint = point;
-
-    editCanvas.setPointerCapture(event.pointerId);
-
-    if(activeTool==="draw" || activeTool==="signature"){
-
-        editCtx.beginPath();
-        editCtx.moveTo(point.x,point.y);
-
-    }else if(activeTool==="highlight" || activeTool==="erase"){
-
-        editCtx.beginPath();
-        editCtx.moveTo(point.x,point.y);
-
-    }
-
-});
-
-// =====================================
-// MOUSE MOVE
-// =====================================
-
-editCanvas.addEventListener("pointermove",function(event){
-
-    if(!drawing)return;
-
-    event.preventDefault();
-
-    const point = getPosition(event);
-
-    const color = document.getElementById("color").value;
-
-    const penSize = Number(
-        document.getElementById("penSize").value
-    );
-
-    editCtx.lineCap = "round";
-    editCtx.lineJoin = "round";
-
-    if(activeTool==="draw" || activeTool==="signature"){
-
-        editCtx.strokeStyle = color;
-        editCtx.lineWidth = penSize;
-
-    }
-
-    if(activeTool==="highlight"){
-
-        editCtx.strokeStyle =
-            "rgba(255,235,59,"+
-            (Number(document.getElementById("opacity").value)/100)+")";
-
-        editCtx.lineWidth = penSize*5;
-
-    }
-
-    if(activeTool==="erase"){
-
-        editCtx.strokeStyle = "#ffffff";
-        editCtx.lineWidth = penSize*8;
-
-    }
-
-    editCtx.lineTo(point.x,point.y);
-    editCtx.stroke();
-
-    lastPoint = point;
-
-});
-
-// =====================================
-// MOUSE UP
-// =====================================
-
-function finishDrawing(){
-
-    if(!drawing)return;
-
-    drawing = false;
-
-    editCtx.closePath();
-
-    savePageState();
-
-    status("Editing applied successfully.");
-
-}
-
-editCanvas.addEventListener("pointerup",finishDrawing);
-editCanvas.addEventListener("pointercancel",finishDrawing);
-editCanvas.addEventListener("pointerleave",finishDrawing);
-
-// =====================================
-// ADD IMAGE
-// =====================================
-
-document.getElementById("imageInput").addEventListener("change",function(){
-
-    const file = this.files[0];
-
-    if(!file)return;
-
-    if(!pdfDocument){
-        status("Open a PDF first.");
-        this.value="";
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function(event){
-
-        const image = new Image();
-
-        image.onload = function(){
-
-            imageToInsert = image;
-
-            activeTool = "image";
-
-            document.querySelectorAll(".tool").forEach(b=>
-                b.classList.remove("active")
-            );
-
-            status("Click on the PDF page to place the image.");
-
+    layer.appendChild(box);
+  });
+
+  // Custom text and image objects.
+  (overlaysByPage[currentPage]||[]).forEach(item=>{
+    const el=document.createElement('div');
+
+    el.className='draggable-item'+
+      (activeOverlayId===item.id?' active':'');
+
+    el.style.left=item.x+'px';
+    el.style.top=item.y+'px';
+
+    if(item.type==='image'){
+      el.style.width=item.width+'px';
+      el.style.height=item.height+'px';
+
+      const img=document.createElement('img');
+      img.src=item.src;
+      el.appendChild(img);
+
+      const resize=document.createElement('div');
+      resize.className='resize-handle';
+      resize.onpointerdown=e=>startResize(e,item);
+      el.appendChild(resize);
+
+    }else if(item.type==='text'){
+      el.classList.add('draggable-text');
+      el.style.fontSize=item.fontSize+'px';
+      el.style.color=item.color;
+      el.style.fontWeight=item.fontWeight||'normal';
+
+      const span=document.createElement('span');
+      span.textContent=item.text;
+
+      if(editingOverlayId===item.id){
+        el.classList.add('editing');
+        span.contentEditable='true';
+
+        span.oninput=()=>{
+          item.text=span.innerText;
         };
 
-        image.src = event.target.result;
-
-    };
-
-    reader.readAsDataURL(file);
-
-    this.value="";
-
-});
-
-// =====================================
-// PLACE IMAGE
-// =====================================
-
-editCanvas.addEventListener("click",function(event){
-
-    if(activeTool!=="image" || !imageToInsert)return;
-
-    const point = getPosition(event);
-
-    saveHistory();
-
-    const maxWidth = editCanvas.width*0.35;
-
-    const ratio = Math.min(
-        maxWidth/imageToInsert.width,
-        1
-    );
-
-    const width = imageToInsert.width*ratio;
-    const height = imageToInsert.height*ratio;
-
-    editCtx.drawImage(
-        imageToInsert,
-        point.x,
-        point.y,
-        width,
-        height
-    );
-
-    savePageState();
-
-    imageToInsert = null;
-
-    activeTool = "select";
-
-    document.querySelector('[data-tool="select"]').classList.add("active");
-
-    status("Image inserted successfully.");
-
-});
-
-// =====================================
-// CLEAR CURRENT PAGE ANNOTATIONS
-// =====================================
-
-function clearCurrentPage(){
-
-    if(!pdfDocument)return;
-
-    if(!confirm("Clear all added marks on this page?"))return;
-
-    saveHistory();
-
-    editCtx.clearRect(
-        0,0,editCanvas.width,editCanvas.height
-    );
-
-    savePageState();
-
-    status("Page annotations cleared.");
-
-}
-
-// =====================================
-// EXPORT EDITED PDF
-// =====================================
-
-async function downloadPDF(){
-    send_21();
-
-    if(!pdfDocument || !originalBytes){
-        status("Please open a PDF first.");
-        return;
-    }
-
-    try{
-
-        document.getElementById("saveBtn").disabled = true;
-
-        status("Preparing your edited PDF...");
-
-        savePageState();
-
-        const {PDFDocument} = PDFLib;
-
-        const pdfDoc = await PDFDocument.load(
-            originalBytes.slice(0)
-        );
-
-        const pages = pdfDoc.getPages();
-
-        for(let i=0;i<pages.length;i++){
-
-            const pageNumber = i+1;
-
-            const overlay = pageStates[pageNumber];
-
-            if(!overlay)continue;
-
-            status(
-                "Applying edits to page "+
-                pageNumber+" of "+pages.length+"..."
-            );
-
-            // Convert overlay PNG to embedded image
-            const imageBytes = await fetch(overlay)
-                .then(response=>response.arrayBuffer());
-
-            const pngImage = await pdfDoc.embedPng(imageBytes);
-
-            const page = pages[i];
-
-            const pageSize = page.getSize();
-
-            const imageDims = pngImage.scale(1);
-
-            page.drawImage(pngImage,{
-
-                x:0,
-
-                y:0,
-
-                width:pageSize.width,
-
-                height:pageSize.height
-
-            });
-
-        }
-
-        const finalPDF = await pdfDoc.save();
-
-        const blob = new Blob(
-            [finalPDF],
-            {type:"application/pdf"}
-        );
-
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-
-        link.href = url;
-
-        link.download = "MANIKARNIKA_EDITED.pdf";
-
-        document.body.appendChild(link);
-
-        link.click();
-
-        link.remove();
+        span.onblur=()=>{
+          item.text=span.innerText;
+          editingOverlayId=null;
+          renderOverlays();
+        };
+
+        span.onkeydown=e=>{
+          if(e.key==='Escape')span.blur();
+        };
 
         setTimeout(()=>{
-            URL.revokeObjectURL(url);
-        },5000);
+          span.focus();
+          const range=document.createRange();
+          range.selectNodeContents(span);
+          const sel=window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        },30);
+      }
 
-        status("✓ Edited PDF downloaded successfully.");
+      el.ondblclick=e=>{
+        e.stopPropagation();
+        activeOverlayId=item.id;
+        editingOverlayId=item.id;
+        editingNativeId=null;
+        renderOverlays();
+      };
 
-    }catch(error){
-
-        console.error(error);
-
-        status("PDF export failed: "+error.message);
-
-    }finally{
-
-        document.getElementById("saveBtn").disabled = false;
-
+      el.appendChild(span);
     }
 
+    const del=document.createElement('div');
+    del.className='delete-badge';
+    del.textContent='×';
+    del.onpointerdown=e=>e.stopPropagation();
+    del.onclick=e=>{
+      e.stopPropagation();
+      deleteOverlay(item.id);
+    };
+    el.appendChild(del);
+
+    el.onpointerdown=e=>{
+      if(e.target.classList.contains('resize-handle')||
+         e.target.classList.contains('delete-badge'))return;
+
+      if(editingOverlayId===item.id)return;
+
+      startDrag(e,item);
+    };
+
+    layer.appendChild(el);
+  });
 }
 
-// =====================================
-// RESET EDITOR
-// =====================================
+/* ---------------------------------
+   ADD TEXT
+--------------------------------- */
 
-function resetEditor(){
+function addTextOverlay(){
+  const text=document.getElementById('textInput').value.trim();
 
-    if(!confirm("Clear the PDF editor completely?"))return;
+  if(!text||!pdfJsDoc)return;
 
-    pdfDocument = null;
-    originalBytes = null;
+  const fontSize=clamp(
+    parseFloat(document.getElementById('fontSizeInput').value)||18,
+    5,120
+  );
 
-    totalPages = 0;
-    currentPage = 1;
+  const color=document.getElementById('textColorInput').value;
 
-    pageStates = {};
-    undoStacks = {};
-    redoStacks = {};
+  const item={
+    id:'ov_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    type:'text',
+    x:60,y:60,
+    text,fontSize,color,
+    fontWeight:'normal'
+  };
 
-    imageToInsert = null;
+  overlaysByPage[currentPage].push(item);
+  activeOverlayId=item.id;
+  editingOverlayId=null;
 
-    document.getElementById("pdfInput").value = "";
-
-    pdfCanvas.width = 0;
-    pdfCanvas.height = 0;
-
-    editCanvas.width = 0;
-    editCanvas.height = 0;
-
-    document.getElementById("pageInfo").textContent =
-        "Page 0 / 0";
-
-    document.getElementById("saveBtn").disabled = true;
-
-    status("Editor cleared. Select a PDF to start.");
-
+  document.getElementById('textInput').value='';
+  renderOverlays();
 }
 
+/* ---------------------------------
+   ADD IMAGE / SIGNATURE
+--------------------------------- */
+
+function handleImageUpload(event){
+  const file=event.target.files[0];
+  if(!file||!pdfJsDoc)return;
+
+  if(!['image/png','image/jpeg'].includes(file.type)){
+    alert('Please choose a PNG or JPEG image.');
+    event.target.value='';
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=e=>{
+    const img=new Image();
+
+    img.onload=()=>{
+      const maxWidth=180;
+      const ratio=img.height/img.width;
+      const width=Math.min(img.width,maxWidth);
+
+      const item={
+        id:'ov_'+Date.now(),
+        type:'image',
+        x:50,y:50,
+        width,
+        height:width*ratio,
+        src:e.target.result,
+        mimeType:file.type
+      };
+
+      overlaysByPage[currentPage].push(item);
+      activeOverlayId=item.id;
+      renderOverlays();
+      setStatus('IMAGE ADDED');
+    };
+
+    img.onerror=()=>alert('Unable to load this image.');
+    img.src=e.target.result;
+  };
+
+  reader.onerror=()=>alert('Image reading failed.');
+  reader.readAsDataURL(file);
+  event.target.value='';
+}
+
+/* ---------------------------------
+   EAGLE STAMP
+--------------------------------- */
+
+function insertManikarnikaStamp(){
+  if(!pdfJsDoc)return;
+
+  const canvas=document.createElement('canvas');
+  canvas.width=400;
+  canvas.height=400;
+
+  const ctx=canvas.getContext('2d');
+
+  ctx.beginPath();
+  ctx.arc(200,200,185,0,Math.PI*2);
+  ctx.fillStyle='#0d2035';
+  ctx.fill();
+
+  ctx.lineWidth=10;
+  ctx.strokeStyle='#e9b949';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(200,200,165,0,Math.PI*2);
+  ctx.lineWidth=4;
+  ctx.strokeStyle='#ffe08a';
+  ctx.stroke();
+
+  ctx.fillStyle='#f7ca52';
+  ctx.font='bold 125px Arial';
+  ctx.textAlign='center';
+  ctx.fillText('🦅',200,205);
+
+  ctx.fillStyle='#ffe5a0';
+  ctx.font='bold 32px Arial';
+  ctx.fillText('MANIKARNIKA',200,270);
+
+  ctx.font='bold 19px Arial';
+  ctx.fillText('VERIFIED SEAL',200,305);
+
+  const item={
+    id:'ov_'+Date.now(),
+    type:'image',
+    x:70,y:70,
+    width:120,height:120,
+    src:canvas.toDataURL('image/png'),
+    mimeType:'image/png'
+  };
+
+  overlaysByPage[currentPage].push(item);
+  activeOverlayId=item.id;
+  renderOverlays();
+}
+
+/* ---------------------------------
+   DRAG AND RESIZE
+--------------------------------- */
+
+function startDrag(e,item){
+  e.preventDefault();
+  e.stopPropagation();
+
+  activeOverlayId=item.id;
+  editingNativeId=null;
+
+  const startX=e.clientX;
+  const startY=e.clientY;
+  const originalX=item.x;
+  const originalY=item.y;
+
+  function move(ev){
+    const rect=document.getElementById('canvasWrapper').getBoundingClientRect();
+    const scaleX=document.getElementById('pdfCanvas').width/rect.width;
+    const scaleY=document.getElementById('pdfCanvas').height/rect.height;
+
+    item.x=originalX+(ev.clientX-startX)*scaleX;
+    item.y=originalY+(ev.clientY-startY)*scaleY;
+
+    const el=document.querySelector(
+      '.draggable-item.active'
+    );
+
+    if(el){
+      el.style.left=item.x+'px';
+      el.style.top=item.y+'px';
+    }
+  }
+
+  function up(){
+    window.removeEventListener('pointermove',move);
+    window.removeEventListener('pointerup',up);
+    renderOverlays();
+  }
+
+  window.addEventListener('pointermove',move);
+  window.addEventListener('pointerup',up);
+}
+
+function startResize(e,item){
+  e.preventDefault();
+  e.stopPropagation();
+
+  const startX=e.clientX;
+  const originalWidth=item.width;
+  const originalHeight=item.height;
+  const aspect=originalHeight/originalWidth;
+
+  function move(ev){
+    const rect=document.getElementById('canvasWrapper').getBoundingClientRect();
+    const scale=document.getElementById('pdfCanvas').width/rect.width;
+
+    item.width=Math.max(
+      20,originalWidth+(ev.clientX-startX)*scale
+    );
+
+    item.height=item.width*aspect;
+
+    const el=document.querySelector('.draggable-item.active');
+    if(el){
+      el.style.width=item.width+'px';
+      el.style.height=item.height+'px';
+    }
+  }
+
+  function up(){
+    window.removeEventListener('pointermove',move);
+    window.removeEventListener('pointerup',up);
+    renderOverlays();
+  }
+
+  window.addEventListener('pointermove',move);
+  window.addEventListener('pointerup',up);
+}
+
+function deleteOverlay(id){
+  overlaysByPage[currentPage]=
+    overlaysByPage[currentPage].filter(item=>item.id!==id);
+
+  if(activeOverlayId===id)activeOverlayId=null;
+  if(editingOverlayId===id)editingOverlayId=null;
+
+  renderOverlays();
+}
+
+function deselectAll(e){
+  if(e.target.id==='overlayLayer'){
+    activeOverlayId=null;
+    editingOverlayId=null;
+    editingNativeId=null;
+    renderOverlays();
+  }
+}
+
+function clearCurrentPageOverlays(){
+  if(!pdfJsDoc)return;
+
+  if(!confirm('Clear all added objects and text changes on this page?'))return;
+
+  overlaysByPage[currentPage]=[];
+
+  if(nativeTextByPage[currentPage]){
+    nativeTextByPage[currentPage].forEach(item=>{
+      item.text=item.origText;
+      item.modified=false;
+    });
+  }
+
+  activeOverlayId=null;
+  editingOverlayId=null;
+  editingNativeId=null;
+
+  renderOverlays();
+}
+
+/* ---------------------------------
+   EXPORT EDITED PDF
+--------------------------------- */
+
+async function exportEditedPdf(){
+  if(!pdfBytes||!pdfJsDoc)return;
+
+  const button=document.getElementById('exportPdfBtn');
+  button.disabled=true;
+  button.textContent='⏳ Preparing PDF...';
+
+  try{
+    const pdfDoc=await PDFLib.PDFDocument.load(pdfBytes);
+    const pages=pdfDoc.getPages();
+
+    // Use regular Helvetica rather than forcing bold.
+    const regularFont=await pdfDoc.embedFont(
+      PDFLib.StandardFonts.Helvetica
+    );
+
+    const scaleFactor=1/renderScale;
+
+    for(let p=1;p<=totalPages;p++){
+      const page=pages[p-1];
+      const pdfSize=page.getSize();
+      const pdfH=pdfSize.height;
+
+      // 1. Apply edited original PDF text.
+      const nativeItems=nativeTextByPage[p]||[];
+
+      for(const nat of nativeItems){
+        if(!nat.modified)continue;
+
+        const rectX=nat.x*scaleFactor;
+        const rectYTop=nat.y*scaleFactor;
+        const rectH=Math.max(nat.height*scaleFactor,4);
+
+        const rectW=Math.max(
+          nat.width*scaleFactor,
+          nat.fontSize*scaleFactor*nat.text.length*.45
+        );
+
+        const rectY=pdfH-rectYTop-rectH;
+
+        // Cover old text with sampled background colour.
+        const bg=nat.backgroundColor||[255,255,255];
+
+        page.drawRectangle({
+          x:rectX-1,
+          y:rectY-1,
+          width:rectW+4,
+          height:rectH+2,
+          color:rgbArrayToPdfColor(bg),
+          borderWidth:0
+        });
+
+        // Draw replacement using sampled foreground colour.
+        const fg=nat.textColor||[0,0,0];
+
+        const fontSize=clamp(
+          nat.fontSize*scaleFactor*.82,
+          4,100
+        );
+
+        const text=nat.text||'';
+
+        if(text){
+          page.drawText(text,{
+            x:rectX,
+            y:rectY+Math.max(1,rectH*.2),
+            size:fontSize,
+            font:regularFont,
+            color:rgbArrayToPdfColor(fg),
+            maxWidth:Math.max(rectW,20),
+            lineHeight:fontSize*1.15
+          });
+        }
+      }
+
+      // 2. Apply custom text and images.
+      const overlays=overlaysByPage[p]||[];
+
+      for(const item of overlays){
+        const pdfX=item.x*scaleFactor;
+
+        if(item.type==='image'){
+          const imageBytes=item.src;
+
+          let embedded;
+
+          if(item.mimeType==='image/png'){
+            embedded=await pdfDoc.embedPng(imageBytes);
+          }else{
+            embedded=await pdfDoc.embedJpg(imageBytes);
+          }
+
+          const imageW=item.width*scaleFactor;
+          const imageH=item.height*scaleFactor;
+          const pdfY=pdfH-(item.y*scaleFactor)-imageH;
+
+          page.drawImage(embedded,{
+            x:pdfX,
+            y:pdfY,
+            width:imageW,
+            height:imageH
+          });
+
+        }else if(item.type==='text'){
+          const fontSize=clamp(
+            item.fontSize*scaleFactor,4,150
+          );
+
+          const lines=String(item.text).split('\n');
+
+          lines.forEach((line,index)=>{
+            if(!line)return;
+
+            const pdfY=
+              pdfH-(item.y*scaleFactor)-fontSize-
+              index*fontSize*1.25;
+
+            page.drawText(line,{
+              x:pdfX+3*scaleFactor,
+              y:pdfY,
+              size:fontSize,
+              font:regularFont,
+              color:rgbArrayToPdfColor(hexToRgb(item.color))
+            });
+          });
+        }
+      }
+    }
+
+    const output=await pdfDoc.save();
+
+    const blob=new Blob([output],{
+      type:'application/pdf'
+    });
+
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+
+    link.href=url;
+    link.download='MANIKARNIKA_EDITED_'+Date.now()+'.pdf';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+    send_21();
+    setStatus('PDF DOWNLOADED SUCCESSFULLY');
+
+  }catch(error){
+    console.error(error);
+    alert(
+      'PDF export failed:\n'+error.message+
+      '\n\nPlease check the browser console for details.'
+    );
+    setStatus('EXPORT FAILED',true);
+
+  }finally{
+    button.disabled=false;
+    button.textContent='📥 Download Edited PDF';
+  }
+}
+
+/* ---------------------------------
+   INITIAL SETUP
+--------------------------------- */
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setStatus('READY');
+
+  document.getElementById('fontSizeInput').addEventListener(
+    'change',()=>{
+      const item=(overlaysByPage[currentPage]||[]).find(
+        x=>x.id===activeOverlayId&&x.type==='text'
+      );
+
+      if(item){
+        item.fontSize=clamp(
+          parseFloat(document.getElementById('fontSizeInput').value)||18,
+          5,120
+        );
+        renderOverlays();
+      }
+    }
+  );
+
+  document.getElementById('textColorInput').addEventListener(
+    'change',()=>{
+      const item=(overlaysByPage[currentPage]||[]).find(
+        x=>x.id===activeOverlayId&&x.type==='text'
+      );
+
+      if(item){
+        item.color=document.getElementById('textColorInput').value;
+        renderOverlays();
+      }
+    }
+  );
+});
 </script>
-
-<script>
+    <script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -1021,6 +1315,6 @@ function resetEditor(){
     });
     </script>
 <script src="database_script.js"></script>
-
 </body>
 </html>
+
