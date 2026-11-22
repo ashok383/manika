@@ -3,250 +3,977 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sri Rudhra Solar Solutions | GST Invoice Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sri Rudhra Solar Solutions | GST Invoice</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--navy:#12304a;--blue:#176b87;--teal:#0e8a83;--gold:#e4a83b;--ink:#203040;--muted:#64748b;--line:#d9e3ec;--paper:#fff;--bg:#edf3f7}
+:root{
+ --red:#d90429;
+ --green:#087f3e;
+ --blue:#004aad;
+ --black:#000;
+ --paper:#fff;
+}
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(135deg,#eaf2f7,#f6f8fb);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
-.topbar{background:linear-gradient(110deg,var(--navy),var(--blue));color:white;padding:22px 5%;box-shadow:0 5px 18px #12304a22}
-.topbar-inner{max-width:1400px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;align-items:center;gap:14px}.brand-mark{width:48px;height:48px;border-radius:14px;background:#ffffff20;display:grid;place-items:center;font-size:24px;border:1px solid #ffffff55}
-.brand h1{font-size:20px;margin:0 0 4px}.brand p{margin:0;color:#d7e8f1;font-size:12px}
-.top-pill{border:1px solid #ffffff55;padding:8px 13px;border-radius:30px;font-size:12px;color:#eaf7ff}
-.layout{max-width:1400px;margin:28px auto;padding:0 22px;display:grid;grid-template-columns:370px minmax(0,1fr);gap:24px;align-items:start}
-.panel{background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px #163b5510;overflow:hidden}
-.panel-head{padding:18px 20px;background:#f8fbfd;border-bottom:1px solid var(--line)}
-.panel-head h2{font-size:16px;margin:0;color:var(--navy)}.panel-head p{font-size:12px;color:var(--muted);margin:6px 0 0}
-.form-body{padding:18px 20px}
-.group-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;color:var(--teal);margin:18px 0 11px;padding-bottom:7px;border-bottom:1px solid #e7eff3}
+body{
+ margin:0;
+ background:linear-gradient(135deg,#dbeafe,#f8fafc,#dcfce7);
+ font-family:Arial,sans-serif;
+ color:#080808;
+}
+.topbar{
+ background:linear-gradient(110deg,#000,#004aad,#087f3e,#d90429);
+ color:white;padding:16px 4%;
+ border-bottom:4px solid #000;
+}
+.topbar-inner{
+ max-width:1400px;margin:auto;
+ display:flex;align-items:center;
+ justify-content:space-between;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{
+ width:58px;height:58px;object-fit:contain;
+ background:white;border:3px solid black;
+ border-radius:10px;padding:3px;
+}
+.brand h1{font-size:20px;margin:0;font-weight:900}
+.brand p{font-size:12px;margin:5px 0 0;font-weight:bold}
+.top-pill{
+ border:2px solid white;border-radius:30px;
+ padding:8px 14px;font-size:12px;font-weight:bold;
+}
+.layout{
+ max-width:1450px;margin:22px auto;padding:0 16px;
+ display:grid;grid-template-columns:370px minmax(0,1fr);
+ gap:20px;align-items:start;
+}
+.panel{
+ background:white;border:3px solid black;
+ border-radius:13px;overflow:hidden;
+ box-shadow:0 8px 25px #0002;
+}
+.panel-head{
+ padding:14px 17px;
+ background:linear-gradient(90deg,#e2e8f0,#dbeafe);
+ border-bottom:3px solid black;
+}
+.panel-head h2{margin:0;font-size:17px;font-weight:900}
+.panel-head p{margin:5px 0 0;font-size:12px;color:#334155}
+.form-body{padding:16px}
+.group-title{
+ color:white;background:linear-gradient(90deg,#004aad,#087f3e);
+ border:2px solid black;border-radius:6px;
+ padding:7px 10px;margin:17px 0 11px;
+ font-size:12px;font-weight:900;
+ letter-spacing:1px;
+}
 .group-title:first-child{margin-top:0}
-.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;color:#40566a;margin-bottom:6px}
-input,textarea{width:100%;border:1px solid #d4e0e8;border-radius:9px;padding:10px 11px;font:13px inherit;color:var(--ink);background:#fbfdfe;outline:none}
-input:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px #0e8a8317}
-textarea{min-height:65px;resize:vertical}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.upload-box{border:1.5px dashed #9bb8c6;background:#f5fafc;border-radius:12px;padding:13px;text-align:center}
-.upload-box input{border:0;padding:7px;background:transparent;font-size:12px}
-.upload-box small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
-.signature-thumb{max-width:100%;max-height:75px;object-fit:contain;display:none;margin:8px auto 0}
-.form-actions{display:flex;gap:9px;margin-top:20px}
-.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:700;font-size:12px;cursor:pointer}
-.btn-primary{background:linear-gradient(110deg,var(--teal),var(--blue));color:white;flex:1}
-.btn-light{background:#edf3f7;color:var(--navy)}
+.field{margin-bottom:11px}
+label{
+ display:block;font-size:12px;font-weight:900;
+ margin-bottom:5px;
+}
+input,textarea,select{
+ width:100%;padding:9px 10px;
+ border:2px solid #334155;border-radius:7px;
+ font-size:13px;font-weight:600;
+ background:white;color:#000;
+}
+input:focus,textarea:focus,select:focus{
+ outline:none;border-color:#004aad;
+ box-shadow:0 0 0 3px #004aad22;
+}
+textarea{resize:vertical;min-height:55px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.search-box{
+ background:#eff6ff;border:2px solid #004aad;
+ padding:12px;border-radius:10px;
+}
+.search-actions{display:flex;gap:7px;margin-top:9px}
+.btn{
+ border:2px solid black;border-radius:8px;
+ padding:10px 12px;font-weight:900;
+ font-size:12px;cursor:pointer;
+ box-shadow:0 3px 0 black;
+}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 black}
+.btn-primary{
+ background:linear-gradient(110deg,#087f3e,#004aad);
+ color:white;flex:1;
+}
+.btn-light{background:#f1f5f9;color:black}
+.btn-red{
+ background:linear-gradient(110deg,#d90429,#991b1b);
+ color:white;
+}
+.btn-cyan{
+ background:linear-gradient(110deg,#00d2ff,#0097a7);
+ color:#000;
+}
+.status{
+ margin-top:9px;padding:9px;
+ border-radius:7px;font-size:12px;
+ font-weight:bold;background:#e2e8f0;
+}
+.status.success{background:#dcfce7;color:#166534}
+.status.error{background:#fee2e2;color:#991b1b}
+.status.info{background:#dbeafe;color:#1e40af}
+.upload-box{
+ border:2px dashed black;border-radius:9px;
+ padding:10px;text-align:center;
+ background:#f8fafc;
+}
+.upload-box input{border:0;background:transparent}
+.signature-thumb{
+ display:none;max-height:75px;max-width:100%;
+ margin:8px auto;object-fit:contain;
+}
+.form-actions{display:flex;gap:10px;margin-top:18px}
 .preview-wrap{min-width:0}
-.preview-toolbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;gap:12px}
-.preview-toolbar h2{font-size:16px;color:var(--navy);margin:0}
-.preview-toolbar span{font-size:12px;color:var(--muted)}
-.print-btn{background:var(--gold);color:#2c2a22;border:0;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer}
-.invoice{background:var(--paper);max-width:900px;margin:auto;padding:38px 42px;border-radius:5px;box-shadow:0 15px 45px #163b5520;min-height:1050px;position:relative}
-.invoice-top{height:7px;background:linear-gradient(90deg,var(--teal),var(--blue),var(--gold));position:absolute;top:0;left:0;right:0}
-.inv-header{text-align:center;padding:4px 0 18px;border-bottom:2px solid var(--navy)}
-.inv-logo{width:90px;height:78px;object-fit:contain;display:block;margin:0 auto 8px}
-.inv-header h2{margin:0;color:var(--navy);font-size:22px;letter-spacing:.5px}
-.inv-header p{font-size:11px;color:#526779;margin:4px 0}
-.inv-title{display:inline-block;background:var(--navy);color:white;padding:8px 26px;border-radius:0 0 10px 10px;font-size:13px;font-weight:800;letter-spacing:1.3px;margin-bottom:18px}
-.title-row{text-align:center}
-.meta{display:grid;grid-template-columns:1.35fr .8fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.meta-block{padding:15px 17px}.meta-block+ .meta-block{border-left:1px solid var(--line);background:#f8fbfd}
-.meta h3{font-size:10px;letter-spacing:1px;color:var(--teal);margin:0 0 10px}
-.meta p{font-size:11px;margin:6px 0;line-height:1.45}.meta strong{color:var(--navy)}
-.items{width:100%;border-collapse:collapse;margin-top:20px}
-.items th{background:var(--navy);color:white;font-size:10px;text-align:left;padding:11px 9px}
-.items td{border:1px solid var(--line);padding:11px 9px;font-size:11px;vertical-align:top;line-height:1.5}
-.items tbody tr:nth-child(even){background:#f8fbfd}
-.center{text-align:center!important}.right{text-align:right!important}
-.totals-area{display:flex;justify-content:flex-end;margin-top:14px}
-.totals{width:310px;border-collapse:collapse}
-.totals td{padding:8px 11px;border-bottom:1px solid var(--line);font-size:11px}
-.totals td:last-child{text-align:right;font-weight:700}
-.totals .grand td{background:#eaf5f5;color:var(--navy);font-size:14px;font-weight:900;border-top:2px solid var(--teal)}
-.words{margin-top:18px;padding:12px 14px;background:#f5f9fb;border-left:3px solid var(--gold);font-size:11px}
-.inv-footer{display:flex;justify-content:space-between;align-items:flex-end;gap:25px;margin-top:75px;font-size:11px}
-.sign-area{text-align:center;width:220px;min-height:95px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
-.sign-img{max-width:190px;max-height:65px;object-fit:contain;display:none;margin-bottom:5px}
-.sign-line{width:100%;border-top:1px solid #64748b;padding-top:8px;font-weight:800;color:var(--navy)}
-.note{font-size:9px;color:#7b8b98;text-align:center;margin-top:28px}
-@media(max-width:1050px){.layout{grid-template-columns:320px minmax(0,1fr)}.invoice{padding:28px 25px}}
-@media(max-width:760px){.layout{display:flex;flex-direction:column;padding:0 12px}.panel,.preview-wrap{width:100%}.preview-wrap{overflow:auto}.invoice{min-width:650px}.top-pill{display:none}}
+.preview-toolbar{
+ background:white;border:2px solid black;
+ border-radius:9px;padding:11px 14px;
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;margin-bottom:13px;
+}
+.preview-toolbar h2{font-size:15px;margin:0;font-weight:900}
+.preview-toolbar span{font-size:11px;color:#475569}
+.invoice{
+ position:relative;background:white;
+ width:100%;max-width:850px;margin:auto;
+ padding:22px 27px;
+ border:3px solid black;
+ box-shadow:0 12px 35px #0003;
+ overflow:hidden;
+}
+.invoice-top,.invoice-bottom-bar{
+ height:9px;position:absolute;left:0;right:0;
+ background:linear-gradient(90deg,#d90429,#004aad,#087f3e);
+}
+.invoice-top{top:0}
+.invoice-bottom-bar{bottom:0}
+.inv-header{
+ text-align:center;padding:12px 0;
+ border-bottom:3px solid black;
+}
+.inv-logo{width:90px;height:75px;object-fit:contain}
+.inv-header h2{
+ margin:4px 0;font-size:22px;font-weight:900;
+ color:#004aad;
+}
+.inv-header p{
+ margin:4px 0;font-size:11px;font-weight:bold;
+}
+.gst-badge{
+ display:inline-block;padding:4px 10px;
+ background:#eff6ff;border:1.5px solid black;
+ font-weight:900;font-size:11px;
+}
+.title-row{text-align:center;margin-bottom:12px}
+.inv-title{
+ display:inline-block;
+ background:linear-gradient(90deg,#d90429,#004aad,#087f3e);
+ color:white;padding:7px 28px;
+ border:2px solid black;border-top:0;
+ border-radius:0 0 10px 10px;
+ font-weight:900;letter-spacing:1px;
+}
+.meta{
+ display:grid;grid-template-columns:1.4fr .8fr;
+ border:2px solid black;border-radius:7px;
+ overflow:hidden;
+}
+.meta-block{padding:10px 12px}
+.meta-block+ .meta-block{
+ border-left:2px solid black;
+ background:#f0fdf4;
+}
+.meta h3{
+ display:inline-block;background:#004aad;
+ color:white;padding:4px 8px;
+ border-radius:4px;font-size:11px;
+ margin:0 0 7px;font-weight:900;
+}
+.meta-block+ .meta-block h3{background:#087f3e}
+.meta p{font-size:11px;margin:5px 0;line-height:1.4}
+.meta strong{font-weight:900}
+.items{
+ width:100%;border-collapse:collapse;
+ margin-top:14px;border:2px solid black;
+}
+.items th{
+ background:linear-gradient(90deg,#000,#004aad,#087f3e);
+ color:white;padding:9px 6px;
+ border:2px solid black;font-size:10px;
+}
+.items td{
+ border:2px solid black;padding:9px 7px;
+ font-size:10.5px;font-weight:600;
+ vertical-align:top;line-height:1.45;
+}
+.items tbody tr:nth-child(even){background:#f8fafc}
+.center{text-align:center}
+.right{text-align:right}
+.totals-area{
+ display:flex;justify-content:flex-end;margin-top:12px;
+}
+.totals{
+ width:310px;border-collapse:collapse;
+ border:2px solid black;
+}
+.totals td{
+ padding:7px 9px;border:1.5px solid black;
+ font-size:11px;font-weight:bold;
+}
+.totals td:last-child{text-align:right}
+.totals .grand td{
+ background:linear-gradient(90deg,#087f3e,#004aad);
+ color:white;font-size:14px;font-weight:900;
+}
+.inv-footer{
+ display:flex;justify-content:space-between;
+ align-items:flex-end;gap:15px;margin-top:25px;
+}
+.for-company{font-weight:900;color:#d90429;font-size:12px}
+.sign-area{
+ width:240px;min-height:115px;
+ display:flex;flex-direction:column;
+ justify-content:flex-end;align-items:center;
+}
+.sign-img{
+ display:none;max-width:225px;max-height:95px;
+ object-fit:contain;margin-bottom:5px;
+}
+.sign-line{
+ width:100%;border-top:2px solid black;
+ padding-top:6px;text-align:center;
+ font-weight:900;font-size:11px;
+}
+.note{
+ text-align:center;font-size:10px;
+ font-weight:bold;margin-top:14px;
+ padding-bottom:5px;
+}
+.capacity-line{
+ font-weight:900;color:#004aad;
+}
+@media(max-width:1050px){
+ .layout{grid-template-columns:320px minmax(0,1fr)}
+}
+@media(max-width:760px){
+ .layout{display:flex;flex-direction:column}
+ .panel,.preview-wrap{width:100%}
+ .invoice{min-width:650px}
+ .preview-wrap{overflow-x:auto}
+ .top-pill{display:none}
+}
 @media print{
- body{background:white}.topbar,.panel,.preview-toolbar{display:none!important}.layout{display:block;margin:0;padding:0}.preview-wrap{width:100%}.invoice{box-shadow:none;border-radius:0;margin:0 auto;padding:12mm 13mm;min-height:0;max-width:none;width:210mm}.invoice-top{-webkit-print-color-adjust:exact;print-color-adjust:exact}
- *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
- @page{size:A4;margin:0}
+ @page{size:A4 portrait;margin:0}
+ html,body{
+  width:210mm;height:297mm;margin:0!important;
+  padding:0!important;background:white!important;
+ }
+ .topbar,.panel,.preview-toolbar{display:none!important}
+ .layout{display:block!important;margin:0!important;padding:0!important}
+ .preview-wrap{width:100%!important}
+ .invoice{
+  width:202mm!important;max-width:202mm!important;
+  min-height:286mm!important;
+  margin:4mm auto!important;
+  padding:10mm 11mm!important;
+  box-shadow:none!important;border-radius:0!important;
+  border:3px solid black!important;
+  break-inside:avoid!important;
+ }
+ *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
 </head>
+
 <body>
+
 <header class="topbar">
  <div class="topbar-inner">
-  <div class="brand"><div class="brand-mark">☀</div><div><h1>Sri Rudhra Solar Solutions</h1><p>GST TAX INVOICE GENERATOR</p></div></div>
-  <div class="top-pill">A4 • Live invoice preview • PDF ready</div>
+  <div class="brand">
+   <img src="rudhra_logo.jpeg" alt="Logo"
+    onerror="this.style.display='none'">
+   <div>
+    <h1>SRI RUDHRA SOLAR SOLUTIONS</h1>
+    <p>GST TAX INVOICE GENERATOR</p>
+   </div>
+  </div>
+  <div class="top-pill">SUPABASE CONNECTED • A4 PDF</div>
  </div>
 </header>
 
 <main class="layout">
- <section class="panel">
-  <div class="panel-head"><h2>Invoice input form</h2><p>Enter or change details. The invoice preview updates automatically.</p></div>
-  <div class="form-body">
-   <div class="group-title">Invoice details</div>
-   <div class="two">
-    <div class="field"><label>Invoice number</label><input id="invoiceNo" value="SRSS-016"></div>
-    <div class="field"><label>Invoice date</label><input id="invoiceDate" type="date" value="2026-10-11"></div>
-   </div>
-   <div class="group-title">Customer / consignee</div>
-   <div class="field"><label>Customer name</label><input id="customer" value="AMMIKA DHARAMSOTH"></div>
-   <div class="field"><label>Address</label><textarea id="address">9-292, BAYYARAM, KOTHAPETA,</textarea></div>
-   <div class="two">
-    <div class="field"><label>District</label><input id="district" value="MAHABUBABAD"></div>
-    <div class="field"><label>State</label><input id="state" value="TELANGANA"></div>
-   </div>
-   <div class="two">
-    <div class="field"><label>PIN code</label><input id="pin" value="507211"></div>
-    <div class="field"><label>Mobile number</label><input id="mobile" value="9573288624"></div>
-   </div>
-   <div class="field"><label>Email ID</label><input id="email" value="dskishan12@gmail.com"></div>
 
-   <div class="group-title">Item details</div>
-   <div class="field"><label>Item 1 description</label><textarea id="item1">ADANI MODULES
-5 KW POLYCAB INVERTER</textarea></div>
-   <div class="two">
-    <div class="field"><label>Quantity</label><input id="qty1" value="10 NO / 1 UNIT"></div>
-    <div class="field"><label>HSN / SAC</label><input id="hsn1" value="8541"></div>
-   </div>
-   <div class="field"><label>Item 1 amount (₹)</label><input id="amount1" type="number" step="0.01" value="233333.33"></div>
-   <div class="field"><label>Item 2 description</label><textarea id="item2">GALVANIZED STRUCTURE, POLYCAB CABLES, ACDB, DCDB BOXES, JUNCTION BOXES, EARTHING KIT & OTHER ACCESSORIES AS REQUIRED, ERECTION, PLUMBING, CIVIL WORK, TRANSPORTATION, INSTALLATION AND COMMISSIONING SERVICES</textarea></div>
-   <div class="two">
-    <div class="field"><label>Quantity</label><input id="qty2" value=""></div>
-    <div class="field"><label>HSN / SAC</label><input id="hsn2" value="9954"></div>
-   </div>
-   <div class="field"><label>Item 2 amount (₹)</label><input id="amount2" type="number" step="0.01" value="88984"></div>
+<!-- INPUT PANEL -->
+<section class="panel">
+ <div class="panel-head">
+  <h2>Invoice Input Form</h2>
+  <p>Fetch booking details and generate invoice.</p>
+ </div>
 
-   <div class="group-title">Tax and total</div>
-   <div class="two">
-    <div class="field"><label>CGST 2.5% (₹)</label><input id="cgst25" type="number" step="0.01" value="5833.33"></div>
-    <div class="field"><label>SGST 2.5% (₹)</label><input id="sgst25" type="number" step="0.01" value="5833"></div>
-   </div>
-   <div class="two">
-    <div class="field"><label>CGST 9% (₹)</label><input id="cgst9" type="number" step="0.01" value="8008"></div>
-    <div class="field"><label>SGST 9% (₹)</label><input id="sgst9" type="number" step="0.01" value="8008"></div>
-   </div>
-   <div class="field"><label>Grand total (₹)</label><input id="grandTotal" type="number" step="0.01" value="350000"></div>
+ <div class="form-body">
 
-   <div class="group-title">Authorised signatory</div>
-   <div class="upload-box">
-    <label for="signatureUpload">Upload digital signature image</label>
-    <input id="signatureUpload" type="file" accept="image/*">
-    <small>PNG or JPG recommended. The signature appears above “AUTHORISED SIGNATORY”.</small>
-    <img id="signatureThumb" class="signature-thumb" alt="Signature preview">
+  <div class="group-title">SUPABASE CUSTOMER SEARCH</div>
+
+  <div class="search-box">
+   <div class="field">
+    <label>Customer Mobile Number</label>
+    <input id="searchMobile" type="tel"
+     maxlength="15" placeholder="Enter booking mobile number">
    </div>
-   <div class="group-title">Company logo</div>
-   <div class="upload-box">
-    <label for="logoUpload">Upload company logo (optional)</label>
-    <input id="logoUpload" type="file" accept="image/*">
-    <small>Default logo filename: rudhralogo.jpeg (keep it beside this HTML file).</small>
+   <div class="search-actions">
+    <button class="btn btn-primary" id="fetchBtn"
+     type="button" onclick="fetchBooking()">FETCH BOOKING</button>
+    <button class="btn btn-light" type="button"
+     onclick="clearBooking()">CLEAR</button>
    </div>
-   <div class="form-actions">
-    <button class="btn btn-primary" type="button" onclick="window.print()">Print / Save PDF</button>
-    <button class="btn btn-light" type="button" onclick="resetForm()">Reset</button>
+   <div id="dbStatus" class="status info">
+    Enter mobile number to fetch customer booking.
    </div>
   </div>
- </section>
 
- <section class="preview-wrap">
-  <div class="preview-toolbar"><div><h2>Live invoice preview</h2><span>What you see here is what prints to PDF.</span></div><button class="print-btn" onclick="window.print()">↓ Save as PDF</button></div>
-  <article class="invoice">
-   <div class="invoice-top"></div>
-   <div class="inv-header">
-    <img id="invoiceLogo" class="inv-logo" src="rudhralogo.jpeg" alt="Sri Rudhra Solar Solutions logo" onerror="this.style.display='none'">
-    <h2>SRI RUDHRA SOLAR SOLUTIONS</h2>
-    <p>1-7-28/12/1, Narsampeta Main Road Ramachandrapuram,</p>
-    <p>Indiranagar Mahabubabad - 506101</p>
-    <p>State Name: Telangana &nbsp; | &nbsp; GSTIN/UIN: 36APAPB0361CIZS</p>
+  <div class="group-title">INVOICE DETAILS</div>
+  <div class="two">
+   <div class="field">
+    <label>Invoice Number</label>
+    <input id="invoiceNo">
    </div>
-   <div class="title-row"><div class="inv-title">GST TAX INVOICE</div></div>
-   <div class="meta">
-    <div class="meta-block">
-     <h3>CONSIGNEE / SHIP TO</h3>
-     <p><strong>NAME:</strong> <span data-bind="customer">AMMIKA DHARAMSOTH</span></p>
-     <p><strong>ADDRESS:</strong> <span data-bind="address">9-292, BAYYARAM, KOTHAPETA,</span></p>
-     <p><strong>DISTRICT:</strong> <span data-bind="district">MAHABUBABAD</span></p>
-     <p><strong>STATE:</strong> <span data-bind="state">TELANGANA</span> &nbsp; <strong>PIN:</strong> <span data-bind="pin">507211</span></p>
-     <p><strong>MOBILE:</strong> <span data-bind="mobile">9573288624</span></p>
-     <p><strong>EMAIL:</strong> <span data-bind="email">dskishan12@gmail.com</span></p>
-    </div>
-    <div class="meta-block">
-     <h3>INVOICE INFORMATION</h3>
-     <p><strong>INVOICE NO:</strong> <span data-bind="invoiceNo">SRSS-016</span></p>
-     <p><strong>DATE:</strong> <span id="outDate">11-10-2026</span></p>
-    </div>
+   <div class="field">
+    <label>Invoice Date</label>
+    <input id="invoiceDate" type="date">
    </div>
-   <table class="items">
-    <thead><tr><th style="width:7%">SI.NO</th><th style="width:45%">ITEM NAMES</th><th style="width:15%">QUANTITY</th><th style="width:13%">HSN/SAC</th><th style="width:20%" class="right">AMOUNT (₹)</th></tr></thead>
-    <tbody>
-     <tr><td class="center">1</td><td id="outItem1">ADANI MODULES<br>5 KW POLYCAB INVERTER</td><td id="outQty1" class="center">10 NO / 1 UNIT</td><td id="outHsn1" class="center">8541</td><td id="outAmount1" class="right">2,33,333.33</td></tr>
-     <tr><td class="center">2</td><td id="outItem2">GALVANIZED STRUCTURE, POLYCAB CABLES, ACDB, DCDB BOXES, JUNCTION BOXES, EARTHING KIT &amp; OTHER ACCESSORIES AS REQUIRED, ERECTION, PLUMBING, CIVIL WORK, TRANSPORTATION, INSTALLATION AND COMMISSIONING SERVICES</td><td id="outQty2" class="center"></td><td id="outHsn2" class="center">9954</td><td id="outAmount2" class="right">88,984.00</td></tr>
-    </tbody>
+  </div>
+
+  <div class="group-title">CUSTOMER / CONSIGNEE</div>
+
+  <div class="field">
+   <label>Customer Name</label>
+   <input id="customer" placeholder="Customer name">
+  </div>
+
+  <div class="field">
+   <label>House Number</label>
+   <input id="houseNo">
+  </div>
+
+  <div class="field">
+   <label>Village</label>
+   <input id="village">
+  </div>
+
+  <div class="field">
+   <label>Mandal</label>
+   <input id="mandal">
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>District</label>
+    <input id="district">
+   </div>
+   <div class="field">
+    <label>State</label>
+    <input id="state">
+   </div>
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>PIN Code</label>
+    <input id="pin">
+   </div>
+   <div class="field">
+    <label>Mobile Number</label>
+    <input id="mobile">
+   </div>
+  </div>
+
+  <div class="field">
+   <label>Email ID</label>
+   <input id="email">
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>Solar Capacity</label>
+    <input id="capacity" placeholder="Fetched from database">
+   </div>
+   <div class="field">
+    <label>Agent Name</label>
+    <input id="agent" placeholder="Fetched from database">
+   </div>
+  </div>
+
+  <div class="group-title">ITEM DETAILS</div>
+
+  <div class="field">
+   <label>Item 1 Description</label>
+   <textarea id="item1">SOLAR PV MODULES
+SOLAR INVERTER</textarea>
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>Quantity</label>
+    <input id="qty1" value="1 UNIT">
+   </div>
+   <div class="field">
+    <label>HSN / SAC</label>
+    <input id="hsn1" value="8541">
+   </div>
+  </div>
+
+  <div class="field">
+   <label>Item 1 Amount (₹)</label>
+   <input id="amount1" type="number" step="0.01" value="233333.33">
+  </div>
+
+  <div class="field">
+   <label>Item 2 Description</label>
+   <textarea id="item2">GALVANIZED STRUCTURE, CABLES, ACDB, DCDB BOXES, JUNCTION BOXES, EARTHING KIT, ACCESSORIES, ERECTION, CIVIL WORK, TRANSPORTATION, INSTALLATION AND COMMISSIONING SERVICES</textarea>
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>Quantity</label>
+    <input id="qty2" value="1 UNIT">
+   </div>
+   <div class="field">
+    <label>HSN / SAC</label>
+    <input id="hsn2" value="9954">
+   </div>
+  </div>
+
+  <div class="field">
+   <label>Item 2 Amount (₹)</label>
+   <input id="amount2" type="number" step="0.01" value="88984">
+  </div>
+
+  <div class="group-title">TAX AND TOTAL</div>
+
+  <div class="two">
+   <div class="field">
+    <label>CGST 2.5%</label>
+    <input id="cgst25" type="number" step="0.01" value="5833.33">
+   </div>
+   <div class="field">
+    <label>SGST 2.5%</label>
+    <input id="sgst25" type="number" step="0.01" value="5833">
+   </div>
+  </div>
+
+  <div class="two">
+   <div class="field">
+    <label>CGST 9%</label>
+    <input id="cgst9" type="number" step="0.01" value="8008">
+   </div>
+   <div class="field">
+    <label>SGST 9%</label>
+    <input id="sgst9" type="number" step="0.01" value="8008">
+   </div>
+  </div>
+
+  <div class="field">
+   <label>Grand Total (₹)</label>
+   <input id="grandTotal" type="number" step="0.01" value="350000">
+  </div>
+
+  <div class="group-title">SIGNATURE AND COMPANY SEAL</div>
+  <div class="upload-box">
+   <label for="signatureUpload">Upload Signature / Company Seal</label>
+   <input id="signatureUpload" type="file" accept="image/*">
+   <small>PNG or JPG format</small>
+   <img id="signatureThumb" class="signature-thumb" alt="Preview">
+  </div>
+
+  <div class="form-actions">
+   <button class="btn btn-primary" type="button"
+    onclick="window.print()">SAVE PDF</button>
+   <button class="btn btn-light" type="button"
+    onclick="resetForm()">RESET</button>
+  </div>
+
+ </div>
+</section>
+
+<!-- INVOICE PREVIEW -->
+<section class="preview-wrap">
+
+ <div class="preview-toolbar">
+  <div>
+   <h2>LIVE GST INVOICE PREVIEW</h2>
+   <span>A4 Portrait • Print / Save PDF</span>
+  </div>
+  <button class="btn btn-red" onclick="window.print()">
+   ↓ SAVE PDF
+  </button>
+ </div>
+
+ <article class="invoice">
+
+  <div class="invoice-top"></div>
+
+  <div class="inv-header">
+   <img id="invoiceLogo" class="inv-logo"
+    src="rudhra_logo.jpeg" alt="Company Logo">
+   <h2>SRI RUDHRA SOLAR SOLUTIONS</h2>
+   <p>1-7-28/12/1, Narsampeta Main Road, Ramachandrapuram,
+    Indiranagar, Mahabubabad - 506101</p>
+   <p>
+    <span class="gst-badge">
+     State: Telangana | GSTIN/UIN: 36APAPB0361CIZS
+    </span>
+   </p>
+  </div>
+
+  <div class="title-row">
+   <div class="inv-title">GST TAX INVOICE</div>
+  </div>
+
+  <div class="meta">
+
+   <div class="meta-block">
+    <h3>CONSIGNEE / SHIP TO</h3>
+    <p><strong>NAME:</strong> <span id="outCustomer"></span></p>
+    <p><strong>HOUSE NO:</strong> <span id="outHouse"></span></p>
+    <p><strong>VILLAGE:</strong> <span id="outVillage"></span></p>
+    <p><strong>MANDAL:</strong> <span id="outMandal"></span></p>
+    <p><strong>DISTRICT:</strong> <span id="outDistrict"></span></p>
+    <p><strong>STATE:</strong> <span id="outState"></span></p>
+    <p><strong>PIN:</strong> <span id="outPin"></span></p>
+    <p><strong>MOBILE:</strong> <span id="outMobile"></span></p>
+    <p><strong>EMAIL:</strong> <span id="outEmail"></span></p>
+   </div>
+
+   <div class="meta-block">
+    <h3>INVOICE INFORMATION</h3>
+    <p><strong>INVOICE NO:</strong> <span id="outInvoice"></span></p>
+    <p><strong>DATE:</strong> <span id="outDate"></span></p>
+    <p><strong>SOLAR CAPACITY:</strong></p>
+    <p class="capacity-line" id="outCapacity"></p>
+    <p><strong>AGENT NAME:</strong></p>
+    <p id="outAgent"></p>
+   </div>
+
+  </div>
+
+  <table class="items">
+   <thead>
+    <tr>
+     <th style="width:7%" class="center">SI.NO</th>
+     <th style="width:45%">ITEM DESCRIPTION</th>
+     <th style="width:15%" class="center">QUANTITY</th>
+     <th style="width:13%" class="center">HSN/SAC</th>
+     <th style="width:20%" class="right">AMOUNT (₹)</th>
+    </tr>
+   </thead>
+
+   <tbody>
+    <tr>
+     <td class="center">1</td>
+     <td id="outItem1"></td>
+     <td id="outQty1" class="center"></td>
+     <td id="outHsn1" class="center"></td>
+     <td id="outAmount1" class="right"></td>
+    </tr>
+
+    <tr>
+     <td class="center">2</td>
+     <td id="outItem2"></td>
+     <td id="outQty2" class="center"></td>
+     <td id="outHsn2" class="center"></td>
+     <td id="outAmount2" class="right"></td>
+    </tr>
+   </tbody>
+  </table>
+
+  <div class="totals-area">
+   <table class="totals">
+    <tr><td>CGST 2.5%</td><td id="outCgst25"></td></tr>
+    <tr><td>SGST 2.5%</td><td id="outSgst25"></td></tr>
+    <tr><td>CGST 9%</td><td id="outCgst9"></td></tr>
+    <tr><td>SGST 9%</td><td id="outSgst9"></td></tr>
+    <tr class="grand">
+     <td>GRAND TOTAL</td><td id="outGrand"></td>
+    </tr>
    </table>
-   <div class="totals-area"><table class="totals">
-    <tr><td>CGST 2.5%</td><td id="outCgst25">₹5,833.33</td></tr>
-    <tr><td>SGST 2.5%</td><td id="outSgst25">₹5,833.00</td></tr>
-    <tr><td>CGST 9%</td><td id="outCgst9">₹8,008.00</td></tr>
-    <tr><td>SGST 9%</td><td id="outSgst9">₹8,008.00</td></tr>
-    <tr class="grand"><td>TOTAL</td><td id="outGrand">₹3,50,000.00</td></tr>
-   </table></div>
-   <div class="inv-footer">
-    <div><strong>FOR: SRI RUDHRA SOLAR SOLUTIONS</strong></div>
-    <div class="sign-area"><img id="signatureOutput" class="sign-img" alt="Digital signature"><div class="sign-line">AUTHORISED SIGNATORY</div></div>
+  </div>
+
+  <div class="inv-footer">
+   <div class="for-company">
+    FOR: SRI RUDHRA SOLAR SOLUTIONS
    </div>
-   <div class="note">This is a computer-generated GST tax invoice.</div>
-  </article>
- </section>
+   <div class="sign-area">
+    <img id="signatureOutput" class="sign-img" alt="Signature">
+    <div class="sign-line">AUTHORISED SIGNATORY</div>
+   </div>
+  </div>
+
+  <div class="note">
+   This is a computer-generated GST tax invoice.
+  </div>
+
+  <div class="invoice-bottom-bar"></div>
+ </article>
+</section>
+
 </main>
 
 <script>
-const fields = ['invoiceNo','customer','address','district','state','pin','mobile','email','item1','qty1','hsn1','amount1','item2','qty2','hsn2','amount2','cgst25','sgst25','cgst9','sgst9','grandTotal'];
-const money = n => '₹' + (Number(n || 0)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-function setText(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
+/* =========================================
+   SUPABASE CONFIGURATION
+========================================= */
+
+const SUPABASE_URL = "https://gzqevoudbwttcdeglish.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN";
+
+const TABLE_NAME = "rudhra_solar_bookings";
+
+let db = null;
+
+try {
+ if (
+  SUPABASE_URL.startsWith("https://") &&
+  SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
+ ) {
+  db = window.supabase.createClient(
+   SUPABASE_URL,
+   SUPABASE_ANON_KEY
+  );
+ }
+} catch(error) {
+ console.error("Supabase initialization:",error);
+}
+
+/* =========================================
+   GENERAL FUNCTIONS
+========================================= */
+
+const $ = id => document.getElementById(id);
+
+function safeText(id,value){
+ $(id).textContent = value ?? "";
+}
+
+function escapeHTML(value){
+ return String(value ?? "").replace(/[&<>"']/g,c=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ })[c]);
+}
+
+function money(value){
+ return "₹" + Number(value || 0).toLocaleString("en-IN",{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+ });
+}
+
+function dateFormat(value){
+ if(!value) return "";
+ const parts=value.split("-");
+ if(parts.length!==3) return value;
+ return parts[2]+"-"+parts[1]+"-"+parts[0];
+}
+
+function showStatus(message,type="info"){
+ const el=$("dbStatus");
+ el.textContent=message;
+ el.className="status "+type;
+}
+
+/* =========================================
+   FETCH CUSTOMER FROM SUPABASE
+========================================= */
+
+async function fetchBooking(){
+
+ if(!db){
+  showStatus(
+   "Supabase is not configured. Enter your project URL and anon key.",
+   "error"
+  );
+  return;
+ }
+
+ const mobile=$("searchMobile").value.trim();
+
+ if(!mobile){
+  showStatus("Please enter customer mobile number.","error");
+  $("searchMobile").focus();
+  return;
+ }
+
+ if(!/^[0-9+\-\s]{7,15}$/.test(mobile)){
+  showStatus("Please enter a valid mobile number.","error");
+  return;
+ }
+
+ const btn=$("fetchBtn");
+ btn.disabled=true;
+ btn.textContent="FETCHING...";
+
+ showStatus("Searching booking database...","info");
+
+ try{
+
+  const {data,error}=await db
+   .from(TABLE_NAME)
+   .select(`
+    id,
+    created_at,
+    capacity,
+    agent_name,
+    full_name,
+    mobile_no,
+    email_id,
+    house_no,
+    village,
+    mandal,
+    pincode,
+    district,
+    state
+   `)
+   .eq("mobile_no",mobile)
+   .order("created_at",{ascending:false})
+   .limit(1);
+
+  if(error) throw error;
+
+  if(!data || data.length===0){
+   showStatus(
+    "No booking found for mobile number: "+mobile,
+    "error"
+   );
+   return;
+  }
+
+  const customer=data[0];
+
+  fillCustomer(customer);
+
+  showStatus(
+   "Booking fetched successfully! Customer: "+customer.full_name,
+   "success"
+  );
+
+ }catch(error){
+
+  console.error("Booking fetch error:",error);
+
+  showStatus(
+   "Database error: "+(error.message || "Unable to fetch booking."),
+   "error"
+  );
+
+ }finally{
+
+  btn.disabled=false;
+  btn.textContent="FETCH BOOKING";
+
+ }
+}
+
+/* =========================================
+   AUTO FILL BOOKING DETAILS
+========================================= */
+
+function fillCustomer(c){
+
+ $("customer").value=c.full_name || "";
+ $("houseNo").value=c.house_no || "";
+ $("village").value=c.village || "";
+ $("mandal").value=c.mandal || "";
+ $("district").value=c.district || "";
+ $("state").value=c.state || "";
+ $("pin").value=c.pincode || "";
+ $("mobile").value=c.mobile_no || "";
+ $("email").value=c.email_id || "";
+
+ $("capacity").value=c.capacity || "";
+ $("agent").value=c.agent_name || "";
+
+ // Put fetched solar capacity in the item description.
+ const capacity=c.capacity || "";
+ $("item1").value=
+  "SOLAR PV MODULES\n"+
+  "SOLAR INVERTER\n"+
+  "SOLAR SYSTEM CAPACITY: "+capacity;
+
+ updateInvoice();
+}
+
+/* =========================================
+   CLEAR BOOKING DETAILS
+========================================= */
+
+function clearBooking(){
+
+ [
+  "searchMobile","customer","houseNo","village",
+  "mandal","district","state","pin","mobile",
+  "email","capacity","agent"
+ ].forEach(id=>$(id).value="");
+
+ updateInvoice();
+
+ showStatus("Customer booking details cleared.","info");
+}
+
+/* =========================================
+   LIVE INVOICE UPDATE
+========================================= */
+
 function updateInvoice(){
- fields.forEach(id=>{
-  const input=document.getElementById(id);
-  const targets=document.querySelectorAll('[data-bind="'+id+'"]');
-  targets.forEach(el=>el.textContent=input.value);
+
+ safeText("outCustomer",$("customer").value);
+ safeText("outHouse",$("houseNo").value);
+ safeText("outVillage",$("village").value);
+ safeText("outMandal",$("mandal").value);
+ safeText("outDistrict",$("district").value);
+ safeText("outState",$("state").value);
+ safeText("outPin",$("pin").value);
+ safeText("outMobile",$("mobile").value);
+ safeText("outEmail",$("email").value);
+
+ safeText("outInvoice",$("invoiceNo").value);
+ safeText("outDate",dateFormat($("invoiceDate").value));
+
+ safeText("outCapacity",$("capacity").value);
+ safeText("outAgent",$("agent").value);
+
+ ["1","2"].forEach(n=>{
+
+  $("outItem"+n).innerHTML=
+   escapeHTML($("item"+n).value).replace(/\n/g,"<br>");
+
+  safeText("outQty"+n,$("qty"+n).value);
+  safeText("outHsn"+n,$("hsn"+n).value);
+
+  $("outAmount"+n).textContent=
+   Number($("amount"+n).value || 0).toLocaleString(
+    "en-IN",
+    {minimumFractionDigits:2,maximumFractionDigits:2}
+   );
+
  });
- ['1','2'].forEach(n=>{
-  const text=document.getElementById('item'+n).value;
-  setText('outItem'+n,text);
-  document.getElementById('outItem'+n).innerHTML = escapeHTML(text).replace(/\n/g,'<br>');
-  setText('outQty'+n,document.getElementById('qty'+n).value);
-  setText('outHsn'+n,document.getElementById('hsn'+n).value);
-  setText('outAmount'+n,Number(document.getElementById('amount'+n).value||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}));
+
+ ["cgst25","sgst25","cgst9","sgst9"].forEach(id=>{
+  safeText(
+   "out"+id.charAt(0).toUpperCase()+id.slice(1),
+   money($(id).value)
+  );
  });
- ['cgst25','sgst25','cgst9','sgst9'].forEach(id=>setText('out'+id.charAt(0).toUpperCase()+id.slice(1),money(document.getElementById(id).value)));
- setText('outGrand',money(document.getElementById('grandTotal').value));
- const d=document.getElementById('invoiceDate').value;
- if(d){const [y,m,day]=d.split('-');setText('outDate',`${day}-${m}-${y}`);}
+
+ safeText("outGrand",money($("grandTotal").value));
 }
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-fields.concat(['invoiceDate']).forEach(id=>document.getElementById(id).addEventListener('input',updateInvoice));
-function loadImage(inputId,imgId,thumbId){
- document.getElementById(inputId).addEventListener('change',e=>{
-  const file=e.target.files[0];if(!file)return;
-  if(!file.type.startsWith('image/')){alert('Please select an image file.');return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{
-   document.getElementById(imgId).src=ev.target.result;
-   document.getElementById(imgId).style.display='block';
-   if(thumbId)document.getElementById(thumbId).style.display='block';
-  };
-  reader.readAsDataURL(file);
- });
+
+/* =========================================
+   AUTO UPDATE ON INPUT
+========================================= */
+
+const liveFields=[
+ "invoiceNo","invoiceDate",
+ "customer","houseNo","village","mandal",
+ "district","state","pin","mobile","email",
+ "capacity","agent",
+ "item1","qty1","hsn1","amount1",
+ "item2","qty2","hsn2","amount2",
+ "cgst25","sgst25","cgst9","sgst9","grandTotal"
+];
+
+liveFields.forEach(id=>{
+ $(id).addEventListener("input",updateInvoice);
+});
+
+/* =========================================
+   SIGNATURE UPLOAD
+========================================= */
+
+$("signatureUpload").addEventListener("change",function(e){
+
+ const file=e.target.files[0];
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  alert("Please select a valid image.");
+  this.value="";
+  return;
+ }
+
+ const reader=new FileReader();
+
+ reader.onload=function(event){
+
+  $("signatureOutput").src=event.target.result;
+  $("signatureOutput").style.display="block";
+
+  $("signatureThumb").src=event.target.result;
+  $("signatureThumb").style.display="block";
+
+ };
+
+ reader.onerror=function(){
+  alert("Unable to read selected image.");
+ };
+
+ reader.readAsDataURL(file);
+
+});
+
+/* =========================================
+   RESET FORM
+========================================= */
+
+function resetForm(){
+
+ if(!confirm("Reset invoice form?"))return;
+
+ location.reload();
+
 }
-loadImage('signatureUpload','signatureOutput','signatureThumb');
-loadImage('logoUpload','invoiceLogo');
-function resetForm(){if(confirm('Reset all invoice fields to the sample values?'))location.reload();}
-updateInvoice();
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+function initialize(){
+
+ const today=new Date();
+ const yyyy=today.getFullYear();
+ const mm=String(today.getMonth()+1).padStart(2,"0");
+ const dd=String(today.getDate()).padStart(2,"0");
+
+ $("invoiceDate").value=yyyy+"-"+mm+"-"+dd;
+
+ $("invoiceNo").value=
+  "SRSS-"+yyyy+mm+dd;
+
+ updateInvoice();
+
+ if(db){
+  showStatus("Supabase client initialized. Ready to fetch bookings.","success");
+ }else{
+  showStatus("Enter your Supabase URL and anon key in the HTML configuration.","error");
+ }
+
+}
+
+initialize();
+
 </script>
-    <script>
+
+ <script>
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.addEventListener("keydown", function(e) {
@@ -261,5 +988,6 @@ updateInvoice();
     });
     </script>
 <script src="database_script.js"></script>
+
 </body>
 </html>
