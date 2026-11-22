@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Sri Rudhra Solar Solutions - 3 Page Quotation &amp; Advance Receipt Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
         :root {
             --primary-red: #b91c1c;
@@ -13,6 +14,14 @@
             --accent-cyan: #0e7490;
             --bg-slate: #f8fafc;
             --dark-border: #0f172a;
+            --primary: #c2410c;
+            --primary-dark: #9a3412;
+            --border: #cbd5e1;
+            --accent-red: #dc2626;
+            --accent-soft-red: #fff5f5;
+            --accent-soft-green: #f2fbf4;
+            --accent-soft-blue: #f3f7ff;
+            --accent-soft-cyan: #effcff;
         }
 
         * {
@@ -23,8 +32,8 @@
         }
 
         body {
-            background-color: #334155;
-            color: #0f172a;
+            background-color: #64748b;
+            color: #1e293b;
             display: flex;
             height: 100dvh;
             overflow: hidden;
@@ -32,9 +41,11 @@
 
         /* Sidebar Styles */
         .sidebar {
-            width: 400px;
+            width: 450px;
             background: #ffffff;
             border-right: 2px solid var(--dark-border);
+            border-top: 4px solid transparent;
+            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
             display: flex;
             flex-direction: column;
             box-shadow: 4px 0 15px rgba(0,0,0,0.25);
@@ -43,33 +54,72 @@
 
         .sidebar-header {
             padding: 14px 18px;
-            background: #0f172a;
+            background: linear-gradient(105deg, #1e293b 0%, #263b50 100%);
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
         }
 
         .sidebar-header h2 { font-size: 1.05rem; }
+
+        .tab-buttons {
+            display: flex;
+            background: #142033;
+            border-bottom: 2px solid #dbeafe;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background: #1e293b;
+        }
+        .tab-btn:nth-child(1).active { border-bottom-color: var(--accent-red); }
+        .tab-btn:nth-child(2).active { border-bottom-color: var(--accent-cyan); }
 
         .tab-content {
             flex: 1;
             overflow-y: auto;
             padding: 16px 18px;
+            display: none;
         }
+
+        .tab-content.active { display: block; }
 
         .section-title {
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--accent-cyan);
+            color: #334155;
             margin: 14px 0 8px 0;
             font-weight: 800;
-            border-bottom: 2px solid var(--dark-border);
-            padding-bottom: 3px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 4px;
         }
 
         .section-title:first-child { margin-top: 0; }
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 54px;
+            height: 3px;
+            margin-top: 4px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan));
+        }
 
         .form-group { margin-bottom: 10px; }
 
@@ -89,6 +139,7 @@
             font-size: 0.84rem;
             outline: none;
             color: #0f172a;
+            background: #ffffff;
         }
 
         .form-group input:focus, .form-group textarea:focus {
@@ -111,39 +162,101 @@
             gap: 6px;
         }
 
-        .btn-primary { background: var(--primary-red); color: white; }
-        .btn-primary:hover { background: #991b1b; }
+        .btn-primary {
+            background: linear-gradient(100deg, #dc2626, #2563eb);
+            color: white;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.16);
+        }
+        .btn-primary:hover { background: linear-gradient(100deg, #b91c1c, #1d4ed8); }
+
+        .btn-secondary {
+            background: linear-gradient(100deg, #15803d, #0891b2);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+
+        .btn-fetch {
+            background: linear-gradient(100deg, #075985, #0891b2);
+            color: white;
+            padding: 7px 11px;
+            font-size: 0.78rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .btn-fetch:hover { filter: brightness(1.08); }
+
+        .fetch-bar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .fetch-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 4px;
+            min-height: 16px;
+        }
+
+        .locked-field {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+            font-weight: 600;
+        }
+
+        .bom-item-row {
+            display: grid;
+            grid-template-columns: 35px 1fr 70px 35px;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--accent-cyan);
+            background: linear-gradient(90deg, #f0fdfa, #f8fafc 70%);
+            padding: 6px;
+            border-radius: 4px;
+        }
 
         /* Workspace & Sheet */
         .preview-workspace {
             flex: 1;
-            overflow: auto;
-            padding: 25px;
+            overflow-y: auto;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 32px;
         }
 
         .pdf-page {
             width: 210mm;
             min-height: 297mm;
+            height: 297mm;
             background: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-            padding: 10mm 13mm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            padding: 14mm;
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: 8px;
-            font-size: 9.8pt;
+            justify-content: space-between;
+            font-size: 10.5pt;
             color: #000;
             border: 2px solid var(--dark-border);
+            border-top: 4px solid transparent;
+            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
         }
 
         .header {
             text-align: center;
-            border-bottom: 3px solid var(--dark-border);
-            padding-bottom: 7px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
             position: relative;
         }
 
@@ -178,178 +291,281 @@
             background: #fff;
         }
 
-        .company-title { 
-            font-size: 16.5pt; 
-            font-weight: 900; 
-            color: var(--primary-red); 
-            letter-spacing: 0.5px; 
-        }
-
-        .tagline { 
-            font-size: 8.5pt; 
-            font-weight: 800; 
-            color: var(--accent-blue); 
-            margin-top: 2px; 
-        }
-
-        .receipt-title-box {
+        .logo-placeholder {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 2px solid #b45309;
+            margin: 0 auto 5px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #b45309;
             text-align: center;
-            margin: 2px 0;
+            background: #fffbe6;
         }
-        
-        .receipt-title {
-            font-size: 12pt;
-            font-weight: 900;
-            color: #000;
-            text-decoration: underline;
-            letter-spacing: 0.5px;
-        }
-        
-        .receipt-subtitle {
+
+        .company-title { font-size: 16pt; font-weight: 900; color: #1e3a8a; letter-spacing: 0.4px; }
+        .gstin {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: #eff6ff;
+            border-left: 3px solid var(--accent-blue);
             font-size: 9pt;
-            font-weight: 800;
-            color: var(--accent-blue);
+            font-weight: bold;
+        }
+        .tagline {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: #f0fdf4;
+            border-left: 3px solid var(--accent-green);
+            font-size: 9pt;
+            font-weight: bold;
+            color: #1e3a8a;
             margin-top: 2px;
         }
+        .doc-title {
+            font-size: 10pt;
+            font-weight: 900;
+            text-align: center;
+            margin: 8px 0;
+            text-decoration: underline;
+            line-height: 1.3;
+            padding: 5px 7px;
+            border-left: 3px solid var(--accent-red);
+            border-right: 3px solid var(--accent-cyan);
+            background: linear-gradient(90deg, #fff7f7, #f4fff6 35%, #f4f7ff 70%, #f0fdff);
+        }
+        .contact-info { text-align: center; font-size: 9pt; margin-bottom: 10px; line-height: 1.3; font-weight: 750; }
 
-        /* Dark & Thick Grid Tables */
-        .info-table, .items-table, .payment-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8.8pt;
-            border: 2px solid var(--dark-border);
+        .details-box { border: 1px solid #000; margin-bottom: 10px; }
+        .details-box-header {
+            background: linear-gradient(90deg, #fff1f2, #f0fdf4 38%, #eff6ff 70%, #ecfeff);
+            border-left: 4px solid var(--accent-blue);
+            font-weight: 900;
+            padding: 4px 8px;
+            border-bottom: 1px solid #000;
+            font-size: 9.5pt;
+        }
+        .details-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+        .details-table td { padding: 4.5px 8px; vertical-align: top; border-bottom: 1px solid #e2e8f0; }
+        .details-table td.label-col { width: 28%; font-weight: 900; border-right: 1px solid #000; color: #111; }
+        .details-table td.val-col { width: 72%; font-weight: 800; color: #000; }
+        .details-table tr:nth-child(4n+1) td.label-col { border-left: 3px solid var(--accent-red); }
+        .details-table tr:nth-child(4n+2) td.label-col { border-left: 3px solid var(--accent-green); }
+        .details-table tr:nth-child(4n+3) td.label-col { border-left: 3px solid var(--accent-blue); }
+        .details-table tr:nth-child(4n) td.label-col { border-left: 3px solid var(--accent-cyan); }
+
+        .proprietor-details-box {
+            border: 3px solid #172554 !important;
+            border-radius: 5px;
+            overflow: hidden;
+            background: linear-gradient(90deg, #fff1f2, #eff6ff 55%, #ecfeff);
+        }
+        .proprietor-details-box .details-box-header {
+            color: #fff !important;
+            background: linear-gradient(90deg, #b91c1c, #1d4ed8, #0891b2) !important;
+            border-bottom: 3px solid #172554 !important;
+            font-size: 10pt !important;
+            font-weight: 900 !important;
+            padding: 6px 9px !important;
+        }
+        .proprietor-details-box .proprietor-content {
+            padding: 8px 10px !important;
+            background: linear-gradient(90deg, #fff7ed, #eff6ff, #ecfeff);
+            font-size: 9.2pt !important;
+            line-height: 1.5 !important;
+            font-weight: 800 !important;
+            border-left: 6px solid #dc2626;
+        }
+        .proprietor-details-box .proprietor-content strong,
+        .proprietor-details-box .proprietor-value {
+            font-weight: 900 !important;
+            color: #991b1b !important;
+            background: #ffedd5;
+            border: 1.5px solid #f97316;
+            border-radius: 3px;
+            padding: 1px 4px;
+        }
+        .proprietor-details-box .proprietor-value {
+            color: #1e3a8a !important;
+            background: #dbeafe;
+            border-color: #2563eb;
         }
 
-        .info-table td, .items-table td, .items-table th, .payment-table td {
-            border: 1.5px solid var(--dark-border);
-            padding: 5px 8px;
-            vertical-align: middle;
+        .bank-details-box {
+            border: 3px solid #172554;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(23, 37, 84, 0.12);
         }
-
-        .info-table td.label {
-            font-weight: 800;
-            background-color: #e2e8f0;
-            color: #000;
-            width: 24%;
+        .bank-details-box .details-box-header {
+            color: #ffffff;
+            background: linear-gradient(90deg, #dc2626 0%, #16a34a 34%, #2563eb 68%, #06b6d4 100%);
+            border-bottom: 3px solid #172554;
+            padding: 6px 9px;
+            font-size: 9.8pt;
+            letter-spacing: 0.25px;
         }
-
-        .items-table th {
-            background-color: #0f172a;
+        .bank-details-box .details-table td {
+            padding: 6.5px 9px;
+            border-bottom: 2px solid #ffffff;
+            font-size: 9.2pt;
+        }
+        .bank-details-box .details-table tr:last-child td { border-bottom: 0; }
+        .bank-details-box .details-table td.label-col {
             color: #ffffff;
             font-weight: 800;
-            text-align: center;
-            border: 1.5px solid var(--dark-border);
-            padding: 6px 8px;
+            border-right: 3px solid #ffffff;
         }
-
-        .payment-table td.label {
+        .bank-details-box .details-table td.val-col {
             font-weight: 800;
-            background-color: #e2e8f0;
-            color: #000;
-            width: 55%;
+            letter-spacing: 0.15px;
         }
+        .bank-row-red td.label-col { background: #dc2626; }
+        .bank-row-red td.val-col { background: #fee2e2; border-left: 4px solid #dc2626; }
+        .bank-row-green td.label-col { background: #15803d; }
+        .bank-row-green td.val-col { background: #dcfce7; border-left: 4px solid #16a34a; }
+        .bank-row-blue td.label-col { background: #1d4ed8; }
+        .bank-row-blue td.val-col { background: #dbeafe; border-left: 4px solid #2563eb; }
+        .bank-row-cyan td.label-col { background: #0891b2; }
+        .bank-row-cyan td.val-col { background: #cffafe; border-left: 4px solid #06b6d4; }
 
-        .payment-terms-box {
-            border: 2px solid var(--dark-border);
-            border-left: 5px solid var(--accent-blue);
-            padding: 6px 8px;
-            font-size: 8.5pt;
-            background: #eff6ff;
-            font-weight: 600;
-            line-height: 1.35;
-        }
-
-        .received-box {
-            border: 2px solid var(--dark-border);
-            border-left: 5px solid var(--accent-green);
-            background-color: #dcfce7;
-            color: #000;
-            padding: 7px 8px;
+        .bom-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 5px; }
+        .bom-table th, .bom-table td { border: 1.5px solid #111; padding: 5px; text-align: left; font-weight: 750; }
+        .bom-table th {
+            background: linear-gradient(90deg, #fee2e2, #dcfce7 36%, #dbeafe 70%, #cffafe);
+            border: 2px solid #111;
             font-weight: 900;
-            font-size: 9.8pt;
+            text-align: center;
         }
+        .bom-table td.center { text-align: center; }
+        .bom-table td.right { text-align: right; }
+        .bom-table tbody tr:nth-child(4n+1) { background: var(--accent-soft-red); }
+        .bom-table tbody tr:nth-child(4n+2) { background: var(--accent-soft-green); }
+        .bom-table tbody tr:nth-child(4n+3) { background: var(--accent-soft-blue); }
+        .bom-table tbody tr:nth-child(4n) { background: var(--accent-soft-cyan); }
+        .bom-table tfoot .highlight-row:nth-child(1) { background: #fff1f2; }
+        .bom-table tfoot .highlight-row:nth-child(2) { background: #f0fdf4; }
+        .bom-table tfoot .highlight-row:nth-child(3) { background: #eff6ff; }
+        .highlight-row td { font-weight: 900; border-top: 2px solid #111; border-bottom: 2px solid #111; }
 
-        .reason-box {
-            border: 2px solid var(--dark-border);
-            border-left: 5px solid var(--accent-cyan);
-            padding: 6px 8px;
-            font-size: 8.6pt;
-            background: #ecfeff;
-            font-weight: 600;
-            line-height: 1.35;
-        }
-
-        /* Footer Vendor & Proprietor Area */
-        .footer-section {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.4fr 0.6fr;
-            border: 2px solid var(--dark-border);
-            font-size: 8.6pt;
-        }
-
-        .footer-left {
-            border-right: 2px solid var(--dark-border);
-            padding: 6px 8px;
-            background: #f8fafc;
-        }
-
-        .footer-left table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .footer-left td {
-            padding: 3px 2px;
-            border: none;
-            color: #000;
-        }
-
-        .footer-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
+        .subsidy-note {
+            margin-top: 14px;
+            font-weight: 900;
+            font-size: 9.5pt;
+            text-align: center;
             padding: 6px;
-            text-align: center;
-            background: #fff;
-            font-weight: 800;
-            font-size: 8.2pt;
+            border: 4px dashed var(--accent-green);
+            background: linear-gradient(90deg, #fff7f7, #f0fdf4 38%, #eff6ff 70%, #ecfeff);
         }
 
-        .stamp-space {
-            height: 55px;
-            width: 100%;
-        }
-
-        .office-address {
-            text-align: center;
-            font-size: 8pt;
-            font-weight: 800;
-            border-top: 2px solid var(--dark-border);
-            padding-top: 5px;
-            color: #000;
-        }
-
-        .page-badge { 
-            position: absolute; 
-            top: -24px; 
-            left: -2px; 
-            background: var(--dark-border); 
-            color: white; 
-            padding: 2px 10px; 
-            font-size: 0.78rem; 
+        .page-badge {
+            position: absolute;
+            top: -24px;
+            left: -2px;
+            background: linear-gradient(90deg, #dc2626, #16a34a, #2563eb, #0891b2);
+            color: white;
+            padding: 2px 10px;
+            font-size: 0.78rem;
             font-weight: 700;
-            border-radius: 4px 4px 0 0; 
+            border-radius: 4px 4px 0 0;
         }
 
-        /* Mobile & Tablet Responsive Layout */
+        .receipt-page {
+            padding: 10mm 13mm !important;
+            gap: 8px !important;
+            justify-content: flex-start !important;
+            border: 2px solid #0f172a !important;
+            font-size: 9.8pt !important;
+        }
+        .receipt-page .company-title {
+            font-size: 16.5pt !important;
+            font-weight: 900 !important;
+            color: #b91c1c !important;
+            letter-spacing: .5px !important;
+        }
+        .receipt-page .tagline {
+            font-size: 8.5pt !important;
+            font-weight: 800 !important;
+            color: #1d4ed8 !important;
+            margin-top: 2px !important;
+        }
+        .receipt-page .receipt-title-box { text-align:center; margin:2px 0; }
+        .receipt-page .receipt-title {
+            font-size:12pt; font-weight:900; color:#000;
+            text-decoration:underline; letter-spacing:.5px;
+        }
+        .receipt-page .receipt-subtitle {
+            font-size:9pt; font-weight:800; color:#1d4ed8; margin-top:2px;
+        }
+        .receipt-page .info-table,
+        .receipt-page .items-table,
+        .receipt-page .payment-table {
+            width:100%; border-collapse:collapse; font-size:8.8pt;
+            border:2px solid #0f172a;
+        }
+        .receipt-page .info-table td,
+        .receipt-page .items-table td,
+        .receipt-page .items-table th,
+        .receipt-page .payment-table td {
+            border:1.5px solid #0f172a; padding:5px 8px; vertical-align:middle;
+        }
+        .receipt-page .info-table td.label,
+        .receipt-page .payment-table td.label {
+            font-weight:800; background:#e2e8f0; color:#000;
+        }
+        .receipt-page .info-table td.label { width:24%; }
+        .receipt-page .items-table th {
+            background:#0f172a !important; color:#fff !important;
+            font-weight:800; text-align:center; padding:6px 8px;
+        }
+        .receipt-page .payment-table td.label { width:55%; }
+        .receipt-page .payment-terms-box {
+            border:2px solid #0f172a; border-left:5px solid #1d4ed8;
+            padding:6px 8px; font-size:8.5pt; background:#eff6ff;
+            font-weight:600; line-height:1.35;
+        }
+        .receipt-page .received-box {
+            border:2px solid #0f172a; border-left:5px solid #15803d;
+            background:#dcfce7; color:#000; padding:7px 8px;
+            font-weight:900; font-size:9.8pt;
+        }
+        .receipt-page .reason-box {
+            border:2px solid #0f172a; border-left:5px solid #0e7490;
+            padding:6px 8px; font-size:8.6pt; background:#ecfeff;
+            font-weight:600; line-height:1.35;
+        }
+        .receipt-page .footer-section {
+            margin-top:auto; display:flex; flex-direction:column; gap:6px;
+        }
+        .receipt-page .footer-grid {
+            display:grid; grid-template-columns:1.4fr .6fr;
+            border:2px solid #0f172a; font-size:8.6pt;
+        }
+        .receipt-page .footer-left {
+            border-right:2px solid #0f172a; padding:6px 8px; background:#f8fafc;
+        }
+        .receipt-page .footer-left table { width:100%; border-collapse:collapse; }
+        .receipt-page .footer-left td { padding:3px 2px; border:none; color:#000; }
+        .receipt-page .footer-right {
+            display:flex; flex-direction:column; justify-content:space-between;
+            align-items:center; padding:6px; text-align:center; background:#fff;
+            font-weight:800; font-size:8.2pt;
+        }
+        .receipt-page .stamp-space {
+            height:55px; width:100%; display:flex; align-items:center; justify-content:center;
+        }
+        .receipt-page .office-address {
+            text-align:center; font-size:8pt; font-weight:800;
+            border-top:2px solid #0f172a; padding-top:5px; color:#000;
+        }
+
         @media (max-width: 1024px) {
             body {
                 flex-direction: column;
@@ -372,7 +588,6 @@
             }
         }
 
-        /* Exact Fit-to-Page A4 Print Rules */
         @page {
             size: A4 portrait;
             margin: 0;
@@ -413,631 +628,19 @@
                 page-break-after: auto !important;
                 break-after: auto !important;
             }
-        }
-    
-
-        :root {
-            --primary: #c2410c;
-            --primary-dark: #9a3412;
-            --bg-slate: #f8fafc;
-            --border: #cbd5e1;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #64748b;
-            color: #1e293b;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 450px;
-            background: #ffffff;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-
-        .sidebar-header {
-            padding: 16px 20px;
-            background: #1e293b;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-header h2 { font-size: 1.1rem; }
-
-        .tab-buttons { display: flex; background: #0f172a; }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab-btn.active {
-            color: #ffffff;
-            border-bottom-color: #f97316;
-            background: #1e293b;
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: none;
-        }
-
-        .tab-content.active { display: block; }
-
-        .section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            margin: 16px 0 8px 0;
-            font-weight: 700;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 4px;
-        }
-
-        .section-title:first-child { margin-top: 0; }
-
-        .form-group { margin-bottom: 12px; }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 4px;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.85rem;
-            outline: none;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: #f97316;
-            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
-        }
-
-        .form-row { display: flex; gap: 10px; }
-
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-primary { background: #ea580c; color: white; }
-        .btn-primary:hover { background: #c2410c; }
-        .btn-secondary { background: #334155; color: white; }
-        .btn-danger { background: #ef4444; color: white; padding: 4px 8px; font-size: 0.75rem; }
-
-        .bom-item-row {
-            display: grid;
-            grid-template-columns: 35px 1fr 70px 35px;
-            gap: 6px;
-            align-items: center;
-            margin-bottom: 8px;
-            background: #f1f5f9;
-            padding: 6px;
-            border-radius: 4px;
-        }
-
-        /* Workspace & Sheet */
-        .preview-workspace {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-        }
-
-        .pdf-page {
-            width: 210mm;
-            min-height: 297mm;
-            height: 297mm;
-            background: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            padding: 15mm;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            font-size: 11pt;
-            color: #000;
-            box-sizing: border-box;
-        }
-
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .logo-placeholder {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            border: 2px solid #b45309;
-            margin: 0 auto 5px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8pt;
-            font-weight: bold;
-            color: #b45309;
-            text-align: center;
-            background: #fffbe6;
-        }
-
-        .company-title { font-size: 16pt; font-weight: bold; color: #9a3412; }
-        .gstin { font-size: 9pt; font-weight: bold; }
-        .tagline { font-size: 9pt; font-weight: bold; color: #1e3a8a; margin-top: 2px; }
-        .doc-title { font-size: 10pt; font-weight: bold; text-align: center; margin: 8px 0; text-decoration: underline; line-height: 1.3; }
-        .contact-info { text-align: center; font-size: 9pt; margin-bottom: 10px; line-height: 1.3; }
-
-        .details-box { border: 1px solid #000; margin-bottom: 12px; }
-        .details-box-header { background: #f1f5f9; font-weight: bold; padding: 4px 8px; border-bottom: 1px solid #000; font-size: 9.5pt; }
-        .details-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
-        .details-table td { padding: 5px 8px; vertical-align: top; border-bottom: 1px solid #e2e8f0; }
-        .details-table td.label-col { width: 25%; font-weight: bold; border-right: 1px solid #000; }
-        .details-table td.val-col { width: 75%; }
-
-
-        /* Subtle red / green / blue / cyan theme across the complete page */
-        :root {
-            --accent-red: #dc2626;
-            --accent-green: #16a34a;
-            --accent-blue: #2563eb;
-            --accent-cyan: #0891b2;
-            --accent-soft-red: #fff5f5;
-            --accent-soft-green: #f2fbf4;
-            --accent-soft-blue: #f3f7ff;
-            --accent-soft-cyan: #effcff;
-        }
-
-        .sidebar {
-            border-top: 4px solid transparent;
-            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
-        }
-        .sidebar-header {
-            background: linear-gradient(105deg, #1e293b 0%, #263b50 100%);
-            border-bottom: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
-        }
-        .tab-buttons {
-            background: #142033;
-            border-bottom: 2px solid #dbeafe;
-        }
-        .tab-btn {
-            border-bottom-width: 3px;
-        }
-        .tab-btn:nth-child(1).active { border-bottom-color: var(--accent-red); }
-        .tab-btn:nth-child(2).active { border-bottom-color: var(--accent-cyan); }
-
-        .section-title {
-            color: #334155;
-            border-bottom: 2px solid #e2e8f0;
-            position: relative;
-        }
-        .section-title::after {
-            content: "";
-            display: block;
-            width: 54px;
-            height: 3px;
-            margin-top: 4px;
-            border-radius: 3px;
-            background: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan));
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
-        }
-        .form-group:nth-of-type(4n+1) input:focus,
-        .form-group:nth-of-type(4n+1) textarea:focus { border-color: var(--accent-red); }
-        .form-group:nth-of-type(4n+2) input:focus,
-        .form-group:nth-of-type(4n+2) textarea:focus { border-color: var(--accent-green); }
-        .form-group:nth-of-type(4n+3) input:focus,
-        .form-group:nth-of-type(4n+3) textarea:focus { border-color: var(--accent-blue); }
-        .form-group:nth-of-type(4n) input:focus,
-        .form-group:nth-of-type(4n) textarea:focus { border-color: var(--accent-cyan); }
-
-        .btn-primary {
-            background: linear-gradient(100deg, #dc2626, #2563eb);
-            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.16);
-        }
-        .btn-primary:hover { background: linear-gradient(100deg, #b91c1c, #1d4ed8); }
-        .btn-secondary {
-            background: linear-gradient(100deg, #15803d, #0891b2);
-        }
-        .bom-item-row {
-            border-left: 3px solid var(--accent-cyan);
-            background: linear-gradient(90deg, #f0fdfa, #f8fafc 70%);
-        }
-
-        .pdf-page {
-            border-top: 4px solid transparent;
-            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
-        }
-        .header {
-            border-bottom: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--accent-red), var(--accent-green), var(--accent-blue), var(--accent-cyan)) 1;
-        }
-        .company-title { color: #1e3a8a; }
-        .gstin {
-            display: inline-block;
-            margin-top: 3px;
-            padding: 2px 7px;
-            border-radius: 3px;
-            background: #eff6ff;
-            border-left: 3px solid var(--accent-blue);
-        }
-        .tagline {
-            display: inline-block;
-            padding: 2px 7px;
-            border-radius: 3px;
-            background: #f0fdf4;
-            border-left: 3px solid var(--accent-green);
-        }
-        .doc-title {
-            padding: 5px 7px;
-            border-left: 3px solid var(--accent-red);
-            border-right: 3px solid var(--accent-cyan);
-            background: linear-gradient(90deg, #fff7f7, #f4fff6 35%, #f4f7ff 70%, #f0fdff);
-        }
-        .details-box-header {
-            background: linear-gradient(90deg, #fff1f2, #f0fdf4 38%, #eff6ff 70%, #ecfeff);
-            border-left: 4px solid var(--accent-blue);
-        }
-        .details-table tr:nth-child(4n+1) td.label-col { border-left: 3px solid var(--accent-red); }
-        .details-table tr:nth-child(4n+2) td.label-col { border-left: 3px solid var(--accent-green); }
-        .details-table tr:nth-child(4n+3) td.label-col { border-left: 3px solid var(--accent-blue); }
-        .details-table tr:nth-child(4n) td.label-col { border-left: 3px solid var(--accent-cyan); }
-
-        .bom-table th {
-            background: linear-gradient(90deg, #fee2e2, #dcfce7 36%, #dbeafe 70%, #cffafe);
-            border-bottom: 2px solid #64748b;
-        }
-        .bom-table tbody tr:nth-child(4n+1) { background: var(--accent-soft-red); }
-        .bom-table tbody tr:nth-child(4n+2) { background: var(--accent-soft-green); }
-        .bom-table tbody tr:nth-child(4n+3) { background: var(--accent-soft-blue); }
-        .bom-table tbody tr:nth-child(4n) { background: var(--accent-soft-cyan); }
-        .bom-table tfoot .highlight-row:nth-child(1) { background: #fff1f2; }
-        .bom-table tfoot .highlight-row:nth-child(2) { background: #f0fdf4; }
-        .bom-table tfoot .highlight-row:nth-child(3) { background: #eff6ff; }
-
-        .subsidy-note {
-            border: 4px dashed var(--accent-green);
-            background: linear-gradient(90deg, #fff7f7, #f0fdf4 38%, #eff6ff 70%, #ecfeff);
-        }
-        .page-badge {
-            background: linear-gradient(90deg, #dc2626, #16a34a, #2563eb, #0891b2);
-        }
-
-        @media print {
             .pdf-page, .pdf-page *,
             .header, .header *,
             .details-box-header,
             .details-table td,
             .bom-table th, .bom-table td,
-            .subsidy-note {
+            .subsidy-note,
+            .bank-details-box, .bank-details-box *,
+            .proprietor-details-box, .proprietor-details-box *,
+            .receipt-page, .receipt-page * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
         }
-
-        /* Bold, four-colour bank details highlight */
-        .bank-details-box {
-            border: 3px solid #172554;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 0 1px rgba(23, 37, 84, 0.12);
-        }
-        .bank-details-box .details-box-header {
-            color: #ffffff;
-            background: linear-gradient(90deg, #dc2626 0%, #16a34a 34%, #2563eb 68%, #06b6d4 100%);
-            border-bottom: 3px solid #172554;
-            padding: 7px 9px;
-            font-size: 10pt;
-            letter-spacing: 0.25px;
-        }
-        .bank-details-box .details-table td {
-            padding: 8px 9px;
-            border-bottom: 2px solid #ffffff;
-            font-size: 9.5pt;
-        }
-        .bank-details-box .details-table tr:last-child td { border-bottom: 0; }
-        .bank-details-box .details-table td.label-col {
-            color: #ffffff;
-            font-weight: 800;
-            border-right: 3px solid #ffffff;
-        }
-        .bank-details-box .details-table td.val-col {
-            font-weight: 800;
-            letter-spacing: 0.15px;
-        }
-        .bank-row-red td.label-col { background: #dc2626; }
-        .bank-row-red td.val-col { background: #fee2e2; border-left: 4px solid #dc2626; }
-        .bank-row-green td.label-col { background: #15803d; }
-        .bank-row-green td.val-col { background: #dcfce7; border-left: 4px solid #16a34a; }
-        .bank-row-blue td.label-col { background: #1d4ed8; }
-        .bank-row-blue td.val-col { background: #dbeafe; border-left: 4px solid #2563eb; }
-        .bank-row-cyan td.label-col { background: #0891b2; }
-        .bank-row-cyan td.val-col { background: #cffafe; border-left: 4px solid #06b6d4; }
-
-        @media print {
-            .bank-details-box,
-            .bank-details-box * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-
-        .bom-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 5px; }
-        .bom-table th, .bom-table td { border: 1px solid #000; padding: 5px; text-align: left; }
-        .bom-table th { background-color: #f1f5f9; font-weight: bold; text-align: center; }
-        .bom-table td.center { text-align: center; }
-        .bom-table td.right { text-align: right; }
-        .highlight-row { font-weight: bold; background-color: #fafafa; }
-        .subsidy-note { margin-top: 15px; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 6px; border: 1px dashed #000; background: #fffbe6; }
-        .page-badge { position: absolute; top: -25px; left: 0; background: #334155; color: white; padding: 2px 10px; font-size: 0.8rem; border-radius: 4px 4px 0 0; }
-
-        @media print {
-            body { background: white; color: black; height: auto !important; overflow: visible !important; }
-            .sidebar { display: none !important; }
-            .preview-workspace { padding: 0; overflow: visible; display: block; }
-            .pdf-page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; page-break-after: always; break-after: page; }
-            .pdf-page:last-child { page-break-after: auto; break-after: auto; }
-            .page-badge { display: none; }
-        }
-
-        /* STRONG PRINT TYPOGRAPHY: BOTH QUOTATION PAGES */
-        .pdf-page {
-            font-weight: 700;
-            color: #000 !important;
-        }
-        .pdf-page p,
-        .pdf-page div,
-        .pdf-page span,
-        .pdf-page td,
-        .pdf-page th {
-            font-weight: 650;
-        }
-        .pdf-page .company-title,
-        .pdf-page .doc-title,
-        .pdf-page .details-box-header,
-        .pdf-page .section-title,
-        .pdf-page .subsidy-note,
-        .pdf-page .highlight-row,
-        .pdf-page .bom-table th {
-            font-weight: 900 !important;
-        }
-        .pdf-page .details-table td.label-col {
-            font-weight: 900 !important;
-            color: #111;
-        }
-        .pdf-page .details-table td.val-col {
-            font-weight: 800 !important;
-            color: #000;
-        }
-        .pdf-page .contact-info {
-            font-weight: 750 !important;
-        }
-        .pdf-page .bom-table td {
-            font-weight: 750 !important;
-            border: 1.5px solid #111;
-        }
-        .pdf-page .bom-table th {
-            border: 2px solid #111;
-        }
-        .pdf-page .highlight-row td {
-            font-weight: 900 !important;
-            border-top: 2px solid #111;
-            border-bottom: 2px solid #111;
-        }
-
-        /* VENDOR / PROPRIETOR INFORMATION - PROMINENT HIGHLIGHT */
-        .proprietor-details-box {
-            border: 3px solid #172554 !important;
-            border-radius: 5px;
-            overflow: hidden;
-            background: linear-gradient(90deg, #fff1f2, #eff6ff 55%, #ecfeff);
-        }
-        .proprietor-details-box .details-box-header {
-            color: #fff !important;
-            background: linear-gradient(90deg, #b91c1c, #1d4ed8, #0891b2) !important;
-            border-bottom: 3px solid #172554 !important;
-            font-size: 10pt !important;
-            font-weight: 900 !important;
-            padding: 7px 9px !important;
-        }
-        .proprietor-details-box .proprietor-content {
-            padding: 10px !important;
-            background: linear-gradient(90deg, #fff7ed, #eff6ff, #ecfeff);
-            font-size: 9.5pt !important;
-            line-height: 1.55 !important;
-            font-weight: 800 !important;
-            border-left: 6px solid #dc2626;
-        }
-        .proprietor-details-box .proprietor-content strong,
-        .proprietor-details-box .proprietor-value {
-            font-weight: 900 !important;
-            color: #991b1b !important;
-            background: #ffedd5;
-            border: 1.5px solid #f97316;
-            border-radius: 3px;
-            padding: 1px 4px;
-        }
-        .proprietor-details-box .proprietor-value {
-            color: #1e3a8a !important;
-            background: #dbeafe;
-            border-color: #2563eb;
-        }
-        @media print {
-            .pdf-page, .pdf-page *,
-            .proprietor-details-box,
-            .proprietor-details-box * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                text-rendering: geometricPrecision;
-            }
-        }
-
-    
-/* Combined three-page A4 print layout */
-.receipt-page {
-    padding: 10mm 13mm !important;
-    gap: 8px !important;
-    justify-content: flex-start !important;
-    border: 2px solid #0f172a !important;
-    font-size: 9.8pt !important;
-}
-.receipt-page .header {
-    text-align: center !important;
-    border-bottom: 3px solid #0f172a !important;
-    padding-bottom: 7px !important;
-    position: relative !important;
-}
-.receipt-page .company-title {
-    font-size: 16.5pt !important;
-    font-weight: 900 !important;
-    color: #b91c1c !important;
-    letter-spacing: .5px !important;
-}
-.receipt-page .tagline {
-    font-size: 8.5pt !important;
-    font-weight: 800 !important;
-    color: #1d4ed8 !important;
-    margin-top: 2px !important;
-}
-.receipt-page .receipt-title-box { text-align:center; margin:2px 0; }
-.receipt-page .receipt-title {
-    font-size:12pt; font-weight:900; color:#000;
-    text-decoration:underline; letter-spacing:.5px;
-}
-.receipt-page .receipt-subtitle {
-    font-size:9pt; font-weight:800; color:#1d4ed8; margin-top:2px;
-}
-.receipt-page .info-table,
-.receipt-page .items-table,
-.receipt-page .payment-table {
-    width:100%; border-collapse:collapse; font-size:8.8pt;
-    border:2px solid #0f172a;
-}
-.receipt-page .info-table td,
-.receipt-page .items-table td,
-.receipt-page .items-table th,
-.receipt-page .payment-table td {
-    border:1.5px solid #0f172a; padding:5px 8px; vertical-align:middle;
-}
-.receipt-page .info-table td.label,
-.receipt-page .payment-table td.label {
-    font-weight:800; background:#e2e8f0; color:#000;
-}
-.receipt-page .info-table td.label { width:24%; }
-.receipt-page .items-table th {
-    background:#0f172a !important; color:#fff !important;
-    font-weight:800; text-align:center; padding:6px 8px;
-}
-.receipt-page .payment-table td.label { width:55%; }
-.receipt-page .payment-terms-box {
-    border:2px solid #0f172a; border-left:5px solid #1d4ed8;
-    padding:6px 8px; font-size:8.5pt; background:#eff6ff;
-    font-weight:600; line-height:1.35;
-}
-.receipt-page .received-box {
-    border:2px solid #0f172a; border-left:5px solid #15803d;
-    background:#dcfce7; color:#000; padding:7px 8px;
-    font-weight:900; font-size:9.8pt;
-}
-.receipt-page .reason-box {
-    border:2px solid #0f172a; border-left:5px solid #0e7490;
-    padding:6px 8px; font-size:8.6pt; background:#ecfeff;
-    font-weight:600; line-height:1.35;
-}
-.receipt-page .footer-section {
-    margin-top:auto; display:flex; flex-direction:column; gap:6px;
-}
-.receipt-page .footer-grid {
-    display:grid; grid-template-columns:1.4fr .6fr;
-    border:2px solid #0f172a; font-size:8.6pt;
-}
-.receipt-page .footer-left {
-    border-right:2px solid #0f172a; padding:6px 8px; background:#f8fafc;
-}
-.receipt-page .footer-left table { width:100%; border-collapse:collapse; }
-.receipt-page .footer-left td { padding:3px 2px; border:none; color:#000; }
-.receipt-page .footer-right {
-    display:flex; flex-direction:column; justify-content:space-between;
-    align-items:center; padding:6px; text-align:center; background:#fff;
-    font-weight:800; font-size:8.2pt;
-}
-.receipt-page .stamp-space {
-    height:55px; width:100%; display:flex; align-items:center; justify-content:center;
-}
-.receipt-page .office-address {
-    text-align:center; font-size:8pt; font-weight:800;
-    border-top:2px solid #0f172a; padding-top:5px; color:#000;
-}
-@media print {
-    @page { size:A4 portrait; margin:0; }
-    html, body { width:210mm !important; height:auto !important; overflow:visible !important; background:#fff !important; }
-    .pdf-page {
-        width:210mm !important; height:297mm !important;
-        min-height:297mm !important; margin:0 !important;
-        box-shadow:none !important; page-break-after:always !important;
-        break-after:page !important;
-        page-break-inside:avoid !important;
-        break-inside:avoid !important;
-    }
-    .pdf-page:last-child { page-break-after:auto !important; break-after:auto !important; }
-    .sidebar, .page-badge { display:none !important; }
-    .preview-workspace { padding:0 !important; margin:0 !important; overflow:visible !important; display:block !important; }
-    .receipt-page, .receipt-page * {
-        -webkit-print-color-adjust:exact !important;
-        print-color-adjust:exact !important;
-    }
-}
 </style>
 </head>
 <body>
@@ -1051,101 +654,131 @@
 <button class="tab-btn active" onclick="switchTab('page1')">Page 1 Details</button>
 <button class="tab-btn" onclick="switchTab('page2')">Page 2 BOM &amp; Pricing</button>
 </div>
+
 <!-- PAGE 1 INPUTS TAB -->
 <div class="tab-content active" id="tab-page1">
-<div class="section-title">Company Header &amp; Logo</div>
+<div class="section-title">Fetch Customer by Mobile Number (Supabase)</div>
 <div class="form-group">
-<label>Change Logo Image (Optional)</label>
-<input accept="image/*" id="in_dp" onchange="uploadDP(event)" type="file"/>
+<label>Enter Mobile Number &amp; Fetch</label>
+<div class="fetch-bar">
+<input id="in_cust_mobile" oninput="updatePreview()" onkeydown="if(event.key==='Enter'){event.preventDefault();fetchByMobile();}" placeholder="10-digit mobile number" type="tel" value=""/>
+<button class="btn-fetch" id="fetchMobileBtn" onclick="fetchByMobile()" type="button">🔍 Fetch</button>
+</div>
+<div class="fetch-status" id="fetchStatus"></div>
+</div>
+
+<div class="section-title">Supabase Fetched Customer Details (Read-Only)</div>
+<div class="form-group">
+<label>Name (Supabase)</label>
+<input class="locked-field" id="in_cust_name" readonly type="text" value=""/>
 </div>
 <div class="form-group">
+<label>House No (Supabase)</label>
+<input class="locked-field" id="in_house_no" readonly type="text" value=""/>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
+<label>Village (Supabase)</label>
+<input class="locked-field" id="in_village" readonly type="text" value=""/>
+</div>
+<div class="form-group" style="flex: 1;">
+<label>Mandal (Supabase)</label>
+<input class="locked-field" id="in_mandal" readonly type="text" value=""/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
+<label>PIN Code (Supabase)</label>
+<input class="locked-field" id="in_pincode" readonly type="text" value=""/>
+</div>
+<div class="form-group" style="flex: 1;">
+<label>District (Supabase)</label>
+<input class="locked-field" id="in_district" readonly type="text" value=""/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
+<label>State (Supabase)</label>
+<input class="locked-field" id="in_state" readonly type="text" value=""/>
+</div>
+<div class="form-group" style="flex: 1;">
+<label>Registration Date (Supabase)</label>
+<input class="locked-field" id="in_reg_date" readonly type="text" value=""/>
+</div>
+</div>
+<div class="form-group">
+<label>Email Id (Supabase)</label>
+<input class="locked-field" id="in_cust_email" readonly type="text" value=""/>
+</div>
+
+<div class="section-title">Company Header &amp; Logo (Fixed)</div>
+<div class="form-group">
 <label>Company Name</label>
-<input id="in_company" oninput="updatePreview()" type="text" value="SRI RUDHRA SOLAR SOLUTIONS"/>
+<input class="locked-field" id="in_company" readonly type="text" value="SRI RUDHRA SOLAR SOLUTIONS"/>
 </div>
 <div class="form-row">
 <div class="form-group" style="flex: 1;">
 <label>GSTIN Number</label>
-<input id="in_gstin" oninput="updatePreview()" type="text" value="36APAPB0361C1ZS"/>
+<input class="locked-field" id="in_gstin" readonly type="text" value="36APAPB0361C1ZS"/>
 </div>
 <div class="form-group" style="flex: 1;">
 <label>System Capacity (KW)</label>
-<input id="in_kw" oninput="updatePreview()" type="text" value="3KW"/>
+<input class="locked-field" id="in_kw" readonly type="text" value="" placeholder="Fetch customer record to load capacity"/>
 </div>
 </div>
 <div class="form-group">
 <label>Company Tagline</label>
-<input id="in_tagline" oninput="updatePreview()" type="text" value="ENERGIZING A BRIGHTER FUTURE"/>
+<input class="locked-field" id="in_tagline" readonly type="text" value="ENERGIZING A BRIGHTER FUTURE"/>
 </div>
 <div class="form-row">
 <div class="form-group" style="flex: 1;">
 <label>Phone Numbers</label>
-<input id="in_phones" oninput="updatePreview()" type="text" value="9110328712, 9866903175"/>
+<input class="locked-field" id="in_phones" readonly type="text" value="9110328712, 9866903175"/>
 </div>
 <div class="form-group" style="flex: 1;">
 <label>Email Address</label>
-<input id="in_email" oninput="updatePreview()" type="text" value="srirudhrasolarsolutions@gmail.com"/>
+<input class="locked-field" id="in_email" readonly type="text" value="srirudhrasolarsolutions@gmail.com"/>
 </div>
 </div>
 <div class="form-group">
 <label>Location / Address</label>
-<input id="in_location" oninput="updatePreview()" type="text" value="Mahabubabad, Telangana, India."/>
+<input class="locked-field" id="in_location" readonly type="text" value="Mahabubabad, Telangana, India."/>
 </div>
-<div class="section-title">Customer Information</div>
-<div class="form-group">
-<label>Customer Name</label>
-<input id="in_cust_name" oninput="updatePreview()" type="text" value=" "/>
-</div>
-<div class="form-group">
-<label>Address Line 1</label>
-<input id="in_cust_addr1" oninput="updatePreview()" type="text" value=" "/>
-</div>
-<div class="form-group">
-<label>Address Line 2</label>
-<textarea id="in_cust_addr2" oninput="updatePreview()" rows="2">District: MAHABUBABAD, State: TELANGANA, PIN Code: </textarea>
-</div>
-<div class="form-row">
-<div class="form-group" style="flex: 1;">
-<label>Mobile Number</label>
-<input id="in_cust_mobile" oninput="updatePreview()" type="text" value=""/>
-</div>
-<div class="form-group" style="flex: 1;">
-<label>Email Id</label>
-<input id="in_cust_email" oninput="updatePreview()" type="text" value="   @gmail.com"/>
-</div>
-</div>
-<div class="section-title">Offer &amp; Bank Details</div>
+
+<div class="section-title">Offer &amp; Bank Details (Fixed)</div>
 <div class="form-row">
 <div class="form-group" style="flex: 1;">
 <label>Vendor EPC Reg No</label>
-<input id="in_epc_no" oninput="updatePreview()" type="text" value="TSRE261046"/>
+<input class="locked-field" id="in_epc_no" readonly type="text" value="TSRE261046"/>
 </div>
 <div class="form-group" style="flex: 1;">
 <label>Vendor Name</label>
-<input id="in_vendor_name" oninput="updatePreview()" type="text" value="B. RAVI KUMAR"/>
+<input class="locked-field" id="in_vendor_name" readonly type="text" value="B. RAVI KUMAR"/>
 </div>
 </div>
 <div class="form-group">
 <label>Account Name</label>
-<input id="in_acc_name" oninput="updatePreview()" type="text" value="SRI RUDHRA SOLAR SOLUTIONS"/>
+<input class="locked-field" id="in_acc_name" readonly type="text" value="SRI RUDHRA SOLAR SOLUTIONS"/>
 </div>
 <div class="form-row">
 <div class="form-group" style="flex: 1;">
 <label>Account Number</label>
-<input id="in_acc_no" oninput="updatePreview()" type="text" value="5020 0120 3628 62"/>
+<input class="locked-field" id="in_acc_no" readonly type="text" value="5020 0120 3628 62"/>
 </div>
 <div class="form-group" style="flex: 1;">
 <label>IFSC Code</label>
-<input id="in_ifsc" oninput="updatePreview()" type="text" value="HDFC0002347"/>
+<input class="locked-field" id="in_ifsc" readonly type="text" value="HDFC0002347"/>
 </div>
 </div>
 <div class="form-group">
 <label>Bank Name</label>
-<input id="in_bank" oninput="updatePreview()" type="text" value="HDFC Bank Limited."/>
+<input class="locked-field" id="in_bank" readonly type="text" value="HDFC Bank Limited."/>
 </div>
 </div>
-<!-- PAGE 2 INPUTS TAB -->
+
+<!-- PAGE 2 INPUTS TAB (EDITABLE) -->
 <div class="tab-content" id="tab-page2">
-<div class="section-title">Proposal Header &amp; BOM Capacity</div>
+<div class="section-title">Proposal Header &amp; BOM Capacity (Editable)</div>
 <div class="form-group">
 <label>Proposal Intro Text</label>
 <textarea id="in_salutation" oninput="updatePreview()" rows="2">With reference to your requirements and discussion with us, our proposal for a 3Kw Power Grid connected Solar Power Generating System is with below stated prices:</textarea>
@@ -1155,11 +788,11 @@
 <input id="in_bom_title" oninput="updatePreview()" type="text" value="Cost Estimations &amp; Bill of Material of 3KW On-Grid Photovoltaic System"/>
 </div>
 <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-<span>Bill of Materials (BOM)</span>
-<button class="btn btn-secondary" onclick="addBomItem()" style="padding: 2px 8px; font-size: 0.75rem;">+ Add Item</button>
+<span>Bill of Materials (BOM) (Editable)</span>
+<button class="btn btn-secondary" onclick="addBomItem()" style="padding: 2px 8px; font-size: 0.75rem;" type="button">+ Add Item</button>
 </div>
 <div id="bom_inputs_container"></div>
-<div class="section-title">Pricing &amp; Subsidy Summary</div>
+<div class="section-title">Pricing &amp; Subsidy Summary (Editable)</div>
 <div class="form-row">
 <div class="form-group" style="flex: 1;">
 <label>System Total Cost (₹)</label>
@@ -1180,44 +813,62 @@
 <input id="in_subsidy_amount" oninput="updatePreview()" type="text" value="78,000/-"/>
 </div>
 </div>
-<div class="section-title">PAGE 3 — ADVANCE RECEIPT DETAILS</div><div class="form-group" style="flex: 1;">
-<label>Receipt Date</label>
-<input id="in_date" oninput="updatePreview()" type="text" value="02-11-2026"/>
-</div><div class="form-group" style="flex: 1;">
+<div class="section-title">PAGE 3 — ADVANCE RECEIPT DETAILS (EDITABLE)</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
+<label>Receipt Date (DB Registration Date)</label>
+<input class="locked-field" id="in_date" readonly type="text" value=""/>
+</div>
+<div class="form-group" style="flex: 1;">
 <label>Receipt No</label>
 <input id="in_receipt_no" oninput="updatePreview()" type="text" value="SRSS/3K/2026/"/>
-</div><div class="form-group">
-<label>Customer Address</label>
-<textarea id="in_cust_addr" oninput="updatePreview()" rows="2">-------------------</textarea>
-</div><div class="form-group" style="flex: 1;">
-<label>Advance Payment Date</label>
-<input id="in_advance_date" oninput="updatePreview()" type="text" value="02-11-2026"/>
-</div><div class="form-group" style="flex: 1;">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
+<label>Advance Payment Date (DB Reg Date)</label>
+<input class="locked-field" id="in_advance_date" readonly type="text" value=""/>
+</div>
+<div class="form-group" style="flex: 1;">
+<label>Received Date (DB Reg Date)</label>
+<input class="locked-field" id="in_rec_date" readonly type="text" value=""/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
 <label>Advance Payment (₹)</label>
 <input id="in_advance" oninput="updatePreview()" type="text" value="25,000.00"/>
-</div><div class="form-group" style="flex: 1;">
+</div>
+<div class="form-group" style="flex: 1;">
 <label>2nd Payment (₹)</label>
 <input id="in_payment2" oninput="updatePreview()" type="text" value="00.00"/>
-</div><div class="form-group" style="flex: 1;">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" style="flex: 1;">
 <label>Remaining Balance (₹)</label>
 <input id="in_balance" oninput="updatePreview()" type="text" value="2,00,000.00"/>
-</div><div class="form-group">
+</div>
+<div class="form-group" style="flex: 1;">
 <label>Total Received (₹)</label>
 <input id="in_total_rec" oninput="updatePreview()" type="text" value="25,000/-"/>
-</div><div class="form-group">
+</div>
+</div>
+<div class="form-group">
 <label>Reason for Payment</label>
 <textarea id="in_reason" oninput="updatePreview()" rows="2">Advance payment towards the enhancement of the contract load and feasibility approval process.</textarea>
-</div><div class="form-group">
+</div>
+<div class="form-group">
 <label>Payment Mode</label>
 <input id="in_pay_mode" oninput="updatePreview()" type="text" value="Cash / Online Transfer/Cheque/"/>
-</div><div class="form-group" style="flex: 1;">
-<label>Received Date</label>
-<input id="in_rec_date" oninput="updatePreview()" type="text" value="02-11-2026"/>
-</div><div class="form-group">
+</div>
+<div class="form-group">
 <label>Office Address Footer</label>
 <input id="in_office" oninput="updatePreview()" type="text" value="Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist."/>
-</div><div class="form-group"><label>Authorized Signature / Stamp Image (Optional)</label><input accept="image/*" id="in_signature" onchange="uploadSignature(event)" type="file"/></div></div>
 </div>
+</div>
+</div>
+
 <!-- PREVIEW WORKSPACE -->
 <div class="preview-workspace">
 <!-- PAGE 1 PREVIEW -->
@@ -1226,7 +877,6 @@
 <div>
 <div class="header">
 <div style="text-align: center; margin-bottom: 8px;">
-<!-- Defaults to sirlogo.png with fallback to styled text placeholder if image is missing -->
 <img alt="Logo" id="out_dp" onerror="handleImageError()" src="rudhralogo.png" style="width: 80px; height: 80px; object-fit: contain; border-radius: 50%; border: 2px solid #b45309; margin: 0 auto 5px auto; display: block;"/>
 <div class="logo-placeholder" id="out_dp_placeholder" style="display: none;">SRI RUDHRA<br/>SOLAR</div>
 </div>
@@ -1235,7 +885,7 @@
 <div class="tagline" id="out_tagline">ENERGIZING A BRIGHTER FUTURE</div>
 </div>
 <div class="doc-title">
-                    DETAILED QUOTATION FOR THE SUPPLY OF <span id="out_kw">3 KW</span> DCR SOLAR ROOFTOP ONGRID POWER GENERATING SYSTEM
+                    DETAILED QUOTATION FOR THE SUPPLY OF <span id="out_kw">3KW</span> DCR SOLAR ROOFTOP ONGRID POWER GENERATING SYSTEM
                 </div>
 <div class="contact-info">
 <strong>M/s. <span id="out_company_sub">SRI RUDHRA SOLAR SOLUTIONS</span></strong><br/>
@@ -1247,14 +897,15 @@
 <table class="details-table">
 <tr>
 <td class="label-col">Name</td>
-<td class="val-col" id="out_cust_name">Name of Customer</td>
+<td class="val-col" id="out_cust_name"></td>
 </tr>
 <tr>
-<td class="label-col">Address</td>
-<td class="val-col">
-<span id="out_cust_addr1"> </span><br/>
-<span id="out_cust_addr2">District: MAHABUBABAD, State: TELANGANA, PIN Code: </span>
-</td>
+<td class="label-col">House No &amp; Village</td>
+<td class="val-col" id="out_cust_addr1"></td>
+</tr>
+<tr>
+<td class="label-col">Mandal, Dist, State, PIN</td>
+<td class="val-col" id="out_cust_addr2"></td>
 </tr>
 <tr>
 <td class="label-col">Mobile Number</td>
@@ -1262,7 +913,11 @@
 </tr>
 <tr>
 <td class="label-col">Email Id</td>
-<td class="val-col" id="out_cust_email">@gmail.com</td>
+<td class="val-col" id="out_cust_email"></td>
+</tr>
+<tr>
+<td class="label-col">Date of Registration</td>
+<td class="val-col" id="out_cust_reg_date"></td>
 </tr>
 </table>
 </div>
@@ -1302,6 +957,7 @@
 </div>
 <div style="text-align: right; font-size: 8pt; border-top: 1px solid #ccc; padding-top: 4px;">Page 1 of 3</div>
 </div>
+
 <!-- PAGE 2 PREVIEW -->
 <div class="pdf-page">
 <span class="page-badge">Page 2 Preview</span>
@@ -1311,6 +967,10 @@
 <div class="gstin">GSTIN: <span id="out_gstin_p2">36APAPB0361C1ZS</span></div>
 <div class="tagline" id="out_tagline_p2">ENERGIZING A BRIGHTER FUTURE</div>
 </div>
+<div style="display:flex; justify-content:space-between; font-size:8.8pt; font-weight:800; margin-bottom:6px;">
+<span>Capacity: <span id="out_kw_p2">3KW</span></span>
+<span>Date: <span id="out_date_p2"></span></span>
+</div>
 <div style="margin-bottom: 10px; font-size: 9.5pt; line-height: 1.4;">
 <strong>RESPECTED SIR/MADAM,</strong><br/>
 <span id="out_salutation">With reference to your requirements and discussion with us, our proposal for a 3Kw Power Grid connected Solar Power Generating System is with below stated prices:</span>
@@ -1318,7 +978,7 @@
 <table class="bom-table">
 <thead>
 <tr>
-<th colspan="3" id="out_bom_title">Cost Estimations &amp; Bill of Material of 3Kw On-Grid Photovoltaic System</th>
+<th colspan="3" id="out_bom_title">Cost Estimations &amp; Bill of Material of 3KW On-Grid Photovoltaic System</th>
 </tr>
 <tr>
 <th style="width: 8%;">Sr.</th>
@@ -1343,14 +1003,15 @@
 </tfoot>
 </table>
 <div class="subsidy-note">
-                    SUBSIDY AMOUNT: <span id="out_subsidy_amount">78000/-</span> Directly Credited To Customer Bank Account
+                    SUBSIDY AMOUNT: <span id="out_subsidy_amount">78,000/-</span> Directly Credited To Customer Bank Account
                 </div>
 </div>
 <div style="text-align: right; font-size: 8pt; border-top: 1px solid #ccc; padding-top: 4px;">Page 2 of 3</div>
 </div>
+
+<!-- PAGE 3 PREVIEW -->
 <div class="pdf-page receipt-page">
 <span class="page-badge">Page 3 Preview</span>
-<!-- Header -->
 <div class="header">
 <div class="gstin-top">GSTIN: <span id="out3_gstin">36APAPB0361C1ZS</span></div>
 <div class="proprietor-top"><strong>PROPRIETOR: <span id="out3_proprietor_top">B. RAVI KUMAR</span></strong></div>
@@ -1358,39 +1019,40 @@
 <div class="company-title" id="out3_company">SRI RUDHRA SOLAR SOLUTIONS</div>
 <div class="tagline" id="out3_tagline">ENERGIZING A BRIGHTER FUTURE</div>
 </div>
-<!-- Document Titles -->
 <div class="receipt-title-box">
 <div class="receipt-title">ADVANCE PAYMENT RECEIPT</div>
-<div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out3_kw">5KW</span>)</div>
+<div class="receipt-subtitle">ON-GRID SOLAR SYSTEM (<span id="out3_kw">3KW</span>)</div>
 </div>
-<!-- Customer Information Table -->
 <table class="info-table">
 <tr>
 <td class="label">Customer Name Mr./Mrs.</td>
-<td><strong id="out3_cust_name">--------------</strong></td>
+<td><strong id="out3_cust_name"></strong></td>
 <td class="label" style="width: 14%;">Date</td>
-<td id="out3_date" style="width: 24%; font-weight: 700;">02-11-2026</td>
+<td id="out3_date" style="width: 24%; font-weight: 700;"></td>
 </tr>
 <tr>
 <td class="label">Customer Address</td>
-<td id="out3_cust_addr">--------------------------</td>
+<td id="out3_cust_addr"></td>
 <td class="label">Receipt No:</td>
 <td id="out3_receipt_no" style="font-weight: 700;">SRSS/3K/2026/</td>
 </tr>
 <tr>
 <td class="label">Mobile Number</td>
-<td id="out3_cust_mobile" style="font-weight: 700;">--------------------</td>
+<td id="out3_cust_mobile" style="font-weight: 700;"></td>
 <td class="label">Email Id</td>
-<td id="out3_cust_email">----------------------@gmail.com</td>
+<td id="out3_cust_email"></td>
+</tr>
+<tr>
+<td class="label">Reg. Date</td>
+<td colspan="3" id="out3_cust_reg_date" style="font-weight: 700;"></td>
 </tr>
 </table>
-<!-- System Components Table -->
 <table class="items-table">
 <thead>
 <tr>
 <th style="width: 8%;">S.No</th>
 <th style="width: 42%;">Total Project Cost</th>
-<th id="out3_total_cost_head" style="width: 50%;">3KW - 2,25,000/-</th>
+<th id="out3_total_cost_head" style="width: 50%;">3KW - 2,25,000</th>
 </tr>
 </thead>
 <tbody>
@@ -1406,10 +1068,9 @@
 <tr><td style="text-align:center; font-weight:700;">10</td><td><strong>Lightning Arrester</strong></td><td>Protects from lightning</td></tr>
 </tbody>
 </table>
-<!-- Payment Breakdown Table -->
 <table class="payment-table">
 <tr>
-<td class="label">Advance Payment (<span id="out3_advance_date">02-11-2026</span>)</td>
+<td class="label">Advance Payment (<span id="out3_advance_date"></span>)</td>
 <td id="out3_advance" style="text-align: right; font-weight: 900; color: var(--primary-red); font-size: 9.5pt;">25,000.00</td>
 </tr>
 <tr>
@@ -1417,27 +1078,23 @@
 <td id="out3_payment2" style="text-align: right; font-weight: 700;">00.00</td>
 </tr>
 </table>
-<!-- Payment Terms Box -->
 <div class="payment-terms-box">
 <strong style="color: var(--accent-blue);">Payment Terms:</strong>
                 The remaining balance amount of <strong id="out3_balance">2,00,000.00</strong> must be paid before or at the time of dispatch of the materials.
             </div>
-<!-- Total Amount Received -->
 <div class="received-box">
                 Amount (Received): ₹ <span id="out3_total_rec">25,000/-</span>
 </div>
-<!-- Reason for Payment -->
 <div class="reason-box">
 <strong style="color: var(--accent-cyan);">Reason for Payment:</strong> <span id="out3_reason">Advance payment towards the enhancement of the contract load and feasibility approval process.</span>
 </div>
-<!-- Bottom Section anchored cleanly without artificial gaps -->
 <div class="footer-section">
 <div class="footer-grid">
 <div class="footer-left">
 <table>
 <tr>
 <td style="width: 38%;"><strong>Payment Mode</strong></td>
-<td><strong>: <span id="out3_pay_mode">Cash / Online Transfer</span></strong></td>
+<td><strong>: <span id="out3_pay_mode">Cash / Online Transfer/Cheque/</span></strong></td>
 </tr>
 <tr>
 <td><strong>Vendor / Company</strong></td>
@@ -1453,7 +1110,7 @@
 </tr>
 <tr>
 <td><strong>Received Date</strong></td>
-<td><strong>: <span id="out3_rec_date">02-11-2026</span></strong></td>
+<td><strong>: <span id="out3_rec_date"></span></strong></td>
 </tr>
 </table>
 </div>
@@ -1463,13 +1120,22 @@
 <div><strong>Authorized Signatory / Proprietor</strong></div>
 </div>
 </div>
-<!-- Office Footer Address -->
 <div class="office-address" id="out3_office">
                     Office: 1-7-28/12.1, Near SBI Bank Gudur Branch, Indira Nagar, Mahabubabad Urban, Mahabubabad Dist.
                 </div>
 </div>
-</div></div>
+</div>
+</div>
+
 <script>
+        const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+        const SOLAR_TABLE = "rudhra_solar_bookings";
+
+        const db = (SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY")
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            : null;
+
         let bomItems = [
             { desc: "Solar PV module: Bifacial/ADANI/PREMIER/WAREE/SATVIK/EQUIVALENT DCR/SET Module", qty: "-" },
             { desc: "GI Module 5FT/6.5FT Mounting structure Designed Wind Load Resistance: 180Kmph. Hot dip Legs And G.I Rafter/Purlin (AS PER SITE REQUIRED BASIC AND HEIGHT)", qty: "1" },
@@ -1486,36 +1152,14 @@
         ];
 
         function handleImageError() {
-            // Fallback if sirlogo.png isn't found in the directory
             document.getElementById('out_dp').style.display = 'none';
             document.getElementById('out_dp_placeholder').style.display = 'flex';
-        }
-
-        function uploadDP(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgElement = document.getElementById('out_dp');
-                    const placeholder = document.getElementById('out_dp_placeholder');
-                    
-                    imgElement.src = e.target.result;
-                    imgElement.style.display = 'block';
-                    placeholder.style.display = 'none';
-                    const receiptLogo = document.getElementById('out3_dp');
-                    if (receiptLogo) {
-                        receiptLogo.src = e.target.result;
-                        receiptLogo.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
         }
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             if (tabName === 'page1') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
                 document.getElementById('tab-page1').classList.add('active');
@@ -1534,9 +1178,9 @@
                 row.className = 'bom-item-row';
                 row.innerHTML = `
                     <span style="font-size: 0.8rem; font-weight: bold; text-align: center;">${index + 1}</span>
-                    <input type="text" value="${item.desc}" oninput="updateBomItem(${index}, 'desc', this.value)">
-                    <input type="text" value="${item.qty}" oninput="updateBomItem(${index}, 'qty', this.value)">
-                    <button class="btn btn-danger" onclick="removeBomItem(${index})">✕</button>
+                    <input type="text" value="${item.desc.replace(/"/g, '&quot;')}" oninput="updateBomItem(${index}, 'desc', this.value)">
+                    <input type="text" value="${item.qty.replace(/"/g, '&quot;')}" oninput="updateBomItem(${index}, 'qty', this.value)">
+                    <button class="btn btn-danger" onclick="removeBomItem(${index})" type="button">✕</button>
                 `;
                 container.appendChild(row);
             });
@@ -1559,10 +1203,160 @@
             updatePreview();
         }
 
+        function setFetchStatus(msg, color = "#075985") {
+            const el = document.getElementById("fetchStatus");
+            if (el) {
+                el.style.color = color;
+                el.textContent = msg;
+            }
+        }
+
+        function formatRegDate(val) {
+            if (!val) return "";
+            const d = new Date(val);
+            if (!Number.isNaN(d.getTime())) {
+                return d.toLocaleDateString("en-IN");
+            }
+            return String(val);
+        }
+
+        function applyDbRegistrationDate(regDate) {
+            const formatted = regDate || "";
+            ["in_reg_date", "in_date", "in_advance_date", "in_rec_date"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = formatted;
+            });
+        }
+
+        // Capacity is read only from the Supabase `capacity` column.
+        function normalizeCapacity(value) {
+            if (value === null || value === undefined || String(value).trim() === "") return "";
+            const raw = String(value).trim().toUpperCase();
+            return /KW$/.test(raw) ? raw : raw.replace(/\s+/g, "") + "KW";
+        }
+
+        function applyDbCapacity(capacity) {
+            const kw = normalizeCapacity(capacity);
+            document.getElementById("in_kw").value = kw;
+            if (!kw) return;
+
+            // Update the proposal text and BOM labels to match the fetched system size.
+            const salutation = document.getElementById("in_salutation");
+            const bomTitle = document.getElementById("in_bom_title");
+            if (salutation) salutation.value = salutation.value.replace(/\b\d+(?:\.\d+)?\s*KW?\b/ig, kw).replace(/\bKW\b/ig, "KW");
+            if (bomTitle) bomTitle.value = bomTitle.value.replace(/\b\d+(?:\.\d+)?\s*KW?\b/ig, kw);
+            bomItems.forEach(item => {
+                item.desc = item.desc.replace(/\b\d+(?:\.\d+)?\s*KW?\b/ig, kw);
+            });
+            renderBomInputs();
+        }
+
+        async function fetchByMobile() {
+            const rawMobile = (document.getElementById("in_cust_mobile").value || "").trim();
+            const cleanMobile = rawMobile.replace(/[^0-9]/g, "");
+
+            if (!cleanMobile) {
+                setFetchStatus("Please enter a mobile number.", "#dc2626");
+                return;
+            }
+
+            if (!db) {
+                setFetchStatus("Check the Supabase URL and publishable key in the script.", "#dc2626");
+                return;
+            }
+
+            const btn = document.getElementById("fetchMobileBtn");
+            btn.disabled = true;
+            btn.textContent = "Fetching...";
+            setFetchStatus("Searching Supabase...", "#075985");
+
+            try {
+                const { data, error } = await db
+                    .from(SOLAR_TABLE)
+                    .select("capacity,agent_name,full_name,mobile_no,email_id,house_no,village,mandal,pincode,district,state,created_at")
+                    .or(`mobile_no.eq.${cleanMobile},mobile_no.eq.${rawMobile}`)
+                    .order("created_at", { ascending: false })
+                    .limit(1);
+
+                if (error) throw error;
+
+                if (!data || !data.length) {
+                    setFetchStatus("No record found in rudhra_solar_bookings for this mobile number.", "#dc2626");
+                    return;
+                }
+
+                const row = data[0];
+
+                // Map the exact column names from the supplied SQL schema.
+                const fullName = row.full_name ?? "";
+                const houseNo = row.house_no ?? "";
+                const village = row.village ?? "";
+                const mandal = row.mandal ?? "";
+                const pincode = row.pincode ?? "";
+                const district = row.district ?? "";
+                const state = row.state ?? "";
+                const email = row.email_id ?? "";
+                const fetchedMobile = row.mobile_no ?? rawMobile;
+                const capacity = row.capacity ?? "";
+
+                // Registration date comes from the created_at column in your SQL table.
+                const regDate = formatRegDate(row.created_at ?? "");
+
+                document.getElementById("in_cust_mobile").value = fetchedMobile;
+                document.getElementById("in_cust_name").value = fullName;
+                document.getElementById("in_house_no").value = houseNo;
+                document.getElementById("in_village").value = village;
+                document.getElementById("in_mandal").value = mandal;
+                document.getElementById("in_pincode").value = pincode;
+                document.getElementById("in_district").value = district;
+                document.getElementById("in_state").value = state;
+                document.getElementById("in_cust_email").value = email;
+                applyDbCapacity(capacity);
+                applyDbRegistrationDate(regDate);
+
+                updatePreview();
+                setFetchStatus(capacity ? `Customer details and ${normalizeCapacity(capacity)} system capacity fetched from Supabase.` : "Customer details fetched, but the Supabase capacity field is empty.", capacity ? "#15803d" : "#b45309");
+            } catch (err) {
+                console.error(err);
+                setFetchStatus("Fetch error: " + err.message, "#dc2626");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "🔍 Fetch";
+            }
+        }
+
+        function getInputValue(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : "";
+        }
+
+        function setReceiptText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value == null ? "" : value;
+        }
+
         function updateQuotationPreview() {
-            const comp = document.getElementById('in_company').value;
-            const gstin = document.getElementById('in_gstin').value;
-            const tagline = document.getElementById('in_tagline').value;
+            const comp = getInputValue('in_company');
+            const gstin = getInputValue('in_gstin');
+            const tagline = getInputValue('in_tagline');
+            const kw = getInputValue('in_kw');
+
+            const houseNo = getInputValue('in_house_no');
+            const village = getInputValue('in_village');
+            const mandal = getInputValue('in_mandal');
+            const district = getInputValue('in_district');
+            const state = getInputValue('in_state');
+            const pincode = getInputValue('in_pincode');
+            const regDate = getInputValue('in_reg_date');
+
+            const addrLine1 = [houseNo ? `House No: ${houseNo}` : "", village ? `Village: ${village}` : ""]
+                .filter(Boolean).join(", ");
+            const addrLine2 = [
+                mandal ? `Mandal: ${mandal}` : "",
+                district ? `District: ${district}` : "",
+                state ? `State: ${state}` : "",
+                pincode ? `PIN Code: ${pincode}` : ""
+            ].filter(Boolean).join(", ");
 
             document.getElementById('out_company').innerText = comp;
             document.getElementById('out_company_sub').innerText = comp;
@@ -1575,32 +1369,36 @@
             document.getElementById('out_tagline').innerText = tagline;
             document.getElementById('out_tagline_p2').innerText = tagline;
 
-            document.getElementById('out_kw').innerText = document.getElementById('in_kw').value;
-            document.getElementById('out_phones').innerText = document.getElementById('in_phones').value;
-            document.getElementById('out_email').innerText = document.getElementById('in_email').value;
-            document.getElementById('out_location').innerText = document.getElementById('in_location').value;
+            document.getElementById('out_kw').innerText = kw;
+            document.getElementById('out_kw_p2').innerText = kw;
+            document.getElementById('out_date_p2').innerText = regDate;
 
-            document.getElementById('out_cust_name').innerText = document.getElementById('in_cust_name').value;
-            document.getElementById('out_cust_addr1').innerText = document.getElementById('in_cust_addr1').value;
-            document.getElementById('out_cust_addr2').innerText = document.getElementById('in_cust_addr2').value;
-            document.getElementById('out_cust_mobile').innerText = document.getElementById('in_cust_mobile').value;
-            document.getElementById('out_cust_email').innerText = document.getElementById('in_cust_email').value;
+            document.getElementById('out_phones').innerText = getInputValue('in_phones');
+            document.getElementById('out_email').innerText = getInputValue('in_email');
+            document.getElementById('out_location').innerText = getInputValue('in_location');
 
-            document.getElementById('out_epc_no').innerText = document.getElementById('in_epc_no').value;
-            document.getElementById('out_vendor_name').innerText = document.getElementById('in_vendor_name').value;
+            document.getElementById('out_cust_name').innerText = getInputValue('in_cust_name');
+            document.getElementById('out_cust_addr1').innerText = addrLine1;
+            document.getElementById('out_cust_addr2').innerText = addrLine2;
+            document.getElementById('out_cust_mobile').innerText = getInputValue('in_cust_mobile');
+            document.getElementById('out_cust_email').innerText = getInputValue('in_cust_email');
+            document.getElementById('out_cust_reg_date').innerText = regDate;
 
-            document.getElementById('out_acc_name').innerText = document.getElementById('in_acc_name').value;
-            document.getElementById('out_acc_no').innerText = document.getElementById('in_acc_no').value;
-            document.getElementById('out_ifsc').innerText = document.getElementById('in_ifsc').value;
-            document.getElementById('out_bank').innerText = document.getElementById('in_bank').value;
+            document.getElementById('out_epc_no').innerText = getInputValue('in_epc_no');
+            document.getElementById('out_vendor_name').innerText = getInputValue('in_vendor_name');
 
-            document.getElementById('out_salutation').innerText = document.getElementById('in_salutation').value;
-            document.getElementById('out_bom_title').innerText = document.getElementById('in_bom_title').value;
+            document.getElementById('out_acc_name').innerText = getInputValue('in_acc_name');
+            document.getElementById('out_acc_no').innerText = getInputValue('in_acc_no');
+            document.getElementById('out_ifsc').innerText = getInputValue('in_ifsc');
+            document.getElementById('out_bank').innerText = getInputValue('in_bank');
 
-            document.getElementById('out_cost').innerText = document.getElementById('in_cost').value;
-            document.getElementById('out_subtotal').innerText = document.getElementById('in_subtotal').value;
-            document.getElementById('out_after_subsidy').innerText = document.getElementById('in_after_subsidy').value;
-            document.getElementById('out_subsidy_amount').innerText = document.getElementById('in_subsidy_amount').value;
+            document.getElementById('out_salutation').innerText = getInputValue('in_salutation');
+            document.getElementById('out_bom_title').innerText = getInputValue('in_bom_title');
+
+            document.getElementById('out_cost').innerText = getInputValue('in_cost');
+            document.getElementById('out_subtotal').innerText = getInputValue('in_subtotal');
+            document.getElementById('out_after_subsidy').innerText = getInputValue('in_after_subsidy');
+            document.getElementById('out_subsidy_amount').innerText = getInputValue('in_subsidy_amount');
 
             const tbody = document.getElementById('bom_preview_tbody');
             tbody.innerHTML = '';
@@ -1615,80 +1413,65 @@
             });
         }
 
+        function updateReceiptPreview() {
+            const company = getInputValue("in_company");
+            const gstin = getInputValue("in_gstin");
+            const tagline = getInputValue("in_tagline");
+            const proprietor = getInputValue("in_vendor_name");
+            const customer = getInputValue("in_cust_name");
+            const mobile = getInputValue("in_cust_mobile");
+            const email = getInputValue("in_cust_email");
+            const regDate = getInputValue("in_reg_date");
+            const kw = getInputValue("in_kw");
+            const cost = getInputValue("in_cost");
+
+            const address = [
+                getInputValue("in_house_no") ? `H.No: ${getInputValue("in_house_no")}` : "",
+                getInputValue("in_village"),
+                getInputValue("in_mandal"),
+                getInputValue("in_district"),
+                getInputValue("in_state"),
+                getInputValue("in_pincode")
+            ].filter(Boolean).join(", ");
+
+            setReceiptText("out3_gstin", gstin);
+            setReceiptText("out3_proprietor_top", proprietor);
+            setReceiptText("out3_proprietor_footer", proprietor);
+            setReceiptText("out3_company", company);
+            setReceiptText("out3_tagline", tagline);
+
+            setReceiptText("out3_date", regDate);
+            setReceiptText("out3_receipt_no", getInputValue("in_receipt_no"));
+            setReceiptText("out3_cust_name", customer);
+            setReceiptText("out3_cust_addr", address);
+            setReceiptText("out3_cust_mobile", mobile);
+            setReceiptText("out3_cust_email", email);
+            setReceiptText("out3_cust_reg_date", regDate);
+
+            setReceiptText("out3_kw", kw);
+            setReceiptText("out3_total_cost_head", kw + " - " + cost);
+
+            setReceiptText("out3_advance_date", regDate);
+            setReceiptText("out3_advance", getInputValue("in_advance"));
+            setReceiptText("out3_payment2", getInputValue("in_payment2"));
+            setReceiptText("out3_balance", getInputValue("in_balance"));
+            setReceiptText("out3_total_rec", getInputValue("in_total_rec"));
+
+            setReceiptText("out3_reason", getInputValue("in_reason"));
+            setReceiptText("out3_pay_mode", getInputValue("in_pay_mode"));
+            setReceiptText("out3_receiver_name", company);
+            setReceiptText("out3_receiver_phone", getInputValue("in_phones"));
+            setReceiptText("out3_rec_date", regDate);
+            setReceiptText("out3_office", getInputValue("in_office"));
+        }
+
+        function updatePreview() {
+            updateQuotationPreview();
+            updateReceiptPreview();
+        }
+
         renderBomInputs();
         updatePreview();
-    
-
-function getInputValue(id) {
-    const el = document.getElementById(id);
-    return el ? el.value : "";
-}
-function setReceiptText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value == null ? "" : value;
-}
-function updateReceiptPreview() {
-    const company = getInputValue("in_company");
-    const gstin = getInputValue("in_gstin");
-    const tagline = getInputValue("in_tagline");
-    const proprietor = getInputValue("in_vendor_name");
-    const customer = getInputValue("in_cust_name");
-    const mobile = getInputValue("in_cust_mobile");
-    const email = getInputValue("in_cust_email");
-    const kw = getInputValue("in_kw");
-    const cost = getInputValue("in_cost");
-    const address = [getInputValue("in_cust_addr1"), getInputValue("in_cust_addr2")]
-        .filter(Boolean).join(", ");
-
-    setReceiptText("out3_gstin", gstin);
-    setReceiptText("out3_proprietor_top", proprietor);
-    setReceiptText("out3_proprietor_footer", proprietor);
-    setReceiptText("out3_company", company);
-    setReceiptText("out3_tagline", tagline);
-
-    setReceiptText("out3_date", getInputValue("in_date"));
-    setReceiptText("out3_receipt_no", getInputValue("in_receipt_no"));
-    setReceiptText("out3_cust_name", customer);
-    setReceiptText("out3_cust_addr", address);
-    setReceiptText("out3_cust_mobile", mobile);
-    setReceiptText("out3_cust_email", email);
-
-    setReceiptText("out3_kw", kw);
-    setReceiptText("out3_total_cost_head", kw + " - " + cost);
-
-    setReceiptText("out3_advance_date", getInputValue("in_advance_date"));
-    setReceiptText("out3_advance", getInputValue("in_advance"));
-    setReceiptText("out3_payment2", getInputValue("in_payment2"));
-    setReceiptText("out3_balance", getInputValue("in_balance"));
-    setReceiptText("out3_total_rec", getInputValue("in_total_rec"));
-
-    setReceiptText("out3_reason", getInputValue("in_reason"));
-    setReceiptText("out3_pay_mode", getInputValue("in_pay_mode"));
-    setReceiptText("out3_receiver_name", company);
-    setReceiptText("out3_receiver_phone", getInputValue("in_phones"));
-    setReceiptText("out3_rec_date", getInputValue("in_rec_date"));
-    setReceiptText("out3_office", getInputValue("in_office"));
-}
-function updatePreview() {
-    updateQuotationPreview();
-    updateReceiptPreview();
-}
-function uploadSignature(event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-        alert("Please select an image file for the signature or stamp.");
-        event.target.value = "";
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = document.getElementById("out3_signature");
-        img.src = e.target.result;
-        img.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-}
 </script>
 <script>
 document.addEventListener("contextmenu", e => e.preventDefault());
@@ -1699,5 +1482,6 @@ document.addEventListener("keydown", function(e) {
         e.preventDefault();
     }
 });
-</script></body>
+</script>
+</body>
 </html>
