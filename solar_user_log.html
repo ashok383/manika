@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solar Panel Booking | Sri Rudhra Solar Solutions</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--green:#087f5b;--green2:#12a875;--cyan:#00bcd4;--dark:#123047;--muted:#64748b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--dark);background:linear-gradient(135deg,#e7fbff,#effff4 55%,#f4f8ff)}
+.hero{padding:42px 18px 65px;text-align:center;color:white;background:linear-gradient(120deg,#064e68,#087f5b 58%,#10a77a);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:360px;height:360px;border:1px solid #ffffff30;border-radius:50%;right:-100px;top:-170px;box-shadow:0 0 0 35px #ffffff0c,0 0 0 70px #ffffff08}
+.logo{font-size:13px;letter-spacing:3px;font-weight:800;color:#b9fff0}
+.hero h1{font-size:clamp(27px,5vw,42px);margin:12px 0}
+.hero p{margin:0;color:#dcfff5}
+.wrap{max-width:960px;margin:-35px auto 40px;padding:0 15px;position:relative;z-index:1}
+.panel{background:#fff;border:1px solid #d9f0e8;border-radius:20px;padding:clamp(18px,4vw,34px);box-shadow:0 18px 55px #0b45501a}
+.intro{display:flex;gap:14px;align-items:center;background:#effcf7;border:1px solid #d4f5e5;border-radius:13px;padding:15px;margin-bottom:25px}
+.sun{font-size:30px}
+.intro p{margin:4px 0;color:var(--muted);font-size:13px;line-height:1.5}
+.section{margin-top:28px}
+.section h2{font-size:17px;color:var(--green);display:flex;align-items:center;gap:9px;border-bottom:1px solid #e2eee9;padding-bottom:12px;margin:0 0 17px}
+.section h2 span{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#e5fbf1}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.field{min-width:0}
+.field.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:750;margin:0 0 7px}
+input:not([type=file]):not([type=checkbox]),select,textarea{width:100%;border:1px solid #d7e3e7;border-radius:10px;padding:13px 14px;font-size:14px;background:#fbfefe;color:#163247;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00bcd41c}
+input[type=file]{width:100%;padding:11px;border:1px dashed #9acfc0;background:#f5fffa;border-radius:10px;font-size:13px}
+.hint{font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+.consent{display:flex;gap:10px;align-items:flex-start;padding:15px;background:#f3fbf7;border-radius:11px;margin-top:22px;font-size:13px;line-height:1.5}
+.consent input{margin-top:3px}
+.submit{width:100%;border:0;border-radius:12px;padding:16px;margin-top:20px;color:white;font-size:16px;font-weight:800;letter-spacing:.4px;background:linear-gradient(110deg,#087f5b,#00a6a6);box-shadow:0 8px 22px #087f5b30;cursor:pointer;transition:.2s}
+.submit:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+#message{display:none;margin-top:18px;padding:15px;border-radius:11px;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+#message.ok{display:block;background:#e9fff3;color:#087443;border:1px solid #b9efd0}
+#message.bad{display:block;background:#fff1f1;color:#b42318;border:1px solid #ffcaca}
+footer{text-align:center;padding:20px;color:#64748b;font-size:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding-bottom:58px}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="logo">SRI RUDHRA SOLAR SOLUTIONS</div>
+  <h1>☀ Solar Panel Booking</h1>
+  <p>Submit your details to apply for solar installation</p>
+</header>
+
+<main class="wrap">
+<div class="panel">
+  <div class="intro">
+    <div class="sun">🌞</div>
+    <div>
+      <strong>Solar Installation Application</strong>
+      <p>Fill in the required information and upload clear copies of your documents. All fields marked * are required.</p>
+    </div>
+  </div>
+
+<form id="bookingForm">
+  <section class="section">
+    <h2><span>01</span> Applicant Information</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Solar Capacity *</label>
+        <select name="solar_capacity" required>
+          <option value="">Choose capacity</option>
+          <option>3 KW</option><option>10 KW</option>
+          <option>15 KW</option><option>30 KW</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Full Name *</label>
+        <input name="full_name" required maxlength="150" placeholder="Enter applicant full name">
+      </div>
+      <div class="field">
+        <label>Aadhaar Registered Mobile Number *</label>
+        <input name="mobile_number" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" required placeholder="10-digit mobile number">
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input name="email" type="email" maxlength="200" placeholder="example@email.com">
+      </div>
+      <div class="field full">
+        <label>Complete Address *</label>
+        <textarea name="address" rows="3" required maxlength="1000" placeholder="House number, street, village/town, mandal, district, state and PIN"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>02</span> Aadhaar Details</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Aadhaar Number *</label>
+        <input name="aadhaar_number" inputmode="numeric" pattern="[0-9]{12}" maxlength="12" required placeholder="12-digit Aadhaar number">
+      </div>
+      <div class="field">
+        <label>Aadhaar Card Document *</label>
+        <input type="file" name="aadhaar_card" required>
+        <p class="hint">Upload a clear Aadhaar document.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>03</span> Electricity Details</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Electricity Consumer Number *</label>
+        <input name="electricity_consumer_number" required maxlength="100" placeholder="Consumer / service number">
+      </div>
+      <div class="field">
+        <label>Electricity Bill *</label>
+        <input type="file" name="electricity_bill" required>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>04</span> Property Details</h2>
+    <div class="grid">
+      <div class="field full">
+        <label>Property Tax Receipt *</label>
+        <input type="file" name="property_tax_receipt" required>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>05</span> Bank Details</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Bank Account Number *</label>
+        <input name="bank_account_number" inputmode="numeric" maxlength="30" required placeholder="Enter account number">
+      </div>
+      <div class="field">
+        <label>IFSC Code *</label>
+        <input name="ifsc_code" maxlength="11" pattern="[A-Za-z]{4}0[A-Za-z0-9]{6}" required placeholder="Example: SBIN0001234">
+      </div>
+      <div class="field full">
+        <label>Bank Passbook / Bank Proof *</label>
+        <input type="file" name="bank_proof" required>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>06</span> Installation Site</h2>
+    <div class="grid">
+      <div class="field full">
+        <label>Installation Site Photo *</label>
+        <input type="file" name="site_photo" required>
+        <p class="hint">Upload a photo of the proposed installation location.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>07</span> PAN Details</h2>
+    <div class="grid">
+      <div class="field">
+        <label>PAN Number *</label>
+        <input name="pan_number" maxlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" required placeholder="10-character PAN">
+      </div>
+      <div class="field">
+        <label>PAN Card Document *</label>
+        <input type="file" name="pan_card" required>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span>08</span> Applicant Signature</h2>
+    <div class="grid">
+      <div class="field full">
+        <label>Signature Document *</label>
+        <input type="file" name="signature" required>
+      </div>
+    </div>
+  </section>
+
+  <label class="consent">
+    <input type="checkbox" id="consent" required>
+    <span>I confirm that the information supplied is accurate and consent to the processing of these documents for the solar application and installation process.</span>
+  </label>
+
+  <p class="hint">Maximum upload size: 8 MB per document. Any file type can be selected; however, the admin PDF merger may not be able to convert every file type.</p>
+  <button class="submit" id="submitBtn" type="submit">SUBMIT SOLAR APPLICATION →</button>
+  <div id="message" role="status" aria-live="polite"></div>
+</form>
+</div>
+</main>
+<footer>© Sri Rudhra Solar Solutions | Solar Application Portal</footer>
+
+<script>
+const SUPABASE_URL = "https://ohotwjjgpjrzahzzprld.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_x_qthRXVE4IzGZ8uNDjmxA_olsQMY2_";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BUCKET = "solar-documents";
+const MAX_SIZE = 8 * 1024 * 1024;
+
+const fileMap = {
+  aadhaar_card: "aadhaar_card_path",
+  electricity_bill: "electricity_bill_path",
+  property_tax_receipt: "property_tax_receipt_path",
+  bank_proof: "bank_proof_path",
+  site_photo: "site_photo_path",
+  pan_card: "pan_card_path",
+  signature: "signature_path"
+};
+
+const form = document.getElementById("bookingForm");
+const btn = document.getElementById("submitBtn");
+const message = document.getElementById("message");
+
+function showMessage(text, type) {
+  message.className = type;
+  message.textContent = text;
+  message.style.display = "block";
+}
+
+function cleanName(name) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  message.style.display = "none";
+
+  if (!form.reportValidity()) return;
+
+  const data = new FormData(form);
+  const uploaded = [];
+  btn.disabled = true;
+
+  try {
+    const applicationId = crypto.randomUUID();
+
+    const row = {
+      id: applicationId,
+      solar_capacity: data.get("solar_capacity"),
+      full_name: data.get("full_name").trim(),
+      mobile_number: data.get("mobile_number").trim(),
+      email: data.get("email").trim() || null,
+      address: data.get("address").trim(),
+      aadhaar_number: data.get("aadhaar_number").trim(),
+      electricity_consumer_number: data.get("electricity_consumer_number").trim(),
+      bank_account_number: data.get("bank_account_number").trim(),
+      ifsc_code: data.get("ifsc_code").trim().toUpperCase(),
+      pan_number: data.get("pan_number").trim().toUpperCase()
+    };
+
+    const entries = Object.entries(fileMap);
+
+    for (let i = 0; i < entries.length; i++) {
+      const [field, column] = entries[i];
+      const file = data.get(field);
+
+      if (!(file instanceof File) || file.size === 0) {
+        throw new Error("Please select the " + field.replaceAll("_", " ") + " document.");
+      }
+      if (file.size > MAX_SIZE) {
+        throw new Error(file.name + " exceeds the 8 MB limit.");
+      }
+
+      btn.textContent = `UPLOADING DOCUMENT ${i + 1} OF ${entries.length}...`;
+
+      const path = applicationId + "/" + field + "_" + cleanName(file.name);
+
+      const { error } = await db.storage.from(BUCKET).upload(path, file, {
+        upsert: false,
+        contentType: file.type || "application/octet-stream"
+      });
+
+      if (error) throw error;
+
+      uploaded.push(path);
+      row[column] = path;
+
+      // Supports older database/admin code using this legacy column.
+      if (field === "aadhaar_card") row.aadhaar_front_path = path;
+    }
+
+    btn.textContent = "SAVING APPLICATION...";
+    const { error: insertError } = await db.from("solar_applications").insert([row]);
+
+    if (insertError) throw insertError;
+
+    form.reset();
+    showMessage("Application submitted successfully! Your Application ID is: " + applicationId, "ok");
+
+  } catch (error) {
+    console.error(error);
+    showMessage("Submission failed: " + (error.message || "Please try again."), "bad");
+
+    if (uploaded.length) {
+      const { error: cleanupError } = await db.storage.from(BUCKET).remove(uploaded);
+      if (cleanupError) console.error("Upload cleanup issue:", cleanupError.message);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "SUBMIT SOLAR APPLICATION →";
+  }
+});
+</script>
+</body>
+</html>
+
