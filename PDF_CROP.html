@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANIKARNIKA — PDF Crop &amp; Rotate</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<style>
+:root {
+  --bg: #fff5f5;
+  --surface: #ffffff;
+  --surface-tint: #fff0f1;
+  --border: #fecdd3;
+  --border-strong: #fda4af;
+  --red: #dc2626;
+  --red-dark: #991b1b;
+  --red-deep: #7f1d1d;
+  --red-soft: rgba(220, 38, 38, 0.12);
+  --text: #1f1215;
+  --muted: #6b4c52;
+  --shadow: 0 8px 24px rgba(153, 27, 27, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 24px 14px;
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 55%, #b91c1c 100%);
+  color: #ffffff;
+  border-bottom: 4px solid #ffffff;
+  box-shadow: 0 6px 22px rgba(153, 27, 27, 0.25);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 2.5px;
+  font-weight: 800;
+}
+
+header p {
+  margin: 6px 0 0;
+  color: #ffe4e6;
+  font-size: 14px;
+}
+
+.container {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 20px 16px 44px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+button, .upload-label {
+  border: 1.5px solid var(--red);
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  color: #ffffff;
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+  transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 10px rgba(220, 38, 38, 0.2);
+}
+
+button:hover:not(:disabled), .upload-label:hover {
+  background: linear-gradient(180deg, #dc2626, #991b1b);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.upload-label {
+  display: inline-block;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.btn-white {
+  background: #ffffff;
+  color: var(--red-dark);
+  border-color: var(--red);
+}
+
+.btn-white:hover:not(:disabled) {
+  background: #fef2f2;
+  color: var(--red-deep);
+}
+
+.btn-crimson {
+  background: linear-gradient(180deg, #b91c1c, #7f1d1d);
+  border-color: var(--red-dark);
+}
+
+.status {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-tint);
+  border: 1px solid var(--border-strong);
+  color: var(--red-dark);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.help {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-tint);
+  border-left: 4px solid var(--red);
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+#pageTitle {
+  font-weight: 800;
+  color: var(--red-dark);
+  margin: 0 0 12px;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+#workspace {
+  background: #f8fafc;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 18px;
+  overflow: auto;
+  text-align: center;
+  min-height: 360px;
+}
+
+#canvasWrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  max-width: 100%;
+  touch-action: none;
+  user-select: none;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.18);
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+}
+
+#pdfCanvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #ffffff;
+}
+
+#cropLayer {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+#cropRect {
+  position: absolute;
+  border: 2.5px solid #dc2626;
+  background: rgba(220, 38, 38, 0.14);
+  box-shadow: 0 0 0 9999px rgba(127, 29, 29, 0.36);
+  display: none;
+  cursor: move;
+}
+
+.handle {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  background: #ffffff;
+  border: 2.5px solid #dc2626;
+  border-radius: 50%;
+  z-index: 3;
+}
+
+.tl { left: -7px; top: -7px; cursor: nwse-resize; }
+.tr { right: -7px; top: -7px; cursor: nesw-resize; }
+.bl { left: -7px; bottom: -7px; cursor: nesw-resize; }
+.br { right: -7px; bottom: -7px; cursor: nwse-resize; }
+.top { left: 50%; top: -7px; transform: translateX(-50%); cursor: ns-resize; }
+.bottom { left: 50%; bottom: -7px; transform: translateX(-50%); cursor: ns-resize; }
+.left { left: -7px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.right { right: -7px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+
+.page-info {
+  margin-top: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  header h1 { font-size: 22px; }
+  .container { padding: 10px 8px 34px; }
+  button, .upload-label { padding: 10px 12px; }
+  .status { width: 100%; margin: 6px 0 0; text-align: center; border-radius: 10px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>MANIKARNIKA</h1>
+  <p>Precision PDF Page Cropping &amp; Rotation Studio</p>
+</header>
+
+<div class="container">
+
+  <div class="panel">
+    <div class="toolbar">
+      <label class="upload-label">
+        SELECT PDF FILE
+        <input type="file" id="fileInput" accept=".pdf,application/pdf">
+      </label>
+      <button class="btn-white" id="prevBtn" disabled>◀ PREVIOUS</button>
+      <button class="btn-white" id="nextBtn" disabled>NEXT ▶</button>
+      <button class="btn-white" id="zoomOut" disabled>− ZOOM</button>
+      <button class="btn-white" id="zoomIn" disabled>＋ ZOOM</button>
+      <button class="btn-white" id="rotateLeftBtn" disabled>↺ ROTATE LEFT</button>
+      <button class="btn-white" id="rotateRightBtn" disabled>↻ ROTATE RIGHT</button>
+      <span class="status" id="status">No PDF selected</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <button id="applyBtn" disabled>✓ APPLY CROP</button>
+      <button class="btn-white" id="resetBtn" disabled>↺ RESET PAGE</button>
+      <button class="btn-crimson" id="resetAllBtn" disabled>RESET ALL</button>
+      <button id="downloadBtn" disabled>⬇ DOWNLOAD CROPPED PDF</button>
+    </div>
+    <p class="help">
+      <strong>How to crop accurately:</strong><br>
+      1. Drag across the page to draw a red crop box, drag inside to move it, or drag any white handle to resize.<br>
+      2. Rotate pages left or right anytime—each page's crop is stored in normalized page coordinates.<br>
+      3. Click <strong>APPLY CROP</strong> to lock in the crop for that page, then click <strong>DOWNLOAD CROPPED PDF</strong>.
+    </p>
+  </div>
+
+  <div class="panel">
+    <div id="pageTitle">PDF PREVIEW</div>
+    <div id="workspace">
+      <div id="canvasWrap">
+        <canvas id="pdfCanvas"></canvas>
+        <div id="cropLayer">
+          <div id="cropRect">
+            <span class="handle tl" data-h="tl"></span>
+            <span class="handle tr" data-h="tr"></span>
+            <span class="handle bl" data-h="bl"></span>
+            <span class="handle br" data-h="br"></span>
+            <span class="handle top" data-h="top"></span>
+            <span class="handle bottom" data-h="bottom"></span>
+            <span class="handle left" data-h="left"></span>
+            <span class="handle right" data-h="right"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page-info" id="pageInfo">Upload a PDF to begin.</div>
+  </div>
+
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const fileInput = document.getElementById('fileInput');
+const canvas = document.getElementById('pdfCanvas');
+const ctx = canvas.getContext('2d');
+const layer = document.getElementById('cropLayer');
+const rect = document.getElementById('cropRect');
+
+let pdfDoc = null;
+let originalBytes = null;
+let currentPage = 1;
+let totalPages = 0;
+let zoom = 1.35;
+let renderTask = null;
+
+// Normalized visual crop boxes { nx, ny, nw, nh } in [0..1] relative to displayed viewport
+let crops = {};
+let applied = {};
+// User-added rotation per page (0, 90, 180, 270)
+let extraRotations = {};
+
+let interaction = null;
+let interactionHandle = '';
+let startPoint = null;
+let startRect = null;
+
+const $ = id => document.getElementById(id);
+
+function setStatus(msg) {
+  $('status').textContent = msg;
+}
+
+function enableControls(enabled) {
+  [
+    'prevBtn', 'nextBtn', 'zoomIn', 'zoomOut',
+    'rotateLeftBtn', 'rotateRightBtn',
+    'applyBtn', 'resetBtn', 'resetAllBtn', 'downloadBtn'
+  ].forEach(id => {
+    $(id).disabled = !enabled;
+  });
+}
+
+function getExtraRotation(pageNum) {
+  return ((extraRotations[pageNum] || 0) % 360 + 360) % 360;
+}
+
+fileInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  if (!isPdf) {
+    alert('Please select a PDF file.');
+    return;
+  }
+
+  try {
+    setStatus('Loading PDF...');
+    originalBytes = await file.arrayBuffer();
+    pdfDoc = await pdfjsLib.getDocument({
+      data: new Uint8Array(originalBytes.slice(0))
+    }).promise;
+
+    totalPages = pdfDoc.numPages;
+    currentPage = 1;
+    zoom = 1.35;
+    crops = {};
+    applied = {};
+    extraRotations = {};
+    enableControls(true);
+    await renderPage();
+    setStatus('PDF loaded');
+  } catch (err) {
+    console.error(err);
+    alert('Unable to open this PDF.');
+    setStatus('Load failed');
+  }
+});
+
+async function renderPage() {
+  if (!pdfDoc) return;
+
+  try {
+    if (renderTask) {
+      try { renderTask.cancel(); } catch (_) {}
+    }
+
+    const page = await pdfDoc.getPage(currentPage);
+    const baseViewport = page.getViewport({ scale: zoom });
+    const totalVisualRot = (baseViewport.rotation + getExtraRotation(currentPage)) % 360;
+    const viewport = page.getViewport({
+      scale: zoom,
+      rotation: totalVisualRot
+    });
+
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
+    canvas.style.width = canvas.width + 'px';
+    canvas.style.height = canvas.height + 'px';
+
+    layer.style.width = canvas.width + 'px';
+    layer.style.height = canvas.height + 'px';
+
+    renderTask = page.render({
+      canvasContext: ctx,
+      viewport
+    });
+
+    await renderTask.promise;
+    renderTask = null;
+
+    restoreCrop();
+    updateInfo();
+  } catch (err) {
+    if (err.name !== 'RenderingCancelledException') {
+      console.error(err);
+    }
+  }
+}
+
+function updateInfo() {
+  const rot = getExtraRotation(currentPage);
+  $('pageTitle').textContent = `PAGE ${currentPage} OF ${totalPages}  •  +${rot}° ROTATION`;
+  $('pageInfo').textContent =
+    `Page ${currentPage} / ${totalPages}  |  Added Rotation: +${rot}°  |  ` +
+    (applied[currentPage] ? 'Crop applied' : 'Crop not applied');
+  $('prevBtn').disabled = currentPage <= 1;
+  $('nextBtn').disabled = currentPage >= totalPages;
+}
+
+// Always measure rendered DOM box so CSS scaling never causes offset drift
+function getDisplayedSize() {
+  const r = canvas.getBoundingClientRect();
+  return {
+    width: Math.max(1, r.width),
+    height: Math.max(1, r.height)
+  };
+}
+
+function pointerPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const w = Math.max(1, r.width);
+  const h = Math.max(1, r.height);
+  return {
+    x: Math.max(0, Math.min(w, e.clientX - r.left)),
+    y: Math.max(0, Math.min(h, e.clientY - r.top))
+  };
+}
+
+function normalize(a, b) {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    w: Math.abs(b.x - a.x),
+    h: Math.abs(b.y - a.y)
+  };
+}
+
+function showRect(box) {
+  rect.style.display = 'block';
+  rect.style.left = box.x + 'px';
+  rect.style.top = box.y + 'px';
+  rect.style.width = box.w + 'px';
+  rect.style.height = box.h + 'px';
+}
+
+function hideRect() {
+  rect.style.display = 'none';
+}
+
+function currentBox() {
+  if (rect.style.display === 'none') return null;
+  return {
+    x: parseFloat(rect.style.left) || 0,
+    y: parseFloat(rect.style.top) || 0,
+    w: parseFloat(rect.style.width) || 0,
+    h: parseFloat(rect.style.height) || 0
+  };
+}
+
+function saveNormalizedCrop(box, markApplied = false) {
+  const d = getDisplayedSize();
+  crops[currentPage] = {
+    nx: Math.max(0, Math.min(1, box.x / d.width)),
+    ny: Math.max(0, Math.min(1, box.y / d.height)),
+    nw: Math.max(0, Math.min(1, box.w / d.width)),
+    nh: Math.max(0, Math.min(1, box.h / d.height))
+  };
+  if (markApplied) {
+    applied[currentPage] = true;
+  }
+}
+
+function restoreCrop() {
+  const norm = crops[currentPage];
+  if (norm) {
+    const d = getDisplayedSize();
+    showRect({
+      x: norm.nx * d.width,
+      y: norm.ny * d.height,
+      w: norm.nw * d.width,
+      h: norm.nh * d.height
+    });
+  } else {
+    hideRect();
+  }
+}
+
+layer.addEventListener('pointerdown', e => {
+  if (!pdfDoc) return;
+  e.preventDefault();
+
+  const p = pointerPos(e);
+  const box = currentBox();
+  const handle = e.target.dataset && e.target.dataset.h ? e.target.dataset.h : null;
+
+  if (handle && box) {
+    interaction = 'resize';
+    startRect = { ...box };
+    startPoint = p;
+    interactionHandle = handle;
+  } else if (
+    box &&
+    p.x >= box.x && p.x <= box.x + box.w &&
+    p.y >= box.y && p.y <= box.y + box.h
+  ) {
+    interaction = 'move';
+    startRect = { ...box };
+    startPoint = p;
+  } else {
+    interaction = 'draw';
+    startPoint = p;
+    startRect = null;
+    showRect({ x: p.x, y: p.y, w: 1, h: 1 });
+  }
+
+  layer.setPointerCapture(e.pointerId);
+});
+
+layer.addEventListener('pointermove', e => {
+  if (!interaction) return;
+  e.preventDefault();
+
+  const d = getDisplayedSize();
+  const p = pointerPos(e);
+
+  if (interaction === 'draw') {
+    showRect(normalize(startPoint, p));
+  } else if (interaction === 'move') {
+    const box = { ...startRect };
+    box.x += p.x - startPoint.x;
+    box.y += p.y - startPoint.y;
+    box.x = Math.max(0, Math.min(d.width - box.w, box.x));
+    box.y = Math.max(0, Math.min(d.height - box.h, box.y));
+    showRect(box);
+  } else if (interaction === 'resize') {
+    const dx = p.x - startPoint.x;
+    const dy = p.y - startPoint.y;
+    const b = { ...startRect };
+    const h = interactionHandle;
+
+    if (h.includes('l') || h === 'left') {
+      b.x = Math.max(0, Math.min(startRect.x + startRect.w - 10, startRect.x + dx));
+      b.w = startRect.x + startRect.w - b.x;
+    }
+    if (h.includes('r') || h === 'right') {
+      b.w = Math.max(10, Math.min(d.width - startRect.x, startRect.w + dx));
+    }
+    if (h.includes('t') || h === 'top') {
+      b.y = Math.max(0, Math.min(startRect.y + startRect.h - 10, startRect.y + dy));
+      b.h = startRect.y + startRect.h - b.y;
+    }
+    if (h.includes('b') || h === 'bottom') {
+      b.h = Math.max(10, Math.min(d.height - startRect.y, startRect.h + dy));
+    }
+    showRect(b);
+  }
+});
+
+function stopInteraction() {
+  if (!interaction) return;
+  interaction = null;
+  interactionHandle = '';
+  const b = currentBox();
+  if (b && b.w > 8 && b.h > 8) {
+    saveNormalizedCrop(b, Boolean(applied[currentPage]));
+  } else {
+    delete crops[currentPage];
+    delete applied[currentPage];
+    hideRect();
+    updateInfo();
+  }
+}
+
+layer.addEventListener('pointerup', stopInteraction);
+layer.addEventListener('pointercancel', stopInteraction);
+layer.addEventListener('lostpointercapture', stopInteraction);
+
+async function rotateCurrentPage(deltaDeg) {
+  if (!pdfDoc) return;
+  const nextRot = ((getExtraRotation(currentPage) + deltaDeg) % 360 + 360) % 360;
+  extraRotations[currentPage] = nextRot;
+  // Reset box when swapping width/height so proportions stay accurate
+  if (Math.abs(deltaDeg) % 180 === 90) {
+    delete crops[currentPage];
+    delete applied[currentPage];
+  }
+  await renderPage();
+  setStatus(`Page ${currentPage} rotated to +${nextRot}°`);
+}
+
+$('rotateLeftBtn').addEventListener('click', () => rotateCurrentPage(-90));
+$('rotateRightBtn').addEventListener('click', () => rotateCurrentPage(90));
+
+$('applyBtn').addEventListener('click', () => {
+  const box = currentBox();
+  if (!box || box.w < 10 || box.h < 10) {
+    alert('Draw a crop rectangle on the page first.');
+    return;
+  }
+  saveNormalizedCrop(box, true);
+  updateInfo();
+  setStatus('Crop applied to page ' + currentPage);
+});
+
+$('resetBtn').addEventListener('click', async () => {
+  delete crops[currentPage];
+  delete applied[currentPage];
+  delete extraRotations[currentPage];
+  hideRect();
+  await renderPage();
+  updateInfo();
+  setStatus('Page ' + currentPage + ' reset');
+});
+
+$('resetAllBtn').addEventListener('click', async () => {
+  if (!confirm('Reset crop and rotation for all pages?')) return;
+  crops = {};
+  applied = {};
+  extraRotations = {};
+  hideRect();
+  await renderPage();
+  updateInfo();
+  setStatus('All pages reset');
+});
+
+$('prevBtn').addEventListener('click', async () => {
+  if (currentPage > 1) {
+    currentPage--;
+    await renderPage();
+  }
+});
+
+$('nextBtn').addEventListener('click', async () => {
+  if (currentPage < totalPages) {
+    currentPage++;
+    await renderPage();
+  }
+});
+
+$('zoomIn').addEventListener('click', async () => {
+  zoom = Math.min(3, +(zoom + 0.2).toFixed(2));
+  await renderPage();
+});
+
+$('zoomOut').addEventListener('click', async () => {
+  zoom = Math.max(0.5, +(zoom - 0.2).toFixed(2));
+  await renderPage();
+});
+
+window.addEventListener('resize', () => {
+  if (pdfDoc) restoreCrop();
+});
+
+// Map normalized visual box [nx, ny, nw, nh] into pdf-lib page coordinates
+// accounting for existing CropBox/MediaBox origin and total page rotation.
+function computePdfCropBox(pdfLibPage, norm, addedRotationDeg) {
+  const activeBox = pdfLibPage.getCropBox() || pdfLibPage.getMediaBox();
+  const baseAngle = ((pdfLibPage.getRotation().angle % 360) + 360) % 360;
+  const totalAngle = ((baseAngle + addedRotationDeg) % 360 + 360) % 360;
+
+  const bx = activeBox.x;
+  const by = activeBox.y;
+  const bw = activeBox.width;
+  const bh = activeBox.height;
+
+  // Visual [0..1] (u left->right, v top->bottom) -> unrotated PDF space [bx..bx+bw, by..by+bh]
+  const mapPoint = (u, v) => {
+    if (totalAngle === 0) {
+      return { x: bx + u * bw, y: by + (1 - v) * bh };
+    }
+    if (totalAngle === 90) {
+      return { x: bx + v * bw, y: by + u * bh };
+    }
+    if (totalAngle === 180) {
+      return { x: bx + (1 - u) * bw, y: by + v * bh };
+    }
+    // 270 deg
+    return { x: bx + (1 - v) * bw, y: by + (1 - u) * bh };
+  };
+
+  const u0 = norm.nx;
+  const v0 = norm.ny;
+  const u1 = norm.nx + norm.nw;
+  const v1 = norm.ny + norm.nh;
+
+  const pts = [
+    mapPoint(u0, v0),
+    mapPoint(u1, v0),
+    mapPoint(u0, v1),
+    mapPoint(u1, v1)
+  ];
+
+  const minX = Math.max(bx, Math.min(...pts.map(p => p.x)));
+  const maxX = Math.min(bx + bw, Math.max(...pts.map(p => p.x)));
+  const minY = Math.max(by, Math.min(...pts.map(p => p.y)));
+  const maxY = Math.min(by + bh, Math.max(...pts.map(p => p.y)));
+
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(1, maxX - minX),
+    height: Math.max(1, maxY - minY)
+  };
+}
+
+$('downloadBtn').addEventListener('click', async () => {
+  if (!originalBytes) return;
+
+  try {
+    setStatus('Generating PDF...');
+    const { PDFDocument, degrees } = PDFLib;
+
+    const source = await PDFDocument.load(originalBytes);
+    const output = await PDFDocument.create();
+    const pages = source.getPages();
+
+    for (let i = 0; i < pages.length; i++) {
+      const pageNum = i + 1;
+      const page = pages[i];
+      const addedAngle = getExtraRotation(pageNum);
+      const normCrop = crops[pageNum];
+
+      if (normCrop && applied[pageNum]) {
+        const box = computePdfCropBox(page, normCrop, addedAngle);
+        page.setCropBox(box.x, box.y, box.width, box.height);
+      }
+
+      if (addedAngle !== 0) {
+        const currentAngle = page.getRotation().angle;
+        page.setRotation(degrees((currentAngle + addedAngle) % 360));
+      }
+    }
+
+    const copied = await output.copyPages(source, source.getPageIndices());
+    copied.forEach(p => output.addPage(p));
+
+    const bytes = await output.save();
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MANIKARNIKA_CROPPED.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    setStatus('Downloaded MANIKARNIKA_CROPPED.pdf');
+  } catch (err) {
+    console.error(err);
+    alert('Export failed: ' + err.message);
+    setStatus('Export failed');
+  }
+});
+</script>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
+</body>
+</html>
