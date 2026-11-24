@@ -228,7 +228,7 @@
         .modal-content {
             background: #fff;
             width: 100%;
-            max-width: 820px;
+            max-width: 860px;
             max-height: 90vh;
             overflow-y: auto;
             border-radius: 12px;
@@ -305,7 +305,7 @@
     <div id="dashboardApp">
         <header class="fixed-header">
             <div class="header-left">
-                <img src="rudhra_logo.jpeg" alt="RUDHRA Logo">
+                <img src="rudhralogo.jpeg" alt="RUDHRA Logo">
                 <div>
                     <h1><span>RUDHRA</span> ADMIN PORTAL</h1>
                     <small style="color: #cbd5e1;">Manage Solar Bookings & Customer Documents</small>
@@ -554,7 +554,7 @@
                         <td style="display:flex; gap:6px; flex-wrap:wrap;">
                             <button class="btn btn-edit" onclick="openEditModal('${row.id}')">✏️ View / Edit</button>
                             <button class="btn btn-pdf" id="pdfBtn_${row.id}" onclick="downloadMergedPDF('${row.id}')">📥 Download All (PDF)</button>
-                            <button class="btn btn-delete" onclick="deleteBooking('${row.id}', '${row.full_name}')">🗑️</button>
+                            <!--    <button class="btn btn-delete" onclick="deleteBooking('${row.id}', '${row.full_name}')">🗑️</button>    -->  
                         </td>
                     </tr>
                 `;
@@ -580,6 +580,17 @@
             renderTable(filtered);
         }
 
+        // Storage document map. URLs are public URLs from the rudhra-docs bucket.
+        const DOC_FIELDS = [
+            { key: 'aadhar_doc_url', label: 'Aadhaar Card', folder: 'aadhar', accept: 'image/*,.pdf', requiredInPdf: false },
+            { key: 'bank_doc_url', label: 'Bank Proof', folder: 'bank', accept: 'image/*,.pdf', requiredInPdf: false },
+            { key: 'pan_doc_url', label: 'PAN Card', folder: 'pan', accept: 'image/*,.pdf', requiredInPdf: false },
+            { key: 'site_photo_url', label: 'Site Photo', folder: 'site', accept: 'image/*', requiredInPdf: false },
+            { key: 'house_tax_doc_url', label: 'House Tax Document', folder: 'house_tax', accept: 'image/*,.pdf', requiredInPdf: true },
+            { key: 'electricity_bill_doc_url', label: 'Electricity Bill', folder: 'electricity_bill', accept: 'image/*,.pdf', requiredInPdf: true },
+            { key: 'digital_jansamarth_doc_url', label: 'Digital / Jansamarth File', folder: 'digital_jansamarth', accept: 'image/*,.pdf', requiredInPdf: true }
+        ];
+
         // 4. Open Edit Modal
         function openEditModal(id) {
             const record = allBookings.find(r => String(r.id) === String(id));
@@ -603,35 +614,11 @@
             document.getElementById('edit_ifsc_code').value = record.ifsc_code || '';
             document.getElementById('edit_pan_no').value = record.pan_no || '';
 
-            // Document preview links
-            const linksDiv = document.getElementById('modalDocLinks');
-            linksDiv.innerHTML = '<strong style="width:100%; font-size:0.85rem;">Uploaded Documents:</strong>';
-            const docs = [
-                { label: '📄 Aadhar Card', url: record.aadhar_doc_url },
-                { label: '🏦 Bank Proof', url: record.bank_doc_url },
-                { label: '🪪 PAN Card', url: record.pan_doc_url },
-                { label: '🏠 Site Photo', url: record.site_photo_url },
-                { label: '🏡 House Tax Document', url: record.house_tax_doc_url }
-            ];
-            docs.forEach(d => {
-                if (d.url) {
-                    linksDiv.innerHTML += `<a href="${d.url}" target="_blank">${d.label}</a>`;
-                }
-            });
-
+            refreshDocLinks(record);
             renderDocumentManager(record);
             setFileStatus('');
             document.getElementById('editModal').style.display = 'flex';
         }
-
-        // Storage document map. URLs are public URLs from the rudhra-docs bucket.
-        const DOC_FIELDS = [
-            { key: 'aadhar_doc_url', label: 'Aadhaar Card', folder: 'aadhar', accept: 'image/*,.pdf' },
-            { key: 'bank_doc_url', label: 'Bank Proof', folder: 'bank', accept: 'image/*,.pdf' },
-            { key: 'pan_doc_url', label: 'PAN Card', folder: 'pan', accept: 'image/*,.pdf' },
-            { key: 'site_photo_url', label: 'Site Photo', folder: 'site', accept: 'image/*' },
-            { key: 'house_tax_doc_url', label: 'House Tax Document', folder: 'house_tax', accept: 'image/*,.pdf' }
-        ];
 
         function storagePathFromPublicUrl(url) {
             if (!url) return null;
@@ -698,7 +685,6 @@
                     await supabaseClient.storage.from('rudhra-docs').remove([path]);
                     throw updateError;
                 }
-                // Remove previous object only after DB now points at the new object.
                 const oldPath = storagePathFromPublicUrl(oldUrl);
                 if (oldPath) {
                     const { error: removeError } = await supabaseClient.storage.from('rudhra-docs').remove([oldPath]);
@@ -739,8 +725,12 @@
             linksDiv.innerHTML = '<strong style="width:100%; font-size:0.85rem;">Uploaded Documents:</strong>';
             DOC_FIELDS.forEach(doc => {
                 if (record[doc.key]) {
-                    const a = document.createElement('a'); a.href = record[doc.key]; a.target = '_blank'; a.rel = 'noopener';
-                    a.textContent = doc.label; linksDiv.appendChild(a);
+                    const a = document.createElement('a');
+                    a.href = record[doc.key];
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.textContent = doc.label;
+                    linksDiv.appendChild(a);
                 }
             });
         }
@@ -890,13 +880,15 @@
                 const mergedPdf = await PDFDocument.load(summaryBytes);
                 const fontBold = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
 
-                // Step C: Fetch and append every uploaded document, including House Tax.
+                // Step C: Fetch and append every uploaded document
                 const filesToAttach = [
-                    { key: 'aadhar_doc_url', title: '1. AADHAAR CARD DOCUMENT', url: record.aadhar_doc_url },
-                    { key: 'bank_doc_url', title: '2. BANK PASSBOOK / CANCELLED CHEQUE', url: record.bank_doc_url },
-                    { key: 'pan_doc_url', title: '3. PAN CARD DOCUMENT', url: record.pan_doc_url },
-                    { key: 'site_photo_url', title: '4. SITE INSTALLATION PHOTO', url: record.site_photo_url },
-                    { key: 'house_tax_doc_url', title: '5. HOUSE TAX DOCUMENT', url: record.house_tax_doc_url }
+                    { key: 'aadhar_doc_url', title: '1. AADHAAR CARD DOCUMENT', url: record.aadhar_doc_url, required: false },
+                    { key: 'bank_doc_url', title: '2. BANK PASSBOOK / CANCELLED CHEQUE', url: record.bank_doc_url, required: false },
+                    { key: 'pan_doc_url', title: '3. PAN CARD DOCUMENT', url: record.pan_doc_url, required: false },
+                    { key: 'site_photo_url', title: '4. SITE INSTALLATION PHOTO', url: record.site_photo_url, required: false },
+                    { key: 'house_tax_doc_url', title: '5. HOUSE TAX DOCUMENT', url: record.house_tax_doc_url, required: true },
+                    { key: 'electricity_bill_doc_url', title: '6. ELECTRICITY BILL', url: record.electricity_bill_doc_url, required: true },
+                    { key: 'digital_jansamarth_doc_url', title: '7. DIGITAL / JANSAMARTH FILE', url: record.digital_jansamarth_doc_url, required: true }
                 ];
 
                 for (const item of filesToAttach) {
@@ -911,7 +903,6 @@
                         const fileBuffer = await response.arrayBuffer();
                         if (!fileBuffer.byteLength) throw new Error('Downloaded file is empty');
 
-                        // Detect PDF by response MIME type, URL path, or its actual file signature.
                         const urlPath = new URL(item.url).pathname.toLowerCase();
                         const firstBytes = new Uint8Array(fileBuffer.slice(0, 5));
                         const isPdf = contentType.includes('pdf') || urlPath.endsWith('.pdf') ||
@@ -946,9 +937,8 @@
                         }
                     } catch (fileErr) {
                         console.error(`Could not attach ${item.title}:`, fileErr);
-                        // Never silently produce a dossier missing an uploaded House Tax file.
-                        if (item.key === 'house_tax_doc_url') {
-                            throw new Error(`House Tax document could not be added to the combined PDF. Check that the file is accessible in the rudhra-docs bucket. Details: ${fileErr.message}`);
+                        if (item.required) {
+                            throw new Error(`${item.title} could not be added to the combined PDF. Check that the file is accessible in the rudhra-docs bucket. Details: ${fileErr.message}`);
                         }
                         console.warn(`${item.title} was skipped: ${fileErr.message}`);
                     }
