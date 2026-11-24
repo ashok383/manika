@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A4 Draggable X, Y, Z Coordinates Over DEMO.jpeg</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Top Control Panel */
+    .controls {
+      max-width: 794px;
+      margin: 0 auto 12px;
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 720px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .control-group label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .control-group input[type="text"],
+    .control-group textarea {
+      padding: 7px 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .control-group input[type="file"] {
+      padding: 4px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      background: #f8fafc;
+    }
+
+    .control-group textarea {
+      resize: vertical;
+      min-height: 36px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      padding: 9px 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-reset {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .btn-print {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .btn-fix {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .btn-fix.locked {
+      background: #15803d;
+    }
+
+    /* X, Y, Z Coordinate Bar */
+    .coord-bar {
+      max-width: 794px;
+      margin: 0 auto 14px;
+      background: #ffffff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .coord-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .coord-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .coord-item select,
+    .coord-item input[type="number"] {
+      padding: 5px 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      width: 78px;
+    }
+
+    .coord-item select {
+      width: auto;
+    }
+
+    .live-readout {
+      font-size: 0.82rem;
+      font-family: Consolas, Monaco, monospace;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #0f172a;
+    }
+
+    /* A4 Page Canvas (794px x 1123px at 96 DPI) */
+    .a4-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .a4-page {
+      position: relative;
+      width: 794px;
+      height: 1123px;
+      background-color: #ffffff;
+      background-image: url('DEMO.jpeg');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+    }
+
+    /* Pure Draggable Items */
+    .drag-item {
+      position: absolute;
+      cursor: grab;
+      user-select: none;
+      background: transparent;
+      border: none;
+      padding: 2px;
+      margin: 0;
+      color: #000000;
+    }
+
+    .drag-item:hover {
+      outline: 1px dashed rgba(37, 99, 235, 0.55);
+    }
+
+    .drag-item.dragging {
+      cursor: grabbing;
+      outline: 1px dashed #2563eb;
+    }
+
+    .drag-item.fixed {
+      cursor: not-allowed;
+      outline: 1px solid rgba(21, 128, 61, 0.5);
+    }
+
+    #renderedTitle {
+      font-size: 20px;
+      font-weight: 700;
+      white-space: pre-wrap;
+    }
+
+    #renderedPara {
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 650px;
+      white-space: pre-wrap;
+    }
+
+    #renderedPhoto {
+      width: 110px;
+      height: 135px;
+      padding: 0;
+      display: none;
+    }
+
+    #renderedPhoto img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background: none;
+      }
+      .controls,
+      .coord-bar {
+        display: none !important;
+      }
+      .a4-page {
+        box-shadow: none;
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .drag-item:hover,
+      .drag-item.dragging,
+      .drag-item.fixed {
+        outline: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Editor Bar -->
+  <div class="controls">
+    <div class="control-group">
+      <label for="titleInput">Title</label>
+      <input type="text" id="titleInput" value="ENTER TITLE HERE" placeholder="Type title..." />
+    </div>
+
+    <div class="control-group">
+      <label for="paraInput">Paragraph</label>
+      <textarea id="paraInput" rows="1" placeholder="Type paragraph...">Type your paragraph here and drag it onto the page.</textarea>
+    </div>
+
+    <div class="control-group">
+      <label for="photoInput">Passphoto</label>
+      <input type="file" id="photoInput" accept="image/*" />
+    </div>
+
+    <div class="btn-group">
+      <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+      <button type="button" class="btn-print" onclick="window.print()">Print / PDF</button>
+    </div>
+  </div>
+
+  <!-- X, Y, Z Coordinate & Fix Bar -->
+  <div class="coord-bar">
+    <div class="coord-fields">
+      <div class="coord-item">
+        <label for="activeTargetSelect">Item:</label>
+        <select id="activeTargetSelect">
+          <option value="renderedTitle">Title</option>
+          <option value="renderedPara">Paragraph</option>
+          <option value="renderedPhoto">Passphoto</option>
+        </select>
+      </div>
+
+      <div class="coord-item">
+        <label for="xCoordInput">X:</label>
+        <input type="number" id="xCoordInput" step="1" value="80" />
+      </div>
+
+      <div class="coord-item">
+        <label for="yCoordInput">Y:</label>
+        <input type="number" id="yCoordInput" step="1" value="240" />
+      </div>
+
+      <div class="coord-item">
+        <label for="zCoordInput">Z:</label>
+        <input type="number" id="zCoordInput" step="1" value="1" />
+      </div>
+
+      <button type="button" class="btn-fix" id="fixBtn">Fix Position</button>
+    </div>
+
+    <div class="live-readout" id="liveReadout">Title → X: 80, Y: 240, Z: 1</div>
+  </div>
+
+  <!-- A4 Sheet with DEMO.jpeg Background -->
+  <div class="a4-wrapper">
+    <div class="a4-page" id="a4Page">
+      <div class="drag-item" id="renderedTitle" data-label="Title" style="left: 80px; top: 240px; z-index: 1;">ENTER TITLE HERE</div>
+      <div class="drag-item" id="renderedPara" data-label="Paragraph" style="left: 80px; top: 300px; z-index: 2;">Type your paragraph here and drag it onto the page.</div>
+      <div class="drag-item" id="renderedPhoto" data-label="Passphoto" style="left: 90px; top: 675px; z-index: 3;">
+        <img id="photoPreview" alt="Passphoto" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bindings = [
+      { inputId: 'titleInput', targetId: 'renderedTitle' },
+      { inputId: 'paraInput', targetId: 'renderedPara' }
+    ];
+
+    bindings.forEach(({ inputId, targetId }) => {
+      const inputEl = document.getElementById(inputId);
+      const targetEl = document.getElementById(targetId);
+      inputEl.addEventListener('input', () => {
+        targetEl.textContent = inputEl.value;
+      });
+    });
+
+    const photoInput = document.getElementById('photoInput');
+    const renderedPhoto = document.getElementById('renderedPhoto');
+    const photoPreview = document.getElementById('photoPreview');
+
+    photoInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        photoPreview.src = event.target.result;
+        renderedPhoto.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const page = document.getElementById('a4Page');
+    const items = document.querySelectorAll('.drag-item');
+    const activeTargetSelect = document.getElementById('activeTargetSelect');
+    const xCoordInput = document.getElementById('xCoordInput');
+    const yCoordInput = document.getElementById('yCoordInput');
+    const zCoordInput = document.getElementById('zCoordInput');
+    const fixBtn = document.getElementById('fixBtn');
+    const liveReadout = document.getElementById('liveReadout');
+
+    const fixedState = {
+      renderedTitle: false,
+      renderedPara: false,
+      renderedPhoto: false
+    };
+
+    const defaultPositions = {
+      renderedTitle: { left: 80, top: 240, z: 1 },
+      renderedPara: { left: 80, top: 300, z: 2 },
+      renderedPhoto: { left: 90, top: 675, z: 3 }
+    };
+
+    function getItemCoords(el) {
+      return {
+        x: Math.round(parseFloat(el.style.left) || 0),
+        y: Math.round(parseFloat(el.style.top) || 0),
+        z: parseInt(el.style.zIndex, 10) || 1
+      };
+    }
+
+    function syncCoordBar(el) {
+      const id = el.id;
+      const { x, y, z } = getItemCoords(el);
+      activeTargetSelect.value = id;
+      xCoordInput.value = x;
+      yCoordInput.value = y;
+      zCoordInput.value = z;
+
+      const lockTag = fixedState[id] ? ' [FIXED]' : '';
+      liveReadout.textContent = `${el.dataset.label} → X: ${x}, Y: ${y}, Z: ${z}${lockTag}`;
+
+      const isFixed = Boolean(fixedState[id]);
+      fixBtn.textContent = isFixed ? 'Fixed (Unlock)' : 'Fix Position';
+      fixBtn.classList.toggle('locked', isFixed);
+    }
+
+    function applyManualCoords() {
+      const el = document.getElementById(activeTargetSelect.value);
+      if (!el) return;
+
+      const maxLeft = Math.max(0, page.clientWidth - el.offsetWidth);
+      const maxTop = Math.max(0, page.clientHeight - el.offsetHeight);
+
+      const nextX = Math.max(0, Math.min(parseFloat(xCoordInput.value) || 0, maxLeft));
+      const nextY = Math.max(0, Math.min(parseFloat(yCoordInput.value) || 0, maxTop));
+      const nextZ = parseInt(zCoordInput.value, 10) || 1;
+
+      el.style.left = `${nextX}px`;
+      el.style.top = `${nextY}px`;
+      el.style.zIndex = `${nextZ}`;
+      syncCoordBar(el);
+    }
+
+    activeTargetSelect.addEventListener('change', () => {
+      const el = document.getElementById(activeTargetSelect.value);
+      if (el) syncCoordBar(el);
+    });
+
+    xCoordInput.addEventListener('input', applyManualCoords);
+    yCoordInput.addEventListener('input', applyManualCoords);
+    zCoordInput.addEventListener('input', applyManualCoords);
+
+    fixBtn.addEventListener('click', () => {
+      applyManualCoords();
+      const id = activeTargetSelect.value;
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      fixedState[id] = !fixedState[id];
+      el.classList.toggle('fixed', fixedState[id]);
+      syncCoordBar(el);
+    });
+
+    items.forEach((el) => {
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let origLeft = 0;
+      let origTop = 0;
+
+      el.addEventListener('pointerdown', (e) => {
+        syncCoordBar(el);
+        if (fixedState[el.id]) return;
+
+        isDragging = true;
+        el.classList.add('dragging');
+        el.setPointerCapture(e.pointerId);
+
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = parseFloat(el.style.left) || 0;
+        origTop = parseFloat(el.style.top) || 0;
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+
+        const maxLeft = page.clientWidth - el.offsetWidth;
+        const maxTop = page.clientHeight - el.offsetHeight;
+
+        const nextLeft = Math.max(0, Math.min(origLeft + (e.clientX - startX), maxLeft));
+        const nextTop = Math.max(0, Math.min(origTop + (e.clientY - startY), maxTop));
+
+        el.style.left = `${nextLeft}px`;
+        el.style.top = `${nextTop}px`;
+        syncCoordBar(el);
+      });
+
+      const stopDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        el.classList.remove('dragging');
+        if (el.hasPointerCapture(e.pointerId)) {
+          el.releasePointerCapture(e.pointerId);
+        }
+        syncCoordBar(el);
+      };
+
+      el.addEventListener('pointerup', stopDrag);
+      el.addEventListener('pointercancel', stopDrag);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.entries(defaultPositions).forEach(([id, pos]) => {
+        const el = document.getElementById(id);
+        fixedState[id] = false;
+        if (el) {
+          el.style.left = `${pos.left}px`;
+          el.style.top = `${pos.top}px`;
+          el.style.zIndex = `${pos.z}`;
+          el.classList.remove('fixed');
+        }
+      });
+      syncCoordBar(document.getElementById(activeTargetSelect.value));
+    });
+
+    syncCoordBar(document.getElementById(activeTargetSelect.value));
+  </script>
+  <script>
+setInterval(() => {
+  if (window.outerWidth - window.innerWidth > 160) {
+    window.location.href = "https://google.com";
+  }
+}, 1000);
+</script>
+</body>
+</html>
