@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annexure 2 - RTS Agreement Generator</title>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- html2pdf.js for Client-Side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #000;
+    }
+
+    /* Control Bar (Hidden in PDF) */
+    .controls {
+      max-width: 210mm;
+      margin: 0 auto 20px auto;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      font-family: Arial, sans-serif;
+    }
+
+    .controls-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .controls input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      width: 250px;
+    }
+
+    .controls button {
+      padding: 9px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-fetch {
+      background-color: #0284c7;
+      color: white;
+    }
+
+    .btn-pdf {
+      background-color: #16a34a;
+      color: white;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #555;
+    }
+
+    /* Document Container (A4 Layout) */
+    #agreement-document {
+      width: 210mm;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Standard Page Styling */
+    .page {
+      width: 210mm;
+      height: 296.5mm;
+      padding: 18mm 20mm 16mm 20mm;
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      overflow: hidden;
+    }
+
+    /* ONLY 1st Page gets 7cm (70mm) top space */
+    #page-1 {
+      padding-top: 70mm !important;
+    }
+
+    /* Pages 2, 3, 4 explicitly keep standard 18mm top space */
+    #page-2, #page-3, #page-4 {
+      padding-top: 18mm !important;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin: 4px 0;
+    }
+
+    h2 {
+      font-size: 14.5pt;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+    }
+
+    p, li {
+      font-size: 11pt;
+      line-height: 1.42;
+      text-align: justify;
+      margin: 5px 0;
+    }
+
+    ol {
+      padding-left: 20px;
+      margin: 5px 0;
+    }
+
+    ol li {
+      margin-bottom: 5px;
+    }
+
+    .center-bold {
+      text-align: center;
+      font-weight: bold;
+      margin: 8px 0;
+      font-size: 11.5pt;
+    }
+
+    .blank-field {
+      display: inline-block;
+      min-width: 125px;
+      border-bottom: 1px solid #000;
+      padding: 0 6px;
+      font-weight: bold;
+      text-align: center;
+      color: #111;
+    }
+
+    /* Signature & Party Table on Page 4 */
+    .party-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      font-size: 11.5pt;
+    }
+
+    .party-table th, .party-table td {
+      border: 1px solid #000;
+      padding: 10px 12px;
+      vertical-align: top;
+      width: 50%;
+    }
+
+    .party-table th {
+      text-align: left;
+      background-color: #f9f9f9;
+      font-size: 12pt;
+    }
+
+    .sig-box {
+      height: 80px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .sig-box img {
+      max-height: 75px;
+      max-width: 190px;
+      object-fit: contain;
+    }
+
+    /* Page Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid #ccc;
+      padding-top: 6px;
+      font-size: 10pt;
+      color: #333;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Control Panel -->
+  <div class="controls">
+    <div class="controls-left">
+      <input
+        type="tel"
+        id="mobile-input"
+        placeholder="Enter Mobile Number (e.g. 9550431332)"
+        maxlength="15"
+      />
+      <button class="btn-fetch" onclick="fetchByMobile()">Fetch by Mobile</button>
+      <span class="status" id="status-msg">Ready</span>
+    </div>
+    <button class="btn-pdf" onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <!-- Printable Agreement -->
+  <div id="agreement-document">
+
+    <!-- ==================== PAGE 1 (7cm Top Space) ==================== -->
+    <div class="page" id="page-1">
+      <div>
+        <h2>Annexure 2</h2>
+        <h3>Model Draft Agreement between Consumer &amp; Vendor for installation of grid<br>connected rooftop solar (RTS) project under PM – Surya Ghar: Muft Bijli Yojana</h3>
+
+        <p style="margin-top: 12px;">
+          This agreement is executed on (<span class="blank-field" id="agreement_date">&nbsp;</span>) for design, supply, installation, commissioning and 5-year comprehensive maintenance of RTS project/system along with warranty under PM Surya Ghar: Muft Bijli Yojana
+        </p>
+
+        <div class="center-bold">Between</div>
+
+        <p>
+          <strong>SRI.</strong> (<span class="blank-field" id="consumer_name">&nbsp;</span>), Electricity Consumer No.: (<span class="blank-field" id="electricity_consumer_no">&nbsp;</span>), having address at (<span class="blank-field" id="consumer_address" style="min-width: 220px;">&nbsp;</span>), District: (<span class="blank-field" id="consumer_district">&nbsp;</span>), State: (<span class="blank-field" id="consumer_state">&nbsp;</span>), PIN Code: (<span class="blank-field" id="consumer_pincode" style="min-width: 85px;">&nbsp;</span>)
+        </p>
+
+        <div class="center-bold">And</div>
+
+        <p>
+          <strong>M/s. SRI RUDHRA SOLAR SOLUTIONS</strong> having registered office at <strong>HNO: 1-7-28/12/1, Near SBI Bank Narsampeta Main Road DIST: MAHABUBABAD 506101, TELANGANA</strong> here in after referred to as second Party i.e. Vendor/ contractor/ System Integrator).
+        </p>
+
+        <p style="margin-top: 10px;"><strong>Whereas</strong></p>
+        <p>
+          First Party wishes to install a Grid Connected Rooftop Solar Plant on the rooftop of the residential building of the Consumer under PM Surya Ghar: Muft Bijli Yojana.
+        </p>
+
+        <p><strong>And whereas</strong></p>
+        <p>
+          Second Party has verified availability of appropriate roof and found it feasible to install a Grid Connected Roof Top Solar plant and that the second party is willing to design, supply, install, test, commission and carry out Operation &amp; Maintenance of the Rooftop Solar plant for 5 year period.
+        </p>
+
+        <p style="margin-top: 10px;"><strong>On this day, the First Party and Second Party agree to the following:</strong></p>
+        <p><strong>The First Party hereby undertakes to perform the following activities:</strong></p>
+        <ol>
+          <li>Submission of online application at National Portal for installation of RTS project/system, Submission of application for net-metering and system inspection and upload of the relevant documents on the National Portal of the scheme</li>
+          <li>Provide secure storage of the material of the RTS plant delivered at the premises till handover of the system.</li>
+          <li>Provide access to the Roof Top during installation of the plant, operation &amp; maintenance, testing of the plant and equipment and for meter reading from solar meter, inverter etc.</li>
+        </ol>
+      </div>
+
+      <div class="footer">
+        <span>Guidelines for PM-Surya Ghar: Muft Bijli Yojana</span>
+        <span>1</span>
+      </div>
+    </div>
+
+    <!-- ==================== PAGE 2 (Normal Top Space) ==================== -->
+    <div class="page" id="page-2">
+      <div>
+        <ol start="4">
+          <li>Provide electricity during plant installation and water for cleaning of the panels.</li>
+          <li>Report any malfunctioning of the plant to the Vendor during the warranty period.</li>
+          <li>Pay the amount as per the payment schedule as mutually agreed with the vendor, including any additional amount to the second party for any additional work/customization required depending upon the building condition</li>
+        </ol>
+
+        <p style="margin-top: 14px;"><strong>The Second Party hereby undertakes to perform the following activities:</strong></p>
+        <ol>
+          <li>The Vendor must follow all the standards and safety guidelines prescribed under state regulations and technical standards prescribed by MNRE for RTS projects, failing which the vendor is liable for blacklisting from participation in the govt. project/ scheme and other penal actions in accordance with the law. The responsibility of supply, installation and commissioning of the rooftop solar project/system in complete compliance with MNRE scheme guidelines lies with the Vendor.</li>
+          <li><strong>Site Survey:</strong> Site visit, survey and development of detailed project report for installation of RTS system. This also includes, feasibility study of roof, strength of roof and shadow free area. If any additional work or customization is involved for the plant installation as per site condition and requirement of the consumer building, the Vendor shall prepare an estimate and can raise separate invoice including GST in addition to the amount towards standard plant cost. The consumer shall pay the amount for such additional work directly to the Vendor.</li>
+          <li><strong>Design &amp; Engineering:</strong> Design of plant along with drawings and selection of components as per standard provided by the DISCOM/SERC/MNRE for best performance and safety of the plant.</li>
+          <li><strong>Module and Inverter:</strong> The solar modules, including the solar cells, should be manufactured in India. Both the solar modules and inverters shall conform to the relevant standards and specifications prescribed by MNRE. Any other requirement, viz. star labelling (solar modules), quality control orders and standards &amp; labeling (inverters) etc., shall also be complied.</li>
+          <li><strong>Procurement &amp; Supply:</strong> Procurement of complete system as per BIS/IS/IEC standard (whatever Applicable) &amp; safety guidelines for installation of rooftop solar plants. The supplied materials should comply with all MNRE standards for release of subsidy.</li>
+          <li><strong>Installation &amp; Civil work:</strong> Complete civil work, structure work and electrical work (including drawings) following all the safety and relevant BIS standards.</li>
+          <li><strong>Documentation (Technical Catalogues/Warranty Certificates/BIS certificates/other test reports etc):</strong> All such documents shall be provided to the consumer for online uploading and submission of technical specifications, IEC/BIS report, Sr. No's, Warranty card of Solar Panel &amp; Inverter, Layout &amp; Electrical SLD, Structure Design and Drawing, Cable and other detailed documents.</li>
+        </ol>
+      </div>
+
+      <div class="footer">
+        <span>Guidelines for PM-Surya Ghar: Muft Bijli Yojana</span>
+        <span>2</span>
+      </div>
+    </div>
+
+    <!-- ==================== PAGE 3 (Normal Top Space) ==================== -->
+    <div class="page" id="page-3">
+      <div>
+        <ol start="8">
+          <li><strong>Project completion report (PCR):</strong> Assisting the consumer in filling and uploading of signed documents (Consumer &amp; Vendor) on the national portal.</li>
+          <li><strong>Warranty:</strong> System warranty certificates should be provided to the consumer. The complete system should be warranted for 5 years from the date of commissioning by DISCOM. Individual component warranty documents provided by the manufacturer shall be provided to the consumer and all possible assistance should be extended to the consumer for claiming the warranty from the manufacturer.</li>
+          <li><strong>NET meter &amp; Grid Connectivity:</strong> Net meter supply/procurement, testing and approvals shall be in the scope of vendor. Grid connection of the plant shall be in the scope of the vendor.</li>
+          <li><strong>Testing and Commissioning:</strong> The vendor shall be present at the time of testing and commissioning by the DISCOM.</li>
+          <li><strong>Operation &amp; Maintenance:</strong> Five (5) years Comprehensive Operation and Maintenance including overhauling, wear and tear and regular checking of healthiness of system at proper interval shall be in the scope of vendor. The vendor shall also educate the consumer on best practices for cleaning of the modules and system maintenance.</li>
+          <li><strong>Insurance:</strong> Any insurance cost pertaining to material transfer/storage before commissioning of the system shall be in the scope of the vendor.</li>
+          <li><strong>Applicable Standard:</strong> The system must meet the technical standards and specifications notified by MNRE. The vendor is solely responsible to supply component and service which meets the technical standards and specification prescribed by MNRE and State DISCOMs.</li>
+          <li><strong>Project/system cost &amp; payment terms:</strong> The cost of the plant and payment schedule should be mutually discussed and decided between the vendor and consumer. The consumer may opt for milestone-based payment to the vendor and the same shall be included in the agreement.</li>
+          <li><strong>Dispute:</strong> In-case of any dispute between consumer and vendor (in supply/ installation/ maintenance of system or payment terms), both parties must settle the same mutually or as per law. MNRE/DISCOM shall not be liable for, and would not be a party to any dispute arising between vendor and consumer.</li>
+          <li><strong>Subsidy / Project Related Documents:</strong> Vendor must provide all the documents to consumer and help in uploading the same to National Portal for smooth release of subsidy.</li>
+          <li><strong>Performance of Plant:</strong> The Performance Ratio (PR) of Plant must be 75% at the time of commissioning of the project by DISCOM or its authorized agency. Vendor must provide (returnable basis) radiation sensor with valid calibration certificate of any NABL / International laboratory at the time of commissioning / testing of the plant. Vendor must maintain the PR of the</li>
+        </ol>
+      </div>
+
+      <div class="footer">
+        <span>Guidelines for PM-Surya Ghar: Muft Bijli Yojana</span>
+        <span>3</span>
+      </div>
+    </div>
+
+    <!-- ==================== PAGE 4 (Normal Top Space) ==================== -->
+    <div class="page" id="page-4">
+      <div>
+        <p style="padding-left: 20px;">
+          plant till warranty of project i.e. 5 years from the date of commissioning.
+        </p>
+        <ol start="19">
+          <li><strong>Mutually Agreed Terms of Payment.</strong></li>
+        </ol>
+
+        <!-- First Party & Second Party Details & Signature Table -->
+        <table class="party-table">
+          <thead>
+            <tr>
+              <th>First Party (Consumer):</th>
+              <th>Second Party (Vendor):</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Name:</strong> <span id="table_first_party_name">_______________________</span><br>
+                <strong>Consumer No.:</strong> <span id="table_first_party_consumer_no">_________________</span>
+              </td>
+              <td>
+                <strong>Name:</strong> SRI RUDHRA SOLAR SOLUTIONS
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Address:</strong><br>
+                <span id="table_first_party_address">_______________________</span><br>
+                <strong>District:</strong> <span id="table_first_party_district">___________</span><br>
+                <strong>State:</strong> <span id="table_first_party_state">___________</span>,
+                <strong>PIN Code:</strong> <span id="table_first_party_pincode">_______</span>
+              </td>
+              <td>
+                <strong>Address:</strong><br>
+                HNO: 1-7-28/12/1, NEAR SBI BANK,<br>
+                NARSAMPETA MAIN ROAD,<br>
+                DIST: MAHABUBABAD,<br>
+                State: TELANGANA, PIN Code: 506101
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Signature of First Party (Customer Sign):</strong>
+                <div class="sig-box">
+                  <img id="first_party_signature" src="" alt="Customer Signature" style="display: none;" crossorigin="anonymous" />
+                </div>
+              </td>
+              <td>
+                <strong>Signature &amp; Company Seal of Second Party:</strong>
+                <div class="sig-box">
+                  <img id="second_party_signature" src="" alt="Company Seal" style="display: none;" crossorigin="anonymous" />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <span>Guidelines for PM-Surya Ghar: Muft Bijli Yojana</span>
+        <span>4</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. INITIALIZE SUPABASE CLIENT
+    const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+    const STORAGE_BUCKET = 'rudhra-docs';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Optional fallback: if company_seal_url is empty on a booking row,
+    // set a default file path inside 'rudhra-docs' (e.g. 'company_seal.png') or a full public URL
+    const DEFAULT_COMPANY_SEAL_REF = '';
+
+    // Normalize mobile number (digits only, strips leading 91 if 12 digits)
+    function normalizeMobile(raw) {
+      return (raw || '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+    }
+
+    // Format created_at timestamp into DD/MM/YYYY
+    function formatDate(isoString) {
+      if (!isoString) return new Date().toLocaleDateString('en-IN');
+      const d = new Date(isoString);
+      return isNaN(d.getTime()) ? new Date().toLocaleDateString('en-IN') : d.toLocaleDateString('en-IN');
+    }
+
+    // Combine house_no, village, and mandal from rudhra_solar_bookings
+    function buildFullAddress(row) {
+      return [row.house_no, row.village, row.mandal ? `Mandal: ${row.mandal}` : '']
+        .map(part => (part || '').trim())
+        .filter(Boolean)
+        .join(', ');
+    }
+
+    // Resolve either a full URL/Base64 or a path inside the 'rudhra-docs' public bucket
+    function resolveStorageOrUrl(value) {
+      if (!value || typeof value !== 'string' || value.trim() === '') return '';
+      const trimmed = value.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+        return trimmed;
+      }
+      const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(trimmed);
+      return data?.publicUrl || '';
+    }
+
+    function setSignatureImage(elementId, urlOrBase64) {
+      const img = document.getElementById(elementId);
+      const resolved = resolveStorageOrUrl(urlOrBase64);
+      if (resolved) {
+        img.src = resolved;
+        img.style.display = 'block';
+      } else {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+      }
+    }
+
+    // 2. FETCH BOOKING FROM rudhra_solar_bookings BY mobile_no
+    async function fetchByMobile() {
+      const mobile = normalizeMobile(document.getElementById('mobile-input').value);
+      const statusEl = document.getElementById('status-msg');
+
+      if (!mobile || mobile.length < 10) {
+        statusEl.textContent = 'Please enter a valid 10-digit mobile number.';
+        return;
+      }
+
+      statusEl.textContent = `Fetching booking for Mobile No. ${mobile}...`;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('rudhra_solar_bookings')
+          .select('*')
+          .eq('mobile_no', mobile)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          statusEl.textContent = `No booking found for Mobile No.: ${mobile}`;
+          return;
+        }
+
+        const agreementDate = formatDate(data.created_at);
+        const fullAddress = buildFullAddress(data);
+
+        // Populate Page 1 Blanks
+        document.getElementById('agreement_date').textContent = agreementDate;
+        document.getElementById('consumer_name').textContent = data.full_name || '';
+        document.getElementById('electricity_consumer_no').textContent = data.electricity_consumer_no || '';
+        document.getElementById('consumer_address').textContent = fullAddress;
+        document.getElementById('consumer_district').textContent = data.district || '';
+        document.getElementById('consumer_state').textContent = data.state || '';
+        document.getElementById('consumer_pincode').textContent = data.pincode || '';
+
+        // Populate Page 4 Table
+        document.getElementById('table_first_party_name').textContent = data.full_name || '';
+        document.getElementById('table_first_party_consumer_no').textContent = data.electricity_consumer_no || '';
+        document.getElementById('table_first_party_address').textContent = fullAddress;
+        document.getElementById('table_first_party_district').textContent = data.district || '';
+        document.getElementById('table_first_party_state').textContent = data.state || '';
+        document.getElementById('table_first_party_pincode').textContent = data.pincode || '';
+
+        // Populate Customer Sign & Company Seal from Supabase
+        setSignatureImage('first_party_signature', data.customer_sign_url || '');
+        setSignatureImage('second_party_signature', data.company_seal_url || DEFAULT_COMPANY_SEAL_REF);
+
+        statusEl.textContent = `Loaded booking for ${data.full_name} (Consumer No: ${data.electricity_consumer_no || 'N/A'})`;
+      } catch (err) {
+        console.error('Supabase Error:', err);
+        statusEl.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    // 3. GENERATE AND DOWNLOAD PDF
+    function downloadPDF() {
+      const element = document.getElementById('agreement-document');
+      const consumerName = document.getElementById('consumer_name').textContent.trim() || 'Consumer';
+
+      const opt = {
+        margin: 0,
+        filename: `Annexure_2_${consumerName.replace(/\s+/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // 4. ANTI-INSPECT / DEVTOOLS DETERRENCE
+    document.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      const key = e.key ? e.key.toLowerCase() : '';
+      if (e.keyCode === 123 || key === 'f12') {
+        e.preventDefault();
+        return false;
+      }
+      if (e.ctrlKey && (key === 'u' || key === 's' || e.keyCode === 85 || e.keyCode === 83)) {
+        e.preventDefault();
+        return false;
+      }
+      if (e.ctrlKey && e.shiftKey && (key === 'i' || key === 'j' || key === 'c' || [73, 74, 67].includes(e.keyCode))) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    setInterval(function () {
+      const widthDiff = window.outerWidth - window.innerWidth > 160;
+      const heightDiff = window.outerHeight - window.innerHeight > 160;
+      if (widthDiff || heightDiff) {
+        document.body.innerHTML =
+          '<h2 style="text-align:center; margin-top:100px; font-family:Arial, sans-serif; color:#b91c1c;">Inspect / Developer Tools is disabled on this page.</h2>';
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>
