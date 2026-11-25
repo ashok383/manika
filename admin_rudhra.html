@@ -290,14 +290,14 @@
     <!-- PASSWORD LOCK SCREEN -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card">
-            <img src="rudhralogo.jpeg" alt="RUDHRA Logo">
+            <img src="rudhra_logo.jpeg" alt="RUDHRA Logo">
             <h2><span>RUDHRA</span> ADMIN</h2>
             <p>Enter Admin Password to Access Portal</p>
             <form id="loginForm">
                 <input type="password" id="adminPasswordInput" class="login-input" placeholder="Enter Password" required autofocus>
                 <button type="submit" class="login-btn">UNLOCK PORTAL</button>
             </form>
-            <div class="login-error" id="loginError">❌ Incorrect Password. Try again.</div>
+            <div class="login-error" id="loginError">Incorrect Password. Try again.</div>
         </div>
     </div>
 
@@ -305,15 +305,15 @@
     <div id="dashboardApp">
         <header class="fixed-header">
             <div class="header-left">
-                <img src="rudhralogo.jpeg" alt="RUDHRA Logo">
+                <img src="rudhra_logo.jpeg" alt="RUDHRA Logo">
                 <div>
                     <h1><span>RUDHRA</span> ADMIN PORTAL</h1>
-                    <small style="color: #cbd5e1;">Manage Solar Bookings & Customer Documents</small>
+                    <small style="color: #cbd5e1;">Manage Solar Bookings &amp; Customer Documents</small>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-refresh" onclick="fetchBookings()">↻ Refresh Data</button>
-                <button class="btn btn-lock" onclick="lockPortal()">🔒 Lock</button>
+                <button class="btn btn-refresh" onclick="fetchBookings()">Refresh Data</button>
+                <button class="btn btn-lock" onclick="lockPortal()">Lock</button>
             </div>
         </header>
 
@@ -339,7 +339,6 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
                             <th>Customer Name</th>
                             <th>Mobile</th>
                             <th>Capacity</th>
@@ -347,6 +346,7 @@
                             <th>Village / District</th>
                             <th>Consumer No</th>
                             <th>Actions</th>
+                            <th>Registration Date</th>
                         </tr>
                     </thead>
                     <tbody id="bookingsBody">
@@ -444,6 +444,14 @@
                             <label>PAN Number</label>
                             <input type="text" id="edit_pan_no" style="text-transform:uppercase;">
                         </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="edit_status">
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- View Individual Uploaded Files -->
@@ -495,7 +503,6 @@
             }
         });
 
-        // Check session on page load
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('rudhra_admin_auth') === 'true') {
                 unlockDashboard();
@@ -507,17 +514,20 @@
         // ==========================================
         const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+        const STORAGE_BUCKET = 'rudhra-docs';
+        const BOOKINGS_TABLE = 'rudhra_solar_bookings';
+        const LOGO_FILENAME = 'rudhra_logo.jpeg';
+        const FIXED_SEAL_FILENAME = 'rudhra_seal.jpeg';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let allBookings = [];
 
-        // 1. Fetch All Bookings
         async function fetchBookings() {
             const tbody = document.getElementById('bookingsBody');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:25px;">Loading data...</td></tr>';
 
             const { data, error } = await supabaseClient
-                .from('rudhra_solar_bookings')
+                .from(BOOKINGS_TABLE)
                 .select('*')
                 .order('created_at', { ascending: false });
 
@@ -530,7 +540,6 @@
             renderTable(allBookings);
         }
 
-        // 2. Render Table Rows
         function renderTable(records) {
             const tbody = document.getElementById('bookingsBody');
             document.getElementById('recordCount').innerText = `Total Bookings: ${records.length}`;
@@ -544,7 +553,6 @@
                 const dateStr = row.created_at ? new Date(row.created_at).toLocaleDateString('en-IN') : '-';
                 return `
                     <tr>
-                        <td>${dateStr}</td>
                         <td><strong>${row.full_name || ''}</strong></td>
                         <td>${row.mobile_no || ''}</td>
                         <td><span class="badge">${row.capacity || ''}</span></td>
@@ -552,16 +560,15 @@
                         <td>${row.village || ''}, ${row.district || ''}</td>
                         <td>${row.electricity_consumer_no || ''}</td>
                         <td style="display:flex; gap:6px; flex-wrap:wrap;">
-                            <button class="btn btn-edit" onclick="openEditModal('${row.id}')">✏️ View / Edit</button>
-                            <button class="btn btn-pdf" id="pdfBtn_${row.id}" onclick="downloadMergedPDF('${row.id}')">📥 Download All (PDF)</button>
-                            <!--    <button class="btn btn-delete" onclick="deleteBooking('${row.id}', '${row.full_name}')">🗑️</button>    -->  
+                            <button class="btn btn-edit" onclick="openEditModal('${row.id}')">View / Edit</button>
+                            <button class="btn btn-pdf" id="pdfBtn_${row.id}" onclick="downloadMergedPDF('${row.id}')">Download All (PDF)</button>
                         </td>
+                        <td>${dateStr}</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // 3. Search & Filter
         function filterTable() {
             const q = document.getElementById('searchInput').value.toLowerCase();
             const agent = document.getElementById('agentFilter').value;
@@ -580,18 +587,15 @@
             renderTable(filtered);
         }
 
-        // Storage document map. URLs are public URLs from the rudhra-docs bucket.
         const DOC_FIELDS = [
             { key: 'aadhar_doc_url', label: 'Aadhaar Card', folder: 'aadhar', accept: 'image/*,.pdf', requiredInPdf: false },
             { key: 'bank_doc_url', label: 'Bank Proof', folder: 'bank', accept: 'image/*,.pdf', requiredInPdf: false },
             { key: 'pan_doc_url', label: 'PAN Card', folder: 'pan', accept: 'image/*,.pdf', requiredInPdf: false },
             { key: 'site_photo_url', label: 'Site Photo', folder: 'site', accept: 'image/*', requiredInPdf: false },
             { key: 'house_tax_doc_url', label: 'House Tax Document', folder: 'house_tax', accept: 'image/*,.pdf', requiredInPdf: true },
-            { key: 'electricity_bill_doc_url', label: 'Electricity Bill', folder: 'electricity_bill', accept: 'image/*,.pdf', requiredInPdf: true },
-            { key: 'digital_jansamarth_doc_url', label: 'Digital / Jansamarth File', folder: 'digital_jansamarth', accept: 'image/*,.pdf', requiredInPdf: true }
+            { key: 'customer_sign_url', label: 'Customer Sign', folder: 'customer_sign', accept: 'image/*,.pdf', requiredInPdf: false }
         ];
 
-        // 4. Open Edit Modal
         function openEditModal(id) {
             const record = allBookings.find(r => String(r.id) === String(id));
             if (!record) return;
@@ -613,6 +617,7 @@
             document.getElementById('edit_bank_ac_no').value = record.bank_ac_no || '';
             document.getElementById('edit_ifsc_code').value = record.ifsc_code || '';
             document.getElementById('edit_pan_no').value = record.pan_no || '';
+            document.getElementById('edit_status').value = record.status || 'Pending';
 
             refreshDocLinks(record);
             renderDocumentManager(record);
@@ -624,7 +629,7 @@
             if (!url) return null;
             try {
                 const parsed = new URL(url);
-                const marker = '/storage/v1/object/public/rudhra-docs/';
+                const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
                 const index = parsed.pathname.indexOf(marker);
                 return index >= 0 ? decodeURIComponent(parsed.pathname.slice(index + marker.length)) : null;
             } catch (_) { return null; }
@@ -676,18 +681,18 @@
             try {
                 const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-zA-Z0-9]/g, '');
                 const path = `${doc.folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-                const { error: uploadError } = await supabaseClient.storage.from('rudhra-docs').upload(path, file, { upsert: false });
+                const { error: uploadError } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: false });
                 if (uploadError) throw uploadError;
-                const { data: urlData } = supabaseClient.storage.from('rudhra-docs').getPublicUrl(path);
-                const { error: updateError } = await supabaseClient.from('rudhra_solar_bookings')
+                const { data: urlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+                const { error: updateError } = await supabaseClient.from(BOOKINGS_TABLE)
                     .update({ [doc.key]: urlData.publicUrl }).eq('id', recordId);
                 if (updateError) {
-                    await supabaseClient.storage.from('rudhra-docs').remove([path]);
+                    await supabaseClient.storage.from(STORAGE_BUCKET).remove([path]);
                     throw updateError;
                 }
                 const oldPath = storagePathFromPublicUrl(oldUrl);
                 if (oldPath) {
-                    const { error: removeError } = await supabaseClient.storage.from('rudhra-docs').remove([oldPath]);
+                    const { error: removeError } = await supabaseClient.storage.from(STORAGE_BUCKET).remove([oldPath]);
                     if (removeError) console.warn('New file saved, but old Storage file could not be removed:', removeError.message);
                 }
                 setFileStatus(`${doc.label} uploaded and booking updated.`);
@@ -705,11 +710,11 @@
             button.disabled = true; button.textContent = 'Deleting...';
             try {
                 const path = storagePathFromPublicUrl(record[doc.key]);
-                const { error: updateError } = await supabaseClient.from('rudhra_solar_bookings')
+                const { error: updateError } = await supabaseClient.from(BOOKINGS_TABLE)
                     .update({ [doc.key]: null }).eq('id', recordId);
                 if (updateError) throw updateError;
                 if (path) {
-                    const { error: removeError } = await supabaseClient.storage.from('rudhra-docs').remove([path]);
+                    const { error: removeError } = await supabaseClient.storage.from(STORAGE_BUCKET).remove([path]);
                     if (removeError) throw removeError;
                 }
                 setFileStatus(`${doc.label} deleted.`);
@@ -739,7 +744,6 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
-        // 5. Save Edited Data to Supabase
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveEditBtn');
@@ -763,11 +767,12 @@
                 electricity_consumer_no: document.getElementById('edit_electricity_consumer_no').value,
                 bank_ac_no: document.getElementById('edit_bank_ac_no').value,
                 ifsc_code: document.getElementById('edit_ifsc_code').value.toUpperCase(),
-                pan_no: document.getElementById('edit_pan_no').value.toUpperCase()
+                pan_no: document.getElementById('edit_pan_no').value.toUpperCase(),
+                status: document.getElementById('edit_status').value
             };
 
             const { error } = await supabaseClient
-                .from('rudhra_solar_bookings')
+                .from(BOOKINGS_TABLE)
                 .update(updatedData)
                 .eq('id', id);
 
@@ -777,29 +782,12 @@
             if (error) {
                 alert('Error updating record: ' + error.message);
             } else {
-                alert('✅ Customer details updated successfully!');
+                alert('Customer details updated successfully!');
                 closeModal();
                 fetchBookings();
             }
         });
 
-        // 6. Delete Record
-        async function deleteBooking(id, name) {
-            if (!confirm(`Are you sure you want to delete booking for "${name}"?`)) return;
-
-            const { error } = await supabaseClient
-                .from('rudhra_solar_bookings')
-                .delete()
-                .eq('id', id);
-
-            if (error) {
-                alert('Error deleting: ' + error.message);
-            } else {
-                fetchBookings();
-            }
-        }
-
-        // Helper: Convert WebP/unsupported image formats to PNG bytes via Canvas
         async function convertImageToPngBytes(arrayBuffer, mimeType) {
             return new Promise((resolve, reject) => {
                 const blob = new Blob([arrayBuffer], { type: mimeType });
@@ -821,7 +809,222 @@
             });
         }
 
-        // 7. Single Button: Download All Details + Uploaded Files in One PDF named (USERNAME).pdf
+        async function fetchImageAsPngDataUrl(srcUrl) {
+            if (!srcUrl) return null;
+            try {
+                const res = await fetch(srcUrl, { cache: 'no-store' });
+                if (!res.ok) return null;
+                const contentType = (res.headers.get('content-type') || '').toLowerCase();
+                if (contentType.includes('pdf') || srcUrl.toLowerCase().endsWith('.pdf')) {
+                    return null;
+                }
+                const blob = await res.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                return await new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        URL.revokeObjectURL(objectUrl);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.onerror = () => {
+                        URL.revokeObjectURL(objectUrl);
+                        resolve(null);
+                    };
+                    img.src = objectUrl;
+                });
+            } catch (_) {
+                return null;
+            }
+        }
+
+        async function createStyledReceiptBytes(record) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const pageWidth = 210;
+            const margin = 14;
+            const contentWidth = pageWidth - margin * 2;
+
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, pageWidth, 36, 'F');
+            doc.setFillColor(245, 158, 11);
+            doc.rect(0, 36, pageWidth, 2.5, 'F');
+
+            const logoDataUrl = await fetchImageAsPngDataUrl(LOGO_FILENAME);
+            let textStartX = margin;
+            if (logoDataUrl) {
+                try {
+                    doc.addImage(logoDataUrl, 'PNG', margin, 5.5, 24, 24);
+                    textStartX = margin + 29;
+                } catch (_) {}
+            }
+
+            doc.setTextColor(245, 158, 11);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16.5);
+            doc.text('M/s. SRI RUDHRA SOLAR SOLUTIONS', textStartX, 14);
+
+            doc.setTextColor(226, 232, 240);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('HNO: 1-7-28/12/1, Near SBI Bank, Narsampeta Main Road,', textStartX, 20);
+            doc.text('Dist: Mahabubabad - 506101, Telangana | PM - Surya Ghar: Muft Bijli Yojana', textStartX, 25);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.8);
+            doc.text('SOLAR BOOKING ACKNOWLEDGEMENT RECEIPT', textStartX, 31.5);
+
+            let y = 43;
+            doc.setFillColor(241, 245, 249);
+            doc.setDrawColor(203, 213, 225);
+            doc.roundedRect(margin, y, contentWidth, 14.5, 2, 2, 'FD');
+
+            const receiptNo = record.id
+                ? `RSS-${String(record.id).slice(0, 8).toUpperCase()}`
+                : `RSS-${Date.now().toString().slice(-8)}`;
+            const regDate = record.created_at
+                ? new Date(record.created_at).toLocaleString('en-IN')
+                : new Date().toLocaleString('en-IN');
+
+            doc.setTextColor(15, 23, 42);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.2);
+            doc.text(`Receipt / Booking ID: ${receiptNo}`, margin + 4, y + 5.8);
+            doc.text(`Status: ${record.status || 'Pending'}`, pageWidth - margin - 4, y + 5.8, { align: 'right' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.8);
+            doc.setTextColor(71, 85, 105);
+            doc.text(`Registration Date: ${regDate}`, margin + 4, y + 11.5);
+            doc.text(`Assigned Agent: ${record.agent_name || 'N/A'}`, pageWidth - margin - 4, y + 11.5, { align: 'right' });
+
+            y += 20;
+
+            const drawSectionHeader = (title) => {
+                doc.setFillColor(15, 23, 42);
+                doc.rect(margin, y, contentWidth, 7, 'F');
+                doc.setTextColor(245, 158, 11);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9.2);
+                doc.text(title, margin + 3.5, y + 4.8);
+                y += 7;
+            };
+
+            const drawRow = (label, value, isAlt = false) => {
+                const displayValue = String(value || 'N/A');
+                const wrappedLines = doc.splitTextToSize(displayValue, contentWidth - 68);
+                const rowHeight = Math.max(6.8, wrappedLines.length * 4.4 + 2.6);
+
+                doc.setFillColor(isAlt ? 248 : 255, isAlt ? 250 : 255, isAlt ? 252 : 255);
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(margin, y, contentWidth, rowHeight, 'FD');
+
+                doc.setTextColor(51, 65, 85);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8.8);
+                doc.text(label, margin + 3.5, y + 4.6);
+
+                doc.setTextColor(15, 23, 42);
+                doc.setFont('helvetica', 'normal');
+                doc.text(wrappedLines, margin + 65, y + 4.6);
+
+                y += rowHeight;
+            };
+
+            drawSectionHeader('1. CUSTOMER & SOLAR SYSTEM DETAILS');
+            drawRow('Customer Full Name', record.full_name, false);
+            drawRow('Mobile Number', record.mobile_no, true);
+            drawRow('Email ID', record.email_id, false);
+            drawRow('Required Plant Capacity', record.capacity, true);
+            drawRow('Electricity Consumer No.', record.electricity_consumer_no, false);
+
+            y += 4;
+
+            drawSectionHeader('2. INSTALLATION SITE ADDRESS');
+            const fullAddress = `${record.house_no || ''}, ${record.village || ''}, Mandal: ${record.mandal || ''}, Dist: ${record.district || ''}, ${record.state || ''} - ${record.pincode || ''}`;
+            drawRow('Complete Site Address', fullAddress, false);
+
+            y += 4;
+
+            drawSectionHeader('3. KYC & BANK ACCOUNT DETAILS');
+            drawRow('Aadhar Number', record.aadhar_no, false);
+            drawRow('PAN Number', record.pan_no, true);
+            drawRow('Bank Account Number', record.bank_ac_no, false);
+            drawRow('IFSC Code', record.ifsc_code, true);
+
+            y += 4;
+
+            drawSectionHeader('4. ATTACHED DOCUMENTS CHECKLIST');
+            const attachedList = [
+                record.aadhar_doc_url ? 'Aadhaar Card' : null,
+                record.bank_doc_url ? 'Bank Proof' : null,
+                record.pan_doc_url ? 'PAN Card' : null,
+                record.site_photo_url ? 'Site Photo' : null,
+                record.house_tax_doc_url ? 'House Tax Document' : null
+            ].filter(Boolean);
+            drawRow('Enclosed KYC & Site Files', attachedList.length ? attachedList.join(', ') : 'None', false);
+
+            y += 7;
+
+            const boxWidth = (contentWidth - 8) / 2;
+            const boxHeight = 36;
+            const rightBoxX = margin + boxWidth + 8;
+
+            doc.setDrawColor(148, 163, 184);
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(margin, y, boxWidth, boxHeight, 2, 2, 'FD');
+            doc.roundedRect(rightBoxX, y, boxWidth, boxHeight, 2, 2, 'FD');
+
+            const [customerSignDataUrl, fixedSealDataUrl] = await Promise.all([
+                fetchImageAsPngDataUrl(record.customer_sign_url),
+                fetchImageAsPngDataUrl(FIXED_SEAL_FILENAME)
+            ]);
+
+            if (customerSignDataUrl) {
+                try {
+                    doc.addImage(customerSignDataUrl, 'PNG', margin + 12, y + 3, boxWidth - 24, 21);
+                } catch (_) {}
+            } else {
+                doc.setTextColor(148, 163, 184);
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8.5);
+                doc.text('Customer Signature Not Available', margin + boxWidth / 2, y + 15, { align: 'center' });
+            }
+
+            if (fixedSealDataUrl) {
+                try {
+                    doc.addImage(fixedSealDataUrl, 'PNG', rightBoxX + 12, y + 3, boxWidth - 24, 21);
+                } catch (_) {}
+            }
+
+            doc.setDrawColor(203, 213, 225);
+            doc.line(margin + 6, y + 26, margin + boxWidth - 6, y + 26);
+            doc.line(rightBoxX + 6, y + 26, rightBoxX + boxWidth - 6, y + 26);
+
+            doc.setTextColor(15, 23, 42);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.8);
+            doc.text('Signature of Customer (First Party)', margin + boxWidth / 2, y + 31.5, { align: 'center' });
+            doc.text('Authorized Seal & Sign (Sri Rudhra Solar Solutions)', rightBoxX + boxWidth / 2, y + 31.5, { align: 'center' });
+
+            const footerY = 287;
+            doc.setDrawColor(203, 213, 225);
+            doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+            doc.setTextColor(100, 116, 139);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('System-generated Booking Receipt & KYC Dossier | M/s. Sri Rudhra Solar Solutions', margin, footerY);
+            doc.text('Page 1', pageWidth - margin, footerY, { align: 'right' });
+
+            return doc.output('arraybuffer');
+        }
+
         async function downloadMergedPDF(id) {
             const record = allBookings.find(r => String(r.id) === String(id));
             if (!record) return;
@@ -829,66 +1032,22 @@
             const btn = document.getElementById(`pdfBtn_${id}`);
             const originalText = btn.innerText;
             btn.disabled = true;
-            btn.innerText = '⏳ Generating PDF...';
+            btn.innerText = 'Generating PDF...';
 
             try {
-                const { jsPDF } = window.jspdf;
                 const { PDFDocument, rgb, StandardFonts } = PDFLib;
 
-                // Step A: Create Summary Page with jsPDF
-                const summaryDoc = new jsPDF();
-                summaryDoc.setFillColor(15, 23, 42);
-                summaryDoc.rect(0, 0, 210, 28, 'F');
-                summaryDoc.setTextColor(245, 158, 11);
-                summaryDoc.setFontSize(18);
-                summaryDoc.setFont('helvetica', 'bold');
-                summaryDoc.text('RUDHRA SOLAR PANEL BOOKING', 14, 14);
-                summaryDoc.setTextColor(255, 255, 255);
-                summaryDoc.setFontSize(10);
-                summaryDoc.text('Customer Application & KYC Dossier', 14, 22);
-
-                summaryDoc.setTextColor(30, 41, 59);
-                let y = 40;
-                const addRow = (label, val) => {
-                    summaryDoc.setFont('helvetica', 'bold');
-                    summaryDoc.text(`${label}:`, 14, y);
-                    summaryDoc.setFont('helvetica', 'normal');
-                    summaryDoc.text(`${val || 'N/A'}`, 75, y);
-                    summaryDoc.setDrawColor(226, 232, 240);
-                    summaryDoc.line(14, y + 2, 196, y + 2);
-                    y += 10;
-                };
-
-                addRow('Full Name', record.full_name);
-                addRow('Mobile Number', record.mobile_no);
-                addRow('Email ID', record.email_id);
-                addRow('Required Capacity', record.capacity);
-                addRow('Assigned Agent', record.agent_name);
-                addRow('House No', record.house_no);
-                addRow('Village / Town', record.village);
-                addRow('Mandal', record.mandal);
-                addRow('District & State', `${record.district || ''}, ${record.state || ''} - ${record.pincode || ''}`);
-                addRow('Aadhar Number', record.aadhar_no);
-                addRow('Electricity Consumer No', record.electricity_consumer_no);
-                addRow('Bank Account No', record.bank_ac_no);
-                addRow('IFSC Code', record.ifsc_code);
-                addRow('PAN Number', record.pan_no);
-                addRow('Submitted Date', record.created_at ? new Date(record.created_at).toLocaleString('en-IN') : '');
-
-                // Step B: Initialize Master PDFDocument with Summary Page
-                const summaryBytes = summaryDoc.output('arraybuffer');
-                const mergedPdf = await PDFDocument.load(summaryBytes);
+                const receiptBytes = await createStyledReceiptBytes(record);
+                const mergedPdf = await PDFDocument.load(receiptBytes);
                 const fontBold = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
 
-                // Step C: Fetch and append every uploaded document
+                // All uploaded documents EXCEPT customer_sign_url
                 const filesToAttach = [
                     { key: 'aadhar_doc_url', title: '1. AADHAAR CARD DOCUMENT', url: record.aadhar_doc_url, required: false },
                     { key: 'bank_doc_url', title: '2. BANK PASSBOOK / CANCELLED CHEQUE', url: record.bank_doc_url, required: false },
                     { key: 'pan_doc_url', title: '3. PAN CARD DOCUMENT', url: record.pan_doc_url, required: false },
                     { key: 'site_photo_url', title: '4. SITE INSTALLATION PHOTO', url: record.site_photo_url, required: false },
-                    { key: 'house_tax_doc_url', title: '5. HOUSE TAX DOCUMENT', url: record.house_tax_doc_url, required: true },
-                    { key: 'electricity_bill_doc_url', title: '6. ELECTRICITY BILL', url: record.electricity_bill_doc_url, required: true },
-                    { key: 'digital_jansamarth_doc_url', title: '7. DIGITAL / JANSAMARTH FILE', url: record.digital_jansamarth_doc_url, required: true }
+                    { key: 'house_tax_doc_url', title: '5. HOUSE TAX DOCUMENT', url: record.house_tax_doc_url, required: true }
                 ];
 
                 for (const item of filesToAttach) {
@@ -944,7 +1103,6 @@
                     }
                 }
 
-                // Step D: Download Single Combined PDF named (USERNAME).pdf
                 const finalPdfBytes = await mergedPdf.save();
                 const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
                 const downloadUrl = URL.createObjectURL(blob);
@@ -960,41 +1118,35 @@
 
             } catch (err) {
                 console.error(err);
-                alert('❌ Failed to generate combined PDF: ' + err.message);
+                alert('Failed to generate combined PDF: ' + err.message);
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
             }
         }
     </script>
-  <script>
-  // Disable right-click context menu
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-  });
+    <script>
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
 
-  // Disable common DevTools and View Source keyboard shortcuts
-  document.addEventListener("keydown", function (e) {
-    // F12
-    if (e.key === "F12") {
-      e.preventDefault();
-    }
-    // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Inspect / Console)
-    if (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) {
-      e.preventDefault();
-    }
-    // Ctrl+U (View Source) or Ctrl+S (Save Page)
-    if (e.ctrlKey && ["U", "S"].includes(e.key.toUpperCase())) {
-      e.preventDefault();
-    }
-    // Mac shortcuts (Cmd+Option+I / Cmd+U)
-    if (e.metaKey && e.altKey && e.key.toUpperCase() === "I") {
-      e.preventDefault();
-    }
-    if (e.metaKey && e.key.toUpperCase() === "U") {
-      e.preventDefault();
-    }
-  });
-</script>
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "F12") {
+                e.preventDefault();
+            }
+            if (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) {
+                e.preventDefault();
+            }
+            if (e.ctrlKey && ["U", "S"].includes(e.key.toUpperCase())) {
+                e.preventDefault();
+            }
+            if (e.metaKey && e.altKey && e.key.toUpperCase() === "I") {
+                e.preventDefault();
+            }
+            if (e.metaKey && e.key.toUpperCase() === "U") {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
