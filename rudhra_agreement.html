@@ -375,7 +375,7 @@
               <td>
                 <strong>Signature &amp; Company Seal of Second Party:</strong>
                 <div class="sig-box">
-                  <img id="second_party_signature" src="" alt="Company Seal" style="display: none;" crossorigin="anonymous" />
+                  <img id="second_party_signature" src="rudhra_seal.jpeg" alt="Company Seal" />
                 </div>
               </td>
             </tr>
@@ -398,9 +398,16 @@
     const STORAGE_BUCKET = 'rudhra-docs';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Optional fallback: if company_seal_url is empty on a booking row,
-    // set a default file path inside 'rudhra-docs' (e.g. 'company_seal.png') or a full public URL
-    const DEFAULT_COMPANY_SEAL_REF = '';
+    // Fixed local asset for Second Party signature/seal (never fetched from database)
+    const FIXED_SECOND_PARTY_SEAL = 'rudhra_seal.jpeg';
+
+    function ensureFixedSecondPartySeal() {
+      const sealImg = document.getElementById('second_party_signature');
+      if (sealImg) {
+        sealImg.src = FIXED_SECOND_PARTY_SEAL;
+        sealImg.style.display = 'block';
+      }
+    }
 
     // Normalize mobile number (digits only, strips leading 91 if 12 digits)
     function normalizeMobile(raw) {
@@ -493,9 +500,9 @@
         document.getElementById('table_first_party_state').textContent = data.state || '';
         document.getElementById('table_first_party_pincode').textContent = data.pincode || '';
 
-        // Populate Customer Sign & Company Seal from Supabase
+        // Populate Customer Sign from Supabase; keep Second Party seal fixed to rudhra_seal.jpeg
         setSignatureImage('first_party_signature', data.customer_sign_url || '');
-        setSignatureImage('second_party_signature', data.company_seal_url || DEFAULT_COMPANY_SEAL_REF);
+        ensureFixedSecondPartySeal();
 
         statusEl.textContent = `Loaded booking for ${data.full_name} (Consumer No: ${data.electricity_consumer_no || 'N/A'})`;
       } catch (err) {
@@ -504,8 +511,11 @@
       }
     }
 
+    ensureFixedSecondPartySeal();
+
     // 3. GENERATE AND DOWNLOAD PDF
     function downloadPDF() {
+      ensureFixedSecondPartySeal();
       const element = document.getElementById('agreement-document');
       const consumerName = document.getElementById('consumer_name').textContent.trim() || 'Consumer';
 
