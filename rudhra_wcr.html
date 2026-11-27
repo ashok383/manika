@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Annexure-IV: Work Completion Report (WCR) Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -25,14 +26,14 @@
       max-width: 210mm;
       margin: 0 auto 15px auto;
       background: #fff;
-      padding: 12px 20px;
+      padding: 14px 20px;
       border-radius: 6px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .toolbar h3 {
@@ -45,19 +46,81 @@
       color: #555;
     }
 
+    .lookup-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+
+    .lookup-bar label {
+      font-weight: bold;
+      font-size: 12.5px;
+      color: #0f172a;
+    }
+
+    .mobile-input {
+      width: 200px;
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      background: #fff;
+    }
+
+    .mobile-input:focus {
+      outline: none;
+      border-color: #0b5ed7;
+    }
+
+    .booking-select {
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 12.5px;
+      background: #fff;
+      display: none;
+    }
+
+    .db-status {
+      font-size: 12px;
+      font-weight: bold;
+      color: #0369a1;
+    }
+
     .btn-group {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     button {
-      padding: 8px 16px;
+      padding: 8px 14px;
       border: none;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12.5px;
       transition: background 0.2s;
+    }
+
+    .btn-fetch {
+      background-color: #0f172a;
+      color: #fff;
+    }
+
+    .btn-fetch:hover:not(:disabled) {
+      background-color: #1e293b;
+    }
+
+    .btn-fetch:disabled {
+      background-color: #94a3b8;
+      cursor: wait;
     }
 
     .btn-print {
@@ -176,7 +239,7 @@
       font-size: 12px;
       font-weight: bold;
       margin-top: 8px;
-      margin-bottom: 45px;
+      margin-bottom: 10px;
     }
 
     .signature-section {
@@ -184,12 +247,37 @@
       justify-content: space-between;
       align-items: flex-end;
       padding: 0 10px;
-      margin-top: 20px;
+      margin-top: 6px;
     }
 
     .sig-box {
       text-align: center;
-      width: 42%;
+      width: 44%;
+    }
+
+    .sig-img-wrap {
+      height: 62px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      margin-bottom: 4px;
+    }
+
+    .vendor-seal-img {
+      display: inline-block;
+      max-height: 58px;
+      max-width: 185px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .customer-sign-img {
+      max-height: 54px;
+      max-width: 175px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
 
     .sig-line {
@@ -229,7 +317,8 @@
         box-shadow: none !important;
       }
 
-      .section-row {
+      .section-row,
+      img {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -242,12 +331,27 @@
   <div class="toolbar">
     <div>
       <h3>WCR PDF Generator (Annexure-IV)</h3>
-      <p>Click any field inside the form below to edit details, then click Print / Save as PDF.</p>
+      <p>Enter customer's mobile number to fetch Applicant details from database, then click Print / Save as PDF.</p>
     </div>
     <div class="btn-group">
-      <button type="button" class="btn-clear" onclick="clearForm()">Clear Fields</button>
+      <button type="button" class="btn-clear" onclick="clearCustomerAndTechFields()">Clear Fields</button>
       <button type="button" class="btn-print" onclick="window.print()">Print / Save as PDF</button>
     </div>
+
+    <form class="lookup-bar" id="lookupForm">
+      <label for="mobileSearchInput">Customer Mobile No:</label>
+      <input
+        type="tel"
+        id="mobileSearchInput"
+        class="mobile-input"
+        maxlength="15"
+        placeholder="Enter 10-digit mobile no"
+        required
+      />
+      <button type="submit" class="btn-fetch" id="fetchBtn">Fetch Customer</button>
+      <select id="bookingMatchSelect" class="booking-select" onchange="applySelectedMatch(this.value)"></select>
+      <span id="dbStatus" class="db-status"></span>
+    </form>
   </div>
 
   <!-- A4 Printable Sheet -->
@@ -259,7 +363,7 @@
     </div>
 
     <table class="wcr-table" id="wcrTable">
-      <!-- SECTION A -->
+      <!-- SECTION A: Fetched from Customer Database -->
       <tr class="section-row">
         <td class="col-sn">A</td>
         <td colspan="2">Applicant/Consumer Details</td>
@@ -267,35 +371,35 @@
       <tr>
         <td class="col-sn">1</td>
         <td class="col-label">Net Meter Registration Number</td>
-        <td class="col-value"><input type="text" class="bold-input" value="SNM-180078009"></td>
+        <td class="col-value"><input type="text" id="net_meter_no" class="bold-input" placeholder="Enter Net Meter Reg. No."></td>
       </tr>
       <tr>
         <td class="col-sn">2</td>
         <td class="col-label">Application Reference Number/ Date</td>
-        <td class="col-value"><input type="text" value="NP-TSNPD26-14507495/22-08-2026"></td>
+        <td class="col-value"><input type="text" id="app_ref_date" placeholder="Enter Application Ref. No. / Date"></td>
       </tr>
       <tr>
         <td class="col-sn">3</td>
         <td class="col-label">Name of The Applicant</td>
-        <td class="col-value"><input type="text" class="bold-input" value="MUDAVATH SHANTHI"></td>
+        <td class="col-value"><input type="text" id="applicant_name" class="bold-input" placeholder="Fetched via mobile number"></td>
       </tr>
       <tr>
         <td class="col-sn">4</td>
         <td class="col-label">Service Number</td>
-        <td class="col-value"><input type="text" value="SC No. 14417-00394 USC No. 11151042"></td>
+        <td class="col-value"><input type="text" id="service_number" placeholder="Fetched via mobile number"></td>
       </tr>
       <tr>
         <td class="col-sn">5</td>
         <td class="col-label">Category</td>
-        <td class="col-value"><input type="text" value="Cat: 1(A) Domestic Ph:1"></td>
+        <td class="col-value"><input type="text" id="category" value="Cat: 1(A) Domestic Ph:1"></td>
       </tr>
       <tr>
         <td class="col-sn">6</td>
         <td class="col-label">Load in KW</td>
-        <td class="col-value"><input type="text" value="3 KW"></td>
+        <td class="col-value"><input type="text" id="load_kw" placeholder="Fetched via mobile number"></td>
       </tr>
 
-      <!-- SECTION B -->
+      <!-- SECTION B: Fixed Company / Vendor Details -->
       <tr class="section-row">
         <td class="col-sn">B</td>
         <td colspan="2">Vendor of the Rooftop Solar PV System</td>
@@ -303,42 +407,42 @@
       <tr>
         <td class="col-sn">1</td>
         <td class="col-label">Name of Vendor</td>
-        <td class="col-value"><input type="text" class="bold-input" value="Sri Rudhra Solar Solutions"></td>
+        <td class="col-value"><input type="text" class="bold-input vendor-fixed" value="Sri Rudhra Solar Solutions"></td>
       </tr>
       <tr>
         <td class="col-sn">2</td>
         <td class="col-label">Door No:</td>
-        <td class="col-value"><input type="text" value="1-7-28/12/1"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="1-7-28/12/1"></td>
       </tr>
       <tr>
         <td class="col-sn">3</td>
         <td class="col-label">Street</td>
-        <td class="col-value"><input type="text" value="Narsampeta Main Road Ramachandrapuram"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="Narsampeta Main Road Ramachandrapuram"></td>
       </tr>
       <tr>
         <td class="col-sn">4</td>
         <td class="col-label">City/Village</td>
-        <td class="col-value"><input type="text" value="Indiranagar Mahabubabad"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="Indiranagar Mahabubabad"></td>
       </tr>
       <tr>
         <td class="col-sn">5</td>
         <td class="col-label">State</td>
-        <td class="col-value"><input type="text" value="Telangana"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="Telangana"></td>
       </tr>
       <tr>
         <td class="col-sn">6</td>
         <td class="col-label">Pin Code</td>
-        <td class="col-value"><input type="text" value="506101"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="506101"></td>
       </tr>
       <tr>
         <td class="col-sn">7</td>
         <td class="col-label">Mobile</td>
-        <td class="col-value"><input type="text" value="9110328712, 6303182834"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="9110328712, 6303182834"></td>
       </tr>
       <tr>
         <td class="col-sn">8</td>
         <td class="col-label">Email ID</td>
-        <td class="col-value"><input type="text" value="Srirudhrasolarsolutions@gmail.com"></td>
+        <td class="col-value"><input type="text" class="vendor-fixed" value="Srirudhrasolarsolutions@gmail.com"></td>
       </tr>
 
       <!-- SECTION C -->
@@ -443,21 +547,158 @@ AS2609191A1780</textarea>
 
     <div class="signature-section">
       <div class="sig-box">
+        <div class="sig-img-wrap">
+          <img id="vendorSealImg" class="vendor-seal-img" src="rudhra_seal.jpeg" alt="Vendor Seal & Stamp">
+        </div>
         <div class="sig-line">Vendor Signature (With Stamp)</div>
       </div>
       <div class="sig-box">
+        <div class="sig-img-wrap">
+          <img id="customerSignImg" class="customer-sign-img" src="" alt="Eligible Consumer Signature" style="display:none;">
+        </div>
         <div class="sig-line">Eligible Consumer Signature</div>
       </div>
     </div>
   </div>
 
   <script>
-    function clearForm() {
-      if (confirm("Are you sure you want to clear all fields to create a blank form?")) {
-        const inputs = document.querySelectorAll('#wcrTable input, #wcrTable textarea');
+    const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+    const BOOKINGS_TABLE = 'rudhra_solar_bookings';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let matchedRecords = [];
+
+    function formatDateDDMMYYYY(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}-${mm}-${yyyy}`;
+    }
+
+    function populateCustomerFields(customer) {
+      const signImg = document.getElementById('customerSignImg');
+
+      if (!customer) {
+        document.getElementById('applicant_name').value = '';
+        document.getElementById('service_number').value = '';
+        document.getElementById('load_kw').value = '';
+        document.getElementById('app_ref_date').value = '';
+        signImg.style.display = 'none';
+        signImg.src = '';
+        return;
+      }
+
+      document.getElementById('applicant_name').value = (customer.full_name || '').toUpperCase();
+      document.getElementById('service_number').value = customer.electricity_consumer_no || '';
+      document.getElementById('load_kw').value = (customer.capacity || '').replace(/kw/i, ' KW');
+
+      const regDate = formatDateDDMMYYYY(customer.created_at);
+      document.getElementById('app_ref_date').value = regDate ? `/${regDate}` : '';
+
+      if (customer.customer_sign_url && !customer.customer_sign_url.toLowerCase().endsWith('.pdf')) {
+        signImg.src = customer.customer_sign_url;
+        signImg.style.display = 'inline-block';
+      } else {
+        signImg.style.display = 'none';
+        signImg.src = '';
+      }
+    }
+
+    function applySelectedMatch(id) {
+      const chosen = matchedRecords.find(r => String(r.id) === String(id));
+      populateCustomerFields(chosen);
+    }
+
+    document.getElementById('lookupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rawMobile = document.getElementById('mobileSearchInput').value.trim();
+      const digitsOnly = rawMobile.replace(/\D/g, '');
+      const statusEl = document.getElementById('dbStatus');
+      const fetchBtn = document.getElementById('fetchBtn');
+      const matchSelect = document.getElementById('bookingMatchSelect');
+
+      if (!digitsOnly) {
+        statusEl.style.color = '#dc2626';
+        statusEl.textContent = 'Enter a valid mobile number.';
+        return;
+      }
+
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Searching...';
+      statusEl.style.color = '#0369a1';
+      statusEl.textContent = 'Fetching customer details...';
+      matchSelect.style.display = 'none';
+
+      try {
+        const searchTerm = digitsOnly.length >= 10 ? digitsOnly.slice(-10) : digitsOnly;
+        const { data, error } = await supabaseClient
+          .from(BOOKINGS_TABLE)
+          .select('*')
+          .ilike('mobile_no', `%${searchTerm}%`)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        matchedRecords = data || [];
+
+        if (matchedRecords.length === 0) {
+          populateCustomerFields(null);
+          statusEl.style.color = '#dc2626';
+          statusEl.textContent = `No customer found for mobile number "${rawMobile}".`;
+          return;
+        }
+
+        if (matchedRecords.length > 1) {
+          matchSelect.innerHTML = matchedRecords.map(r => {
+            const dt = formatDateDDMMYYYY(r.created_at);
+            return `<option value="${r.id}">${r.full_name || 'Customer'} (${r.capacity || ''} - ${dt})</option>`;
+          }).join('');
+          matchSelect.style.display = 'inline-block';
+        }
+
+        populateCustomerFields(matchedRecords[0]);
+        statusEl.style.color = '#166534';
+        statusEl.textContent = `Loaded: ${matchedRecords[0].full_name || 'Customer'} (${matchedRecords[0].mobile_no || rawMobile})`;
+      } catch (err) {
+        statusEl.style.color = '#dc2626';
+        statusEl.textContent = 'Error: ' + err.message;
+      } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = 'Fetch Customer';
+      }
+    });
+
+    function clearCustomerAndTechFields() {
+      if (confirm('Clear customer and technical fields (keeping fixed company details & vendor seal)?')) {
+        document.getElementById('mobileSearchInput').value = '';
+        document.getElementById('bookingMatchSelect').style.display = 'none';
+        document.getElementById('dbStatus').textContent = '';
+        const inputs = document.querySelectorAll('#wcrTable input:not(.vendor-fixed), #wcrTable textarea');
         inputs.forEach(input => input.value = '');
+        const signImg = document.getElementById('customerSignImg');
+        signImg.style.display = 'none';
+        signImg.src = '';
       }
     }
   </script>
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
 </body>
 </html>
