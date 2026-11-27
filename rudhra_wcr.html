@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexure-IV: Work Completion Report (WCR) Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f0f2f5;
+      color: #000;
+      padding: 20px;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    /* Action Bar (Hidden when printing) */
+    .toolbar {
+      max-width: 210mm;
+      margin: 0 auto 15px auto;
+      background: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toolbar h3 {
+      font-size: 15px;
+      color: #1a365d;
+    }
+
+    .toolbar p {
+      font-size: 12px;
+      color: #555;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .btn-print {
+      background-color: #0b5ed7;
+      color: #fff;
+    }
+
+    .btn-print:hover {
+      background-color: #094db1;
+    }
+
+    .btn-clear {
+      background-color: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-clear:hover {
+      background-color: #cbd5e1;
+    }
+
+    /* A4 Sheet Container */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      padding: 12mm 14mm;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Document Header */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .doc-header h1 {
+      font-size: 15px;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .doc-header h2 {
+      font-size: 13.5px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .doc-header p {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* Main WCR Table */
+    table.wcr-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000;
+      margin-bottom: 10px;
+    }
+
+    table.wcr-table th,
+    table.wcr-table td {
+      border: 1px solid #000;
+      padding: 4px 7px;
+      vertical-align: middle;
+    }
+
+    .col-sn {
+      width: 6%;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .col-label {
+      width: 44%;
+    }
+
+    .col-value {
+      width: 50%;
+    }
+
+    .section-row {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+
+    /* Editable Inputs inside Table */
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12.5px;
+      color: #000;
+      padding: 1px 2px;
+      outline: none;
+      resize: none;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      background-color: #fffde7;
+      box-shadow: inset 0 0 0 1px #999;
+    }
+
+    .bold-input {
+      font-weight: bold;
+    }
+
+    /* Footer & Signatures */
+    .enclosures {
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 8px;
+      margin-bottom: 45px;
+    }
+
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 10px;
+      margin-top: 20px;
+    }
+
+    .sig-box {
+      text-align: center;
+      width: 42%;
+    }
+
+    .sig-line {
+      border-top: 1px solid #000;
+      padding-top: 5px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Print Styling for Exact PDF Output */
+    @page {
+      size: A4 portrait;
+      margin: 8mm;
+    }
+
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+
+      .toolbar {
+        display: none !important;
+      }
+
+      .a4-page {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      input[type="text"],
+      textarea {
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .section-row {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Interactive Control Bar -->
+  <div class="toolbar">
+    <div>
+      <h3>WCR PDF Generator (Annexure-IV)</h3>
+      <p>Click any field inside the form below to edit details, then click Print / Save as PDF.</p>
+    </div>
+    <div class="btn-group">
+      <button type="button" class="btn-clear" onclick="clearForm()">Clear Fields</button>
+      <button type="button" class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+  <!-- A4 Printable Sheet -->
+  <div class="a4-page">
+    <div class="doc-header">
+      <h1>ANNEXURE-IV</h1>
+      <h2>Work Completion Report for Synchronization of Rooftop Solar PV System</h2>
+      <p>(To be submitted by Eligible Consumer/Applicant)</p>
+    </div>
+
+    <table class="wcr-table" id="wcrTable">
+      <!-- SECTION A -->
+      <tr class="section-row">
+        <td class="col-sn">A</td>
+        <td colspan="2">Applicant/Consumer Details</td>
+      </tr>
+      <tr>
+        <td class="col-sn">1</td>
+        <td class="col-label">Net Meter Registration Number</td>
+        <td class="col-value"><input type="text" class="bold-input" value="SNM-180078009"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">2</td>
+        <td class="col-label">Application Reference Number/ Date</td>
+        <td class="col-value"><input type="text" value="NP-TSNPD26-14507495/22-08-2026"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">3</td>
+        <td class="col-label">Name of The Applicant</td>
+        <td class="col-value"><input type="text" class="bold-input" value="MUDAVATH SHANTHI"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">4</td>
+        <td class="col-label">Service Number</td>
+        <td class="col-value"><input type="text" value="SC No. 14417-00394 USC No. 11151042"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">5</td>
+        <td class="col-label">Category</td>
+        <td class="col-value"><input type="text" value="Cat: 1(A) Domestic Ph:1"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">6</td>
+        <td class="col-label">Load in KW</td>
+        <td class="col-value"><input type="text" value="3 KW"></td>
+      </tr>
+
+      <!-- SECTION B -->
+      <tr class="section-row">
+        <td class="col-sn">B</td>
+        <td colspan="2">Vendor of the Rooftop Solar PV System</td>
+      </tr>
+      <tr>
+        <td class="col-sn">1</td>
+        <td class="col-label">Name of Vendor</td>
+        <td class="col-value"><input type="text" class="bold-input" value="Sri Rudhra Solar Solutions"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">2</td>
+        <td class="col-label">Door No:</td>
+        <td class="col-value"><input type="text" value="1-7-28/12/1"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">3</td>
+        <td class="col-label">Street</td>
+        <td class="col-value"><input type="text" value="Narsampeta Main Road Ramachandrapuram"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">4</td>
+        <td class="col-label">City/Village</td>
+        <td class="col-value"><input type="text" value="Indiranagar Mahabubabad"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">5</td>
+        <td class="col-label">State</td>
+        <td class="col-value"><input type="text" value="Telangana"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">6</td>
+        <td class="col-label">Pin Code</td>
+        <td class="col-value"><input type="text" value="506101"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">7</td>
+        <td class="col-label">Mobile</td>
+        <td class="col-value"><input type="text" value="9110328712, 6303182834"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">8</td>
+        <td class="col-label">Email ID</td>
+        <td class="col-value"><input type="text" value="Srirudhrasolarsolutions@gmail.com"></td>
+      </tr>
+
+      <!-- SECTION C -->
+      <tr class="section-row">
+        <td class="col-sn">C</td>
+        <td colspan="2">Solar PV Module Details:</td>
+      </tr>
+      <tr>
+        <td class="col-sn">1</td>
+        <td class="col-label">Make:</td>
+        <td class="col-value"><input type="text" class="bold-input" value="Mundra Solar PV Limited"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">2</td>
+        <td class="col-label">Module Numbers</td>
+        <td class="col-value">
+          <textarea rows="3">AS2609191A0984 AS2609191A0973
+AS2609191A1731 AS2609191A1009
+AS2609191A1780</textarea>
+        </td>
+      </tr>
+      <tr>
+        <td class="col-sn">3</td>
+        <td class="col-label">Type of Module</td>
+        <td class="col-value"><input type="text" value="N-TOPCON"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">4</td>
+        <td class="col-label">Capacity of Each Module</td>
+        <td class="col-value"><input type="text" value="615 WP"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">5</td>
+        <td class="col-label">Number Of Modules</td>
+        <td class="col-value"><input type="text" value="05"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">6</td>
+        <td class="col-label">Total Capacity</td>
+        <td class="col-value"><input type="text" class="bold-input" value="3075 WP"></td>
+      </tr>
+
+      <!-- SECTION D -->
+      <tr class="section-row">
+        <td class="col-sn">D</td>
+        <td colspan="2">Grid Tie Inverter / Connecter</td>
+      </tr>
+      <tr>
+        <td class="col-sn">1</td>
+        <td class="col-label">Make</td>
+        <td class="col-value"><input type="text" class="bold-input" value="POLYCAB INDIA LIMITED"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">2</td>
+        <td class="col-label">Serial number</td>
+        <td class="col-value"><input type="text" value="3K6230926-2633-145504040P"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">3</td>
+        <td class="col-label">Capacity</td>
+        <td class="col-value"><input type="text" value="3.6 KW"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">4</td>
+        <td class="col-label">Input voltage</td>
+        <td class="col-value"><input type="text" value="550 VDC"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">5</td>
+        <td class="col-label">Output voltage</td>
+        <td class="col-value"><input type="text" value="240 VAC UPTO"></td>
+      </tr>
+      <tr>
+        <td class="col-sn">6</td>
+        <td class="col-label">If grid supply fails, no return supply to the grid (Yes or No)</td>
+        <td class="col-value"><input type="text" class="bold-input" value="YES"></td>
+      </tr>
+
+      <!-- SECTION E -->
+      <tr>
+        <td class="col-sn"><strong>E</strong></td>
+        <td class="col-label">
+          <strong>Details of protective system available</strong><br>
+          (Commission shall be done only on availability of the above)
+        </td>
+        <td class="col-value"><input type="text" class="bold-input" value="YES"></td>
+      </tr>
+
+      <!-- SECTION F -->
+      <tr>
+        <td class="col-sn"><strong>F</strong></td>
+        <td class="col-label">
+          <strong>CEIG Approval Ref Number</strong> (Rooftop Solar PV System having the capacity in excess of 75 kW)
+        </td>
+        <td class="col-value"><input type="text" value="N/A"></td>
+      </tr>
+    </table>
+
+    <div class="enclosures">
+      Encl:- Connected SPV generator Single line diagram, CEIG Approval copy
+    </div>
+
+    <div class="signature-section">
+      <div class="sig-box">
+        <div class="sig-line">Vendor Signature (With Stamp)</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-line">Eligible Consumer Signature</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function clearForm() {
+      if (confirm("Are you sure you want to clear all fields to create a blank form?")) {
+        const inputs = document.querySelectorAll('#wcrTable input, #wcrTable textarea');
+        inputs.forEach(input => input.value = '');
+      }
+    }
+  </script>
+</body>
+</html>
