@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PART B — Project Completion Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 14px;
+      background: #cbd5e1;
+      color: #000000;
+    }
+
+    /* Streamlined Toolbar: Mobile Number + Fetch + Save PDF Only */
+    .toolbar {
+      width: 210mm;
+      margin: 0 auto 12px;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toolbar input {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 13px;
+      width: 210px;
+      letter-spacing: 0.5px;
+    }
+
+    .toolbar button {
+      padding: 8px 14px;
+      border-radius: 4px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #ffffff;
+      background: #2563eb;
+    }
+
+    .toolbar button:hover {
+      background: #1d4ed8;
+    }
+
+    .toolbar button.pdf-btn {
+      background: #15803d;
+    }
+
+    .toolbar button.pdf-btn:hover {
+      background: #166534;
+    }
+
+    #statusMsg {
+      font-size: 12px;
+      color: #93c5fd;
+      margin-left: auto;
+    }
+
+    /* Exact Single A4 Page Container (210mm x 297mm) */
+    .pcr-sheet {
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 9mm 10mm;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid #000000;
+      overflow: hidden;
+    }
+
+    .doc-header {
+      text-align: center;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .doc-header h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #000000;
+    }
+
+    .doc-header p {
+      margin: 2px 0 0;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .sec-title {
+      background: #e2e8f0;
+      border: 1.8px solid #000000;
+      border-bottom: none;
+      padding: 4.5px 8px;
+      font-weight: 800;
+      font-size: 11.5px;
+      color: #000000;
+      letter-spacing: 0.2px;
+    }
+
+    table.pcr-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      table-layout: fixed;
+      border: 1.8px solid #000000;
+    }
+
+    table.pcr-grid td,
+    table.pcr-grid th {
+      border: 1.5px solid #000000;
+      padding: 5px 7px;
+      vertical-align: top;
+      font-size: 11px;
+      line-height: 1.3;
+      word-wrap: break-word;
+    }
+
+    .lbl {
+      font-weight: 700;
+      color: #000000;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 10.5px;
+    }
+
+    .sub-hint {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .val-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #000000;
+      padding: 1px 0;
+      outline: none;
+    }
+
+    .val-input:focus {
+      background: #eff6ff;
+    }
+
+    textarea.val-input {
+      resize: none;
+      min-height: 38px;
+      line-height: 1.3;
+    }
+
+    .chk-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1.8px solid #000000;
+      padding: 6px 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .chk-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #000000;
+    }
+
+    .chk-item input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: #000000;
+    }
+
+    .cert-box {
+      border: 1.8px solid #000000;
+      padding: 7px 9px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      line-height: 1.38;
+      color: #000000;
+    }
+
+    .cert-box .cert-heading {
+      text-align: center;
+      font-weight: 800;
+      text-decoration: underline;
+      margin-bottom: 5px;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+    }
+
+    .cert-box p {
+      margin: 0 0 4px;
+    }
+
+    .sync-line {
+      display: inline-block;
+      width: 125px;
+      border: none;
+      border-bottom: 1.5px solid #000000;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #000000;
+      background: transparent;
+      outline: none;
+      padding: 0 4px;
+    }
+
+    .sig-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border: 1.8px solid #000000;
+    }
+
+    .sig-grid td {
+      border: 1.5px solid #000000;
+      height: 100px;
+      padding: 5px;
+      text-align: center;
+      vertical-align: bottom;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .seal-img {
+      height: 66px;
+      max-width: 94%;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 3px;
+    }
+
+    .sig-caption {
+      display: block;
+      border-top: 1.2px solid #000000;
+      padding-top: 3px;
+      width: 100%;
+    }
+
+    /* Strict Single-Page A4 Print Rules */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+      }
+
+      .toolbar {
+        display: none !important;
+      }
+
+      .pcr-sheet {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 9mm 10mm !important;
+        box-shadow: none !important;
+        border: 2px solid #000000 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+
+      .val-input:focus {
+        background: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <input
+      id="searchMobile"
+      type="tel"
+      maxlength="15"
+      placeholder="Enter Mobile Number"
+      onkeydown="if(event.key==='Enter') fetchByMobileOnly()"
+    />
+    <button onclick="fetchByMobileOnly()">Fetch Details</button>
+    <button class="pdf-btn" onclick="generateSinglePagePDF()">Generate A4 PDF</button>
+    <div id="statusMsg">Enter customer mobile number to load report.</div>
+  </div>
+
+  <div class="pcr-sheet" id="pcrSheet">
+    <div>
+      <div class="doc-header">
+        <h1>PART B</h1>
+        <p>(Project Completion Report for Grid-Connected Rooftop) Installation Details</p>
+      </div>
+
+      <div class="sec-title">1. Consumer &amp; Installation Site Details</div>
+      <table class="pcr-grid">
+        <colgroup>
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+        </colgroup>
+        <tr>
+          <td>
+            <span class="lbl">Category of the customer:</span>
+            <input id="f_category" class="val-input" type="text" value="Residential" />
+          </td>
+          <td>
+            <span class="lbl">Sub Category of Customer:</span>
+            <input id="f_sub_category" class="val-input" type="text" value="Individual" />
+          </td>
+          <td colspan="2">
+            <span class="lbl">Name of the plant owner:</span>
+            <input id="f_owner_name" class="val-input" type="text" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="lbl">Mobile:</span>
+            <input id="f_mobile" class="val-input" type="text" />
+          </td>
+          <td>
+            <span class="lbl">Email:</span>
+            <input id="f_email" class="val-input" type="text" />
+          </td>
+          <td colspan="2" rowspan="2">
+            <span class="lbl">Address of Installation:</span>
+            <textarea id="f_address" class="val-input" rows="3"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="lbl">District of Installation:</span>
+            <input id="f_district" class="val-input" type="text" />
+          </td>
+          <td>
+            <span class="lbl">State of Installation:</span>
+            <input id="f_state" class="val-input" type="text" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="lbl">PIN Code of Installation:</span>
+            <input id="f_pincode" class="val-input" type="text" />
+          </td>
+          <td colspan="3">
+            <span class="lbl">Consumer Service / USC No.:</span>
+            <input id="f_usc_no" class="val-input" type="text" />
+          </td>
+        </tr>
+      </table>
+
+      <div class="sec-title">2. Solar PV System Technical &amp; Financial Details</div>
+      <table class="pcr-grid">
+        <colgroup>
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+          <col style="width: 25%;" />
+        </colgroup>
+        <tr>
+          <td colspan="2">
+            <span class="lbl">Project Model: <span class="sub-hint">(CAPEX/RESCO)</span></span>
+            <input id="f_project_model" class="val-input" type="text" value="CAPEX" />
+          </td>
+          <td colspan="2">
+            <span class="lbl">Total Cost of Installation: <span class="sub-hint">(In Rs.)</span></span>
+            <input id="f_total_cost" class="val-input" type="text" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <span class="lbl">Date of Commissioning: <span class="sub-hint">(DD-MM-YYYY)</span></span>
+            <input id="f_commissioning_date" class="val-input" type="text" />
+          </td>
+          <td colspan="2">
+            <span class="lbl">Whether installation is: <span class="sub-hint">(Rooftop only / Rooftop + ground)</span></span>
+            <input id="f_install_type" class="val-input" type="text" value="Rooftop only" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <span class="lbl">Plant Capacity (kWp): <span class="sub-hint">(Rooftop only)</span></span>
+            <input id="f_rooftop_kwp" class="val-input" type="text" />
+          </td>
+          <td colspan="2">
+            <span class="lbl">Plant Capacity (kWp): <span class="sub-hint">(Ground only)</span></span>
+            <input id="f_ground_kwp" class="val-input" type="text" value="0" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <span class="lbl">Total Plant Capacity (kWp):</span>
+            <input id="f_total_kwp" class="val-input" type="text" />
+          </td>
+        </tr>
+      </table>
+
+      <div class="sec-title">3. Installed Project Latitude-Longitude Info</div>
+      <table class="pcr-grid">
+        <colgroup>
+          <col style="width: 50%;" />
+          <col style="width: 50%;" />
+        </colgroup>
+        <tr>
+          <td>
+            <span class="lbl">Latitude:</span>
+            <input id="f_latitude" class="val-input" type="text" />
+          </td>
+          <td>
+            <span class="lbl">Longitude:</span>
+            <input id="f_longitude" class="val-input" type="text" />
+          </td>
+        </tr>
+      </table>
+
+      <div class="sec-title">4. Upload Documents Checklist</div>
+      <div class="chk-row">
+        <label class="chk-item">
+          <input id="chk_photo" type="checkbox" />
+          <span><strong>1) Photo of Installed Plant</strong> <span class="sub-hint">(File Format accepts only: JPG, JPEG, PNG and Maximum Size: 2MB)</span></span>
+        </label>
+        <label class="chk-item">
+          <input id="chk_bill" type="checkbox" />
+          <span><strong>2) Electricity DISCOM Bill</strong> <span class="sub-hint">(File Format accepts only: PDF and Maximum Size: 1MB)</span></span>
+        </label>
+      </div>
+
+      <div class="cert-box">
+        <div class="cert-heading">CERTIFICATE</div>
+        <p>It is certified that there is no return voltage from the inverter to the meter when incoming grid supply is switched off.</p>
+        <p>It is further certified that the protective equipment is installed and functioning as prescribed.</p>
+        <p>
+          The above Solar Rooftop PV system was synchronized as per DISCOM guidelines and the performance of the above plant is satisfactory. The date of synchronization of the plant is
+          <input id="f_sync_date" class="sync-line" type="text" placeholder="DD-MM-YYYY" />.
+        </p>
+      </div>
+    </div>
+
+    <table class="sig-grid">
+      <colgroup>
+        <col style="width: 25%;" />
+        <col style="width: 25%;" />
+        <col style="width: 25%;" />
+        <col style="width: 25%;" />
+      </colgroup>
+      <tr>
+        <td>
+          <img
+            id="vendorSealImg"
+            class="seal-img"
+            src="rudhra_seal.jpeg"
+            alt="Rudhra Solar Seal"
+            onerror="fallbackBucketSeal(this)"
+          />
+          <span class="sig-caption">Vendor Signature (With stamp)</span>
+        </td>
+        <td>
+          <img
+            id="customerSignImg"
+            class="seal-img"
+            src=""
+            alt="Customer Signature"
+            style="display: none;"
+          />
+          <span class="sig-caption">Eligible Consumer (Signature)</span>
+        </td>
+        <td>
+          <span class="sig-caption">ADE / M&amp;P (Signature &amp; Seal)</span>
+        </td>
+        <td>
+          <span class="sig-caption">ADE/OP (Signature &amp; Seal)</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+
+    const TABLE_NAME = 'rudhra_solar_bookings';
+    const BUCKET_NAME = 'rudhra-docs';
+    const FIXED_SEAL_FILE = 'rudhra_seal.jpeg';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function fallbackBucketSeal(imgEl) {
+      imgEl.onerror = null;
+      const { data } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(FIXED_SEAL_FILE);
+      if (data?.publicUrl) {
+        imgEl.src = data.publicUrl;
+      }
+    }
+
+    function buildAddress(row) {
+      const parts = [
+        row.house_no ? `H.No: ${row.house_no}` : '',
+        row.village,
+        row.mandal ? `${row.mandal} (M)` : '',
+        row.district,
+        row.state,
+        row.pincode ? `PIN: ${row.pincode}` : ''
+      ];
+      return parts
+        .filter(v => v !== undefined && v !== null && String(v).trim() !== '')
+        .join(', ');
+    }
+
+    function cleanCapacity(capStr) {
+      if (!capStr) return '';
+      // Extracts numeric kWp if stored like "3 kW" or "3kWp", otherwise keeps original text
+      const match = String(capStr).match(/[\d.]+/);
+      return match ? match[0] : String(capStr).trim();
+    }
+
+    async function fetchByMobileOnly() {
+      const statusEl = document.getElementById('statusMsg');
+      const mobile = document.getElementById('searchMobile').value.replace(/\D/g, '').trim();
+      document.getElementById('searchMobile').value = mobile;
+
+      if (!mobile) {
+        statusEl.textContent = 'Please enter a mobile number.';
+        return;
+      }
+
+      statusEl.textContent = `Fetching details for ${mobile}...`;
+
+      // Matches last 10 digits against your exact column name: mobile_no
+      const lastTen = mobile.slice(-10);
+      const { data, error } = await supabaseClient
+        .from(TABLE_NAME)
+        .select('*')
+        .ilike('mobile_no', `%${lastTen}%`)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        statusEl.textContent = `No record found for ${mobile}.`;
+        return;
+      }
+
+      const row = data[0];
+      const ownerName = (row.full_name || '').trim();
+      const capValue = cleanCapacity(row.capacity);
+
+      // Populate Section 1: Consumer & Installation Site Details
+      document.getElementById('f_owner_name').value = ownerName;
+      document.getElementById('f_mobile').value = row.mobile_no || mobile;
+      document.getElementById('f_email').value = row.email_id || '';
+      document.getElementById('f_address').value = buildAddress(row);
+      document.getElementById('f_district').value = row.district || '';
+      document.getElementById('f_state').value = row.state || '';
+      document.getElementById('f_pincode').value = row.pincode || '';
+      document.getElementById('f_usc_no').value = row.electricity_consumer_no || '';
+
+      // Populate Section 2: Solar PV System Capacity
+      document.getElementById('f_rooftop_kwp').value = capValue;
+      document.getElementById('f_total_kwp').value = capValue;
+
+      // Auto-check Photo checklist if site_photo_url exists in DB
+      document.getElementById('chk_photo').checked = Boolean(row.site_photo_url);
+
+      // Load Eligible Consumer Signature if customer_sign_url exists in DB
+      const custSignImg = document.getElementById('customerSignImg');
+      if (row.customer_sign_url && String(row.customer_sign_url).trim() !== '') {
+        let signUrl = String(row.customer_sign_url).trim();
+        if (!signUrl.startsWith('http')) {
+          const { data: pub } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(signUrl);
+          signUrl = pub?.publicUrl || '';
+        }
+        if (signUrl) {
+          custSignImg.src = signUrl;
+          custSignImg.style.display = 'block';
+        } else {
+          custSignImg.style.display = 'none';
+        }
+      } else {
+        custSignImg.style.display = 'none';
+      }
+
+      document.title = `Part_B_${ownerName || mobile}`.replace(/\s+/g, '_');
+      statusEl.textContent = `Loaded: ${ownerName || mobile} (${row.status || 'Pending'})`;
+    }
+
+    function generateSinglePagePDF() {
+      window.print();
+    }
+  </script>
+  <script>
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Disable common DevTools & View Source keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === 'U') ||
+        (e.metaKey && e.altKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))
+      ) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
