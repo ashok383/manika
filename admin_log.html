@@ -40,7 +40,6 @@
     overflow: hidden;
   }
 
-  /* Light mode toggle option if ever switched off */
   body.day-mode {
     --bg: #eef2ff;
     --card: #ffffff;
@@ -167,21 +166,60 @@
     overflow: hidden;
   }
 
-  /* Fixed Top Bar */
+  /* Clean Fixed Top Bar */
   .topbar {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 60;
     flex: 0 0 auto;
     width: 100%;
+    height: 52px;
     background: var(--card);
     border-bottom: 2px solid var(--border);
-    padding: 8px 14px;
+    padding: 0 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .left-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  /* 3-Dot Menu Trigger Button */
+  .dots-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    border: 1.5px solid var(--border-bright);
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #38bdf8;
+    font-size: 20px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+
+  body.day-mode .dots-btn {
+    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+    color: #1d4ed8;
+  }
+
+  .dots-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+  }
+
+  .dots-btn:active {
+    transform: scale(0.95);
   }
 
   .brand {
@@ -194,41 +232,87 @@
   }
 
   .brand-mini-logo {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
     border: 1.5px solid var(--border-bright);
   }
 
-  .nav-group {
+  /* Dropdown Drawer from Left 3-Dot Button */
+  .menu-drawer {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 245px;
+    background: var(--card);
+    border: 2px solid var(--border-bright);
+    border-radius: 16px;
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 7px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.78), 0 0 20px rgba(56, 189, 248, 0.25);
+    z-index: 80;
+    transform-origin: top left;
+  }
+
+  .menu-drawer.open {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
+    animation: dropPop 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes dropPop {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .menu-section-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 2px 6px;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 3px 0;
   }
 
   .pill-btn {
-    border: 1.5px solid rgba(255, 255, 255, 0.22);
-    border-radius: 10px;
-    padding: 7px 12px;
-    min-height: 36px;
+    width: 100%;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 11px;
+    padding: 9px 12px;
+    min-height: 38px;
     color: #ffffff;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     white-space: nowrap;
     cursor: pointer;
     transition: transform 0.14s ease, filter 0.14s ease, border-color 0.14s ease;
   }
 
   .pill-btn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.08);
+    transform: translateX(3px);
+    filter: brightness(1.1);
     border-color: #ffffff;
   }
 
   .pill-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
 
   .btn-home { background: var(--grad-home); }
@@ -241,35 +325,32 @@
 
   .pill-btn.active {
     border-color: #fde047;
-    box-shadow: 0 0 0 2px rgba(253, 224, 71, 0.35);
+    box-shadow: 0 0 0 2px rgba(253, 224, 71, 0.4);
   }
 
-  .status-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
+  /* Timer Badge Only on Top Right */
   .timer-badge {
     background: #000000;
     border: 1.5px solid #fde047;
     color: #fde047;
-    padding: 6px 12px;
+    padding: 6px 13px;
     min-height: 34px;
     display: inline-flex;
     align-items: center;
+    gap: 5px;
     border-radius: 999px;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 800;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 12px rgba(253, 224, 71, 0.18);
   }
 
   .timer-badge.danger {
     background: #2a0608;
     border-color: #f87171;
     color: #fca5a5;
+    box-shadow: 0 0 14px rgba(248, 113, 113, 0.35);
   }
 
   /* Perfectly Fitting Workspace */
@@ -278,7 +359,7 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    padding: 8px 10px 10px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -292,7 +373,7 @@
     background: var(--card);
     border: 2px solid var(--border);
     border-radius: 16px;
-    padding: 10px 12px 12px;
+    padding: 8px 10px 10px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -303,21 +384,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     margin-bottom: 8px;
     border-bottom: 1.5px solid var(--border);
   }
 
   .stage-title {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   /* Auto-Slide Animation */
   @keyframes slideIn {
     from {
       opacity: 0;
-      transform: translateX(22px);
+      transform: translateX(24px);
     }
     to {
       opacity: 1;
@@ -397,7 +481,7 @@
     color: var(--muted);
     font-size: 13.5px;
     max-width: 560px;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   /* Full-Fit Frame Container */
@@ -427,53 +511,20 @@
     display: block;
   }
 
-  /* Mobile Responsive Breakpoints */
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
     .topbar {
-      padding: 6px 8px;
-      gap: 6px;
+      padding: 0 10px;
+      height: 48px;
     }
 
     .brand {
-      width: 100%;
-      justify-content: space-between;
-      font-size: 14px;
-    }
-
-    .nav-group {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 4px;
-    }
-
-    .nav-group .pill-btn {
-      padding: 6px 4px;
-      font-size: 11px;
-      min-height: 32px;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .status-right {
-      width: 100%;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .status-right .pill-btn {
-      flex: 1 1 auto;
-      text-align: center;
-      min-height: 32px;
-      padding: 5px 8px;
-      font-size: 11.5px;
+      font-size: 13.5px;
     }
 
     .timer-badge {
-      min-height: 32px;
       padding: 4px 10px;
-      font-size: 11.5px;
+      font-size: 12px;
+      min-height: 30px;
     }
 
     .stage-workspace {
@@ -481,49 +532,13 @@
     }
 
     .stage-card {
-      padding: 8px;
+      padding: 6px 8px 8px;
       border-radius: 12px;
-    }
-
-    .stage-header {
-      padding-bottom: 6px;
-      margin-bottom: 6px;
-    }
-
-    .home-welcome h2 {
-      font-size: 18px;
-    }
-
-    .home-welcome p {
-      font-size: 12.5px;
-    }
-
-    .logo-tile {
-      padding: 10px 12px;
     }
 
     .logo-tile img {
       width: 68px;
       height: 68px;
-    }
-  }
-
-  @media (max-width: 420px) {
-    .nav-group {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .nav-group .pill-btn:first-child {
-      grid-column: span 3;
-    }
-
-    .auth-card {
-      padding: 20px 16px;
-    }
-
-    .auth-logos img {
-      width: 54px;
-      height: 54px;
     }
   }
 </style>
@@ -548,32 +563,51 @@
   <!-- FULL-SCREEN DASHBOARD -->
   <div class="dashboard-app" id="dashboardApp">
     <header class="topbar">
-      <div class="brand">
-        <span style="display:flex;align-items:center;gap:8px;">
+      <div class="left-controls">
+        <button type="button" class="dots-btn" id="dotsMenuBtn" aria-label="Open Navigation Menu" title="Menu">⋮</button>
+        <div class="brand">
           <img src="rudhra_logo.jpeg" alt="Rudhra Logo" class="brand-mini-logo" />
-          <span>🌙 Admin Dashboard</span>
-        </span>
+          <span>🛡️ Rudhra Portal</span>
+        </div>
+
+        <!-- 3-DOT DROPDOWN MENU -->
+        <nav class="menu-drawer" id="menuDrawer" aria-label="Dashboard Modules">
+          <div class="menu-section-label">📂 Services & Pages</div>
+          <button type="button" class="pill-btn btn-home active" id="btnHome" onclick="showHome()">
+            <span>🏠 Home Dashboard</span><span>✨</span>
+          </button>
+          <button type="button" class="pill-btn btn-pan" data-file="e_pan.html" onclick="openModule('e_pan.html', '🪪 e_pan Service', this)">
+            <span>🪪 e_pan</span><span>➡️</span>
+          </button>
+          <button type="button" class="pill-btn btn-cast" data-file="e_cast.html" onclick="openModule('e_cast.html', '📜 e_cast Certificate', this)">
+            <span>📜 e_cast</span><span>➡️</span>
+          </button>
+          <button type="button" class="pill-btn btn-income" data-file="CAST_INCO_RESI.html" onclick="openModule('CAST_INCO_RESI.html', '💼 e_income Certificate', this)">
+            <span>💼 e_income</span><span>➡️</span>
+          </button>
+          <button type="button" class="pill-btn btn-res" data-file="e_residence.html" onclick="openModule('e_residence.html', '🏡 e_residence Certificate', this)">
+            <span>🏡 e_residence</span><span>➡️</span>
+          </button>
+
+          <div class="menu-divider"></div>
+          <div class="menu-section-label">⚙️ Controls</div>
+          <button type="button" class="pill-btn btn-night" id="nightModeBtn" onclick="toggleNightMode()">
+            <span>🌑 Night Mode: ON</span><span>🌓</span>
+          </button>
+          <button type="button" class="pill-btn btn-logout" onclick="logoutToPassword('🚪 Logged out! Enter admin authentication.')">
+            <span>🚪 Logout</span><span>🔒</span>
+          </button>
+        </nav>
       </div>
 
-      <div class="nav-group">
-        <button type="button" class="pill-btn btn-home active" id="btnHome" onclick="showHome()">🏠 Home</button>
-        <button type="button" class="pill-btn btn-pan" data-file="e_pan.html" onclick="openModule('e_pan.html', '🪪 e_pan', this)">🪪 e_pan</button>
-        <button type="button" class="pill-btn btn-cast" data-file="e_cast.html" onclick="openModule('e_cast.html', '📜 e_cast', this)">📜 e_cast</button>
-        <button type="button" class="pill-btn btn-income" data-file="e_income.html" onclick="openModule('CAST_INCO_RESI.html', '💼 e_income', this)">💼 e_income</button>
-        <button type="button" class="pill-btn btn-res" data-file="e_residence.html" onclick="openModule('e_residence.html', '🏠 e_residence', this)">🏠 e_residence</button>
-      </div>
-
-      <div class="status-right">
-        <button type="button" class="pill-btn btn-night" id="nightModeBtn" onclick="toggleNightMode()">🌑 Night: ON</button>
-        <div class="timer-badge" id="sessionTimer">⏱️ 05:00</div>
-        <button type="button" class="pill-btn btn-logout" onclick="logoutToPassword('🚪 Logged out! Enter admin authentication.')">🚪 Logout</button>
-      </div>
+      <!-- ONLY TIMER ON TOP -->
+      <div class="timer-badge" id="sessionTimer">⌛ 05:00</div>
     </header>
 
     <main class="stage-workspace">
       <section class="stage-card">
         <div class="stage-header">
-          <div class="stage-title" id="stageTitle">🏠 Home • 🌑 Night Mode</div>
+          <div class="stage-title" id="stageTitle">🏠 Home Dashboard • 🌑 Night Mode</div>
         </div>
 
         <div class="home-welcome show slide-animate" id="homeWelcome">
@@ -588,7 +622,7 @@
             </div>
           </div>
           <h2>🌌 Rudhra Admin Night Dashboard</h2>
-          <p>📂 Open <strong>🪪 e_pan</strong>, <strong>📜 e_cast</strong>, <strong>💼 e_income</strong>, or <strong>🏠 e_residence</strong> from the top bar. ⏳ Auto-logs out after inactivity.</p>
+          <p>Tap the <strong>⋮</strong> button on the top-left to open <strong>🪪 e_pan</strong>, <strong>📜 e_cast</strong>, <strong>💼 e_income</strong>, or <strong>🏡 e_residence</strong>. ⌛ Auto-locks on inactivity.</p>
         </div>
 
         <div class="frame-wrap hidden" id="frameWrap">
@@ -609,11 +643,31 @@
     let remainingSec = SESSION_SECONDS;
     let timerInterval = null;
 
+    const dotsMenuBtn = document.getElementById('dotsMenuBtn');
+    const menuDrawer = document.getElementById('menuDrawer');
+
+    function toggleMenu(forceState) {
+      const shouldOpen = typeof forceState === 'boolean' ? forceState : !menuDrawer.classList.contains('open');
+      menuDrawer.classList.toggle('open', shouldOpen);
+    }
+
+    dotsMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+      resetTimer();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menuDrawer.contains(e.target) && e.target !== dotsMenuBtn) {
+        toggleMenu(false);
+      }
+    });
+
     function formatTimer(sec) {
       const total = Math.max(0, Number(sec) || 0);
       const m = Math.floor(total / 60);
       const s = total % 60;
-      return `⏱️ ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      return `⌛ ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function updateTimerBadge() {
@@ -624,7 +678,7 @@
 
     function triggerSlide(el) {
       el.classList.remove('slide-animate');
-      void el.offsetWidth; // Force reflow to restart animation
+      void el.offsetWidth;
       el.classList.add('slide-animate');
     }
 
@@ -632,7 +686,10 @@
       isNightMode = !isNightMode;
       document.body.classList.toggle('day-mode', !isNightMode);
       const btn = document.getElementById('nightModeBtn');
-      btn.textContent = isNightMode ? '🌑 Night: ON' : '☀️ Night: OFF';
+      btn.innerHTML = isNightMode
+        ? '<span>🌑 Night Mode: ON</span><span>🌓</span>'
+        : '<span>☀️ Day Mode: ON</span><span>🔆</span>';
+      toggleMenu(false);
       resetTimer();
     }
 
@@ -645,6 +702,7 @@
 
     function logoutToPassword(message = '⌛ Session timed out! Enter admin password.') {
       clearTimer();
+      toggleMenu(false);
       isAuthenticated = false;
       remainingSec = SESSION_SECONDS;
       updateTimerBadge();
@@ -655,7 +713,7 @@
       homeEl.classList.add('show');
       triggerSlide(homeEl);
 
-      document.getElementById('stageTitle').textContent = '🏠 Home';
+      document.getElementById('stageTitle').textContent = '🏠 Home Dashboard';
       document.querySelectorAll('.pill-btn').forEach((b) => b.classList.remove('active'));
       document.getElementById('btnHome').classList.add('active');
 
@@ -707,10 +765,11 @@
 
     function showHome() {
       if (!isAuthenticated) return;
+      toggleMenu(false);
       resetTimer();
       document.querySelectorAll('.pill-btn').forEach((b) => b.classList.remove('active'));
       document.getElementById('btnHome').classList.add('active');
-      document.getElementById('stageTitle').textContent = '🏠 Home';
+      document.getElementById('stageTitle').textContent = '🏠 Home Dashboard';
       document.getElementById('frameWrap').classList.add('hidden');
       document.getElementById('insideFrame').src = 'about:blank';
 
@@ -721,6 +780,7 @@
 
     function openModule(fileName, label, btnEl) {
       if (!isAuthenticated) return;
+      toggleMenu(false);
       resetTimer();
       document.querySelectorAll('.pill-btn').forEach((b) => b.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
